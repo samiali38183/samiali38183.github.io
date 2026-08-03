@@ -627,12 +627,27 @@ figure.shot figcaption .mono{
 .dot--ok{ color:var(--success); }
 .dot--wip{ color:var(--warn); }
 .cert-list{ list-style:none; margin:0; padding:0; }
-.cert-list li{ padding:12px 0; border-bottom:1px dashed var(--rule); }
+.cert-list li{ border-bottom:1px dashed var(--rule); }
 .cert-list li:last-child{ border-bottom:0; }
 .cert-name{ color:var(--ink); font-weight:500; font-size:15px; }
 .cert-meta{
   color:var(--muted); font-size:12px; margin-top:3px;
   font-family:var(--f-mono); letter-spacing:.04em;
+}
+.cert-link{
+  display:block; padding:12px 6px; margin:0 -6px; border-radius:8px;
+  color:inherit; text-decoration:none;
+  transition:background .15s ease, transform .15s ease;
+}
+.cert-link:hover{
+  background:color-mix(in oklab, var(--accent) 8%, transparent);
+  transform:translateX(2px);
+}
+.cert-link:hover .cert-name{ color:var(--accent); }
+.cert-link:hover .cert-dl{ transform:translateY(2px); }
+.cert-dl{
+  color:var(--accent); font-weight:600; margin-left:6px;
+  display:inline-block; transition:transform .2s ease;
 }
 
 /* =========================================================
