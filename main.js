@@ -129,6 +129,45 @@
     toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
   }
 
+  // ---- Force download on PDF links (browsers preview PDFs otherwise) ----
+  $$('a[download]').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    if (!/\.pdf($|\?)/i.test(href)) return;
+    a.addEventListener('click', async (e) => {
+      try {
+        e.preventDefault();
+        const filename = href.split('/').pop().split('?')[0];
+        const res = await fetch(href, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('fetch failed');
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const tmp = document.createElement('a');
+        tmp.href = url; tmp.download = filename;
+        document.body.appendChild(tmp); tmp.click(); tmp.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (err) {
+        // fallback: let the browser handle it
+        window.location.href = href;
+      }
+    });
+  });
+
+  // ---- Contact form → mailto: link (avoids browser "not secure" warning) ----
+  const contactForm = $('#contactForm');
+  if (contactForm){
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(contactForm);
+      const name    = (data.get('name')    || '').toString().trim();
+      const email   = (data.get('email')   || '').toString().trim();
+      const subject = (data.get('subject') || '').toString().trim();
+      const message = (data.get('message') || '').toString().trim();
+      const subj = subject ? `Portfolio contact — ${subject}` : 'Portfolio contact';
+      const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+      window.location.href = `mailto:samiali38183@gmail.com?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+    });
+  }
+
   // ---- Projects filter ----
   const filterBtns = $$('.filter__btn');
   const cards = $$('#proj-grid .card');

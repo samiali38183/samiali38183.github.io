@@ -75,10 +75,10 @@
           </div>
         </div>
 
-        <form class="form" action="mailto:samiali38183@gmail.com" method="post" enctype="text/plain" aria-label="Contact form">
-          <label>Your name<input type="text" name="name" required></label>
-          <label>Your email<input type="email" name="email" required></label>
-          <label>Company / Role<input type="text" name="subject"></label>
+        <form class="form" id="contactForm" aria-label="Contact form" autocomplete="on">
+          <label>Your name<input type="text" name="name" autocomplete="name" required></label>
+          <label>Your email<input type="email" name="email" autocomplete="email" required></label>
+          <label>Company / Role<input type="text" name="subject" autocomplete="organization"></label>
           <label>Message<textarea name="message" required></textarea></label>
           <button type="submit" class="btn btn--primary" style="width:100%; justify-content:center;">
             Send Message
