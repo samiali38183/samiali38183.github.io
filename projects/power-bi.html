@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KEV Analytics Dashboard — Sami Ali</title>
+<meta name="description" content="Multi-page Power BI dashboard integrating CVSS, EPSS, and KEV status across enterprise scan data. Sanitized case study." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.85em' font-size='90' font-family='monospace' fill='%231E88E5'%3ES%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=IBM+Plex+Mono:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+
+<aside class="sidebar" id="sidebar" aria-label="Primary">
+  <div class="sidebar__brand"><span class="sidebar__name">Sami Ali</span></div>
+  <nav class="sidebar__nav">
+    <a href="../" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg> Home</a>
+    <a href="../about.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg> About</a>
+    <a href="../services.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h6v6H3zM15 4h6v6h-6zM3 14h6v6H3zM15 14h6v6h-6z"/></svg> Services</a>
+    <a href="../projects.html" class="sidebar__link is-active"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3z"/><path d="M8 7V4h8v3"/></svg> Projects</a>
+    <a href="../resume.pdf" class="sidebar__link" download><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></svg> Resume</a>
+    <a href="../contact.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Contact</a>
+  </nav>
+  <div class="sidebar__foot">
+    <a class="icon-btn" href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg></a>
+    <a class="icon-btn" href="https://github.com/samiali38183" aria-label="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg></a>
+    <a class="icon-btn" href="mailto:samiali38183@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
+  </div>
+</aside>
+
+<div class="utility">
+  <button class="util-btn" id="themeToggle" aria-label="Toggle light/dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  <button class="util-btn" id="paletteToggle" aria-label="Theme color"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.5-1-.3-.3-.5-.6-.5-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.7-4.5-8.5-10-8.5z"/></svg></button>
+  <div class="color-picker" id="colorPicker">
+    <span class="color-picker__label">Theme</span>
+    <span class="swatch is-active" data-color="blue"></span>
+    <span class="swatch" data-color="teal"></span>
+    <span class="swatch" data-color="violet"></span>
+    <span class="swatch" data-color="rose"></span>
+    <span class="swatch" data-color="amber"></span>
+  </div>
+</div>
+
+<main id="main">
+  <div class="wrap">
+    <div class="crumb"><a href="../">Home</a> / <a href="../projects.html">Projects</a> / KEV Analytics Dashboard</div>
+
+    <header class="proj-head reveal">
+      <div>
+        <h1 class="proj-title">KEV Analytics Dashboard <span style="font-family:var(--f-script); color:var(--accent); font-weight:400;">— Power BI</span></h1>
+        <p class="proj-sub">Multi-page Power BI dashboard integrating <b>CVSS</b>, <b>EPSS</b>, <b>KEV status</b>, and <b>remediation-age</b> across enterprise vulnerability scan data — with a full executive briefing package. Built during my DHS HS-POWER internship on the CBP Vulnerability Assessment Team.</p>
+      </div>
+      <div class="proj-tags">
+        <span class="card__tag">Power BI</span>
+        <span class="card__tag">Analytics</span>
+        <span class="card__tag">Federal</span>
+      </div>
+    </header>
+
+    <div class="callout callout--warn">
+      <b>Publication policy.</b> Screenshots and datasets from the CBP environment are non-public. This page describes the objectives, dashboard design, analytics process, and technologies — with no real scan output, host counts, CVE lists, or system names.
+    </div>
+
+    <section class="proj-section reveal">
+      <h3>Objectives</h3>
+      <ul class="bullets">
+        <li>Give operators and executives one place to see enterprise vulnerability posture through a <b>risk-based</b> lens, not a severity-only lens.</li>
+        <li>Surface the gap between CVSS severity and real-world exploitation likelihood (EPSS) across the KEV-matched vs. non-KEV population.</li>
+        <li>Track remediation velocity against CISA <b>BOD 26-04</b> risk-based timelines and highlight outlier systems and aged-finding backlogs.</li>
+        <li>Deliver a briefing that leadership can act on — clear takeaways, not a dashboard tour.</li>
+      </ul>
+    </section>
+
+    <section class="proj-section reveal">
+      <h3>Dashboard design</h3>
+      <p>Four connected pages, each answering a specific question a leader or operator asks in the first 30 seconds:</p>
+      <ol style="margin:8px 0 0; padding-left:22px; color:var(--ink-soft);">
+        <li><b>Executive overview</b> — total open findings, KEV-matched count and share, average remediation days, BOD 26-04 compliance snapshot.</li>
+        <li><b>KEV vs. non-KEV comparison</b> — side-by-side distributions of CVSS, EPSS, and remediation-age; the "severity is flat, exploitation isn't" chart.</li>
+        <li><b>Concentration &amp; ownership</b> — where KEVs cluster by system group, vendor, and product family; who owns remediation.</li>
+        <li><b>Aged-finding backlog</b> — findings past their BOD 26-04 due date, sorted by risk score for immediate action.</li>
+      </ol>
+    </section>
+
+    <section class="proj-section reveal">
+      <h3>Analytics process</h3>
+      <ul class="bullets">
+        <li><b>Data ingest:</b> Nessus/Tenable scan output joined against the public CISA KEV Catalog by CVE ID. EPSS pulled from FIRST.</li>
+        <li><b>Data model:</b> star schema — a fact table of scan findings, dimensions for Asset, CVE, KEV metadata, and Time.</li>
+        <li><b>Measures (DAX):</b> KEV match rate, weighted risk score, remediation-age buckets, BOD 26-04 compliance %.</li>
+        <li><b>Weighted risk score:</b> KEV status (0.40) + Asset Criticality (0.25) + EPSS (0.20) + CVSS (0.20) — see the <a href="kev.html">KEV / BOD 26-04 case study</a> for the full model.</li>
+        <li><b>Refresh:</b> scheduled refresh against the scan pipeline; incremental refresh for large tables.</li>
+      </ul>
+    </section>
+
+    <section class="proj-section reveal">
+      <h3>Key insights (methodology-level, sanitized)</h3>
+      <ul class="bullets">
+        <li><b>Severity is flat; exploitation isn't.</b> Mean CVSS is nearly identical across KEV and non-KEV populations, but EPSS is dramatically higher in the KEV group — the case for KEV-first ordering, in one chart.</li>
+        <li><b>KEV concentration is not uniform.</b> Findings cluster on specific vendors and product families — remediation focus produces disproportionate risk reduction.</li>
+        <li><b>Aged findings drive the majority of business risk.</b> A small share of overdue KEV findings represents the majority of BOD 26-04 exposure at any given moment.</li>
+      </ul>
+    </section>
+
+    <section class="proj-section reveal">
+      <h3>Technologies &amp; skills demonstrated</h3>
+      <table class="tbl">
+        <thead><tr><th>Area</th><th>Applied here</th></tr></thead>
+        <tbody>
+          <tr><td>Power BI</td><td>Multi-page report design · slicers · drill-through · bookmarks · theming</td></tr>
+          <tr><td>Data modeling</td><td>Star-schema layout · fact/dimension relationships · role-playing dimensions</td></tr>
+          <tr><td>DAX</td><td>Time-intelligence measures · weighted composite risk score · % compliance calculations</td></tr>
+          <tr><td>Data prep</td><td>Nessus/Tenable normalization · CVE join against CISA KEV Catalog · EPSS enrichment</td></tr>
+          <tr><td>Cybersecurity</td><td>CVSS · EPSS · CISA KEV Catalog · CISA BOD 22-01 / 26-04 · risk-based prioritization</td></tr>
+          <tr><td>Comms</td><td>Executive briefing · slide deck · executive summary · presenter script</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <p style="margin-top:32px;">
+      <a class="btn btn--primary" href="kev.html">Read the KEV / BOD 26-04 case study →</a>
+      <a class="btn btn--ghost" href="../projects.html">← All projects</a>
+    </p>
+
+    <footer class="foot">
+      <span>© 2026 Sami Ali · Alexandria, VA</span>
+      <div class="foot__social">
+        <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg></a>
+        <a href="https://github.com/samiali38183" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg></a>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<button class="to-top" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg></button>
+<script src="../main.js"></script>
+</body>
+</html>

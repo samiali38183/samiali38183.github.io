@@ -4,240 +4,131 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sami Ali — Cybersecurity</title>
-<meta name="description" content="Sami Ali — cybersecurity student with federal vulnerability management experience. Security+, AWS Cloud Practitioner. Alexandria, VA." />
+<meta name="description" content="Sami Ali — cybersecurity student, DHS HS-POWER intern at CBP Vulnerability Assessment Team. Security+ · AWS Certified Cloud Practitioner · Alexandria, VA." />
 <meta property="og:title" content="Sami Ali — Cybersecurity" />
-<meta property="og:description" content="Federal vulnerability management (CISA KEV / BOD 26-04) · Security+ · AWS Cloud Practitioner · Alexandria, VA." />
+<meta property="og:description" content="Federal vulnerability management · Detection · Cloud security. Security+ · AWS CCP. Alexandria, VA." />
 <meta property="og:type" content="website" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='monospace'%3E%E2%97%86%3C/text%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.85em' font-size='90' font-family='monospace' fill='%231E88E5'%3ES%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=IBM+Plex+Mono:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
 <a class="skip" href="#main">Skip to content</a>
 
+<button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-controls="sidebar">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+
+<aside class="sidebar" id="sidebar" aria-label="Primary">
+  <div class="sidebar__brand"><span class="sidebar__name">Sami Ali</span></div>
+  <nav class="sidebar__nav">
+    <a href="./" class="sidebar__link is-active">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Home
+    </a>
+    <a href="about.html" class="sidebar__link">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+      About
+    </a>
+    <a href="services.html" class="sidebar__link">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h6v6H3zM15 4h6v6h-6zM3 14h6v6H3zM15 14h6v6h-6z"/></svg>
+      Services
+    </a>
+    <a href="projects.html" class="sidebar__link">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3z"/><path d="M8 7V4h8v3"/></svg>
+      Projects
+    </a>
+    <a href="resume.pdf" class="sidebar__link" download>
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></svg>
+      Resume
+    </a>
+    <a href="contact.html" class="sidebar__link">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Contact
+    </a>
+  </nav>
+  <div class="sidebar__foot">
+    <a class="icon-btn" href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg>
+    </a>
+    <a class="icon-btn" href="https://github.com/samiali38183" aria-label="GitHub" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+    </a>
+    <a class="icon-btn" href="mailto:samiali38183@gmail.com" aria-label="Email">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+    </a>
+  </div>
+</aside>
+
+<div class="utility">
+  <button class="util-btn" id="themeToggle" aria-label="Toggle light/dark">
+    <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  </button>
+  <button class="util-btn" id="paletteToggle" aria-label="Theme color">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.5-1-.3-.3-.5-.6-.5-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.7-4.5-8.5-10-8.5z"/></svg>
+  </button>
+  <div class="color-picker" id="colorPicker" role="group" aria-label="Accent color">
+    <span class="color-picker__label">Theme</span>
+    <span class="swatch is-active" data-color="blue" role="button" tabindex="0" aria-label="Blue"></span>
+    <span class="swatch" data-color="teal" role="button" tabindex="0" aria-label="Teal"></span>
+    <span class="swatch" data-color="violet" role="button" tabindex="0" aria-label="Violet"></span>
+    <span class="swatch" data-color="rose" role="button" tabindex="0" aria-label="Rose"></span>
+    <span class="swatch" data-color="amber" role="button" tabindex="0" aria-label="Amber"></span>
+  </div>
+</div>
+
 <main id="main">
-
-  <!-- HERO — CISA-style advisory header -->
-  <header class="advisory" aria-labelledby="hero-name">
-    <div class="advisory__tape" aria-hidden="true">
-      <span>ADVISORY</span>
-      <span class="dot">●</span>
-      <span>PROFILE / SAMI-ALI</span>
-      <span class="dot">●</span>
-      <span>REV 2026.08</span>
-    </div>
-
-    <div class="advisory__frame">
-      <dl class="meta">
-        <div class="meta__row"><dt>NAME</dt>        <dd id="hero-name">Sami Ali</dd></div>
-        <div class="meta__row"><dt>LOCATION</dt>    <dd>Alexandria, VA · DC metro</dd></div>
-        <div class="meta__row"><dt>FOCUS</dt>       <dd>Federal vulnerability management · SOC · Cloud security</dd></div>
-        <div class="meta__row"><dt>CREDENTIALS</dt> <dd>CompTIA Security+ · AWS Certified Cloud Practitioner</dd></div>
-        <div class="meta__row"><dt>STATUS</dt>      <dd><span class="pill">OPEN TO 2027 INTERNSHIPS</span></dd></div>
-        <div class="meta__row"><dt>AVAILABILITY</dt><dd>Summer 2027 · Full-time 2028</dd></div>
-      </dl>
-
-      <p class="tagline">
-        Cybersecurity student with federal vulnerability management experience.
-        Targeting SOC Analyst, Vulnerability Analyst, and Cloud Security Analyst roles
-        in the DC / NoVA market.
-      </p>
-
-      <nav class="hero-links" aria-label="Primary links">
-        <a href="resume.pdf" class="btn btn--primary" download>Resume ↓</a>
-        <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" class="btn">LinkedIn ↗</a>
-        <a href="https://github.com/samiali38183" class="btn">GitHub ↗</a>
-        <a href="mailto:samiali38183@gmail.com" class="btn">Email ↗</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- EXPERIENCE -->
-  <section class="section" id="experience" aria-labelledby="s-exp">
-    <div class="section__label"><span>§ 01</span><span>EXPERIENCE</span></div>
-    <h2 id="s-exp" class="section__title">Experience</h2>
-
-    <article class="entry">
-      <aside class="entry__meta">
-        <div class="mono">2026-05 → 2026-08</div>
-        <div class="mono">Ashburn, VA</div>
-        <div class="mono">DHS HS-POWER</div>
-      </aside>
-
-      <div class="entry__body">
-        <h3 class="entry__title">Vulnerability Assessment Team Intern</h3>
-        <div class="entry__org">U.S. Customs and Border Protection · Security Service Division</div>
-
-        <ul class="bullets">
-          <li>Ran enterprise vulnerability scanning and triage with <b>Tenable / Nessus</b> across the agency environment.</li>
-          <li>Triaged findings against the <b>CISA Known Exploited Vulnerabilities (KEV) Catalog</b> — prioritized by confirmed exploitation, not raw CVSS.</li>
-          <li>Tracked remediation compliance against <b>CISA Binding Operational Directives (BOD 22-01 / 26-04)</b>, including due-date tracking and overdue-finding escalation.</li>
-          <li>Built a four-page <b>Power BI</b> dashboard analyzing enterprise scan data against the KEV Catalog under BOD 26-04, plus the full executive briefing package — slide deck, executive summary, presenter script.</li>
-          <li><b>Presented findings to cyber executive leadership.</b></li>
-        </ul>
+  <div class="wrap">
+    <section class="hero" style="position:relative;">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-bg__glow"></div>
+        <div class="hero-bg__glow hero-bg__glow--2"></div>
       </div>
-    </article>
-  </section>
 
-  <!-- PROJECT -->
-  <section class="section" id="project" aria-labelledby="s-proj">
-    <div class="section__label"><span>§ 02</span><span>PROJECT</span></div>
-    <h2 id="s-proj" class="section__title">Project</h2>
-
-    <article class="entry">
-      <aside class="entry__meta">
-        <div class="mono">Tenable · KEV · EPSS</div>
-        <div class="mono">BOD 26-04</div>
-        <div class="mono">Power BI</div>
-      </aside>
-
-      <div class="entry__body">
-        <h3 class="entry__title">KEV / BOD 26-04 Vulnerability Prioritization</h3>
-        <div class="entry__org">Federal enterprise case study · sanitized</div>
-
-        <p class="lede">
-          A risk-based prioritization methodology that ranks enterprise scan findings
-          by <b>confirmed exploitation</b> (CISA KEV) and <b>exploitation probability</b> (EPSS)
-          ahead of raw CVSS severity — aligned with CISA <b>BOD 26-04</b>.
+      <div class="reveal">
+        <div class="hero__eyebrow">Cybersecurity · DC / NoVA</div>
+        <h1 class="hero__hello">Hello, my name is <span class="hero__name-script">Sami Ali</span></h1>
+        <h2 class="hero__role">I'm a <span class="accent">Cybersecurity Engineer</span></h2>
+        <p class="hero__lead">
+          Cybersecurity student with hands-on federal vulnerability management experience at
+          <b>DHS / CBP</b>. CompTIA Security+ and AWS Certified Cloud Practitioner, focused on
+          KEV-based risk prioritization, detection engineering, and cloud security.
         </p>
-
-        <p class="lede">
-          Multi-page analytics dashboard, KEV vs. non-KEV population analysis, and a written
-          methodology explaining the composite scoring model (KEV · Asset Criticality · EPSS · CVSS).
-          Federal specifics are not published; public methodology is.
-        </p>
-
-        <p><a class="link" href="https://github.com/samiali38183/kev-risk-prioritization">Read the case study on GitHub →</a></p>
-      </div>
-    </article>
-  </section>
-
-  <!-- CERTIFICATIONS -->
-  <section class="section" id="certs" aria-labelledby="s-certs">
-    <div class="section__label"><span>§ 03</span><span>CERTIFICATIONS</span></div>
-    <h2 id="s-certs" class="section__title">Certifications</h2>
-
-    <div class="certs">
-      <div class="certs__group certs__group--earned">
-        <div class="certs__heading">
-          <span class="dot dot--ok">●</span> EARNED
+        <div class="hero__ctas">
+          <a class="btn btn--primary" href="projects.html">
+            View Projects
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <a class="btn btn--ghost" href="resume.pdf" download>
+            Resume
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>
+          </a>
+          <a class="btn btn--ghost" href="contact.html">Contact</a>
         </div>
-        <ul class="cert-list">
-          <li>
-            <div class="cert-name">CompTIA Security+</div>
-            <div class="mono cert-meta">DoD 8570 approved</div>
-          </li>
-          <li>
-            <div class="cert-name">AWS Certified Cloud Practitioner</div>
-            <div class="mono cert-meta">CLF-C02</div>
-          </li>
-        </ul>
       </div>
 
-      <div class="certs__group certs__group--wip">
-        <div class="certs__heading">
-          <span class="dot dot--wip">○</span> IN PROGRESS
-        </div>
-        <ul class="cert-list cert-list--wip">
-          <li>
-            <div class="cert-name">AWS Solutions Architect – Associate</div>
-            <div class="mono cert-meta">SAA-C03 · target 2026</div>
-          </li>
-          <li>
-            <div class="cert-name">CompTIA CySA+</div>
-            <div class="mono cert-meta">CS0-003 · target 2026</div>
-          </li>
-        </ul>
+      <div class="portrait reveal">
+        <img class="portrait__img" src="assets/headshot.jpg" alt="Sami Ali portrait" />
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- SKILLS (dense, quiet) -->
-  <section class="section" id="skills" aria-labelledby="s-skills">
-    <div class="section__label"><span>§ 04</span><span>TOOLING</span></div>
-    <h2 id="s-skills" class="section__title">Tooling</h2>
-
-    <dl class="tools">
-      <div class="tools__row">
-        <dt class="mono">Vuln Mgmt</dt>
-        <dd>Tenable · Nessus · CISA KEV triage · BOD 22-01 / 26-04 compliance tracking · remediation prioritization &amp; SLA reporting</dd>
+    <footer class="foot">
+      <span>© 2026 Sami Ali · Alexandria, VA</span>
+      <div class="foot__social">
+        <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg></a>
+        <a href="https://github.com/samiali38183" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg></a>
+        <a href="mailto:samiali38183@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
       </div>
-      <div class="tools__row">
-        <dt class="mono">Cloud (AWS)</dt>
-        <dd>IAM · VPC · EC2 · S3</dd>
-      </div>
-      <div class="tools__row">
-        <dt class="mono">Networking</dt>
-        <dd>TCP/IP · subnetting / VLSM · VLANs · trunking · switching</dd>
-      </div>
-      <div class="tools__row">
-        <dt class="mono">Reporting</dt>
-        <dd>Power BI · executive-level technical reporting · briefing packages</dd>
-      </div>
-      <div class="tools__row">
-        <dt class="mono">Foundations</dt>
-        <dd>Python (basic) · Linux · Git</dd>
-      </div>
-    </dl>
-  </section>
-
-  <!-- EDUCATION -->
-  <section class="section" id="education" aria-labelledby="s-edu">
-    <div class="section__label"><span>§ 05</span><span>EDUCATION</span></div>
-    <h2 id="s-edu" class="section__title">Education</h2>
-
-    <article class="entry">
-      <aside class="entry__meta">
-        <div class="mono">2024 → 2026</div>
-        <div class="mono">Annandale, VA</div>
-      </aside>
-      <div class="entry__body">
-        <h3 class="entry__title">Northern Virginia Community College</h3>
-        <div class="entry__org">AAS · Information Technology · Cybersecurity minor</div>
-        <ul class="bullets">
-          <li>GPA <b>3.65</b> · Dean's List × 4</li>
-          <li>Mason Advance Program — guaranteed transfer to George Mason University</li>
-        </ul>
-      </div>
-    </article>
-
-    <article class="entry">
-      <aside class="entry__meta">
-        <div class="mono">Transfer</div>
-        <div class="mono">Fairfax, VA</div>
-      </aside>
-      <div class="entry__body">
-        <h3 class="entry__title">George Mason University</h3>
-        <div class="entry__org">Mason Advance transfer · <span class="todo">TODO — program, expected start</span></div>
-      </div>
-    </article>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="section section--contact" id="contact" aria-labelledby="s-contact">
-    <div class="section__label"><span>§ 06</span><span>CONTACT</span></div>
-    <h2 id="s-contact" class="section__title">Contact</h2>
-
-    <ul class="contact-list">
-      <li><span class="mono">email    </span><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
-      <li><span class="mono">linkedin </span><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">linkedin.com/in/sami-ali-1a4b89345</a></li>
-      <li><span class="mono">github   </span><a href="https://github.com/samiali38183">github.com/samiali38183</a></li>
-      <li><span class="mono">resume   </span><a href="resume.pdf" download>resume.pdf</a></li>
-    </ul>
-  </section>
-
-  <footer class="foot">
-    <div class="foot__row mono">
-      <span>© 2026 SAMI ALI</span>
-      <span>ALEXANDRIA · VA</span>
-      <span>END OF DOCUMENT</span>
-    </div>
-  </footer>
-
+    </footer>
+  </div>
 </main>
+
+<button class="to-top" id="toTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg>
+</button>
 
 <script src="main.js"></script>
 </body>

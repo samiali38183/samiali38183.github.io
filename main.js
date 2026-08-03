@@ -1,25 +1,148 @@
-/* Minimal enhancements. Everything above the fold works without JS. */
+/* Portfolio interactions:
+   - Mobile sidebar drawer
+   - Light/dark theme toggle (persisted)
+   - Accent color picker (persisted)
+   - Reveal-on-scroll for .reveal
+   - Animated skill bars when in view
+   - Back-to-top button
+   - Projects filter (on projects.html)
+*/
 (function(){
-  // Reveal sections on scroll — subtle, one-shot.
+  'use strict';
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce || !('IntersectionObserver' in window)) return;
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-  const els = document.querySelectorAll('.section');
-  els.forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(8px)';
-    el.style.transition = 'opacity .5s ease, transform .5s cubic-bezier(.2,.7,.2,1)';
-  });
-
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting){
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'none';
-        io.unobserve(entry.target);
+  // ---- Mobile drawer ----
+  const sidebar = $('#sidebar');
+  const menuToggle = $('#menuToggle');
+  if (menuToggle && sidebar){
+    menuToggle.addEventListener('click', () => {
+      const open = sidebar.classList.toggle('is-open');
+      menuToggle.setAttribute('aria-expanded', String(open));
+    });
+    // Close on nav click (mobile)
+    sidebar.querySelectorAll('.sidebar__link').forEach(a => {
+      a.addEventListener('click', () => sidebar.classList.remove('is-open'));
+    });
+    // Close on outside click (mobile)
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)){
+        sidebar.classList.remove('is-open');
       }
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  }
 
-  els.forEach(el => io.observe(el));
+  // ---- Theme toggle (light/dark) ----
+  const themeToggle = $('#themeToggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    try { localStorage.setItem('theme', t); } catch(e){}
+  };
+  const savedTheme = (() => { try { return localStorage.getItem('theme'); } catch(e){ return null; } })();
+  if (savedTheme === 'light' || savedTheme === 'dark'){
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }
+  if (themeToggle){
+    themeToggle.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // ---- Accent color picker ----
+  const COLORS = {
+    blue:   { accent:'#1E88E5', hi:'#64B5F6' },
+    teal:   { accent:'#14B8A6', hi:'#5EEAD4' },
+    violet: { accent:'#8B5CF6', hi:'#C4B5FD' },
+    rose:   { accent:'#F43F5E', hi:'#FDA4AF' },
+    amber:  { accent:'#F59E0B', hi:'#FCD34D' },
+  };
+  const paletteToggle = $('#paletteToggle');
+  const colorPicker = $('#colorPicker');
+  const applyColor = (name) => {
+    const c = COLORS[name]; if (!c) return;
+    document.documentElement.style.setProperty('--accent', c.accent);
+    document.documentElement.style.setProperty('--accent-hi', c.hi);
+    $$('.swatch').forEach(s => s.classList.toggle('is-active', s.dataset.color === name));
+    try { localStorage.setItem('accent', name); } catch(e){}
+  };
+  const savedColor = (() => { try { return localStorage.getItem('accent'); } catch(e){ return null; } })();
+  if (savedColor && COLORS[savedColor]) applyColor(savedColor);
+
+  if (paletteToggle && colorPicker){
+    paletteToggle.addEventListener('click', () => colorPicker.classList.toggle('is-open'));
+    document.addEventListener('click', (e) => {
+      if (!colorPicker.contains(e.target) && !paletteToggle.contains(e.target)){
+        colorPicker.classList.remove('is-open');
+      }
+    });
+    $$('.swatch', colorPicker).forEach(s => {
+      const activate = () => applyColor(s.dataset.color);
+      s.addEventListener('click', activate);
+      s.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); activate(); } });
+    });
+  }
+
+  // ---- Reveal on scroll ----
+  const revealEls = $$('.reveal');
+  if (revealEls.length && 'IntersectionObserver' in window && !reduce){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('is-in'));
+  }
+
+  // ---- Skill bar animation ----
+  const skillEls = $$('.skill');
+  if (skillEls.length){
+    const setBars = (el) => {
+      const fill = el.querySelector('.skill__fill');
+      const pct  = parseFloat(el.dataset.pct || '0');
+      if (fill) fill.style.width = Math.max(0, Math.min(100, pct)) + '%';
+    };
+    if ('IntersectionObserver' in window && !reduce){
+      const sio = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting){ setBars(entry.target); sio.unobserve(entry.target); }
+        });
+      }, { threshold: 0.2 });
+      skillEls.forEach(el => sio.observe(el));
+    } else {
+      skillEls.forEach(setBars);
+    }
+  }
+
+  // ---- Back to top ----
+  const toTop = $('#toTop');
+  if (toTop){
+    const onScroll = () => toTop.classList.toggle('is-visible', window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
+  }
+
+  // ---- Projects filter ----
+  const filterBtns = $$('.filter__btn');
+  const cards = $$('#proj-grid .card');
+  if (filterBtns.length && cards.length){
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-selected', 'false'); });
+        btn.classList.add('is-active'); btn.setAttribute('aria-selected', 'true');
+        const f = btn.dataset.filter;
+        cards.forEach(c => {
+          const show = f === 'all' || (c.dataset.tags || '').split(/\s+/).includes(f);
+          c.style.display = show ? '' : 'none';
+        });
+      });
+    });
+  }
 })();

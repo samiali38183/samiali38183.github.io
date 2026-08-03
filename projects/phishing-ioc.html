@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phishing IOC Extractor — Sami Ali</title>
+<meta name="description" content="Python CLI that parses raw .eml phishing samples and extracts IOCs into deduplicated JSON. 10 pytest tests, MIT licensed." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.85em' font-size='90' font-family='monospace' fill='%231E88E5'%3ES%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=IBM+Plex+Mono:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+
+<aside class="sidebar" id="sidebar" aria-label="Primary">
+  <div class="sidebar__brand"><span class="sidebar__name">Sami Ali</span></div>
+  <nav class="sidebar__nav">
+    <a href="../" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg> Home</a>
+    <a href="../about.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg> About</a>
+    <a href="../services.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h6v6H3zM15 4h6v6h-6zM3 14h6v6H3zM15 14h6v6h-6z"/></svg> Services</a>
+    <a href="../projects.html" class="sidebar__link is-active"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3z"/><path d="M8 7V4h8v3"/></svg> Projects</a>
+    <a href="../resume.pdf" class="sidebar__link" download><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></svg> Resume</a>
+    <a href="../contact.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Contact</a>
+  </nav>
+  <div class="sidebar__foot">
+    <a class="icon-btn" href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg></a>
+    <a class="icon-btn" href="https://github.com/samiali38183" aria-label="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg></a>
+    <a class="icon-btn" href="mailto:samiali38183@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
+  </div>
+</aside>
+
+<div class="utility">
+  <button class="util-btn" id="themeToggle" aria-label="Toggle light/dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  <button class="util-btn" id="paletteToggle" aria-label="Theme color"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.5-1-.3-.3-.5-.6-.5-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.7-4.5-8.5-10-8.5z"/></svg></button>
+  <div class="color-picker" id="colorPicker">
+    <span class="color-picker__label">Theme</span>
+    <span class="swatch is-active" data-color="blue"></span>
+    <span class="swatch" data-color="teal"></span>
+    <span class="swatch" data-color="violet"></span>
+    <span class="swatch" data-color="rose"></span>
+    <span class="swatch" data-color="amber"></span>
+  </div>
+</div>
+
+<main id="main">
+  <div class="wrap">
+  <div class="crumb"><a href="../">Home</a> / <a href="../projects.html">Projects</a> / Phishing IOC Extractor</div>
+
+  <header class="proj-head">
+    <div>
+      <h1 class="proj-title">Phishing IOC Extractor</h1>
+      <p class="proj-sub">Python CLI that parses raw RFC 822 <code>.eml</code> phishing samples and extracts five categories of indicators of compromise — IPs, domains, URLs, email addresses, and MD5/SHA-1/SHA-256 hashes — into deduplicated, sorted JSON for downstream threat-intel workflows.</p>
+    </div>
+    <div class="proj-tags">
+      <span class="card__tag card__tag--amber">Python</span>
+      <span class="card__tag">Automation</span>
+      <span class="card__tag card__tag--violet">Threat Intel</span>
+    </div>
+  </header>
+
+  <div class="callout">
+    <b>Zero external dependencies at runtime.</b> Pure Python standard library — <code>re</code>, <code>email</code>, <code>argparse</code>, <code>json</code>, <code>pathlib</code>. <code>pytest</code> is dev-only.
+  </div>
+
+  <section class="proj-section">
+    <h3>What it does</h3>
+    <ul class="bullets">
+      <li>Parses raw RFC 822 <code>.eml</code> files with the stdlib <code>email</code> module — handles multipart bodies and text extraction.</li>
+      <li>Runs five tuned regex extractors: <b>IPv4</b>, <b>domains</b>, <b>URLs</b>, <b>email addresses</b>, and <b>MD5 / SHA-1 / SHA-256 hashes</b>.</li>
+      <li>Deduplicates, sorts, and returns a single JSON object ready to feed a threat-intel enrichment pipeline.</li>
+      <li>Argparse CLI with pretty-print and file-output flags. Type hints and docstrings throughout.</li>
+      <li>10-test pytest suite covering each extractor and edge cases — empty input, deduplication, case normalization. All passing.</li>
+    </ul>
+  </section>
+
+  <section class="proj-section">
+    <h3>Sample output</h3>
+    <pre class="code"><span class="c">$ python main.py sample_phishing.txt --pretty</span>
+{
+  <span class="n">"ips"</span>: [<span class="s">"192.168.1.100"</span>, <span class="s">"203.0.113.45"</span>],
+  <span class="n">"domains"</span>: [<span class="s">"evil-domain.org"</span>, <span class="s">"malicious-cdn.evil"</span>, <span class="s">"paypa1-fake.com"</span>],
+  <span class="n">"urls"</span>: [<span class="s">"http://paypa1-fake.com/login"</span>, <span class="s">"https://malicious-cdn.evil/payload.exe"</span>],
+  <span class="n">"emails"</span>: [<span class="s">"help@evil-domain.org"</span>, <span class="s">"paypal-security@paypa1-fake.com"</span>, <span class="s">"victim@example.com"</span>],
+  <span class="n">"hashes"</span>: {
+    <span class="n">"md5"</span>: [<span class="s">"5d41402abc4b2a76b9719d911017c592"</span>],
+    <span class="n">"sha1"</span>: [<span class="s">"aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d"</span>],
+    <span class="n">"sha256"</span>: [<span class="s">"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"</span>]
+  }
+}</pre>
+  </section>
+
+  <section class="proj-section">
+    <h3>Why it matters</h3>
+    <p>Phishing triage in a real SOC is a volume problem. Analysts pull email samples out of a shared mailbox all day, and the first thing they need is a clean list of what to enrich — hashes to VirusTotal, domains to URLhaus, IPs to AbuseIPDB. Doing that by hand is error-prone; regexing it by hand every time is silly. This tool is the "give me the IOCs" step of that pipeline, isolated, tested, and portable.</p>
+  </section>
+
+  <section class="proj-section">
+    <h3>Design decisions</h3>
+    <ul class="bullets">
+      <li><b>Stdlib only.</b> The extractor should install nowhere and run anywhere — no <code>pip install</code> required in a locked-down analyst environment.</li>
+      <li><b>Regex, not ML.</b> IOC extraction is a solved problem for tuned patterns; the surface area is bounded and the false-positive story is manageable with careful boundaries.</li>
+      <li><b>JSON out.</b> The output feeds other tools, not a human directly. Deduplicated and sorted so diffs are stable.</li>
+      <li><b>Tested.</b> pytest suite is the contract — anyone forking can add a case and know they didn't break the others.</li>
+    </ul>
+  </section>
+
+  <p><a class="btn" href="https://github.com/samiali38183/cybersecurity-vault/tree/master/08-Projects/Phishing-IOC-Extractor">View on GitHub ↗</a>
+     <a class="btn" href="../projects.html">← All projects</a></p>
+
+<footer class="foot">
+      <span>&copy; 2026 Sami Ali &middot; Alexandria, VA</span>
+      <div class="foot__social">
+        <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg></a>
+        <a href="https://github.com/samiali38183" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg></a>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<button class="to-top" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg></button>
+<script src="../main.js"></script>
+</body>
+</html>
