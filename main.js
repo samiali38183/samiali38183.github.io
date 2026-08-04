@@ -152,20 +152,15 @@
     });
   });
 
-  // ---- Contact form → mailto: link (avoids browser "not secure" warning) ----
-  const contactForm = $('#contactForm');
-  if (contactForm){
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const data = new FormData(contactForm);
-      const name    = (data.get('name')    || '').toString().trim();
-      const email   = (data.get('email')   || '').toString().trim();
-      const subject = (data.get('subject') || '').toString().trim();
-      const message = (data.get('message') || '').toString().trim();
-      const subj = subject ? `Portfolio contact — ${subject}` : 'Portfolio contact';
-      const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-      window.location.href = `mailto:samiali38183@gmail.com?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-    });
+  // ---- Contact form success banner (after Formsubmit redirect) ----
+  if (window.location.search.includes('sent=1')){
+    const note = $('#sentNote');
+    if (note){
+      note.style.display = 'block';
+      note.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    }
+    // Clean the URL so refresh doesn't re-show
+    if (history.replaceState) history.replaceState(null, '', window.location.pathname);
   }
 
   // ---- Projects filter ----

@@ -75,15 +75,26 @@
           </div>
         </div>
 
-        <form class="form" id="contactForm" aria-label="Contact form" autocomplete="on">
-          <label>Your name<input type="text" name="name" autocomplete="name" required></label>
-          <label>Your email<input type="email" name="email" autocomplete="email" required></label>
-          <label>Company / Role<input type="text" name="subject" autocomplete="organization"></label>
-          <label>Message<textarea name="message" required></textarea></label>
+        <form class="form" id="contactForm" action="https://formsubmit.co/samiali38183@gmail.com" method="POST" aria-label="Contact form" autocomplete="on">
+          <input type="hidden" name="_subject" value="Portfolio contact — samiali38183.github.io">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="https://samiali38183.github.io/contact.html?sent=1">
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+          <label>Your name<input type="text" name="Name" autocomplete="name" required></label>
+          <label>Your email<input type="email" name="Email" autocomplete="email" required></label>
+          <label>Company / Role<input type="text" name="Company / Role" autocomplete="organization"></label>
+          <label>Message<textarea name="Message" required></textarea></label>
           <button type="submit" class="btn btn--primary" style="width:100%; justify-content:center;">
             Send Message
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
           </button>
+          <p id="sentNote" style="display:none; margin:14px 0 0; padding:12px 14px; background:color-mix(in oklab, var(--success) 15%, var(--surface)); border:1px solid var(--success); border-radius:8px; color:var(--ink); font-size:14px;">
+            ✓ Thanks — your message was sent. I'll reply within 24 hours.
+          </p>
+          <p style="margin:14px 0 0; font-size:12.5px; color:var(--muted); text-align:center;">
+            Prefer email? <a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a>
+          </p>
         </form>
       </div>
     </section>
