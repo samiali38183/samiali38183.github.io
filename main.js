@@ -129,6 +129,19 @@
     toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
   }
 
+  // ---- Letter-by-letter flow for the hero role accent ("Cybersecurity Engineer") ----
+  const roleAccent = $('.hero__role .accent');
+  if (roleAccent && !reduce){
+    const text = roleAccent.textContent;
+    roleAccent.innerHTML = [...text].map((ch, i) => {
+      const delay = (0.50 + i * 0.045).toFixed(3);
+      if (ch === ' ') return '<span class="letter-space" aria-hidden="true"></span>';
+      return `<span class="letter" style="animation-delay:${delay}s">${ch}</span>`;
+    }).join('');
+    // Keep the accessible text unchanged
+    roleAccent.setAttribute('aria-label', text);
+  }
+
   // ---- Word-by-word flow-in for the hero lead paragraph ----
   const lead = $('.hero__lead');
   if (lead && !reduce){
