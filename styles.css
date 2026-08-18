@@ -320,6 +320,39 @@ main{
 }
 .portrait:hover .portrait__img{ transform:scale(1.02); }
 
+/* Hero: cascade each child in one after another */
+.hero-flow > *{
+  opacity:0;
+  transform:translateY(24px);
+  animation:heroFlow .8s cubic-bezier(.2,.7,.2,1) forwards;
+}
+.hero-flow > *:nth-child(1){ animation-delay:.10s; }
+.hero-flow > *:nth-child(2){ animation-delay:.22s; }
+.hero-flow > *:nth-child(3){ animation-delay:.34s; }
+.hero-flow > *:nth-child(4){ animation-delay:.46s; }
+.hero-flow > *:nth-child(5){ animation-delay:.58s; }
+.hero-flow > *:nth-child(6){ animation-delay:.70s; }
+.hero .portrait{
+  opacity:0; transform:translateY(24px) scale(.98);
+  animation:heroFlow 1s .28s cubic-bezier(.2,.7,.2,1) forwards;
+}
+@keyframes heroFlow{ to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){
+  .hero-flow > *, .hero .portrait{ opacity:1; transform:none; animation:none; }
+}
+
+/* Word-by-word flow for hero lead (added via JS) */
+.flow-word{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(10px);
+  animation:wordFlow .55s cubic-bezier(.2,.7,.2,1) forwards;
+}
+@media (prefers-reduced-motion: reduce){
+  .flow-word{ opacity:1; transform:none; animation:none; }
+}
+@keyframes wordFlow{ to{ opacity:1; transform:none; } }
+
 /* Ambient hero glow */
 .hero-bg{
   position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:-1;

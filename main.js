@@ -129,6 +129,16 @@
     toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
   }
 
+  // ---- Word-by-word flow-in for the hero lead paragraph ----
+  const lead = $('.hero__lead');
+  if (lead && !reduce){
+    const text = lead.textContent.trim();
+    const words = text.split(/\s+/);
+    lead.innerHTML = words.map((w, i) =>
+      `<span class="flow-word" style="animation-delay:${(0.45 + i * 0.035).toFixed(3)}s">${w}</span>`
+    ).join(' ');
+  }
+
   // ---- Force download on PDF links (browsers preview PDFs otherwise) ----
   $$('a[download]').forEach(a => {
     const href = a.getAttribute('href') || '';
