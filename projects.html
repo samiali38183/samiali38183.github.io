@@ -61,9 +61,26 @@
         <button class="filter__btn" data-filter="analytics" role="tab" aria-selected="false">Analytics</button>
         <button class="filter__btn" data-filter="detection" role="tab" aria-selected="false">Detection</button>
         <button class="filter__btn" data-filter="automation" role="tab" aria-selected="false">Automation</button>
+        <button class="filter__btn" data-filter="ai" role="tab" aria-selected="false">LLM Agents</button>
       </div>
 
       <div class="grid" id="proj-grid">
+
+        <a class="card reveal" href="projects/call-kettle.html" data-tags="automation ai" aria-label="Call Kettle AI Voice Receptionist">
+          <div class="card__thumb card__thumb--code" aria-hidden="true">
+            <div>
+              <div style="opacity:.55;">// agent.tool_call</div>
+              <div style="margin-top:6px;color:#C3E88D;">{ tool: "book_appointment", confidence: 0.94 }</div>
+              <div style="margin-top:2px;color:#C3E88D;">↳ Hermes · schema-validated · live</div>
+            </div>
+          </div>
+          <div class="card__body">
+            <span class="card__tag card__tag--amber">LLM Agents · Production</span>
+            <h3 class="card__title">Call Kettle — AI Voice Receptionist</h3>
+            <p class="card__desc">Production AI voice-receptionist platform for small businesses, built on a Nous Hermes agent architecture with structured tool-use. Currently serving <b>10 active clients</b>.</p>
+            <div class="card__foot"><span>LIVE · 2026</span><span class="card__cta">Open →</span></div>
+          </div>
+        </a>
 
         <a class="card reveal" href="projects/kev.html" data-tags="vuln" aria-label="KEV / BOD 26-04 Vulnerability Prioritization">
           <div class="card__thumb card__thumb--pattern" aria-hidden="true"></div>
