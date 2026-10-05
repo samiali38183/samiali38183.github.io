@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Call Kettle — AI Voice Receptionist · Sami Ali</title>
-<meta name="description" content="Production AI voice receptionist built on a Nous Hermes agent architecture — serving live small-business customers." />
+<meta name="description" content="AI voice receptionist — FastAPI, Twilio, Claude tool-use. Built with Claude Code and Hermes Agent." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.85em' font-size='90' font-family='monospace' fill='%231E88E5'%3ES%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -53,7 +53,7 @@
   <header class="proj-head">
     <div>
       <h1 class="proj-title">Call Kettle — AI Voice Receptionist</h1>
-      <p class="proj-sub">A production AI voice-receptionist platform for small businesses — built on a <b>Nous Hermes</b> agent architecture with structured tool-use. Currently serving <b>10 active clients</b>.</p>
+      <p class="proj-sub">AI voice receptionist with a <b>Claude tool-use</b> loop, built with <b>Claude Code</b> and <b>Hermes Agent</b>. Schema-validated tools, pytest as the gate. Public snapshot on GitHub.</p>
     </div>
     <div class="proj-tags">
       <span class="card__tag card__tag--amber">LLM Agents</span>
@@ -62,16 +62,16 @@
     </div>
   </header>
 
-  <div class="callout"><b>Live service.</b> Exact tech-stack details, pricing, and client identities are private — this page covers the architecture and the engineering decisions at a high level.</div>
+  <div class="callout"><b>Public code.</b> Sanitized snapshot: <a href="https://github.com/samiali38183/call-kettle">github.com/samiali38183/call-kettle</a>. Live product: <a href="https://callkettle.com">callkettle.com</a>.</div>
 
   <section class="proj-section">
     <h3>What it does</h3>
-    <p>Call Kettle answers inbound customer calls for small businesses — pressure-washing, mobile detailing, home-service shops — the ones that lose revenue every time an owner misses a ring. The system picks up, talks like a real receptionist, books appointments against the client's calendar, qualifies leads, fires an SMS follow-up, and hands off to a human when the conversation needs one.</p>
+    <p>Call Kettle answers inbound calls with a tool-use agent: it talks, checks availability, books or reschedules, takes a message, and can hand off to a human. Config is YAML. Booking rules live in code, not only in the prompt.</p>
   </section>
 
   <section class="proj-section">
     <h3>The agent architecture — why Hermes, why tool-use</h3>
-    <p>The core of the system is an agent runtime built around <b>Nous Hermes</b>, chosen specifically for its strength at <b>structured function-calling</b> and its willingness to stay inside a schema instead of free-styling into hallucinations. Call Kettle's reliability depends on the model <i>never</i> inventing an appointment time that doesn't exist, a business policy the owner didn't give it, or a fact about the client it wasn't told.</p>
+    <p>The runtime is a <b>Claude Haiku</b> tool-use loop (built and iterated with <b>Claude Code</b> and <b>Hermes Agent</b>). Reliability depends on the model never inventing a slot, a policy, or a fact that was not in config. Invalid tool calls are rejected before they touch storage.</p>
 
     <p>The agent loop looks like this at a high level:</p>
     <ol class="bullets">
@@ -82,7 +82,7 @@
       <li><b>Graceful handoff</b> — any unrecoverable state (payment disputes, angry caller, sensitive request) hands the call back to the business owner cleanly, with a transcript summary already drafted.</li>
     </ol>
 
-    <p>The result is an agent that stays in its lane. It books real appointments against real calendars. It doesn't make up prices. It doesn't pretend to be human. And it logs every tool call so the business owner can audit exactly what was said and done on their behalf.</p>
+    <p>The model proposes; code disposes. It cannot claim a booking unless the tool succeeded. Every tool call is logged.</p>
   </section>
 
   <section class="proj-section">
@@ -91,14 +91,15 @@
       <li>Agent runtime with intent routing, schema-validated function-calling, confidence scoring, and human handoff</li>
       <li>Tool registry: calendar integration, SMS follow-up, lead-qualification form, CRM lookup, business-hours logic</li>
       <li>Call session management with sub-second response latency and recovery across network drops</li>
-      <li>Per-client configuration layer so each business can define its own services, hours, FAQ, and escalation rules without touching code</li>
+      <li>YAML configuration layer for services, hours, FAQ, and escalation — no code change per config</li>
       <li>Transcript + action logging for owner audit and model-improvement feedback loops</li>
     </ul>
   </section>
 
   <section class="proj-section">
     <h3>Why I built this</h3>
-    <p>The project started as a technical bet: how reliable can a modern open-weights agent actually be when the stakes are real money and real customers? Small businesses turned out to be the ideal testbed — they feel every missed call directly in revenue, so the ROI math is obvious when it works. One owner, one line, one agent, measurable lift. From there it grew into a paying product.</p>
+    <p>I wanted a real agent in a real loop: structured tool-use, schema validation, pytest as the gate, and coding agents (Claude Code, Hermes) writing against that gate. Same discipline I use for detection and automation work — the model proposes, the code decides.</p>
+    <p><a class="btn btn--primary" href="https://github.com/samiali38183/call-kettle">GitHub snapshot →</a></p>
     <p>Working on Call Kettle has taught me more about <b>agent reliability</b>, <b>schema design</b>, and <b>where LLMs break under production load</b> than any coursework ever would. Those lessons translate directly into the detection-engineering and security-automation work I want to do long-term — same discipline, different domain.</p>
   </section>
 
