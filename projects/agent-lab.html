@@ -52,8 +52,8 @@
 
   <header class="proj-head">
     <div>
-      <h1 class="proj-title">Agent Engineering Lab — multi-agent builds, voice stacks, and security</h1>
-      <p class="proj-sub">How I build with <b>Hermes Agent</b>, <b>Claude Code</b> and <b>Codex</b>: parallel sub-agents, pytest as the gate, benchmarks before opinions, and security reviewed like a production system.</p>
+      <h1 class="proj-title">Agent Engineering Lab</h1>
+      <p class="proj-sub">I design, orchestrate and ship software with teams of AI agents, then verify it like a security engineer: <b>Hermes Agent</b>, <b>Claude Code</b>, <b>Codex</b>, voice AI, cloud deployment and hardened production systems.</p>
     </div>
     <div class="proj-tags">
       <span class="card__tag card__tag--amber">Agent Orchestration</span>
@@ -62,57 +62,32 @@
     </div>
   </header>
 
-  <div class="callout"><b>Public write-up:</b> <a href="https://github.com/samiali38183/agent-engineering-lab">github.com/samiali38183/agent-engineering-lab</a>. Real engineering notes from a live project; customer data, prices and secrets are not in it.</div>
+  <div class="callout"><b>Overview on GitHub:</b> <a href="https://github.com/samiali38183/agent-engineering-lab">github.com/samiali38183/agent-engineering-lab</a>. A high-level look at how I work; implementation details stay private.</div>
 
   <section class="proj-section">
-    <h3>The stack</h3>
+    <h3>What I do</h3>
     <ul class="bullets">
-      <li><b>Runtime:</b> FastAPI on <b>Fly.io</b> with a persistent volume and <b>SQLite in WAL mode</b> as the system of record (calls, bookings, tenants, usage).</li>
-      <li><b>Telephony and speech:</b> Twilio today; Deepgram streaming speech-to-text and Amazon Polly voices; <b>ElevenLabs</b>, <b>Telnyx</b> and <b>Retell</b> in a controlled benchmark.</li>
-      <li><b>Reasoning:</b> Claude tool-use loop with schema-validated tools. The model proposes; code disposes.</li>
-      <li><b>Integrations:</b> Google Calendar, Cal.com, Calendly and iCal busy feeds behind one provider interface.</li>
-      <li><b>Agent tooling:</b> Hermes Agent as orchestrator, Claude Code and Codex as builders, parallel sub-agents on isolated workstreams.</li>
+      <li><b>Multi-agent engineering:</b> I run parallel AI sub-agents on separate workstreams, then integrate, review and gate their output with automated tests before anything ships.</li>
+      <li><b>Voice and conversational AI:</b> production phone agents with tool use, live speech pipelines, and real-call evaluation across speech, voice and model vendors, including ElevenLabs.</li>
+      <li><b>Cloud and data:</b> deployed on Fly.io with SQLite-backed storage, load-tested for concurrency, with measured results kept separate from estimates.</li>
+      <li><b>Integrations:</b> scheduling and CRM connections behind clean provider interfaces, using OAuth and scoped keys, never customer passwords.</li>
+      <li><b>Benchmarking:</b> reproducible test harnesses so decisions come from data, not opinions.</li>
     </ul>
   </section>
 
   <section class="proj-section">
-    <h3>How I use agents</h3>
-    <ol class="bullets">
-      <li><b>Split work into streams.</b> One orchestration session fans out independent sub-agents (voice audit, coverage routing, usage metering, calendar audit, portal UI, concurrency, field-service research) with disjoint files and explicit "do not touch" lists.</li>
-      <li><b>The test suite is the contract.</b> The backend suite is 3,400+ tests. After every fan-out I re-run the affected slice, diff against a clean baseline worktree, and accept only regressions I can explain.</li>
-      <li><b>Claim levels, not vibes.</b> Every feature is labeled BUILT, UNIT TESTED, INTEGRATION TESTED, DEPLOYED or PRODUCTION VERIFIED, and nothing is marketed above its level.</li>
-      <li><b>Measured vs modeled.</b> Cost and latency numbers are tagged so a model never passes as a measurement.</li>
-      <li><b>No secrets in prompts.</b> Keys live in gitignored env files or platform secrets and are checked with read-only calls.</li>
-    </ol>
+    <h3>Security mindset</h3>
+    <p>I treat an AI agent like any internet-facing system: authenticated inputs, isolated tenants, bounded cost, escaped output, minimal data retention, secrets kept out of prompts and code, and an audit trail. Along the way I found and fixed a real concurrency race before it could reach customers. It is the same discipline I bring to vulnerability management and detection engineering.</p>
   </section>
 
   <section class="proj-section">
-    <h3>Voice-stack benchmark harness</h3>
-    <p>Instead of arguing about which voice stack is best, I built a reproducible harness: 28 scenarios (booking, reschedule, cancel, transfer, emergencies, barge-in, noisy audio, tool failure, a business timezone that differs from the server) driven through the real conversation engine. A deterministic stub model keeps CI free, and a live flag runs real models. Scoring covers booking correctness, tool-call correctness, hallucination checks, transfer correctness and recovery, with slots for latency percentiles and speech accuracy from real-call runs. Architectures under comparison: the Twilio baseline, Deepgram streaming, Telnyx managed and custom, Retell, ElevenLabs voices, and native audio models.</p>
-  </section>
-
-  <section class="proj-section">
-    <h3>Databases and concurrency: a real race the analysis found</h3>
-    <p>A per-client concurrent-call ceiling looked correct but was not atomic. Under a burst of 64 simultaneous callers it admitted 42 against a ceiling of 24, a classic check-then-insert race. The fix was an admission lock around the count-and-claim step, with a hard global cap and a rollback-safe default. A local load test now holds the ceiling exactly at 8, 16, 32 and 64 callers. SQLite WAL, a single Fly machine and a shared model client were analysed as the real scaling limits, and the write-up marks which claims are measured and which are modeled.</p>
-  </section>
-
-  <section class="proj-section">
-    <h3>Security engineering inside an agent system</h3>
+    <h3>What it shows</h3>
     <ul class="bullets">
-      <li><b>Webhook authenticity:</b> telephony webhooks are signature-verified, with duplicate-event handling tested.</li>
-      <li><b>Tenant isolation:</b> every portal query is scoped by the signed-in session, with tests that one tenant's calls never appear for another.</li>
-      <li><b>Output escaping and CSRF:</b> portal pages escape all dynamic text, and write routes require CSRF tokens.</li>
-      <li><b>Claim and injection guards:</b> the agent cannot confirm a booking unless the tool actually succeeded, and tool arguments are validated before execution.</li>
-      <li><b>Cost-abuse limits:</b> worst-case spend per customer is modeled so a runaway caller cannot create an unbounded bill.</li>
-      <li><b>Data minimisation:</b> caller emails are purged after appointments, and secrets are never committed.</li>
-      <li><b>Honest disclosure:</b> the voice persona sounds natural but never claims to be human and answers truthfully if sincerely asked.</li>
+      <li>I can scope, delegate and verify work across many agents at once, with 3,400+ automated tests as the safety net</li>
+      <li>I label every claim by evidence level, so nothing is oversold</li>
+      <li>I ship, measure and fix, across backend, voice, cloud and security</li>
     </ul>
-  </section>
-
-  <section class="proj-section">
-    <h3>What this taught me</h3>
-    <p>Agents are fast; verification is the bottleneck. The valuable skills were scoping sub-agents so they cannot collide, demanding evidence (tests, baselines, load runs) before trusting a summary, and treating a voice agent like any internet-facing service: authenticated inputs, bounded cost, isolated tenants and an audit trail. It is the same mindset I bring to vulnerability management and detection work.</p>
-    <p><a class="btn btn--primary" href="https://github.com/samiali38183/agent-engineering-lab">GitHub write-up →</a></p>
+    <p><a class="btn btn--primary" href="https://github.com/samiali38183/agent-engineering-lab">GitHub overview →</a></p>
   </section>
 
   <p><a class="btn btn--primary" href="../projects.html">← All projects</a></p>
