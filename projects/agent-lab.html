@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agent Engineering Lab — Sami Ali</title>
+<meta name="description" content="Multi-agent builds with Hermes, Claude Code and Codex; voice-stack benchmarks; SQLite on Fly.io; security engineering for AI agents." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.85em' font-size='90' font-family='monospace' fill='%231E88E5'%3ES%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=IBM+Plex+Mono:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+
+<aside class="sidebar" id="sidebar" aria-label="Primary">
+  <div class="sidebar__brand"><span class="sidebar__name">Sami Ali</span></div>
+  <nav class="sidebar__nav">
+    <a href="../" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg> Home</a>
+    <a href="../about.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg> About</a>
+    <a href="../services.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h6v6H3zM15 4h6v6h-6zM3 14h6v6H3zM15 14h6v6h-6z"/></svg> Services</a>
+    <a href="../projects.html" class="sidebar__link is-active"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3z"/><path d="M8 7V4h8v3"/></svg> Projects</a>
+    <a href="../resume.pdf" class="sidebar__link" download><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></svg> Resume</a>
+    <a href="../contact.html" class="sidebar__link"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Contact</a>
+  </nav>
+  <div class="sidebar__foot">
+    <a class="icon-btn" href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg></a>
+    <a class="icon-btn" href="https://github.com/samiali38183" aria-label="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg></a>
+    <a class="icon-btn" href="mailto:samiali38183@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
+  </div>
+</aside>
+
+<div class="utility">
+  <button class="util-btn" id="themeToggle" aria-label="Toggle light/dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  <button class="util-btn" id="paletteToggle" aria-label="Theme color"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.5-1-.3-.3-.5-.6-.5-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.7-4.5-8.5-10-8.5z"/></svg></button>
+  <div class="color-picker" id="colorPicker">
+    <span class="color-picker__label">Theme</span>
+    <span class="swatch is-active" data-color="blue"></span>
+    <span class="swatch" data-color="teal"></span>
+    <span class="swatch" data-color="violet"></span>
+    <span class="swatch" data-color="rose"></span>
+    <span class="swatch" data-color="amber"></span>
+  </div>
+</div>
+
+<main id="main">
+  <div class="wrap">
+  <div class="crumb"><a href="../">Home</a> / <a href="../projects.html">Projects</a> / Agent Engineering Lab</div>
+
+  <header class="proj-head">
+    <div>
+      <h1 class="proj-title">Agent Engineering Lab — multi-agent builds, voice stacks, and security</h1>
+      <p class="proj-sub">How I build with <b>Hermes Agent</b>, <b>Claude Code</b> and <b>Codex</b>: parallel sub-agents, pytest as the gate, benchmarks before opinions, and security reviewed like a production system.</p>
+    </div>
+    <div class="proj-tags">
+      <span class="card__tag card__tag--amber">Agent Orchestration</span>
+      <span class="card__tag card__tag--violet">Voice AI</span>
+      <span class="card__tag">AppSec</span>
+    </div>
+  </header>
+
+  <div class="callout"><b>Public write-up:</b> <a href="https://github.com/samiali38183/agent-engineering-lab">github.com/samiali38183/agent-engineering-lab</a>. Real engineering notes from a live project; customer data, prices and secrets are not in it.</div>
+
+  <section class="proj-section">
+    <h3>The stack</h3>
+    <ul class="bullets">
+      <li><b>Runtime:</b> FastAPI on <b>Fly.io</b> with a persistent volume and <b>SQLite in WAL mode</b> as the system of record (calls, bookings, tenants, usage).</li>
+      <li><b>Telephony and speech:</b> Twilio today; Deepgram streaming speech-to-text and Amazon Polly voices; <b>ElevenLabs</b>, <b>Telnyx</b> and <b>Retell</b> in a controlled benchmark.</li>
+      <li><b>Reasoning:</b> Claude tool-use loop with schema-validated tools. The model proposes; code disposes.</li>
+      <li><b>Integrations:</b> Google Calendar, Cal.com, Calendly and iCal busy feeds behind one provider interface.</li>
+      <li><b>Agent tooling:</b> Hermes Agent as orchestrator, Claude Code and Codex as builders, parallel sub-agents on isolated workstreams.</li>
+    </ul>
+  </section>
+
+  <section class="proj-section">
+    <h3>How I use agents</h3>
+    <ol class="bullets">
+      <li><b>Split work into streams.</b> One orchestration session fans out independent sub-agents (voice audit, coverage routing, usage metering, calendar audit, portal UI, concurrency, field-service research) with disjoint files and explicit "do not touch" lists.</li>
+      <li><b>The test suite is the contract.</b> The backend suite is 3,400+ tests. After every fan-out I re-run the affected slice, diff against a clean baseline worktree, and accept only regressions I can explain.</li>
+      <li><b>Claim levels, not vibes.</b> Every feature is labeled BUILT, UNIT TESTED, INTEGRATION TESTED, DEPLOYED or PRODUCTION VERIFIED, and nothing is marketed above its level.</li>
+      <li><b>Measured vs modeled.</b> Cost and latency numbers are tagged so a model never passes as a measurement.</li>
+      <li><b>No secrets in prompts.</b> Keys live in gitignored env files or platform secrets and are checked with read-only calls.</li>
+    </ol>
+  </section>
+
+  <section class="proj-section">
+    <h3>Voice-stack benchmark harness</h3>
+    <p>Instead of arguing about which voice stack is best, I built a reproducible harness: 28 scenarios (booking, reschedule, cancel, transfer, emergencies, barge-in, noisy audio, tool failure, a business timezone that differs from the server) driven through the real conversation engine. A deterministic stub model keeps CI free, and a live flag runs real models. Scoring covers booking correctness, tool-call correctness, hallucination checks, transfer correctness and recovery, with slots for latency percentiles and speech accuracy from real-call runs. Architectures under comparison: the Twilio baseline, Deepgram streaming, Telnyx managed and custom, Retell, ElevenLabs voices, and native audio models.</p>
+  </section>
+
+  <section class="proj-section">
+    <h3>Databases and concurrency: a real race the analysis found</h3>
+    <p>A per-client concurrent-call ceiling looked correct but was not atomic. Under a burst of 64 simultaneous callers it admitted 42 against a ceiling of 24, a classic check-then-insert race. The fix was an admission lock around the count-and-claim step, with a hard global cap and a rollback-safe default. A local load test now holds the ceiling exactly at 8, 16, 32 and 64 callers. SQLite WAL, a single Fly machine and a shared model client were analysed as the real scaling limits, and the write-up marks which claims are measured and which are modeled.</p>
+  </section>
+
+  <section class="proj-section">
+    <h3>Security engineering inside an agent system</h3>
+    <ul class="bullets">
+      <li><b>Webhook authenticity:</b> telephony webhooks are signature-verified, with duplicate-event handling tested.</li>
+      <li><b>Tenant isolation:</b> every portal query is scoped by the signed-in session, with tests that one tenant's calls never appear for another.</li>
+      <li><b>Output escaping and CSRF:</b> portal pages escape all dynamic text, and write routes require CSRF tokens.</li>
+      <li><b>Claim and injection guards:</b> the agent cannot confirm a booking unless the tool actually succeeded, and tool arguments are validated before execution.</li>
+      <li><b>Cost-abuse limits:</b> worst-case spend per customer is modeled so a runaway caller cannot create an unbounded bill.</li>
+      <li><b>Data minimisation:</b> caller emails are purged after appointments, and secrets are never committed.</li>
+      <li><b>Honest disclosure:</b> the voice persona sounds natural but never claims to be human and answers truthfully if sincerely asked.</li>
+    </ul>
+  </section>
+
+  <section class="proj-section">
+    <h3>What this taught me</h3>
+    <p>Agents are fast; verification is the bottleneck. The valuable skills were scoping sub-agents so they cannot collide, demanding evidence (tests, baselines, load runs) before trusting a summary, and treating a voice agent like any internet-facing service: authenticated inputs, bounded cost, isolated tenants and an audit trail. It is the same mindset I bring to vulnerability management and detection work.</p>
+    <p><a class="btn btn--primary" href="https://github.com/samiali38183/agent-engineering-lab">GitHub write-up →</a></p>
+  </section>
+
+  <p><a class="btn btn--primary" href="../projects.html">← All projects</a></p>
+
+    <footer class="foot">
+      <span>&copy; 2026 Sami Ali &middot; Alexandria, VA</span>
+      <div class="foot__social">
+        <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.5h4v11H3zm7 0h3.8v1.6h.06c.53-.9 1.83-1.9 3.77-1.9C21.3 9.2 22 11.5 22 14.3V20.5h-4v-5.5c0-1.32-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9v5.6h-4z"/></svg></a>
+        <a href="https://github.com/samiali38183" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.27 5.67.41.35.77 1.04.77 2.1v3.11c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg></a>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<button class="to-top" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg></button>
+<script src="../main.js"></script>
+</body>
+</html>
