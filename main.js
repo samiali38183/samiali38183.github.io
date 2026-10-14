@@ -1,295 +1,368 @@
-/* Desktop window manager + app launch sequence */
 (function () {
-  'use strict';
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  "use strict";
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const simple = document.documentElement.classList.contains('simple');
-
-  const desk = $('#desk');
-  const splash = $('#splash');
-  const splashName = $('#splashName');
-  const splashSub = $('#splashSub');
-  const splashBar = $('#splashBar');
-  const splashIco = $('#splashIco');
-  const appMenu = $('#appMenu');
-  const clockEl = $('#clock');
-  const tasks = $('#tasks');
-  let z = 20, drag = null, resize = null, launching = false;
-
-  const META = {
-    about: { title: 'About', bin: 'about', logs: ['reading ~/.profile', 'loading internships', 'ready'] },
-    projects: { title: 'Projects', bin: 'files', logs: ['mounting /home/sami/projects', 'indexing 6 files', 'ready'] },
-    resume: { title: 'Resume', bin: 'evince', logs: ['opening resume.pdf', 'rendering pages', 'ready'] },
-    contact: { title: 'Mail', bin: 'thunderbird', logs: ['starting mail', 'loading compose', 'ready'] },
-    term: { title: 'Terminal', bin: 'qterminal', logs: ['allocating pty', 'bash 5.2', 'ready'] },
-    files: { title: 'Files', bin: 'thunar', logs: ['opening home', 'ready'] },
-    lab: { title: 'agent-lab.md', bin: 'mousepad', logs: ['opening markdown', 'ready'] },
-    'call-kettle': { title: 'call-kettle.md', bin: 'mousepad', logs: ['opening markdown', 'ready'] },
-    kev: { title: 'kev.md', bin: 'mousepad', logs: ['opening case study', 'ready'] },
-    'power-bi': { title: 'power-bi.md', bin: 'mousepad', logs: ['opening notes', 'ready'] },
-    wireshark: { title: 'wireshark.md', bin: 'mousepad', logs: ['opening lab', 'ready'] },
-    phish: { title: 'phishing-ioc.md', bin: 'mousepad', logs: ['opening notes', 'ready'] },
-    trash: { title: 'Trash', bin: 'trash', logs: ['checking trash', 'empty'] }
+  const out = $("#out");
+  const input = $("#cmd");
+  const form = $("#form");
+  const win = $("#win");
+  const suggest = $("#suggest");
+  const hits = $("#hits");
+  const clockEl = $("#clock");
+  const themes = ["night", "phosphor", "paper"];
+  const NAMES = [
+    "whoami", "now", "intern", "projects", "stack", "certs",
+    "resume", "contact", "github", "help", "clear", "ls", "cat", "theme", "date"
+  ];
+  const DESC = {
+    whoami: "Who Sami is",
+    now: "What he’s doing this year",
+    intern: "CBP VAT internship",
+    projects: "Selected work",
+    stack: "Tools and agents",
+    certs: "Certifications",
+    resume: "PDF resume",
+    contact: "Email, phone, LinkedIn",
+    github: "GitHub profile",
+    help: "Show commands",
+    clear: "Clear the screen",
+    ls: "List files",
+    cat: "Read a file",
+    theme: "Cycle terminal theme",
+    date: "Local time"
+  };
+  const FILES = {
+    "about.txt": "whoami",
+    "now.txt": "now",
+    "projects.md": "projects",
+    "stack.md": "stack",
+    "contact.txt": "contact",
+    "resume.pdf": "resume"
   };
 
-  function clock() {
-    const d = new Date();
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    clockEl.textContent = days[d.getDay()] + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
-  }
-  clock();
-  setInterval(clock, 10000);
-
-  function winEl(id) { return document.querySelector('.win[data-id="' + id + '"]'); }
-
-  function focusWin(id) {
-    const el = winEl(id);
-    if (!el) return;
-    z += 1;
-    el.style.zIndex = String(z);
-    $$('.win').forEach((w) => w.classList.toggle('is-focus', w === el));
-    $$('.task').forEach((t) => t.classList.toggle('is-on', t.dataset.id === id));
-  }
-
-  function renderTasks() {
-    if (!tasks) return;
-    tasks.innerHTML = '';
-    $$('.win.is-open').forEach((w) => {
-      if (w.classList.contains('is-min')) return;
-      const b = document.createElement('button');
-      b.className = 'task' + (w.classList.contains('is-focus') ? ' is-on' : '');
-      b.dataset.id = w.dataset.id;
-      b.textContent = w.dataset.title;
-      b.addEventListener('click', () => {
-        w.classList.remove('is-min');
-        w.classList.add('is-open');
-        focusWin(w.dataset.id);
-      });
-      tasks.appendChild(b);
-    });
-  }
-
-  function place(el) {
-    if (simple) {
-      el.classList.add('is-max');
-      el.style.left = '0'; el.style.top = '0';
-      el.style.width = '100%'; el.style.height = '100%';
-      return;
-    }
-    if (el.dataset.placed) return;
-    const n = $$('.win.is-open').length;
-    el.style.left = (48 + (n * 28) % 200) + 'px';
-    el.style.top = (36 + (n * 24) % 140) + 'px';
-    el.style.width = el.dataset.w || '540px';
-    el.style.height = el.dataset.h || '380px';
-    el.dataset.placed = '1';
-  }
-
-  function openWin(id) {
-    const el = winEl(id);
-    if (!el) return;
-    if (simple) {
-      $$('.win').forEach((w) => {
-        if (w !== el) w.classList.remove('is-open', 'is-min', 'is-max', 'is-focus');
-      });
-    }
-    el.classList.add('is-open');
-    el.classList.remove('is-min');
-    place(el);
-    focusWin(id);
-    renderTasks();
-    if (id === 'term') setTimeout(() => $('#termInput')?.focus(), 40);
-  }
-
-  function closeWin(id) {
-    const el = winEl(id);
-    if (!el) return;
-    el.classList.remove('is-open', 'is-min', 'is-max', 'is-focus');
-    renderTasks();
-  }
-
-  function launch(id, fromEl) {
-    if (id === 'resume-file') {
-      const a = document.createElement('a');
-      a.href = 'resume.pdf'; a.download = 'Sami-Ali-Resume.pdf'; a.click();
-      return;
-    }
-    const meta = META[id] || { title: id, bin: id, logs: ['starting', 'ready'] };
-    if (reduce) { openWin(id); return; }
-    if (launching) return;
-    launching = true;
-    fromEl?.classList.add('is-launch');
-    setTimeout(() => fromEl?.classList.remove('is-launch'), 400);
-
-    const ico = fromEl?.querySelector('.ico');
-    splashIco.innerHTML = ico ? ico.outerHTML : '';
-    splashName.textContent = meta.title;
-    splashSub.textContent = 'starting ' + meta.bin + '…';
-    splashBar.style.width = '0%';
-    splash.classList.add('is-on');
-
-    const logs = meta.logs;
-    const total = simple ? 520 : 780;
-    const t0 = performance.now();
-    function tick(now) {
-      const p = Math.min(1, (now - t0) / total);
-      splashBar.style.width = Math.round(p * 100) + '%';
-      const li = Math.min(logs.length - 1, Math.floor(p * logs.length));
-      splashSub.textContent = logs[li];
-      if (p < 1) requestAnimationFrame(tick);
-      else {
-        splash.classList.remove('is-on');
-        launching = false;
-        openWin(id);
-      }
-    }
-    requestAnimationFrame(tick);
-  }
-
-  $$('.win').forEach((el) => {
-    el.addEventListener('mousedown', () => focusWin(el.dataset.id));
-    el.querySelector('[data-act="x"]')?.addEventListener('click', (e) => { e.stopPropagation(); closeWin(el.dataset.id); });
-    el.querySelector('[data-act="m"]')?.addEventListener('click', (e) => { e.stopPropagation(); el.classList.add('is-min'); el.classList.remove('is-focus'); renderTasks(); });
-    el.querySelector('[data-act="M"]')?.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('is-max'); focusWin(el.dataset.id); });
-    el.querySelector('.titlebar')?.addEventListener('dblclick', () => { if (!simple) el.classList.toggle('is-max'); });
-    el.querySelector('.titlebar')?.addEventListener('mousedown', (e) => {
-      if (simple || e.button !== 0 || e.target.closest('.ctrl') || el.classList.contains('is-max')) return;
-      const r = el.getBoundingClientRect();
-      const wr = desk.getBoundingClientRect();
-      drag = { el, dx: e.clientX - r.left, dy: e.clientY - r.top, wr };
-      e.preventDefault();
-    });
-    el.querySelector('.rsz')?.addEventListener('mousedown', (e) => {
-      if (simple) return;
-      e.stopPropagation();
-      const r = el.getBoundingClientRect();
-      resize = { el, x: e.clientX, y: e.clientY, w: r.width, h: r.height };
-      e.preventDefault();
-    });
-  });
-
-  $$('[data-launch]').forEach((el) => {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      launch(el.dataset.launch, el);
-    });
-  });
-
-  window.addEventListener('mousemove', (e) => {
-    if (drag) {
-      let x = e.clientX - drag.wr.left - drag.dx;
-      let y = e.clientY - drag.wr.top - drag.dy;
-      x = Math.max(-40, Math.min(x, drag.wr.width - 80));
-      y = Math.max(0, Math.min(y, drag.wr.height - 40));
-      drag.el.style.left = x + 'px';
-      drag.el.style.top = y + 'px';
-    }
-    if (resize) {
-      resize.el.style.width = Math.max(280, resize.w + (e.clientX - resize.x)) + 'px';
-      resize.el.style.height = Math.max(180, resize.h + (e.clientY - resize.y)) + 'px';
-    }
-  });
-  window.addEventListener('mouseup', () => { drag = null; resize = null; });
-
-  function closeMenus() { appMenu?.classList.remove('is-on'); $('#appBtn')?.classList.remove('is-on'); }
-  $('#appBtn')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const on = appMenu.classList.toggle('is-on');
-    $('#appBtn').classList.toggle('is-on', on);
-  });
-  document.addEventListener('click', closeMenus);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeMenus(); splash.classList.remove('is-on'); launching = false; }
-  });
-
-  const hashMap = {
-    about: 'about', contact: 'contact', projects: 'projects', services: 'about',
-    'call-kettle': 'call-kettle', kev: 'kev', 'power-bi': 'power-bi',
-    wireshark: 'wireshark', 'phishing-ioc': 'phish', 'agent-lab': 'lab', resume: 'resume'
-  };
-  function fromHash() {
-    const h = (location.hash || '').replace(/^#\/?/, '');
-    if (hashMap[h]) launch(hashMap[h]);
-  }
-  window.addEventListener('hashchange', fromHash);
-
-  /* terminal */
-  const out = $('#termOut');
-  const input = $('#termInput');
   const hist = [];
   let hi = 0;
-  function print(html) {
-    if (!out) return;
-    out.insertAdjacentHTML('beforeend', html);
-    const t = $('.term');
-    if (t) t.scrollTop = t.scrollHeight;
+  let themeIdx = 0;
+  let booting = false;
+
+  function setVh() {
+    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty("--vh", h + "px");
   }
-  const cmds = {
-    help: () => '<span class="dim">whoami  neofetch  ls  cat about.txt  open projects  resume  contact  clear</span>',
-    whoami: () => 'sami',
-    pwd: () => '/home/sami',
-    date: () => new Date().toString(),
-    uname: () => 'Linux kali 6.8.0-kali x86_64',
-    ls: (a) => (a[0] === 'projects' || a[0] === '~/projects')
-      ? 'call-kettle.md  kev.md  power-bi.md  wireshark.md  phishing-ioc.md  lab.md'
-      : 'about.txt  contact.txt  projects/  resume.pdf',
-    cat: (a) => ({
-      'about.txt': 'Sami Ali — cybersecurity, Alexandria VA.\nDHS HS-POWER intern, CBP VAT, Summer 2026.\nSecurity+ · AWS CCP · CBP Full BI.',
-      'contact.txt': 'samiali38183@gmail.com · (571) 290-8908'
-    }[(a[0] || '').replace(/^~\//, '')] || '<span class="red">No such file</span>'),
-    open: (a) => { launch(a[0] || 'projects'); return 'launching…'; },
-    projects: () => { launch('projects'); return ''; },
-    contact: () => { launch('contact'); return ''; },
-    resume: () => { launch('resume'); return ''; },
-    clear: () => { out.innerHTML = ''; return ''; },
-    neofetch: () => [
-      '<span class="red">sami</span>@<span class="red">kali</span>',
-      '<span class="dim">-----------</span>',
-      '<span class="cyan">Host</span>: Sami Ali · Alexandria, VA',
-      '<span class="cyan">Role</span>: cybersecurity · detection / cloud / vuln mgmt',
-      '<span class="cyan">Uptime</span>: CBP VAT intern, Summer 2026',
-      '<span class="cyan">Packages</span>: Security+, AWS CCP, CBP Full BI',
-      '<span class="cyan">GitHub</span>: github.com/samiali38183'
-    ].join('\n')
-  };
-  $('#termForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const raw = input.value.trim();
-    input.value = '';
-    if (!raw) return;
-    hist.push(raw); hi = hist.length;
-    const parts = raw.split(/\s+/);
-    print('\n<span class="ok">sami@kali</span>:<span class="cyan">~</span>$ ' + raw.replace(/</g, '&lt;') + '\n');
-    if (parts[0] === 'echo') { print(parts.slice(1).join(' ') + '\n'); return; }
-    const fn = cmds[parts[0]];
-    if (!fn) { print('<span class="red">bash: command not found</span>\n'); return; }
-    const res = fn(parts.slice(1));
-    if (res) print(res + '\n');
-  });
-  input?.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp' && hist.length) { e.preventDefault(); hi = Math.max(0, hi - 1); input.value = hist[hi] || ''; }
-    if (e.key === 'ArrowDown') { e.preventDefault(); hi = Math.min(hist.length, hi + 1); input.value = hist[hi] || ''; }
-  });
+  setVh();
+  window.visualViewport?.addEventListener("resize", setVh);
+  window.addEventListener("resize", setVh);
 
-  $$('a[download]').forEach((a) => {
-    const href = a.getAttribute('href') || '';
-    if (!/\.pdf($|\?)/i.test(href)) return;
-    a.addEventListener('click', async (e) => {
-      try {
-        e.preventDefault();
-        const filename = href.split('/').pop().split('?')[0];
-        const res = await fetch(href, { cache: 'no-cache' });
-        if (!res.ok) throw 0;
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const tmp = document.createElement('a');
-        tmp.href = url; tmp.download = filename;
-        document.body.appendChild(tmp); tmp.click(); tmp.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 800);
-      } catch (err) { window.location.href = href; }
+  function tickClock() {
+    clockEl.textContent = new Date().toLocaleTimeString("en-GB", { hour12: false });
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  try {
+    const saved = localStorage.getItem("sami-theme");
+    if (saved && themes.includes(saved)) {
+      themeIdx = themes.indexOf(saved);
+      applyTheme(saved, true);
+    }
+  } catch (e) {}
+
+  function applyTheme(name, silent) {
+    if (name === "night") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", name);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    const colors = { night: "#07090d", phosphor: "#041108", paper: "#ece7dc" };
+    if (meta) meta.setAttribute("content", colors[name] || colors.night);
+    try { localStorage.setItem("sami-theme", name); } catch (e) {}
+    if (!silent) $("#statusMid").textContent = "theme: " + name;
+  }
+
+  function sleep(ms) {
+    if (reduce) return Promise.resolve();
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
+  function html(s) {
+    const d = document.createElement("div");
+    d.innerHTML = s;
+    out.appendChild(d);
+    out.scrollTop = out.scrollHeight;
+    return d;
+  }
+
+  function bootLine(text, cls) {
+    html('<div class="line boot ' + (cls || "") + '">' + text + "</div>");
+  }
+
+  const BANNER =
+    '   _____           _ \n' +
+    '  / ____|         (_)\n' +
+    ' | (___   __ _ _ __ _ \n' +
+    '  \\___ \\ / _` | \'_ ` _ \\\n' +
+    '  ____) | (_| | | | | | |\n' +
+    ' |_____/ \\__,_|_| |_| |_|  ali\n';
+
+  function helpHtml() {
+    const groups = {
+      About: ["whoami", "now", "intern", "certs"],
+      Work: ["projects", "stack", "resume"],
+      Connect: ["contact", "github"],
+      Terminal: ["theme", "clear", "ls", "cat", "help"]
+    };
+    let t = '<div class="mb"><div class="bold">Available commands</div><div class="mut">---</div>';
+    Object.entries(groups).forEach(([g, list]) => {
+      t += '<div class="bold mt">' + g + "</div>";
+      list.forEach((c) => {
+        t += '<div class="ml"><span class="acc">' + c + "</span> — " + DESC[c] + "</div>";
+      });
     });
+    t += '<div class="mut mb" style="margin-top:10px">Tab autocompletes. Shift+Tab cycles themes. Shortcuts sit under the window.</div></div>';
+    return t;
+  }
+
+  const CMDS = {
+    help: () => helpHtml(),
+    whoami: () =>
+      '<div class="mb">' +
+      '<div class="acc bold">Sami Ali</div>' +
+      "<div>Cybersecurity student, Alexandria, VA.</div>" +
+      "<div>Summer 2026 intern on CBP’s Vulnerability Assessment Team (DHS HS-POWER).</div>" +
+      "<div>Targeting detection, cloud security, and security-engineering internships for 2027.</div>" +
+      '<div class="grid">' +
+      "<div><span class=\"mut\">location</span>  Alexandria, VA</div>" +
+      "<div><span class=\"mut\">clearance</span>  CBP Full BI — active</div>" +
+      "<div><span class=\"mut\">available</span>  Summer 2027</div>" +
+      "<div><span class=\"mut\">learning</span>  HTB CPTS · OSCP</div>" +
+      "</div>" +
+      "<div><span class=\"mut\">edu</span>  B.S. IT, George Mason (2026–2028), cybersecurity minor</div>" +
+      "<div><span class=\"mut\">edu</span>  A.S. IT, NOVA (2024–2026), GPA 3.7</div>" +
+      "</div>",
+    now: () =>
+      '<div class="mb"><div class="bold">Now</div>' +
+      "<div>• Wrapping CBP VAT intern work: risk-based vuln prioritization, dashboard, briefing</div>" +
+      "<div>• Building with coding agents (Hermes, Claude Code, Codex) against real repos + pytest</div>" +
+      "<div>• Studying toward CPTS / OSCP</div>" +
+      "<div>• Looking at 2027 internships in detection / cloud / AppSec, DC–NoVA</div></div>",
+    intern: () =>
+      '<div class="mb"><div class="bold">CBP · Vulnerability Assessment Team</div>' +
+      "<div>DHS HS-POWER · May–Aug 2026 · Ashburn, VA</div>" +
+      "<div>Risk-based ranking on agency scan data. Confirmed exploitation and EPSS ahead of raw CVSS. Executive view so “critical” is not treated as “exploited.”</div></div>",
+    projects: () =>
+      '<div class="mb"><div class="bold">Selected work</div>' +
+      '<div class="ml"><span class="acc">agent-lab</span> — teams of coding agents on real repos; pytest is the gate</div>' +
+      '<div class="ml"><span class="acc">call-kettle</span> — AI voice receptionist. Claude Haiku tool-use, FastAPI, Twilio. Built with Claude Code + Hermes. <a href="https://github.com/samiali38183/call-kettle" target="_blank" rel="noopener">code</a></div>' +
+      '<div class="ml"><span class="acc">kev / bod 26-04</span> — public write-up of CBP-style KEV/EPSS prioritization</div>' +
+      '<div class="ml"><span class="acc">power-bi kev</span> — executive dashboard: similar CVSS, different EPSS</div>' +
+      '<div class="ml"><span class="acc">wireshark-lab</span> — packet write-ups from the pcap, not the dashboard</div>' +
+      '<div class="ml"><span class="acc">phishing-ioc</span> — Python CLI: extract / normalize indicators</div>' +
+      '<div class="mut">cat projects.md  ·  ls</div></div>',
+    stack: () =>
+      '<div class="mb"><div class="bold">Stack</div>' +
+      "<div>Python · FastAPI · pytest · Twilio · YAML tenants</div>" +
+      "<div>Claude Haiku (tool-use runtime) · Claude Code · Hermes Agent · Codex</div>" +
+      "<div>Power BI · Wireshark · GitHub · Vercel / Fly</div></div>",
+    certs: () =>
+      '<div class="mb"><div class="bold">Certifications</div>' +
+      '<div>CompTIA Security+ · <a href="assets/certs/CompTIA-Security-Plus.pdf">PDF</a></div>' +
+      '<div>AWS Cloud Practitioner (CLF-C02) · <a href="assets/certs/AWS-Cloud-Practitioner.pdf">PDF</a></div>' +
+      "<div class=\"mut\">in progress: CPTS, OSCP</div></div>",
+    resume: () =>
+      '<div class="mb">Resume (PDF) — <a href="resume.pdf" download>download</a> · <a href="resume.pdf" target="_blank" rel="noopener">open</a></div>',
+    contact: () =>
+      '<div class="mb"><div class="bold">Connect</div>' +
+      '<div><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></div>' +
+      '<div><a href="tel:+15712908908">(571) 290-8908</a></div>' +
+      '<div><a href="https://www.linkedin.com/in/sami-ali-1a4b89345" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://github.com/samiali38183" target="_blank" rel="noopener">GitHub</a></div>' +
+      "<div class=\"mut\">Internships / security-engineering · DC / NoVA</div></div>",
+    github: () =>
+      '<div class="mb"><a href="https://github.com/samiali38183" target="_blank" rel="noopener">github.com/samiali38183</a></div>',
+    ls: () =>
+      '<div class="mb"><span class="acc">about.txt</span>  <span class="acc">now.txt</span>  <span class="acc">projects.md</span>  <span class="acc">stack.md</span>  <span class="acc">contact.txt</span>  <span class="acc">resume.pdf</span></div>',
+    date: () => '<div class="mb">' + new Date().toString() + "</div>",
+    theme: () => {
+      themeIdx = (themeIdx + 1) % themes.length;
+      applyTheme(themes[themeIdx]);
+      return '<div class="mb">theme → <span class="acc">' + themes[themeIdx] + "</span></div>";
+    },
+    clear: () => {
+      out.innerHTML = "";
+      return "";
+    }
+  };
+
+  CMDS.cat = (args) => {
+    const f = (args[0] || "").replace(/^~\//, "");
+    if (!f) return '<div class="err mb">usage: cat &lt;file&gt;</div>';
+    if (FILES[f]) return CMDS[FILES[f]]();
+    return '<div class="err mb">cat: ' + f.replace(/</g, "&lt;") + ": no such file</div>";
+  };
+
+  function echoPrompt(raw) {
+    html(
+      '<div class="entry"><div class="cmdrow"><span class="ok">sami</span><span class="acc">@nova</span> <span class="mut">~</span> % ' +
+        raw.replace(/</g, "&lt;") +
+        "</div></div>"
+    );
+  }
+
+  function run(raw, fromChip) {
+    const line = (raw || "").trim();
+    if (!line) return;
+    if (!fromChip) {
+      hist.push(line);
+      hi = hist.length;
+    }
+    echoPrompt(line);
+    const parts = line.split(/\s+/);
+    const name = parts[0].toLowerCase();
+    const args = parts.slice(1);
+    hideSuggest();
+    if (name === "echo") {
+      html('<div class="mb">' + args.join(" ").replace(/</g, "&lt;") + "</div>");
+      return;
+    }
+    const fn = CMDS[name];
+    if (!fn) {
+      html('<div class="err mb">zsh: command not found: ' + name.replace(/</g, "&lt;") + " — try <span class=\"acc\">help</span></div>");
+      return;
+    }
+    const res = fn(args);
+    if (res) html(res);
+    location.hash = name === "help" ? "" : name;
+  }
+
+  function matches(q) {
+    if (!q) return [];
+    return NAMES.filter((n) => n.startsWith(q.toLowerCase()));
+  }
+
+  function showSuggest(list) {
+    if (!list.length) {
+      hideSuggest();
+      return;
+    }
+    hits.innerHTML = "";
+    list.forEach((n) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = n;
+      b.addEventListener("click", () => {
+        input.value = n;
+        hideSuggest();
+        input.focus();
+      });
+      hits.appendChild(b);
+    });
+    suggest.classList.add("on");
+  }
+
+  function hideSuggest() {
+    suggest.classList.remove("on");
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = input.value;
+    input.value = "";
+    run(v);
   });
 
-  if (location.hash) setTimeout(fromHash, 200);
+  input.addEventListener("input", () => {
+    const q = input.value.trim();
+    showSuggest(matches(q));
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Tab" && !e.shiftKey) {
+      e.preventDefault();
+      const q = input.value.trim();
+      const m = matches(q);
+      if (m.length === 1) {
+        input.value = m[0];
+        hideSuggest();
+      } else if (m.length > 1) showSuggest(m);
+    }
+    if (e.key === "Tab" && e.shiftKey) {
+      e.preventDefault();
+      themeIdx = (themeIdx + 1) % themes.length;
+      applyTheme(themes[themeIdx]);
+    }
+    if (e.key === "ArrowUp" && hist.length) {
+      e.preventDefault();
+      hi = Math.max(0, hi - 1);
+      input.value = hist[hi] || "";
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      hi = Math.min(hist.length, hi + 1);
+      input.value = hist[hi] || "";
+    }
+    if (e.key === "Escape") hideSuggest();
+  });
+
+  document.querySelectorAll("[data-run]").forEach((el) => {
+    el.addEventListener("click", () => run(el.dataset.run, true));
+  });
+  $("#btnHelp").addEventListener("click", () => run("help", true));
+  $("#btnClose").addEventListener("click", () => boot(true));
+  $("#btnMin").addEventListener("click", () => win.classList.toggle("is-min"));
+  $("#btnMax").addEventListener("click", () => win.classList.toggle("is-max"));
+  $("#winTitle").addEventListener("dblclick", () => win.classList.toggle("is-max"));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") win.classList.remove("is-min");
+    const tag = (e.target && e.target.tagName) || "";
+    if (tag !== "INPUT" && tag !== "TEXTAREA" && e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
+      input.focus();
+    }
+  });
+
+  const HASH = {
+    about: "whoami",
+    whoami: "whoami",
+    now: "now",
+    intern: "intern",
+    projects: "projects",
+    stack: "stack",
+    certs: "certs",
+    resume: "resume",
+    contact: "contact",
+    github: "github",
+    services: "whoami",
+    "call-kettle": "projects",
+    kev: "projects"
+  };
+
+  async function boot(reset) {
+    if (booting) return;
+    booting = true;
+    win.classList.remove("is-min");
+    out.innerHTML = "";
+    const d = new Date();
+    const stamp = d.toLocaleDateString() + " " + d.toLocaleTimeString("en-GB", { hour12: false });
+    bootLine(stamp);
+    await sleep(350);
+    bootLine('Initializing terminal... <span class="ok">done</span>');
+    await sleep(420);
+    bootLine('Loading modules... <span class="ok">done</span>');
+    await sleep(420);
+    bootLine('Connecting to samiali38183.github.io ... <span class="ok">done</span>');
+    await sleep(380);
+    html('<div class="banner">' + BANNER.replace(/</g, "&lt;") + "</div>");
+    html('<div class="mut mb">Type <span class="acc">help</span> or tap a shortcut below.</div>');
+    booting = false;
+    input.focus();
+    if (!reset) {
+      const h = (location.hash || "").replace(/^#\/?/, "");
+      if (HASH[h]) setTimeout(() => run(HASH[h], true), 80);
+    }
+  }
+
+  window.addEventListener("hashchange", () => {
+    const h = (location.hash || "").replace(/^#\/?/, "");
+    if (HASH[h]) run(HASH[h], true);
+  });
+
+  boot(false);
 })();

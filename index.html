@@ -1,264 +1,79 @@
 <!doctype html>
-<html lang="en" class="simple">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<script>
-(function(){
-  try{
-    var touch = (navigator.maxTouchPoints||0)>0 || 'ontouchstart' in window;
-    var w = window.innerWidth || screen.width || 0;
-    if(!touch && w>=901) document.documentElement.className='desk';
-  }catch(e){}
-})();
-</script>
-<title>sami@kali — Sami Ali</title>
-<meta name="description" content="Sami Ali — cybersecurity. DHS HS-POWER intern at CBP. Security+ · AWS CCP. Alexandria, VA." />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.85em' font-size='90' font-family='monospace' fill='%23c62828'%3E$%3C/text%3E%3C/svg%3E" />
+<title>Sami Ali — cybersecurity</title>
+<meta name="description" content="Sami Ali — cybersecurity student in Alexandria, VA. DHS HS-POWER intern on CBP’s Vulnerability Assessment Team. Security+ · AWS CCP." />
+<meta name="theme-color" content="#07090d" />
+<link rel="canonical" href="https://samiali38183.github.io/" />
+<meta property="og:title" content="Sami Ali — cybersecurity" />
+<meta property="og:description" content="CBP VAT intern. Detection, cloud security, vuln management. Alexandria, VA." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.86em' font-size='90' font-family='monospace' fill='%233ddc84'%3E$%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=4" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
-<a class="skip" href="#desk">Skip to desktop</a>
-<div class="os">
-  <div class="wall" aria-hidden="true">
-    <svg class="wall__mark" viewBox="0 0 200 200"><path fill="#c62828" d="M100 12 L178 56 v88 L100 188 22 144 V56z"/><path fill="#0b0c10" d="M100 38 L158 70 v60 L100 162 42 130 V70z"/><path fill="#c62828" d="M100 62 L138 82 v36 L100 138 62 118 V82z"/></svg>
-  </div>
+<a class="skip" href="#cmd">Skip to command</a>
 
-  <header class="panel">
-    <button class="pbtn pbtn--apps desk-only" id="appBtn" type="button"><b>Applications</b></button>
-    <div class="panel__brand">Sami Ali</div>
-    <div class="panel__mid desk-only" id="tasks"></div>
-    <div class="clock" id="clock">Thu 0:00</div>
-  </header>
+<div class="stage">
+  <section class="win" id="win" aria-label="Terminal">
+    <header class="tb">
+      <span class="dots">
+        <button class="dot dot--x" id="btnClose" type="button" aria-label="Reset terminal"></button>
+        <button class="dot dot--m" id="btnMin" type="button" aria-label="Minimize"></button>
+        <button class="dot dot--M" id="btnMax" type="button" aria-label="Maximize"></button>
+      </span>
+      <div class="title" id="winTitle">sami@nova — zsh</div>
+      <button class="helpbtn" id="btnHelp" type="button" title="help">?</button>
+    </header>
 
-  <div class="desk" id="desk">
-    <div class="icons" id="icons">
-      <button class="app" data-launch="about" type="button">
-        <span class="ico ico--user"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="8" r="3.2"/><path d="M5 19c1.2-3.2 3.4-5 7-5s5.8 1.8 7 5"/></svg></span>
-        <span class="app__name">About</span>
-      </button>
-      <button class="app" data-launch="projects" type="button">
-        <span class="ico ico--folder"><svg viewBox="0 0 24 24" fill="#fff6"><path fill="#fff" d="M3 7h6l2 2h10v10H3z"/></svg></span>
-        <span class="app__name">Projects</span>
-      </button>
-      <button class="app" data-launch="resume" type="button">
-        <span class="ico ico--pdf"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h4"/></svg></span>
-        <span class="app__name">Resume</span>
-      </button>
-      <button class="app" data-launch="contact" type="button">
-        <span class="ico ico--mail"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
-        <span class="app__name">Mail</span>
-      </button>
-      <button class="app desk-only" data-launch="term" type="button">
-        <span class="ico ico--term"><svg viewBox="0 0 24 24" fill="none" stroke="#7cfc6a" stroke-width="1.8"><path d="M5 8l5 4-5 4"/><path d="M12 16h7"/></svg></span>
-        <span class="app__name">Terminal</span>
-      </button>
-      <button class="app desk-only" data-launch="files" type="button">
-        <span class="ico ico--code"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></span>
-        <span class="app__name">Files</span>
-      </button>
-    </div>
+    <div class="scroll" id="out" tabindex="-1"></div>
 
-    <div class="splash" id="splash" aria-hidden="true">
-      <div class="splash__card">
-        <div id="splashIco"></div>
-        <p class="splash__title" id="splashName">Starting</p>
-        <p class="splash__sub" id="splashSub">loading…</p>
-        <div class="bar"><i id="splashBar"></i></div>
-      </div>
-    </div>
-
-    <section class="win" data-id="about" data-title="About" data-w="560px" data-h="480px">
-      <div class="titlebar"><span class="title">About — Sami Ali</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">whoami</div>
-        <h1>Sami Ali</h1>
-        <p>Cybersecurity student in Alexandria, VA. Summer 2026 intern on CBP’s Vulnerability Assessment Team (DHS HS-POWER). Targeting detection, cloud security, and security-engineering internships for 2027.</p>
-        <p>I got into security because I like the puzzle of it — the one thing in a pile of noise that actually matters. CBP was the first time that puzzle was federal-scale scan data you cannot “patch everything” for.</p>
-        <div class="facts">
-          <div><b>Location</b> Alexandria, VA</div>
-          <div><b>Clearance</b> CBP Full BI — active</div>
-          <div><b>Available</b> Summer 2027</div>
-          <div><b>Learning</b> HTB CPTS · OSCP</div>
-        </div>
-        <h2>Education</h2>
-        <p><b>B.S. Information Technology</b> — George Mason University, 2026–2028. Minor: Cybersecurity.</p>
-        <p><b>A.S. Information Technology</b> — Northern Virginia Community College, 2024–2026. GPA 3.7.</p>
-        <h2>Experience</h2>
-        <p><b>Vulnerability Assessment Team Analyst Intern</b> — DHS / CBP, May–Aug 2026, Ashburn, VA. Risk-based prioritization on agency scan data. Dashboard + executive briefing.</p>
-        <h2>Certifications</h2>
-        <p>CompTIA Security+ · AWS Cloud Practitioner (CLF-C02) · in progress: CPTS, OSCP</p>
-        <p>
-          <a class="btn" href="assets/certs/CompTIA-Security-Plus.pdf" download>Security+ PDF</a>
-          <a class="btn" href="assets/certs/AWS-Cloud-Practitioner.pdf" download>AWS CCP PDF</a>
-        </p>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="projects" data-title="Projects" data-w="520px" data-h="420px">
-      <div class="titlebar"><span class="title">Files — /home/sami/projects</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body files">
-        <button class="file" type="button" data-launch="lab"><span class="dot ico--code"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></span> agent-lab.md <small>Agents · 2026</small></button>
-        <button class="file" type="button" data-launch="call-kettle"><span class="dot ico--code"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></span> call-kettle.md <small>Voice / LLM</small></button>
-        <button class="file" type="button" data-launch="kev"><span class="dot ico--folder"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 7h6l2 2h10v10H3z"/></svg></span> kev-bod-26-04.md <small>Federal · Vuln</small></button>
-        <button class="file" type="button" data-launch="power-bi"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span> power-bi-kev.md <small>Analytics</small></button>
-        <button class="file" type="button" data-launch="wireshark"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span> wireshark-lab.md <small>Packets</small></button>
-        <button class="file" type="button" data-launch="phish"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></span> phishing-ioc.md <small>Python CLI</small></button>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="files" data-title="Home" data-w="440px" data-h="300px">
-      <div class="titlebar"><span class="title">Files — /home/sami</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body files">
-        <button class="file" type="button" data-launch="about">about.txt</button>
-        <button class="file" type="button" data-launch="projects">projects/</button>
-        <button class="file" type="button" data-launch="contact">mail</button>
-        <a class="file" href="resume.pdf" download>resume.pdf</a>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="lab" data-title="agent-lab.md" data-w="540px" data-h="360px">
-      <div class="titlebar"><span class="title">mousepad — agent-lab.md</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">orchestration</div>
-        <h1>Agent Engineering Lab</h1>
-        <p>Running teams of coding agents (Hermes, Claude Code, Codex) against real repos, with pytest as the gate. Voice AI, cloud deploys, and AppSec checks in the same loop.</p>
-        <p>Agents propose. Tests dispose.</p>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="call-kettle" data-title="call-kettle.md" data-w="560px" data-h="400px">
-      <div class="titlebar"><span class="title">mousepad — call-kettle.md</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">voice · tool-use</div>
-        <h1>Call Kettle</h1>
-        <p>AI voice receptionist. Inbound calls, tool-use agent, YAML tenant config. Books, reschedules, takes a message, or hands off.</p>
-        <p>Runtime is a <b>Claude Haiku</b> tool-use loop, built with <b>Claude Code</b> and <b>Hermes Agent</b>. Invalid tool calls are rejected before they touch storage. Pytest is the gate.</p>
-        <p><a href="https://github.com/samiali38183/call-kettle" target="_blank" rel="noopener">Public code</a> · <a href="https://callkettle.com" target="_blank" rel="noopener">callkettle.com</a></p>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="kev" data-title="kev.md" data-w="540px" data-h="380px">
-      <div class="titlebar"><span class="title">mousepad — kev-bod-26-04.md</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">cbp intern work</div>
-        <h1>KEV / BOD 26-04</h1>
-        <p>Sanitized public version of the prioritization framework from the CBP Vulnerability Assessment Team. Rank findings by confirmed exploitation and EPSS ahead of raw CVSS.</p>
-        <p><button class="btn" type="button" data-launch="power-bi">Open dashboard notes</button></p>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="power-bi" data-title="power-bi.md" data-w="500px" data-h="320px">
-      <div class="titlebar"><span class="title">mousepad — power-bi-kev.md</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">analytics</div>
-        <h1>Power BI · KEV dashboard</h1>
-        <p>Executive view of KEV vs non-KEV: similar CVSS, wildly different EPSS — so leadership can see why “critical” is not the same as “exploited.”</p>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="wireshark" data-title="wireshark.md" data-w="500px" data-h="300px">
-      <div class="titlebar"><span class="title">mousepad — wireshark-lab.md</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">packets</div>
-        <h1>Wireshark lab</h1>
-        <p>Packet-capture write-ups: TCP/IP, protocol dissection, proving a story from the pcap instead of guessing from a dashboard.</p>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="phish" data-title="phishing-ioc.md" data-w="500px" data-h="300px">
-      <div class="titlebar"><span class="title">mousepad — phishing-ioc.md</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">automation</div>
-        <h1>Phishing IOC extractor</h1>
-        <p>Python CLI: pull indicators from phishing mail, normalize them, dump something a human can paste into a ticket. Regex, argparse, pytest.</p>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="resume" data-title="Resume" data-w="640px" data-h="520px">
-      <div class="titlebar"><span class="title">Document Viewer — resume.pdf</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body" style="padding:0;display:flex;flex-direction:column">
-        <div style="padding:8px 12px;border-bottom:1px solid #111;display:flex;gap:8px;align-items:center">
-          <a class="btn btn--go" href="resume.pdf" download>Download PDF</a>
-          <span style="font-size:12px;color:#888">Sami Ali — cybersecurity</span>
-        </div>
-        <iframe class="pdf" src="resume.pdf" title="Resume"></iframe>
-      </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="contact" data-title="Mail" data-w="520px" data-h="460px">
-      <div class="titlebar"><span class="title">Mail — Compose</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body">
-        <div class="kicker">to: sami</div>
-        <h1>Contact</h1>
-        <p>Internships / security-engineering roles in DC / NoVA.</p>
-        <p><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a> · <a href="tel:+15712908908">(571) 290-8908</a><br>
-        <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" target="_blank" rel="noopener">LinkedIn</a> ·
-        <a href="https://github.com/samiali38183" target="_blank" rel="noopener">GitHub</a></p>
-        <form class="form" action="https://formsubmit.co/samiali38183@gmail.com" method="POST">
-          <input type="hidden" name="_subject" value="Portfolio contact — samiali38183.github.io" />
-          <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_next" value="https://samiali38183.github.io/?sent=1" />
-          <label>Name <input name="name" required autocomplete="name" /></label>
-          <label>Email <input type="email" name="email" required autocomplete="email" /></label>
-          <label>Message <textarea name="message" required></textarea></label>
-          <button class="btn btn--go" type="submit">Send</button>
+    <div class="composer">
+      <div class="row">
+        <div class="ps1"><span class="ok">sami</span><span class="at">@</span><span class="acc">nova</span> <span class="path">~</span> %</div>
+        <form id="form" autocomplete="off">
+          <input id="cmd" type="text" name="cmd" spellcheck="false" aria-label="Command" autocapitalize="off" autocorrect="off" />
         </form>
+        <span class="cursor" aria-hidden="true"></span>
       </div>
-      <div class="rsz"></div>
-    </section>
-
-    <section class="win" data-id="term" data-title="Terminal" data-w="560px" data-h="340px">
-      <div class="titlebar"><span class="title">sami@kali: ~</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body" style="padding:0">
-        <div class="term">
-          <div id="termOut"><span class="dim">Type </span><span class="ok">help</span><span class="dim"> or </span><span class="ok">neofetch</span></div>
-          <form id="termForm" class="prompt" autocomplete="off">
-            <label><span class="ok">sami@kali</span>:<span class="cyan">~</span>$</label>
-            <input id="termInput" name="cmd" spellcheck="false" aria-label="Terminal" />
-          </form>
-        </div>
+      <div class="suggest" id="suggest">
+        <b>Suggestions</b>
+        <div class="hits" id="hits"></div>
       </div>
-      <div class="rsz"></div>
-    </section>
+    </div>
 
-    <section class="win" data-id="trash" data-title="Trash" data-w="360px" data-h="200px">
-      <div class="titlebar"><span class="title">Trash</span><span class="ctrls"><button class="ctrl ctrl--m" data-act="m" type="button"></button><button class="ctrl ctrl--M" data-act="M" type="button"></button><button class="ctrl ctrl--x" data-act="x" type="button"></button></span></div>
-      <div class="body"><p>Empty.</p></div>
-      <div class="rsz"></div>
-    </section>
-  </div>
+    <footer class="status">
+      <span>zsh</span>
+      <em id="statusMid">type help · tab to complete · shift+tab theme</em>
+      <span id="clock">00:00:00</span>
+    </footer>
+  </section>
 
-  <nav class="dock" aria-label="Apps">
-    <button class="app" data-launch="about" type="button"><span class="ico ico--user"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="8" r="3.2"/><path d="M5 19c1.2-3.2 3.4-5 7-5s5.8 1.8 7 5"/></svg></span></button>
-    <button class="app" data-launch="projects" type="button"><span class="ico ico--folder"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 7h6l2 2h10v10H3z"/></svg></span></button>
-    <button class="app" data-launch="resume" type="button"><span class="ico ico--pdf"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg></span></button>
-    <button class="app" data-launch="contact" type="button"><span class="ico ico--mail"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span></button>
-  </nav>
-
-  <nav class="menu" id="appMenu">
-    <button type="button" data-launch="about">About</button>
-    <button type="button" data-launch="projects">Projects</button>
-    <button type="button" data-launch="resume">Resume</button>
-    <button type="button" data-launch="contact">Mail</button>
-    <button type="button" data-launch="term">Terminal</button>
-    <div class="sep"></div>
-    <a href="https://github.com/samiali38183" target="_blank" rel="noopener">GitHub</a>
+  <nav class="chips" aria-label="Shortcuts">
+    <button class="chip" type="button" data-run="whoami">whoami</button>
+    <button class="chip" type="button" data-run="now">now</button>
+    <button class="chip" type="button" data-run="projects">projects</button>
+    <button class="chip" type="button" data-run="stack">stack</button>
+    <button class="chip" type="button" data-run="resume">resume</button>
+    <button class="chip" type="button" data-run="contact">contact</button>
+    <button class="chip" type="button" data-run="help">help</button>
   </nav>
 </div>
-<script src="main.js?v=4"></script>
+
+<noscript>
+  <main style="max-width:720px;margin:24px auto;padding:0 16px;font-family:ui-monospace,monospace">
+    <h1>Sami Ali</h1>
+    <p>Cybersecurity student in Alexandria, VA. Summer 2026 intern on CBP’s Vulnerability Assessment Team (DHS HS-POWER).</p>
+    <p>CompTIA Security+ · AWS Cloud Practitioner · CBP Full BI — active. Available Summer 2027.</p>
+    <p><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a> · <a href="https://github.com/samiali38183">GitHub</a> · <a href="resume.pdf">Resume</a></p>
+  </main>
+</noscript>
+
+<script src="main.js?v=7"></script>
 </body>
 </html>
