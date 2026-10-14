@@ -13,6 +13,7 @@
   const clockEl = $('#clock');
   const tasks = $('#tasks');
   const selbox = $('#selbox');
+  const simple = window.matchMedia('(max-width: 900px), (hover: none) and (pointer: coarse)').matches;
   let z = 20;
   let drag = null;
   let resize = null;
@@ -31,10 +32,13 @@
     if (!boot || boot.classList.contains('is-gone')) return;
     boot.classList.add('is-gone');
     setTimeout(() => { if (boot && boot.parentNode) boot.remove(); }, 500);
-    openWin('readme');
-    openWin('term');
+    if (!simple) {
+      openWin('readme');
+      openWin('term');
+    }
   }
   function runBoot() {
+    if (simple) { finishBoot(); return; }
     const lines = boot ? $$('.boot__line', boot) : [];
     if (reduce || !boot) { finishBoot(); return; }
     lines.forEach((el, i) => setTimeout(() => el.classList.add('on'), 90 * i));
@@ -77,9 +81,19 @@
   function openWin(id) {
     const el = winEl(id);
     if (!el) return;
+    if (simple) {
+      $$('.win').forEach((w) => {
+        if (w !== el) w.classList.remove('is-open', 'is-min', 'is-max', 'is-focus');
+      });
+      el.classList.add('is-max');
+      el.style.left = '0';
+      el.style.top = '0';
+      el.style.width = '100%';
+      el.style.height = '100%';
+    }
     el.classList.add('is-open');
     el.classList.remove('is-min');
-    if (!el.dataset.placed) {
+    if (!simple && !el.dataset.placed) {
       const n = $$('.win.is-open').length;
       el.style.left = (36 + (n * 26) % 180) + 'px';
       el.style.top = (28 + (n * 22) % 120) + 'px';
@@ -89,7 +103,7 @@
     }
     focusWin(id);
     renderTasks();
-    if (id === 'term') setTimeout(() => $('#termInput')?.focus(), 50);
+    if (id === 'term' && !simple) setTimeout(() => $('#termInput')?.focus(), 50);
   }
 
   function closeWin(id) {
@@ -122,6 +136,7 @@
     el.querySelector('.titlebar')?.addEventListener('dblclick', () => maxWin(el.dataset.id));
     const bar = el.querySelector('.titlebar');
     bar?.addEventListener('mousedown', (e) => {
+      if (simple) return;
       if (e.button !== 0) return;
       if (e.target.closest('.ctrl')) return;
       if (el.classList.contains('is-max')) return;
@@ -233,6 +248,7 @@
     appMenu.style.top = (r.bottom - wr.top) + 'px';
   });
   workspace?.addEventListener('contextmenu', (e) => {
+    if (simple) return;
     e.preventDefault();
     const wr = $('.os').getBoundingClientRect();
     ctx.style.left = (e.clientX - wr.left) + 'px';

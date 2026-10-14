@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>sami@kali — Sami Ali</title>
 <meta name="description" content="Sami Ali — cybersecurity. DHS HS-POWER intern at CBP Vulnerability Assessment Team. Security+ · AWS CCP. Alexandria, VA." />
 <meta property="og:title" content="sami@kali — Sami Ali" />
@@ -40,12 +40,13 @@
 
         <div class="os">
           <header class="panel">
-            <button class="pbtn" id="appBtn" type="button"><b>Applications</b></button>
-            <button class="pbtn" type="button" data-open="projects">Places</button>
-            <div class="panel__mid" id="tasks"></div>
+            <button class="pbtn desk-only" id="appBtn" type="button"><b>Applications</b></button>
+            <button class="pbtn desk-only" type="button" data-open="projects">Places</button>
+            <div class="phone-brand">Sami Ali</div>
+            <div class="panel__mid desk-only" id="tasks"></div>
             <div class="panel__right">
-              <div class="systray">wlan0 · tun0</div>
-              <button class="pbtn" id="fsBtn" type="button">Fullscreen</button>
+              <div class="systray desk-only">wlan0 · tun0</div>
+              <button class="pbtn desk-only" id="fsBtn" type="button">Fullscreen</button>
               <div class="clock" id="clock">Thu 0:00</div>
             </div>
           </header>
@@ -58,7 +59,18 @@
               <path fill="#d32f2f" d="M100 62 L138 82 v36 L100 138 62 118 V82z"/>
             </svg>
 
-            <div class="icons">
+            <div class="home" id="homeScreen">
+              <p class="home__hi">Sami Ali</p>
+              <p class="home__sub">Cybersecurity · Alexandria, VA<br>DHS intern · Security+ · AWS</p>
+              <div class="home__grid">
+                <button type="button" data-open="about"><span>About</span><small>who I am</small></button>
+                <button type="button" data-open="projects"><span>Projects</span><small>what I built</small></button>
+                <a href="resume.pdf" download><span>Resume</span><small>PDF download</small></a>
+                <button type="button" data-open="contact"><span>Contact</span><small>email / phone</small></button>
+              </div>
+            </div>
+
+            <div class="icons desk-only">
               <button class="icon" data-open="home" type="button"><span class="icon__glyph">🗂</span><span class="icon__label">Home</span></button>
               <button class="icon" data-open="term" type="button"><span class="icon__glyph">⬛</span><span class="icon__label">Terminal</span></button>
               <button class="icon" data-open="projects" type="button"><span class="icon__glyph">📁</span><span class="icon__label">Projects</span></button>
@@ -77,9 +89,11 @@
                 <div class="kicker">/home/sami</div>
                 <h1>Sami Ali</h1>
                 <p>Cybersecurity student in Alexandria, VA. Summer 2026 intern on CBP’s Vulnerability Assessment Team (DHS HS-POWER). Targeting detection, cloud security, and security-engineering internships for 2027.</p>
-                <p>This session is a workstation, not a brochure. Drag the laptop on the desk. Drag the windows. Double-click the icons. Type <b>help</b> in the terminal.</p>
-                <p><button class="btn btn--kali" type="button" data-open="about">Open about.txt</button>
-                   <a class="btn" href="resume.pdf" download>Download resume.pdf</a></p>
+                <p>Cybersecurity student. CBP intern. Security+ and AWS certified. Use the buttons below — or the bar at the bottom on a phone.</p>
+                <p><button class="btn btn--kali" type="button" data-open="about">About me</button>
+                   <button class="btn" type="button" data-open="projects">Projects</button>
+                   <a class="btn" href="resume.pdf" download>Resume</a>
+                   <button class="btn" type="button" data-open="contact">Contact</button></p>
               </div>
               <div class="rsz"></div>
             </section>
@@ -245,13 +259,20 @@
             </section>
           </div>
 
-          <nav class="menu" id="appMenu">
-            <button type="button" data-open="term">Terminal</button>
-            <button type="button" data-open="projects">File Manager</button>
-            <button type="button" data-open="about">about.txt</button>
+          <nav class="dock" id="dock" aria-label="Main">
+            <button type="button" data-open="about">About</button>
+            <button type="button" data-open="projects">Work</button>
+            <a href="resume.pdf" download>Resume</a>
             <button type="button" data-open="contact">Contact</button>
-            <div class="sep"></div>
-            <a href="resume.pdf" download>Resume.pdf</a>
+          </nav>
+
+          <nav class="menu" id="appMenu">
+            <button type="button" data-open="about">About</button>
+            <button type="button" data-open="projects">Projects</button>
+            <button type="button" data-open="contact">Contact</button>
+            <a href="resume.pdf" download>Resume</a>
+            <div class="sep desk-only"></div>
+            <button class="desk-only" type="button" data-open="term">Terminal</button>
             <a href="https://github.com/samiali38183" target="_blank" rel="noopener">GitHub</a>
           </nav>
           <nav class="menu" id="ctx">
