@@ -200,7 +200,7 @@
 
   function echoPrompt(raw) {
     html(
-      '<div class="entry"><div class="cmdrow"><span class="ok">sami</span><span class="acc">@nova</span> <span class="mut">~</span> % ' +
+      '<div class="entry"><div class="cmdrow"><span class="ok">Sami</span> <span class="mut">likes</span> <span class="acc">building</span> % ' +
         raw.replace(/</g, "&lt;") +
         "</div></div>"
     );
