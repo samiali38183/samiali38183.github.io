@@ -1,8 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="simple">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+(function () {
+  try {
+    var touch = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
+    var w = window.innerWidth || screen.width || 0;
+    if (!touch && w >= 901) document.documentElement.className = 'desk';
+  } catch (e) {}
+})();
+</script>
 <title>sami@kali — Sami Ali</title>
 <meta name="description" content="Sami Ali — cybersecurity. DHS HS-POWER intern at CBP Vulnerability Assessment Team. Security+ · AWS CCP. Alexandria, VA." />
 <meta property="og:title" content="sami@kali — Sami Ali" />
@@ -12,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body>
 <a class="skip" href="#workspace">Skip to desktop</a>
@@ -63,10 +72,10 @@
               <p class="home__hi">Sami Ali</p>
               <p class="home__sub">Cybersecurity · Alexandria, VA<br>DHS intern · Security+ · AWS</p>
               <div class="home__grid">
-                <button type="button" data-open="about"><span>About</span><small>who I am</small></button>
-                <button type="button" data-open="projects"><span>Projects</span><small>what I built</small></button>
+                <a href="#about" data-open="about"><span>About</span><small>who I am</small></a>
+                <a href="#projects" data-open="projects"><span>Projects</span><small>what I built</small></a>
                 <a href="resume.pdf" download><span>Resume</span><small>PDF download</small></a>
-                <button type="button" data-open="contact"><span>Contact</span><small>email / phone</small></button>
+                <a href="#contact" data-open="contact"><span>Contact</span><small>email / phone</small></a>
               </div>
             </div>
 
@@ -260,10 +269,10 @@
           </div>
 
           <nav class="dock" id="dock" aria-label="Main">
-            <button type="button" data-open="about">About</button>
-            <button type="button" data-open="projects">Work</button>
+            <a href="#about" data-open="about">About</a>
+            <a href="#projects" data-open="projects">Work</a>
             <a href="resume.pdf" download>Resume</a>
-            <button type="button" data-open="contact">Contact</button>
+            <a href="#contact" data-open="contact">Contact</a>
           </nav>
 
           <nav class="menu" id="appMenu">
@@ -289,6 +298,6 @@
   </div>
 </div>
 
-<script src="main.js"></script>
+<script src="main.js?v=3"></script>
 </body>
 </html>

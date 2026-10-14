@@ -13,7 +13,7 @@
   const clockEl = $('#clock');
   const tasks = $('#tasks');
   const selbox = $('#selbox');
-  const simple = window.matchMedia('(max-width: 900px), (hover: none) and (pointer: coarse)').matches;
+  const simple = document.documentElement.classList.contains('simple');
   let z = 20;
   let drag = null;
   let resize = null;
@@ -259,7 +259,11 @@
 
   $$('[data-open]').forEach((b) => {
     if (b.classList.contains('icon')) return;
-    b.addEventListener('click', () => { closeMenus(); openWin(b.dataset.open); });
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeMenus();
+      openWin(b.dataset.open);
+    });
   });
 
   const hashMap = {
