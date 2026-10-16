@@ -150,6 +150,7 @@
       "<div>Risk-based ranking on agency scan data. Confirmed exploitation and EPSS ahead of raw CVSS. Executive view so “critical” is not treated as “exploited.”</div></div>",
     projects: () =>
       '<div class="mb"><div class="bold">Selected work</div>' +
+      '<div class="ml"><span class="acc">sinkline</span> — interprocedural taint analyzer for Python web apps, OWASP Top 10, SARIF. Zero deps, built from <code>ast</code> up. F1 0.967 on a labeled corpus vs bandit 0.579. <a href="https://github.com/samiali38183/sinkline" target="_blank" rel="noopener">code</a></div>' +
       '<div class="ml"><span class="acc">agent-lab</span> — teams of coding agents on real repos; pytest is the gate</div>' +
       '<div class="ml"><span class="acc">call-kettle</span> — AI voice receptionist. Claude Haiku tool-use, FastAPI, Twilio. Built with Claude Code + Hermes. <a href="https://github.com/samiali38183/call-kettle" target="_blank" rel="noopener">code</a></div>' +
       '<div class="ml"><span class="acc">kev / bod 26-04</span> — public write-up of CBP-style KEV/EPSS prioritization</div>' +
