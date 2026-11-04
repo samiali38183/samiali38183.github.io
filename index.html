@@ -1,79 +1,268 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Sami Ali — cybersecurity</title>
-<meta name="description" content="Sami Ali — cybersecurity student in Alexandria, VA. DHS HS-POWER intern on CBP’s Vulnerability Assessment Team. Security+ · AWS CCP." />
-<meta name="theme-color" content="#07090d" />
-<link rel="canonical" href="https://samiali38183.github.io/" />
-<meta property="og:title" content="Sami Ali — cybersecurity" />
-<meta property="og:description" content="CBP VAT intern. Detection, cloud security, vuln management. Alexandria, VA." />
-<meta property="og:type" content="website" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.86em' font-size='90' font-family='monospace' fill='%233ddc84'%3E$%3C/text%3E%3C/svg%3E" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sami Ali — Security Engineering · Detection &amp; Response</title>
+<meta name="description" content="Sami Ali — security engineering student in Northern Virginia building detection and vulnerability-management tooling. Former DHS/CBP Vulnerability Assessment Team intern (Nessus/Tenable, CISA KEV, BOD 26-04). Security+ · AWS Cloud Practitioner. Seeking Security Engineer / Detection &amp; Response internships, Summer 2027.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="https://samiali38183.github.io/">
+<meta property="og:title" content="Sami Ali — Security Engineering · Detection &amp; Response">
+<meta property="og:description" content="Builds detection and vulnerability-management tooling with tests and measured results. Former DHS/CBP VAT intern. Security+ · AWS CCP. Summer 2027 intern candidate.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://samiali38183.github.io/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23171717'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='17' font-family='ui-monospace,monospace' font-weight='600' fill='%23fff'%3ESA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=9">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Sami Ali","url":"https://samiali38183.github.io/","sameAs":["https://github.com/samiali38183","https://www.linkedin.com/in/sami-ali-1a4b89345"],"jobTitle":"Security engineering student","alumniOf":[{"@type":"CollegeOrUniversity","name":"George Mason University"},{"@type":"CollegeOrUniversity","name":"Northern Virginia Community College"}],"address":{"@type":"PostalAddress","addressRegion":"VA","addressCountry":"US"}}
+</script>
 </head>
 <body>
-<a class="skip" href="#cmd">Skip to command</a>
+<a class="skip" href="#work">Skip to selected work</a>
 
-<div class="stage">
-  <section class="win" id="win" aria-label="Terminal">
-    <header class="tb">
-      <span class="dots">
-        <button class="dot dot--x" id="btnClose" type="button" aria-label="Reset terminal"></button>
-        <button class="dot dot--m" id="btnMin" type="button" aria-label="Minimize"></button>
-        <button class="dot dot--M" id="btnMax" type="button" aria-label="Maximize"></button>
-      </span>
-      <div class="title" id="winTitle">Sami likes building</div>
-      <button class="helpbtn" id="btnHelp" type="button" title="help">?</button>
-    </header>
+<header class="nav" role="banner">
+  <div class="wrap nav__in">
+    <a class="brand" href="#top" aria-label="Sami Ali — home"><span class="brand__mark" aria-hidden="true">SA</span>Sami Ali</a>
+    <nav aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#writing">Writing</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
+      <a class="btn btn--sm" href="resume.pdf">Resume</a>
+    </nav>
+  </div>
+</header>
 
-    <div class="scroll" id="out" tabindex="-1"></div>
+<main id="top">
 
-    <div class="composer">
-      <div class="row">
-        <div class="ps1"><span class="ok">Sami</span> <span class="path">likes</span> <span class="acc">building</span> %</div>
-        <form id="form" autocomplete="off">
-          <input id="cmd" type="text" name="cmd" spellcheck="false" aria-label="Command" autocapitalize="off" autocorrect="off" />
-        </form>
-        <span class="cursor" aria-hidden="true"></span>
+<!-- ========== HERO ========== -->
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Security Engineer / Detection &amp; Response intern candidate · Summer 2027</p>
+    <h1>I build detection and vulnerability-management tooling, then measure whether it works.</h1>
+    <p class="lede">
+      Security engineering student in Northern Virginia (B.S. Information Technology, George Mason University, May&nbsp;2028).
+      Former <strong>DHS / U.S. Customs and Border Protection Vulnerability Assessment Team</strong> intern:
+      Nessus/Tenable scan data, the CISA KEV Catalog, and remediation benchmarking under BOD&nbsp;26-04.
+      Everything below is public, tested, and reproducible.
+    </p>
+    <div class="cta">
+      <a class="btn btn--primary" href="https://github.com/samiali38183" rel="me noopener">GitHub</a>
+      <a class="btn" href="resume.pdf">Resume (PDF)</a>
+      <a class="btn" href="https://www.linkedin.com/in/sami-ali-1a4b89345" rel="me noopener">LinkedIn</a>
+      <a class="btn btn--ghost" href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a>
+    </div>
+
+    <ul class="facts" aria-label="At a glance">
+      <li><b>Security+</b><span>CompTIA · certified</span></li>
+      <li><b>AWS CCP</b><span>Cloud Practitioner · certified</span></li>
+      <li><b>Public Trust</b><span>CBP background investigation · active</span></li>
+      <li><b>U.S. citizen</b><span>no sponsorship needed · DC / NoVA</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== SELECTED WORK ========== -->
+<section class="section" id="work" aria-labelledby="work-h">
+  <div class="wrap">
+    <div class="section__head">
+      <h2 id="work-h">Selected work</h2>
+      <p>Four public repos. Each one answers a question a defender actually asks, ships with tests, and reports only numbers you can re-run.</p>
+    </div>
+
+    <div class="grid">
+      <!-- Flagship detection-engineering project: insert a new <article class="card card--featured"> here when the repo is public. Same fields: problem / what it does / stack / links. -->
+
+      <article class="card">
+        <header class="card__head">
+          <span class="tag">AppSec · static analysis</span>
+          <h3><a href="https://github.com/samiali38183/sinkline" rel="noopener">sinkline</a></h3>
+          <p class="card__sub">Interprocedural taint analysis for Python web apps, mapped to the OWASP Top&nbsp;10.</p>
+        </header>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Pattern-matching linters flag every <code>cursor.execute</code>, whether the argument came from a config file or from <code>request.args</code>. A reviewer needs to know which sinks attacker-controlled bytes can actually reach.</dd>
+          <dt>What it does</dt>
+          <dd>Abstract interpreter over Python <code>ast</code> with two-pass function summaries, CWE-scoped sanitizers and validation-guard recognition. Reports the full source → call → sink path and a fix. Emits SARIF for GitHub code scanning. 138 sink signatures, 42 rules, zero dependencies. On a 109-line labeled corpus: precision&nbsp;0.983 / recall&nbsp;0.951 (bandit on the same corpus: F1&nbsp;0.579) — the score is a CI gate.</dd>
+          <dt>Stack</dt>
+          <dd class="stack"><span>Python</span><span>ast</span><span>SARIF</span><span>pytest</span><span>GitHub Actions · 3 OSes</span></dd>
+        </dl>
+        <footer class="card__links">
+          <a href="https://github.com/samiali38183/sinkline" rel="noopener">Repository →</a>
+          <a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md" rel="noopener">Design notes</a>
+        </footer>
+      </article>
+
+      <article class="card">
+        <header class="card__head">
+          <span class="tag">Vulnerability management</span>
+          <h3><a href="https://github.com/samiali38183/kev-risk-prioritization" rel="noopener">kev-risk-prioritization</a></h3>
+          <p class="card__sub">Risk-based prioritization with CISA KEV, EPSS, CVSS and asset criticality, aligned with BOD&nbsp;26-04.</p>
+        </header>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Scanners produce more findings than any team can fix. CVSS says how bad an exploit <em>could</em> be, not whether anyone is exploiting it. If you can only patch 10% of the queue this sprint, which 10%?</dd>
+          <dt>What it does</dt>
+          <dd>Written case study of the methodology from my CBP internship (public guidance only, no internal data) plus a stdlib-only reference implementation that ranks findings, compares KEV vs non-KEV populations, and matches against the live CISA KEV feed. Runs on synthetic data in the repo or your own CSV; CSV/JSON output for dashboards and ticketing.</dd>
+          <dt>Stack</dt>
+          <dd class="stack"><span>Python · stdlib only</span><span>CISA KEV</span><span>EPSS</span><span>CVSS v3.1</span><span>pytest · CI</span></dd>
+        </dl>
+        <footer class="card__links">
+          <a href="https://github.com/samiali38183/kev-risk-prioritization" rel="noopener">Repository →</a>
+          <a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md" rel="noopener">Methodology</a>
+        </footer>
+      </article>
+
+      <article class="card">
+        <header class="card__head">
+          <span class="tag">Secure backend · AI agent</span>
+          <h3><a href="https://github.com/samiali38183/call-kettle" rel="noopener">call-kettle</a></h3>
+          <p class="card__sub">Sanitized snapshot of a production AI voice receptionist: FastAPI, Twilio, Claude tool-use.</p>
+        </header>
+        <dl>
+          <dt>Problem</dt>
+          <dd>An LLM agent on a public phone line is an internet-facing system. Webhooks must be authenticated, the model must not be able to claim or do things the business rules forbid, and tenants must not see each other's data.</dd>
+          <dt>What it does</dt>
+          <dd>Twilio request-signature validation on every webhook; booking rules (hours, slot grid, lead time, one booking per slot) enforced server-side so the model cannot bypass them; strict Pydantic config (<code>extra: forbid</code>); tenant-isolation tests; bounded tool iterations, reply caps and cost guards. 1,100+ pytest test functions gate every change in CI.</dd>
+          <dt>Stack</dt>
+          <dd class="stack"><span>Python 3.12</span><span>FastAPI</span><span>Twilio</span><span>SQLite</span><span>Claude tool-use</span><span>pytest · CI</span></dd>
+        </dl>
+        <footer class="card__links">
+          <a href="https://github.com/samiali38183/call-kettle" rel="noopener">Repository →</a>
+          <a href="https://github.com/samiali38183/call-kettle/blob/main/docs/AGENT_WORK.md" rel="noopener">How agents were used</a>
+        </footer>
+      </article>
+
+      <article class="card">
+        <header class="card__head">
+          <span class="tag">Detection · packet analysis · threat intel</span>
+          <h3><a href="https://github.com/samiali38183/cybersecurity-vault" rel="noopener">cybersecurity-vault</a></h3>
+          <p class="card__sub">Defensive labs and small tools: a phishing IOC extractor and a Wireshark traffic-analysis lab.</p>
+        </header>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Pulling indicators out of raw phishing samples by hand is slow and error-prone, and encrypted traffic hides less from a defender than people assume.</dd>
+          <dt>What it does</dt>
+          <dd><strong>Phishing IOC Extractor</strong> — stdlib <code>.eml</code> parser that emits deduplicated JSON of IPs, domains, URLs, emails and MD5/SHA-1/SHA-256 hashes; 10 pytest tests. <strong>Wireshark lab</strong> — TCP handshake, DNS, HTTP, TLS Client Hello (SNI), ARP and port-scan captures with display filters, what to look for, and defender relevance, including ARP-poisoning signatures (ATT&amp;CK T1557.002).</dd>
+          <dt>Stack</dt>
+          <dd class="stack"><span>Python</span><span>Wireshark</span><span>MITRE ATT&amp;CK</span><span>pytest</span></dd>
+        </dl>
+        <footer class="card__links">
+          <a href="https://github.com/samiali38183/cybersecurity-vault" rel="noopener">Repository →</a>
+          <a href="https://github.com/samiali38183/cybersecurity-vault/tree/master/08-Projects/Phishing-IOC-Extractor" rel="noopener">IOC extractor</a>
+          <a href="https://github.com/samiali38183/cybersecurity-vault/tree/master/08-Projects/Wireshark-Lab" rel="noopener">Wireshark lab</a>
+        </footer>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========== WRITING ========== -->
+<section class="section" id="writing" aria-labelledby="writing-h">
+  <div class="wrap">
+    <div class="section__head">
+      <h2 id="writing-h">Writing &amp; notes</h2>
+      <p>Technical write-ups that live next to the code they describe.</p>
+    </div>
+    <ol class="posts">
+      <li>
+        <a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md" rel="noopener">Methodology — KEV risk prioritization under BOD 26-04</a>
+        <p>Why confirmed exploitation (KEV) and exploitation probability (EPSS) come before paper severity; the four inputs, the matching step, the KEV vs non-KEV population comparison, and the weighted model. Public guidance only.</p>
+        <span class="meta">kev-risk-prioritization / docs</span>
+      </li>
+      <li>
+        <a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md" rel="noopener">Design notes — why taint analysis, and why from scratch</a>
+        <p>The abstract domain (labels, CWE-scoped <code>cleared</code> set, provenance trail), how taint joins across branches, why <code>shlex.quote</code> clears CWE-78 and nothing else, and the documented misses.</p>
+        <span class="meta">sinkline / docs</span>
+      </li>
+      <li>
+        <a href="https://github.com/samiali38183/cybersecurity-vault/tree/master/08-Projects/Wireshark-Lab" rel="noopener">Wireshark network traffic analysis lab</a>
+        <p>Six capture scenarios with the display filter, what normal looks like, and what a defender should notice: incomplete handshakes, DNS as a C2 channel, SNI still visible under TLS, ARP spoofing, an Nmap scan on the wire.</p>
+        <span class="meta">cybersecurity-vault / 08-Projects</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ========== EXPERIENCE ========== -->
+<section class="section" id="experience" aria-labelledby="exp-h">
+  <div class="wrap">
+    <div class="section__head">
+      <h2 id="exp-h">Experience</h2>
+    </div>
+
+    <article class="job">
+      <div class="job__meta">
+        <span class="job__when">May – Aug 2026</span>
+        <span class="job__where">Ashburn, VA</span>
       </div>
-      <div class="suggest" id="suggest">
-        <b>Suggestions</b>
-        <div class="hits" id="hits"></div>
+      <div class="job__body">
+        <h3>Vulnerability Assessment Team Analyst Intern</h3>
+        <p class="job__org">U.S. Department of Homeland Security · U.S. Customs and Border Protection · DHS HS-POWER program</p>
+        <ul>
+          <li>Led an end-to-end Known Exploited Vulnerabilities (KEV) research project: matched enterprise-wide Nessus/Tenable scan results against the CISA KEV Catalog and benchmarked remediation performance against CISA BOD 26-04 to identify outlier systems and aged-finding backlogs.</li>
+          <li>Built a multi-page Power BI dashboard integrating CVSS, EPSS and remediation-age metrics, showing that exploitation likelihood — not severity alone — distinguishes real-world risk; presented the findings in an executive briefing to technical and leadership audiences.</li>
+          <li>Designed a risk-based prioritization methodology weighing KEV status, asset criticality (HVA), internet exposure, EPSS and CVSS to guide enterprise remediation under federal directives. The public version is <a href="#work">kev-risk-prioritization</a>.</li>
+          <li>Drafted technical compliance reports on vulnerability findings and remediation recommendations aligned with the NIST Cybersecurity Framework, FedRAMP and Zero Trust architecture.</li>
+        </ul>
+      </div>
+    </article>
+
+    <div class="two">
+      <div>
+        <h3 class="h-small">Education</h3>
+        <ul class="plain">
+          <li><b>B.S. Information Technology, minor in Cybersecurity</b><br>George Mason University · expected May 2028</li>
+          <li><b>A.S. Information Technology</b><br>Northern Virginia Community College · May 2026 · GPA 3.7</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="h-small">Certifications &amp; clearance</h3>
+        <ul class="plain">
+          <li><b>CompTIA Security+</b> · <a href="assets/certs/CompTIA-Security-Plus.pdf">certificate</a></li>
+          <li><b>AWS Certified Cloud Practitioner</b> (CLF-C02) · <a href="assets/certs/AWS-Cloud-Practitioner.pdf">certificate</a></li>
+          <li><b>Public Trust</b> · CBP full background investigation, active · U.S. citizen</li>
+        </ul>
       </div>
     </div>
 
-    <footer class="status">
-      <span>zsh</span>
-      <em id="statusMid">type help · tab to complete · shift+tab theme</em>
-      <span id="clock">00:00:00</span>
-    </footer>
-  </section>
+    <h3 class="h-small">Skills</h3>
+    <dl class="skills">
+      <dt>Vulnerability management</dt><dd>Nessus/Tenable · CISA KEV · EPSS · CVSS v3.1 · BOD 26-04 · remediation benchmarking · NIST CSF / FedRAMP context</dd>
+      <dt>Detection &amp; analysis</dt><dd>Wireshark · IOC extraction · MITRE ATT&amp;CK mapping · log and packet triage</dd>
+      <dt>AppSec &amp; static analysis</dt><dd>Taint analysis · OWASP Top 10 / CWE · SARIF · secure-by-default input validation</dd>
+      <dt>Python</dt><dd>stdlib-first CLIs · <code>ast</code> · pytest · argparse · type hints · GitHub Actions</dd>
+      <dt>Cloud / AWS</dt><dd>IAM · EC2 · S3 · VPC · CloudTrail fundamentals (Cloud Practitioner certified)</dd>
+    </dl>
+  </div>
+</section>
 
-  <nav class="chips" aria-label="Shortcuts">
-    <button class="chip" type="button" data-run="whoami">whoami</button>
-    <button class="chip" type="button" data-run="now">now</button>
-    <button class="chip" type="button" data-run="projects">projects</button>
-    <button class="chip" type="button" data-run="stack">stack</button>
-    <button class="chip" type="button" data-run="resume">resume</button>
-    <button class="chip" type="button" data-run="contact">contact</button>
-    <button class="chip" type="button" data-run="help">help</button>
-  </nav>
-</div>
+<!-- ========== CONTACT ========== -->
+<section class="section section--contact" id="contact" aria-labelledby="contact-h">
+  <div class="wrap">
+    <h2 id="contact-h">Hiring for Summer 2027?</h2>
+    <p class="lede">Security Engineer, Detection &amp; Response, or Security Operations internships. Based in Northern Virginia (DC metro). The fastest way to evaluate me is the code.</p>
+    <div class="cta">
+      <a class="btn btn--primary" href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a>
+      <a class="btn" href="https://github.com/samiali38183" rel="me noopener">github.com/samiali38183</a>
+      <a class="btn" href="https://www.linkedin.com/in/sami-ali-1a4b89345" rel="me noopener">LinkedIn</a>
+      <a class="btn" href="resume.pdf">Resume (PDF)</a>
+    </div>
+  </div>
+</section>
 
-<noscript>
-  <main style="max-width:720px;margin:24px auto;padding:0 16px;font-family:ui-monospace,monospace">
-    <h1>Sami Ali</h1>
-    <p>Cybersecurity student in Alexandria, VA. Summer 2026 intern on CBP’s Vulnerability Assessment Team (DHS HS-POWER).</p>
-    <p>CompTIA Security+ · AWS Cloud Practitioner · CBP Full BI — active. Available Summer 2027.</p>
-    <p><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a> · <a href="https://github.com/samiali38183">GitHub</a> · <a href="resume.pdf">Resume</a></p>
-  </main>
-</noscript>
+</main>
 
-<script src="main.js?v=8"></script>
+<footer class="foot">
+  <div class="wrap foot__in">
+    <span>© 2026 Sami Ali</span>
+    <span>Static HTML &amp; CSS, no framework, no tracking · <a href="https://github.com/samiali38183/samiali38183.github.io" rel="noopener">source</a></span>
+  </div>
+</footer>
 </body>
 </html>
