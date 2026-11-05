@@ -6,6 +6,8 @@
   var term = $("term"), form = $("prompt"), input = $("cmd"), ps1 = $("ps1"), chips = $("chips"), screen = $("screen");
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var seen = false;
+  var coarse = window.matchMedia && matchMedia("(pointer: coarse)").matches;
+  function focusInput() { if (!coarse) input.focus({ preventScroll: true }); }
   try { seen = sessionStorage.getItem("booted") === "1"; } catch (e) {}
 
   /* ---------------- helpers ---------------- */
@@ -362,8 +364,8 @@
       line(ps1Text() + esc(v)); line(m.map(esc).join("   "), "dim");
     }
   }
-  function runLink(el) { if (busy) return; var c = el.getAttribute("data-cmd"); exec(c, true); input.focus({ preventScroll: true }); }
-  term.addEventListener("click", function (e) { var t = e.target.closest(".cmdlink"); if (t) { e.preventDefault(); runLink(t); } else if (!window.getSelection().toString()) input.focus({ preventScroll: true }); });
+  function runLink(el) { if (busy) return; var c = el.getAttribute("data-cmd"); exec(c, true); focusInput(); }
+  term.addEventListener("click", function (e) { var t = e.target.closest(".cmdlink"); if (t) { e.preventDefault(); runLink(t); } else if (!window.getSelection().toString()) focusInput(); });
   term.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("cmdlink")) { e.preventDefault(); runLink(e.target); } });
 
   /* ---------------- boot + login ---------------- */
@@ -421,7 +423,7 @@
     chips.innerHTML = "";
     ["help", "cat about.md", "ls projects", "run tripline", "cat work/dhs-cbp.md", "ls certs", "cat contact.txt", "open resume.pdf"].forEach(function (c) {
       var b = document.createElement("button"); b.type = "button"; b.textContent = c;
-      b.addEventListener("click", function () { if (!busy) { exec(c, true); input.focus({ preventScroll: true }); } });
+      b.addEventListener("click", function () { if (!busy) { exec(c, true); focusInput(); } });
       chips.appendChild(b);
     });
   }
@@ -439,7 +441,7 @@
     if (HASH[h] && h !== "about") { await exec(HASH[h], true); } else { await firstScreen(); }
     line("");
     line(dim("Type " ) + cl("help", "help") + dim(", press Tab, or click the buttons below. ") + dim("Hidden files exist: ls -a"));
-    input.focus({ preventScroll: true });
+    focusInput();
   }
   start();
 })();
