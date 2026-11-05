@@ -1,9 +1,9 @@
 # samiali38183.github.io
 
-Portfolio site for Sami Ali — security engineering student (Security Engineer / Detection & Response intern candidate, Summer 2027).
+Portfolio of Sami Ali: detection and vulnerability engineering. Live at https://samiali38183.github.io/
 
-Static site, no build step, no JavaScript: `index.html` + `styles.css`. Deploys from the repo root on `main` via GitHub Pages.
+Plain HTML, CSS and a little JavaScript. No framework, no build step, no tracking.
 
-Live: https://samiali38183.github.io
-
-Old routes (`/projects/*.html`, `/about.html`, ...) are kept as redirects into the matching section anchor.
+- `index.html`, `styles.css`, `main.js`: the whole site. The opening animation replays a real result from the [tripline](https://github.com/samiali38183/tripline) project; it is skippable (Esc), shown once per tab session, and disabled for `prefers-reduced-motion`.
+- `resume.pdf`, `assets/certs/`: résumé and certificate PDFs.
+- The other `*.html` files are redirects from old URLs.
