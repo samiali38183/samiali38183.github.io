@@ -2,183 +2,50 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sami Ali — detection &amp; vulnerability engineering</title>
-<meta name="description" content="Sami Ali, cybersecurity student (George Mason). Builds detection and code-analysis tools and measures them: a Sigma quality gate, a taint analyzer with F1 0.967, and KEV/EPSS risk prioritization. Security+ · AWS CCP.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sami Ali — security engineering</title>
+<meta name="description" content="Sami Ali: cybersecurity student (George Mason). Detection and vulnerability tooling, measured: the stock Sigma setuid rule matched 0 of 36 events; sinkline F1 0.967 vs bandit 0.579. Security+ · AWS CCP.">
 <link rel="canonical" href="https://samiali38183.github.io/">
-<meta property="og:title" content="Sami Ali — detection &amp; vulnerability engineering">
+<meta property="og:title" content="Sami Ali — security engineering">
 <meta property="og:description" content="The stock Sigma rule for setuid matched 0 of 36 events. Detection and analysis tooling, measured instead of claimed.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://samiali38183.github.io/">
-<meta name="theme-color" content="#0e0f12">
+<meta name="theme-color" content="#0b0c0e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
+<div id="screen" class="screen" data-theme="dark">
+  <div id="term" class="term" role="log" aria-live="polite" aria-label="Terminal output"></div>
 
-<!-- Intro: replay of a real tripline result. Hidden unless JS enables it; skippable; skipped for reduced motion and repeat visits. -->
-<div id="gate" class="gate" role="dialog" aria-label="Intro: a real detection result from the tripline project" hidden>
-  <div class="gate-inner">
-    <pre id="gate-log" class="gate-log" aria-live="off"></pre>
-    <button id="gate-skip" class="gate-skip" type="button">skip&nbsp;&nbsp;<kbd>esc</kbd></button>
+  <form id="prompt" class="prompt" autocomplete="off" hidden>
+    <label for="cmd" id="ps1"></label>
+    <input id="cmd" type="text" spellcheck="false" autocapitalize="none" autocorrect="off" aria-label="Type a command, for example help">
+  </form>
+
+  <div id="chips" class="chips" hidden aria-label="Suggested commands"></div>
+
+  <div class="bar" aria-hidden="true">
+    <span class="bar-l"><b>[portfolio]</b> 0:bash*</span>
+    <span class="bar-r"><span id="bar-tip">Tab completes · ↑ history · try: help</span> <span id="clock"></span></span>
   </div>
 </div>
 
-<a class="skip" href="#main">Skip to content</a>
-
-<header class="top">
-  <a class="brand" href="#top">Sami Ali</a>
-  <nav aria-label="Sections">
-    <a href="#work">Work</a>
-    <a href="#experience">Experience</a>
-    <a href="#credentials">Credentials</a>
-    <a href="#contact">Contact</a>
-    <a class="btn-sm" href="resume.pdf">Résumé</a>
-  </nav>
-</header>
-
-<main id="main">
-
-<section class="hero" id="top">
-  <div class="hero-text">
-    <p class="eyebrow">Alexandria, VA · George Mason University · B.S. IT, Cybersecurity minor</p>
-    <h1>I check whether security <em>detections actually fire.</em></h1>
-    <p class="lede">I build detection and code-analysis tools, then measure them against real data. One of them found that the stock Sigma rule for setuid abuse matched <strong>0 of 36</strong> events. I wrote the replacement.</p>
-    <p class="lede sub">Summer 2026: analyst intern on CBP’s Vulnerability Assessment Team (DHS HS-POWER). Looking for security engineering internships, Summer 2027.</p>
-    <p class="cta">
-      <a class="btn" href="resume.pdf">Résumé (PDF)</a>
-      <a class="btn ghost" href="https://github.com/samiali38183" target="_blank" rel="noopener">GitHub</a>
-      <a class="btn ghost" href="https://www.linkedin.com/in/sami-ali-1a4b89345" target="_blank" rel="noopener">LinkedIn</a>
-    </p>
-  </div>
-  <figure class="portrait">
-    <img src="assets/headshot.jpg" width="400" height="400" alt="Portrait of Sami Ali" decoding="async">
-  </figure>
-</section>
-
-<section class="sec" id="work">
-  <div class="rail"><span class="num">01</span><h2>Work</h2><p class="rail-note">Three public repos. Each has numbers you can re-run.</p></div>
-  <div class="body">
-
-    <article class="case" id="tripline">
-      <p class="tags"><span>T1548.001</span><span>Sigma</span><span>auditd</span><span>CloudTrail</span><span>GitHub Actions</span></p>
-      <h3>The stock Sigma rule for setuid abuse matched 0 of 36 events.</h3>
-      <p><strong>tripline</strong> is a detection quality gate. In CI it emulates ATT&amp;CK techniques, replays the resulting telemetry through Sigma rules, scores coverage, and fails the pull request if a rule regresses. No SIEM required.</p>
-      <p>Running it on SigmaHQ’s “Setuid and Setgid” rule: the rule looks for the literal text <code>chmod u+s</code>. The Atomic Red Team test ran <code>chmod u+xs</code>, and the rule also misses <code>chmod 4755</code>. Same behavior, no alert. I wrote a replacement that matches any setuid/setgid chmod form.</p>
-      <ul class="stats">
-        <li><b>4 / 4</b><span>AWS CloudTrail scenarios pass</span></li>
-        <li><b>3 / 3</b><span>Linux auditd scenarios pass</span></li>
-        <li><b>47%</b><span>weighted ATT&amp;CK coverage (Red Canary 2026 weights); 100% of scenarios that have logs</span></li>
-      </ul>
-      <p class="honest">Not done: the 7 Windows scenarios are still pending, which is why overall coverage is 47%. Exports an ATT&amp;CK Navigator layer.</p>
-      <p class="links"><a href="https://github.com/samiali38183/tripline" target="_blank" rel="noopener">Source &amp; write-up →</a></p>
-    </article>
-
-    <article class="case" id="sinkline">
-      <p class="tags"><span>CWE-89</span><span>CWE-79</span><span>OWASP Top 10</span><span>SARIF</span><span>Python <code>ast</code></span></p>
-      <h3>A taint analyzer that tracks input across files, scored against bandit.</h3>
-      <p><strong>sinkline</strong> is an interprocedural taint analyzer for Python web apps. It follows user input from request to dangerous sink across function and file boundaries, maps findings to OWASP and CWE, and emits SARIF. Zero dependencies; built on the standard library’s <code>ast</code>.</p>
-
-      <figure class="chart" aria-labelledby="chart-cap">
-        <div class="chart-legend"><span class="k k1"></span>sinkline <span class="k k2"></span>bandit 1.8</div>
-        <div class="row"><span class="lab">Precision</span><div class="bars"><i class="b1" style="--w:98.3%"><em>0.983</em></i><i class="b2" style="--w:62.3%"><em>0.623</em></i></div></div>
-        <div class="row"><span class="lab">Recall</span><div class="bars"><i class="b1" style="--w:95.1%"><em>0.951</em></i><i class="b2" style="--w:54.1%"><em>0.541</em></i></div></div>
-        <div class="row"><span class="lab">F1</span><div class="bars"><i class="b1" style="--w:96.7%"><em>0.967</em></i><i class="b2" style="--w:57.9%"><em>0.579</em></i></div></div>
-        <figcaption id="chart-cap">109 hand-labeled lines, 37 tests. Small, and I labeled it myself, so the real-app runs below matter more.</figcaption>
-      </figure>
-
-      <p>Run on real intentionally-vulnerable apps: <strong>vulpy</strong> returned 3× CWE-89 across files and 0 in its <code>good/</code> directory; <strong>Vulnerable-Flask-App</strong> yielded SSTI, SQL injection, XSS and weak MD5; <strong>dvpwa</strong> returned CWE-89 and CWE-117; the clean <strong>microblog</strong> app returned 0.</p>
-      <p class="links"><a href="https://github.com/samiali38183/sinkline" target="_blank" rel="noopener">Source &amp; benchmark →</a> · <a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md" target="_blank" rel="noopener">Design notes →</a></p>
-    </article>
-
-    <article class="case" id="kev">
-      <p class="tags"><span>CISA KEV</span><span>EPSS</span><span>CVSS</span><span>BOD 26-04</span></p>
-      <h3>A CVSS 8.8 finding that isn’t in KEV ranks below every KEV match.</h3>
-      <p><strong>kev-risk-prioritization</strong> is a case study and a stdlib-only reference implementation of risk-based vulnerability prioritization aligned with CISA BOD 26-04. Severity alone says what <em>could</em> go wrong; known exploitation says what <em>is</em> going wrong.</p>
-      <ul class="stats">
-        <li><b>9.53 vs 8.34</b><span>average CVSS, KEV vs non-KEV (similar)</span></li>
-        <li><b>0.935 vs 0.029</b><span>average EPSS, KEV vs non-KEV (very different)</span></li>
-      </ul>
-      <p class="honest">Synthetic data, on purpose: the public repo reproduces the method, not any agency’s scan results.</p>
-      <p class="links"><a href="https://github.com/samiali38183/kev-risk-prioritization" target="_blank" rel="noopener">Source &amp; case study →</a> · <a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md" target="_blank" rel="noopener">Methodology →</a></p>
-    </article>
-
-    <div class="also">
-      <h3>Also built</h3>
-      <ul>
-        <li><a href="https://github.com/samiali38183/call-kettle" target="_blank" rel="noopener">call-kettle</a><span>A live phone receptionist for home-service shops, deployed on Fly.io. Claude proposes tool calls; code validates every one, so it can’t book outside hours or claim a booking that didn’t happen. Built with Hermes Agent and Claude Code working in parallel, gated by 3,400+ tests. <a href="https://github.com/samiali38183/call-kettle/blob/main/docs/AGENT_WORK.md" target="_blank" rel="noopener">How the agents were used →</a></span></li>
-        <li><a href="https://github.com/samiali38183/agent-engineering-lab" target="_blank" rel="noopener">agent-engineering-lab</a><span>How I run Hermes Agent, Claude Code and Codex in parallel on a production voice product and verify their work: load tests that caught a real concurrency race, tenant isolation, cost limits, no secrets in prompts.</span></li>
-        <li><a href="https://github.com/samiali38183/cybersecurity-vault" target="_blank" rel="noopener">cybersecurity-vault</a><span>Defensive labs: a stdlib phishing-IOC extractor (10 pytest tests) and a Wireshark lab covering handshakes, DNS, TLS SNI and ARP poisoning (ATT&amp;CK T1557.002), with what a defender should notice in each capture.</span></li>
-        <li><a href="https://github.com/samiali38183/focuslog" target="_blank" rel="noopener">focuslog</a><span>Focus-session tracker with a Pomodoro timer and weekly dashboard.</span></li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="experience">
-  <div class="rail"><span class="num">02</span><h2>Experience</h2></div>
-  <div class="body">
-    <article class="job">
-      <header>
-        <h3>Vulnerability Assessment Analyst Intern</h3>
-        <p class="meta">DHS HS-POWER · U.S. Customs and Border Protection · Ashburn, VA · May–Aug 2026</p>
-      </header>
-      <ul>
-        <li>Cut through scan noise: matched enterprise Nessus/Tenable data to the CISA KEV catalog to find what attackers are already exploiting, benchmarked against BOD 26-04.</li>
-        <li>Built a multi-page Power BI dashboard (CVSS, EPSS, remediation age) that made the case that exploitation likelihood, not severity alone, separates real risk.</li>
-        <li>Designed a prioritization methodology that ranks findings by KEV status, high-value-asset status, internet exposure, EPSS and CVSS.</li>
-        <li>Translated it for leadership: compliance reporting (NIST CSF, FedRAMP, Zero Trust) and an executive briefing.</li>
-      </ul>
-      <p class="honest">Internal systems and figures are non-public, so nothing here comes from them. The public KEV repo above is the same idea on synthetic data.</p>
-    </article>
-  </div>
-</section>
-
-<section class="sec" id="credentials">
-  <div class="rail"><span class="num">03</span><h2>Credentials</h2></div>
-  <div class="body">
-    <ul class="certs">
-      <li>
-        <h3>CompTIA Security+</h3>
-        <p><a href="assets/certs/CompTIA-Security-Plus.pdf">Certificate (PDF)</a></p>
-      </li>
-      <li>
-        <h3>AWS Certified Cloud Practitioner</h3>
-        <p>CLF-C02 · <a href="assets/certs/AWS-Cloud-Practitioner.pdf">Certificate (PDF)</a></p>
-      </li>
-      <li class="wip">
-        <h3>In progress</h3>
-        <p>OSCP / OSCP+ · AWS Certified Security – Specialty (SCS-C03)</p>
-      </li>
+<noscript>
+  <main style="font:16px/1.6 monospace;padding:2rem;max-width:60rem;margin:auto;background:#0b0c0e;color:#d7d3c8">
+    <h1>Sami Ali</h1>
+    <p>Cybersecurity student, George Mason University (B.S. IT, cybersecurity minor, May 2028). Security+ and AWS Cloud Practitioner. DHS HS-POWER intern on CBP’s Vulnerability Assessment Team, summer 2026.</p>
+    <ul>
+      <li><a href="https://github.com/samiali38183/tripline" style="color:#ff6a45">tripline</a>: detection quality gate; the stock Sigma setuid rule matched 0 of 36 events.</li>
+      <li><a href="https://github.com/samiali38183/sinkline" style="color:#ff6a45">sinkline</a>: taint analyzer for Python web apps; F1 0.967 vs bandit 0.579 on a 109-line hand-labeled benchmark.</li>
+      <li><a href="https://github.com/samiali38183/kev-risk-prioritization" style="color:#ff6a45">kev-risk-prioritization</a>: KEV/EPSS/CVSS prioritization case study.</li>
     </ul>
-    <div class="edu">
-      <p><strong>George Mason University</strong> — B.S. Information Technology, Cybersecurity minor. Expected May 2028.</p>
-      <p><strong>Northern Virginia Community College</strong> — A.S. Information Technology, May 2026. GPA 3.7.</p>
-    </div>
-  </div>
-</section>
+    <p><a href="resume.pdf" style="color:#ff6a45">Résumé</a> · <a href="mailto:samiali38183@gmail.com" style="color:#ff6a45">samiali38183@gmail.com</a> · <a href="https://github.com/samiali38183" style="color:#ff6a45">GitHub</a> · <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" style="color:#ff6a45">LinkedIn</a></p>
+  </main>
+</noscript>
 
-<section class="sec" id="contact">
-  <div class="rail"><span class="num">04</span><h2>Contact</h2></div>
-  <div class="body">
-    <p class="big">Hiring for a security engineering, detection, or vulnerability management internship? Email me.</p>
-    <p class="contact-lines">
-      <a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a>
-      <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" target="_blank" rel="noopener">linkedin.com/in/sami-ali-1a4b89345</a>
-      <a href="https://github.com/samiali38183" target="_blank" rel="noopener">github.com/samiali38183</a>
-    </p>
-  </div>
-</section>
-
-</main>
-
-<footer class="foot">
-  <p>Plain HTML, CSS and a little JavaScript. No framework, no tracking. <a href="https://github.com/samiali38183/samiali38183.github.io" target="_blank" rel="noopener">Source</a></p>
-  <p><a href="#" id="replay">Replay the intro</a></p>
-</footer>
-
-<script src="main.js?v=9" defer></script>
+<script src="main.js?v=10" defer></script>
 </body>
 </html>

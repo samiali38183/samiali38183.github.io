@@ -1,9 +1,11 @@
 # samiali38183.github.io
 
-Portfolio of Sami Ali: detection and vulnerability engineering. Live at https://samiali38183.github.io/
+Portfolio of Sami Ali (security engineering) as a Linux-style terminal. Live at https://samiali38183.github.io/
 
-Plain HTML, CSS and a little JavaScript. No framework, no build step, no tracking.
+Vanilla HTML, CSS and JavaScript. No framework, no build step, no tracking.
 
-- `index.html`, `styles.css`, `main.js`: the whole site. The opening animation replays a real result from the [tripline](https://github.com/samiali38183/tripline) project; it is skippable (Esc), shown once per tab session, and disabled for `prefers-reduced-motion`.
-- `resume.pdf`, `assets/certs/`: résumé and certificate PDFs.
-- The other `*.html` files are redirects from old URLs.
+- Boot log, then login, then a shell: `ls`, `cd`, `cat`, `pwd`, `tree`, `find`, `open`, `run`, `history`, `theme`, `help`. Tab completion, arrow-key history, clickable commands for visitors who don't type, and hidden files (`ls -a`).
+- `run tripline | sinkline | kev` replays measured results from the public repos.
+- Every fact comes from the résumé or a public repo. The boot sequence is skippable and is disabled for `prefers-reduced-motion`.
+- `resume.pdf`, `assets/certs/`: résumé and certificate PDFs. Other `*.html` files redirect old URLs.
+- `<noscript>` fallback with the same headline facts.
