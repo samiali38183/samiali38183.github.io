@@ -87,7 +87,7 @@
   var callkettle = H("# call-kettle") + "  " + dim("side project: live phone receptionist for home-service shops") + "\n" +
     dim("tags: FastAPI · Twilio · Claude tool-use · Fly.io · SQLite") + "\n\n" +
     "Claude proposes tool calls; code validates every one. Booking rules (hours, slot grid, lead time,\none booking per slot) are enforced in Python, so the model can't book outside hours or claim a\nbooking that didn't happen. Tenant-isolation tests, cost limits, signature-validated webhooks.\n\n" +
-    "Built with Hermes Agent and Claude Code working in parallel, gated by 3,400+ tests.\n\n" +
+    "Built with Hermes Agent and Claude Code working in parallel; 5,300+ tests collected in the private codebase.\n\n" +
     a("github.com/samiali38183/call-kettle", "https://github.com/samiali38183/call-kettle") + "  ·  " + a("how the agents were used", "https://github.com/samiali38183/call-kettle/blob/main/docs/AGENT_WORK.md");
 
   var lab = H("# agent-engineering-lab") + "\n\n" +
