@@ -207,7 +207,7 @@
       var base = target.join("/");
       var parts = names(n, all).map(function (k) {
         var isDir = !!n.d[k].d, p = (base ? base + "/" : "") + k;
-        return isDir ? cl('<span class="hl b">' + k + "/</span>", "cd " + p) : cl(k, "cat " + p);
+        return isDir ? cl('<span class="hl b">' + k + "/</span>", "cd ~/" + p) : cl(k, "cat ~/" + p);
       });
       line(parts.join("   "));
     },
@@ -261,7 +261,7 @@
         });
       })(FS, ".");
       if (!hits.length) return line("(no matches)", "dim");
-      hits.forEach(function (h) { var rel = h.slice(2); var n = nodeAt(rel.split("/")); line("  " + (n.d ? cl(h, "cd " + rel) : cl(h, "cat " + rel))); });
+      hits.forEach(function (h) { var rel = h.slice(2); var n = nodeAt(rel.split("/")); line("  " + (n.d ? cl(h, "cd ~/" + rel) : cl(h, "cat ~/" + rel))); });
     },
     whoami: function () { line("guest   " + dim("(that's you. I'm Sami Ali: ") + cl("cat about.md", "cat about.md") + dim(")")); },
     neofetch: function () {
@@ -328,15 +328,19 @@
   COMMANDS["projects"] = function () { COMMANDS.ls(["projects"]); };
   COMMANDS["resume"] = function () { COMMANDS.open(["resume.pdf"]); };
 
-  async function exec(raw, echo) {
+  async function exec(raw, echo, fromHome) {
     var cmdline = raw.trim();
     if (echo) line(ps1Text() + esc(raw));
     if (!cmdline) return;
+    // shortcut links/buttons resolve from ~ no matter where the user is; cd keeps its effect
+    var saved = null;
+    if (fromHome && !/^cd(\s|$)/.test(cmdline)) { saved = cwd; cwd = []; }
     if (history[history.length - 1] !== cmdline) history.push(cmdline);
     hIdx = history.length;
     var parts = cmdline.split(/\s+/), c = parts[0], args = parts.slice(1);
     if (COMMANDS[c]) { busy = true; try { await COMMANDS[c](args); } finally { busy = false; } }
     else line("bash: " + esc(c) + ": command not found. Try " + cl("help", "help") + ".", "bad");
+    if (saved) { cwd = saved; setPrompt(); }
     term.scrollTop = term.scrollHeight;
   }
 
@@ -364,7 +368,7 @@
       line(ps1Text() + esc(v)); line(m.map(esc).join("   "), "dim");
     }
   }
-  function runLink(el) { if (busy) return; var c = el.getAttribute("data-cmd"); exec(c, true); focusInput(); }
+  function runLink(el) { if (busy) return; var c = el.getAttribute("data-cmd"); exec(c, true, true); focusInput(); }
   term.addEventListener("click", function (e) { var t = e.target.closest(".cmdlink"); if (t) { e.preventDefault(); runLink(t); } else if (!window.getSelection().toString()) focusInput(); });
   term.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("cmdlink")) { e.preventDefault(); runLink(e.target); } });
 
@@ -423,7 +427,7 @@
     chips.innerHTML = "";
     ["help", "cat about.md", "ls projects", "run tripline", "cat work/dhs-cbp.md", "ls certs", "cat contact.txt", "open resume.pdf"].forEach(function (c) {
       var b = document.createElement("button"); b.type = "button"; b.textContent = c;
-      b.addEventListener("click", function () { if (!busy) { exec(c, true); focusInput(); } });
+      b.addEventListener("click", function () { if (!busy) { exec(c, true, true); focusInput(); } });
       chips.appendChild(b);
     });
   }
