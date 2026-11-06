@@ -82,10 +82,6 @@
     dim("Synthetic data on purpose: the public repo reproduces the method, not any agency's scan results.") + "\n\n" +
     a("github.com/samiali38183/kev-risk-prioritization", "https://github.com/samiali38183/kev-risk-prioritization") + "  ·  " + a("methodology", "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md") + "  ·  try: " + cl("run kev", "run kev");
 
-  var vault = H("# cybersecurity-vault") + "\n\n" +
-    "Defensive labs: a stdlib phishing-IOC extractor (10 pytest tests) and a Wireshark lab covering\nhandshakes, DNS, HTTP, TLS SNI and ARP, with what a defender should notice in each capture.\nThe ARP capture is normal traffic; the poisoning signature (T1557.002) is explained, not captured.\n\n" +
-    a("github.com/samiali38183/cybersecurity-vault", "https://github.com/samiali38183/cybersecurity-vault");
-
   var callkettle = H("# call-kettle") + "  " + dim("side project: live phone receptionist for home-service shops") + "\n" +
     dim("tags: FastAPI · Twilio · Claude tool-use · Fly.io · SQLite") + "\n\n" +
     "Claude proposes tool calls; code validates every one. Booking rules (hours, slot grid, lead time,\none booking per slot) are enforced in Python, so the model can't book outside hours or claim a\nbooking that didn't happen. Tenant-isolation tests, cost limits, signature-validated webhooks.\n\n" +
@@ -138,7 +134,6 @@
       "tripline.md": F(tripline),
       "sinkline.md": F(sinkline),
       "kev-risk-prioritization.md": F(kev),
-      "cybersecurity-vault.md": F(vault),
       "other": D({
         "call-kettle.md": F(callkettle),
         "agent-engineering-lab.md": F(lab),
@@ -148,7 +143,7 @@
     "work": D({ "dhs-cbp.md": F(dhs) }),
     "education": D({
       "gmu.txt": F("George Mason University\nB.S. Information Technology, minor in Cybersecurity\nExpected May 2028"),
-      "nvcc.txt": F("Northern Virginia Community College\nA.S. Information Technology\nMay 2026 · GPA 3.7")
+      "nvcc.txt": F("Northern Virginia Community College\nA.S. Information Technology\nMay 2026")
     }),
     "certs": D({
       "security-plus.pdf": LINK("assets/certs/CompTIA-Security-Plus.pdf", "CompTIA Security+"),
@@ -267,7 +262,7 @@
     neofetch: function () {
       pre('<span class="hl b">guest</span>@<span class="hl b">sami-ali</span>\n----------------\n' +
         '<span class="hl">Name</span>       Sami Ali\n<span class="hl">School</span>     George Mason University, B.S. IT (cyber minor), May 2028\n' +
-        '<span class="hl">Prior</span>      NVCC A.S. IT, May 2026, GPA 3.7\n<span class="hl">Certs</span>      Security+, AWS Cloud Practitioner\n' +
+        '<span class="hl">Prior</span>      NVCC A.S. IT, May 2026\n<span class="hl">Certs</span>      Security+, AWS Cloud Practitioner\n' +
         '<span class="hl">Intern</span>     DHS HS-POWER · CBP Vulnerability Assessment Team (summer 2026)\n<span class="hl">Focus</span>      detection engineering · vulnerability management · appsec\n' +
         '<span class="hl">Studying</span>   OSCP · AWS Security Specialty\n<span class="hl">Shell</span>      this page: vanilla JS, 0 dependencies');
       line("");
