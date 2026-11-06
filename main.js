@@ -83,7 +83,7 @@
     a("github.com/samiali38183/kev-risk-prioritization", "https://github.com/samiali38183/kev-risk-prioritization") + "  ·  " + a("methodology", "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md") + "  ·  try: " + cl("run kev", "run kev");
 
   var vault = H("# cybersecurity-vault") + "\n\n" +
-    "Defensive labs: a stdlib phishing-IOC extractor (10 pytest tests) and a Wireshark lab covering\nhandshakes, DNS, TLS SNI and ARP poisoning (ATT&amp;CK T1557.002), with what a defender should\nnotice in each capture.\n\n" +
+    "Defensive labs: a stdlib phishing-IOC extractor (10 pytest tests) and a Wireshark lab covering\nhandshakes, DNS, HTTP, TLS SNI and ARP, with what a defender should notice in each capture.\nThe ARP capture is normal traffic; the poisoning signature (T1557.002) is explained, not captured.\n\n" +
     a("github.com/samiali38183/cybersecurity-vault", "https://github.com/samiali38183/cybersecurity-vault");
 
   var callkettle = H("# call-kettle") + "  " + dim("side project: live phone receptionist for home-service shops") + "\n" +
