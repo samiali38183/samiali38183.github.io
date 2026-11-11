@@ -1,0 +1,964 @@
+{
+ "meta": {
+  "tool": "fuzzdiff",
+  "version": "0.2.0",
+  "tag": "v0.2.0",
+  "commit": "6ec1e6e",
+  "c_reference": "picohttpparser dd573d8",
+  "httparse": "1.10.1 (default configuration)",
+  "slots": 64,
+  "captured": "2026-11-11",
+  "rustc": "rustc 1.99.1",
+  "platform": "Windows, release build, MSVC build of the C code",
+  "command": "cargo run --release -p fuzzdiff-harness --features mutants --example bench_capture"
+ },
+ "inputs": [
+  {
+   "id": "baseline",
+   "group": "Request line",
+   "title": "Baseline request",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "agree: baseline request"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 27,
+   "bytes": "GET / HTTP/1.1\\r\\nHost: a\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 27,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "Host",
+      "a"
+     ]
+    ],
+    "nheaders": 1
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 27,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "Host",
+      "a"
+     ]
+    ],
+    "nheaders": 1
+   },
+   "httparse": {
+    "verdict": "complete",
+    "consumed": 27,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "Host",
+      "a"
+     ]
+    ],
+    "nheaders": 1
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCC",
+   "explained_by": "agree",
+   "doc": {
+    "class": "Accepted by all three (context)",
+    "class_id": "agree",
+    "label": "baseline request",
+    "pattern": "CCC"
+   },
+   "mutant": null
+  },
+  {
+   "id": "http10",
+   "group": "Request line",
+   "title": "HTTP/1.0 request (corpus)",
+   "source": {
+    "kind": "corpus",
+    "ref": "corpus/request/picohttpparser-simple.bin"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 18,
+   "bytes": "GET / HTTP/1.0\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 18,
+    "method": "GET",
+    "target": "/",
+    "minor": 0,
+    "headers": [],
+    "nheaders": 0
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 18,
+    "method": "GET",
+    "target": "/",
+    "minor": 0,
+    "headers": [],
+    "nheaders": 0
+   },
+   "httparse": {
+    "verdict": "complete",
+    "consumed": 18,
+    "method": "GET",
+    "target": "/",
+    "minor": 0,
+    "headers": [],
+    "nheaders": 0
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCC",
+   "explained_by": "agree",
+   "doc": null,
+   "mutant": null
+  },
+  {
+   "id": "double-sp",
+   "group": "Request line",
+   "title": "Two SP after the method",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "sp-count: two SP after the method"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 19,
+   "bytes": "GET  / HTTP/1.1\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 19,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [],
+    "nheaders": 0
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 19,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [],
+    "nheaders": 0
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "Token"
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCR",
+   "explained_by": "features: multi-space-start-line",
+   "doc": {
+    "class": "Number of SP between start-line elements",
+    "class_id": "sp-count",
+    "label": "two SP after the method",
+    "pattern": "CCR"
+   },
+   "mutant": null
+  },
+  {
+   "id": "http12",
+   "group": "Request line",
+   "title": "HTTP/1.2",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "version: HTTP/1.2 request"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 18,
+   "bytes": "GET / HTTP/1.2\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 18,
+    "method": "GET",
+    "target": "/",
+    "minor": 2,
+    "headers": [],
+    "nheaders": 0
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 18,
+    "method": "GET",
+    "target": "/",
+    "minor": 2,
+    "headers": [],
+    "nheaders": 0
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "Version"
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCR",
+   "explained_by": "features: version-digits",
+   "doc": {
+    "class": "HTTP version digits",
+    "class_id": "version",
+    "label": "HTTP/1.2 request",
+    "pattern": "CCR"
+   },
+   "mutant": null
+  },
+  {
+   "id": "hi-target",
+   "group": "Request line",
+   "title": "0x80 in the target",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "hi-target: 0x80 in the target"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 19,
+   "bytes": "GET /\\x80 HTTP/1.1\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 19,
+    "method": "GET",
+    "target": "/\\x80",
+    "minor": 1,
+    "headers": [],
+    "nheaders": 0
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 19,
+    "method": "GET",
+    "target": "/\\x80",
+    "minor": 1,
+    "headers": [],
+    "nheaders": 0
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "Token"
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCR",
+   "explained_by": "features: high-byte-start-line",
+   "doc": {
+    "class": "Octets 0x80-0xFF in the request-target",
+    "class_id": "hi-target",
+    "label": "0x80 in the target",
+    "pattern": "CCR"
+   },
+   "mutant": null
+  },
+  {
+   "id": "nul-target",
+   "group": "Request line",
+   "title": "NUL byte in the target (corpus)",
+   "source": {
+    "kind": "corpus",
+    "ref": "corpus/request/hand-nul-in-path.bin"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 21,
+   "bytes": "GET /a\\x00b HTTP/1.1\\r\\n\\r\\n",
+   "c": {
+    "verdict": "error"
+   },
+   "rust": {
+    "verdict": "error",
+    "error": "Control"
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "Token"
+   },
+   "harness": {
+    "kind": "BothReject"
+   },
+   "pattern": "RRR",
+   "explained_by": "agree",
+   "doc": null,
+   "mutant": null
+  },
+  {
+   "id": "lead-crlf",
+   "group": "Request line",
+   "title": "Two empty lines before the request",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "lead-crlf: two empty lines before the request"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 22,
+   "bytes": "\\r\\n\\r\\nGET / HTTP/1.1\\r\\n\\r\\n",
+   "c": {
+    "verdict": "error"
+   },
+   "rust": {
+    "verdict": "error",
+    "error": "Token"
+   },
+   "httparse": {
+    "verdict": "complete",
+    "consumed": 22,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [],
+    "nheaders": 0
+   },
+   "harness": {
+    "kind": "BothReject"
+   },
+   "pattern": "RRC",
+   "explained_by": "features: leading-empty-lines",
+   "doc": {
+    "class": "Empty lines before the start-line",
+    "class_id": "lead-crlf",
+    "label": "two empty lines before the request",
+    "pattern": "RRC"
+   },
+   "mutant": null
+  },
+  {
+   "id": "obs-fold",
+   "group": "Headers",
+   "title": "Obsolete line folding",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "fold: request, SP continuation"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 28,
+   "bytes": "GET / HTTP/1.1\\r\\nA: b\\r\\n c\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 28,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "A",
+      "b"
+     ],
+     [
+      null,
+      " c"
+     ]
+    ],
+    "nheaders": 2
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 28,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "A",
+      "b"
+     ],
+     [
+      null,
+      " c"
+     ]
+    ],
+    "nheaders": 2
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "HeaderName"
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCR",
+   "explained_by": "features: obs-fold",
+   "doc": {
+    "class": "Obsolete line folding",
+    "class_id": "fold",
+    "label": "request, SP continuation",
+    "pattern": "CCR"
+   },
+   "mutant": null
+  },
+  {
+   "id": "obs-fold-strict",
+   "group": "Headers",
+   "title": "Obsolete line folding, strict mode (D1)",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "fold: request, SP continuation"
+   },
+   "op": "request",
+   "strict": true,
+   "slots": 64,
+   "bytes_len": 28,
+   "bytes": "GET / HTTP/1.1\\r\\nA: b\\r\\n c\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 28,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "A",
+      "b"
+     ],
+     [
+      null,
+      " c"
+     ]
+    ],
+    "nheaders": 2
+   },
+   "rust": {
+    "verdict": "error",
+    "error": "ObsFold"
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "HeaderName"
+   },
+   "harness": {
+    "kind": "RustStricter",
+    "deviation": "D1"
+   },
+   "pattern": "CCR",
+   "explained_by": "features: obs-fold",
+   "doc": {
+    "class": "Obsolete line folding",
+    "class_id": "fold",
+    "label": "request, SP continuation",
+    "pattern": "CCR"
+   },
+   "mutant": null
+  },
+  {
+   "id": "multi-fold",
+   "group": "Headers",
+   "title": "Several folded lines (corpus)",
+   "source": {
+    "kind": "corpus",
+    "ref": "corpus/request/hand-fold-after-header.bin"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 41,
+   "bytes": "GET / HTTP/1.1\\r\\nHost: a\\r\\n b\\r\\n\\tc\\r\\nX: y\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 41,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "Host",
+      "a"
+     ],
+     [
+      null,
+      " b"
+     ],
+     [
+      null,
+      "\\tc"
+     ],
+     [
+      "X",
+      "y"
+     ]
+    ],
+    "nheaders": 4
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 41,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "Host",
+      "a"
+     ],
+     [
+      null,
+      " b"
+     ],
+     [
+      null,
+      "\\tc"
+     ],
+     [
+      "X",
+      "y"
+     ]
+    ],
+    "nheaders": 4
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "HeaderName"
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCR",
+   "explained_by": "features: obs-fold",
+   "doc": null,
+   "mutant": null
+  },
+  {
+   "id": "many-headers",
+   "group": "Headers",
+   "title": "100 header lines, 64 slots (corpus)",
+   "source": {
+    "kind": "corpus",
+    "ref": "corpus/request/hand-many-headers-100.bin"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 998,
+   "bytes": "GET / HTTP/1.1\\r\\nH0: v0\\r\\nH1: v1\\r\\nH2: v2\\r\\nH3: v3\\r\\nH4: v4\\r\\nH5: v5\\r\\nH6: v6\\r\\nH7: v7\\r\\nH8: v8\\r\\nH9: v9\\r\\nH10: v10\\r\\nH11: v11\\r\\nH12: v12\\r\\nH13: v13\\r\\nH14: v14\\r\\nH15: v15\\r\\nH16: v16\\r\\nH17: v17\\r\\nH18: v18\\r\\nH19: v19\\r\\nH20: v20\\r\\nH21: v21\\r\\nH22: v22\\r\\nH23: v23\\r\\nH24: v24\\r\\nH25: v25\\r\\nH26: v26\\r\\nH27: v27\\r\\nH28: v28\\r\\nH29: v29\\r\\nH30: v30\\r\\nH31: v31\\r\\nH32: v32\\r\\nH33: v33\\r\\nH34: v34\\r\\nH35: v35\\r\\nH36: v36\\r\\nH37: v37\\r\\nH38: v38\\r\\nH39: v39\\r\\nH40: v40\\r\\nH41: v41\\r\\nH42: v42\\r\\nH43: v43\\r\\nH44: v44\\r\\nH45: v45\\r\\nH46: v46\\r\\nH47: v47\\r\\nH48: v48\\r\\nH49: v49\\r\\nH50: v50\\r\\nH51: v51\\r\\nH52: v52\\r\\nH53: v53\\r\\nH54: v54\\r\\nH55: v55\\r\\nH56: v56\\r\\nH57: v57\\r\\nH58: v58\\r\\nH59: v59\\r\\nH60: v60\\r\\nH61: v61\\r\\nH62: v62\\r\\nH63: v63\\r\\nH64: v64\\r\\nH65: v65\\r\\nH66: v66\\r\\nH67: v67\\r\\nH68: v68\\r\\nH69: v69\\r\\nH70: v70\\r\\nH71: v71\\r\\nH72: v72\\r\\nH73: v73\\r\\nH74: v74\\r\\nH75: v75\\r\\nH76: v76\\r\\nH77: v77\\r\\nH78: v78\\r\\nH79: v79\\r\\nH80: v80\\r\\nH81: v81\\r\\nH82: v82\\r\\nH83: v83\\r\\nH84: v84\\r\\nH85: v85\\r\\nH86: v86\\r\\nH87: v87\\r\\nH88: v88\\r\\nH89: v89\\r\\nH90: v90\\r\\nH91: v91\\r\\nH92: v92\\r\\nH93: v93\\r\\nH94: v94\\r\\nH95: v95\\r\\nH96: v96\\r\\nH97: v97\\r\\nH98: v98\\r\\nH99: v99\\r\\n\\r\\n",
+   "c": {
+    "verdict": "error"
+   },
+   "rust": {
+    "verdict": "error",
+    "error": "TooManyHeaders"
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "TooManyHeaders"
+   },
+   "harness": {
+    "kind": "BothReject"
+   },
+   "pattern": "RRR",
+   "explained_by": "agree",
+   "doc": null,
+   "mutant": null
+  },
+  {
+   "id": "status-sp",
+   "group": "Response",
+   "title": "Two SP after the status code",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "sp-count: two SP after the status code"
+   },
+   "op": "response",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 20,
+   "bytes": "HTTP/1.1 200  OK\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 20,
+    "minor": 1,
+    "status": 200,
+    "reason": "OK",
+    "headers": [],
+    "nheaders": 0
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 20,
+    "minor": 1,
+    "status": 200,
+    "reason": "OK",
+    "headers": [],
+    "nheaders": 0
+   },
+   "httparse": {
+    "verdict": "complete",
+    "consumed": 20,
+    "minor": 1,
+    "status": 200,
+    "reason": " OK",
+    "headers": [],
+    "nheaders": 0
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "CCC!",
+   "explained_by": "features: multi-space-start-line",
+   "doc": {
+    "class": "Number of SP between start-line elements",
+    "class_id": "sp-count",
+    "label": "two SP after the status code",
+    "pattern": "CCC!"
+   },
+   "mutant": null
+  },
+  {
+   "id": "chunk-lf-ext",
+   "group": "Chunked body",
+   "title": "Bare LF inside a chunk extension",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "chunk-ext: bare LF inside an extension"
+   },
+   "op": "chunked",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 18,
+   "bytes": "5;a=b\\nhello\\r\\n0\\r\\n\\r\\n",
+   "c": {
+    "verdict": "error"
+   },
+   "rust": {
+    "verdict": "error",
+    "error": "ChunkLineEnding"
+   },
+   "httparse": {
+    "verdict": "complete",
+    "consumed": 13,
+    "size": 5
+   },
+   "harness": {
+    "kind": "BothReject"
+   },
+   "pattern": "RRC",
+   "explained_by": null,
+   "doc": {
+    "class": "Chunk extensions",
+    "class_id": "chunk-ext",
+    "label": "bare LF inside an extension",
+    "pattern": "RRC"
+   },
+   "mutant": null
+  },
+  {
+   "id": "chunk-empty",
+   "group": "Chunked body",
+   "title": "Empty chunk size",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "chunk-size: empty size"
+   },
+   "op": "chunked",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 14,
+   "bytes": "\\r\\nhello\\r\\n0\\r\\n\\r\\n",
+   "c": {
+    "verdict": "error"
+   },
+   "rust": {
+    "verdict": "error",
+    "error": "ChunkSize"
+   },
+   "httparse": {
+    "verdict": "complete",
+    "consumed": 2,
+    "size": 0
+   },
+   "harness": {
+    "kind": "BothReject"
+   },
+   "pattern": "RRC",
+   "explained_by": null,
+   "doc": {
+    "class": "Chunk-size line shape",
+    "class_id": "chunk-size",
+    "label": "empty size",
+    "pattern": "RRC"
+   },
+   "mutant": null
+  },
+  {
+   "id": "chunk-17",
+   "group": "Chunked body",
+   "title": "17 hex digits in a chunk size",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "chunk-size: 17 hex digits (overflow of u64)"
+   },
+   "op": "chunked",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 24,
+   "bytes": "10000000000000000\\r\\nhello",
+   "c": {
+    "verdict": "error"
+   },
+   "rust": {
+    "verdict": "error",
+    "error": "ChunkSizeOverflow"
+   },
+   "httparse": {
+    "verdict": "error",
+    "error": "InvalidChunkSize"
+   },
+   "harness": {
+    "kind": "BothReject"
+   },
+   "pattern": "RRR",
+   "explained_by": null,
+   "doc": {
+    "class": "Chunk-size line shape",
+    "class_id": "chunk-size",
+    "label": "17 hex digits (overflow of u64)",
+    "pattern": "RRR"
+   },
+   "mutant": null
+  },
+  {
+   "id": "trunc-version",
+   "group": "Truncated input",
+   "title": "Version cut after HTTP/1.",
+   "source": {
+    "kind": "httparse-curated",
+    "ref": "timing: version cut after 'HTTP/1.'"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 13,
+   "bytes": "GET / HTTP/1.",
+   "c": {
+    "verdict": "partial"
+   },
+   "rust": {
+    "verdict": "partial"
+   },
+   "httparse": {
+    "verdict": "partial"
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "PPP",
+   "explained_by": "agree",
+   "doc": {
+    "class": "Partial input: when a parser gives up",
+    "class_id": "timing",
+    "label": "version cut after 'HTTP/1.'",
+    "pattern": "PPP"
+   },
+   "mutant": null
+  },
+  {
+   "id": "trunc-corpus",
+   "group": "Truncated input",
+   "title": "Request cut after the target start (corpus)",
+   "source": {
+    "kind": "corpus",
+    "ref": "corpus/request/picohttpparser-incomplete-3.bin"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 5,
+   "bytes": "GET /",
+   "c": {
+    "verdict": "partial"
+   },
+   "rust": {
+    "verdict": "partial"
+   },
+   "httparse": {
+    "verdict": "partial"
+   },
+   "harness": {
+    "kind": "Equal"
+   },
+   "pattern": "PPP",
+   "explained_by": "agree",
+   "doc": null,
+   "mutant": null
+  },
+  {
+   "id": "mut-len",
+   "group": "Planted bug",
+   "title": "Seeded bug HeaderLenOffByOne",
+   "source": {
+    "kind": "seeded-bug",
+    "ref": "HeaderLenOffByOne"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 48,
+   "bytes": "GET / HTTP/1.1\\r\\nX-Long: 0123456789abcdefghij\\r\\n\\r\\n",
+   "c": {
+    "verdict": "complete",
+    "consumed": 48,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "X-Long",
+      "0123456789abcdefghij"
+     ]
+    ],
+    "nheaders": 1
+   },
+   "rust": {
+    "verdict": "complete",
+    "consumed": 48,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "X-Long",
+      "0123456789abcdefghi"
+     ]
+    ],
+    "nheaders": 1
+   },
+   "httparse": {
+    "verdict": "complete",
+    "consumed": 48,
+    "method": "GET",
+    "target": "/",
+    "minor": 1,
+    "headers": [
+     [
+      "X-Long",
+      "0123456789abcdefghij"
+     ]
+    ],
+    "nheaders": 1
+   },
+   "harness": {
+    "kind": "Divergence",
+    "how": "ResultMismatch"
+   },
+   "pattern": "CCC",
+   "explained_by": "agree",
+   "doc": null,
+   "mutant": "HeaderLenOffByOne"
+  },
+  {
+   "id": "mut-bounds",
+   "group": "Planted bug",
+   "title": "Seeded bug MissingBoundsCheck",
+   "source": {
+    "kind": "seeded-bug",
+    "ref": "MissingBoundsCheck"
+   },
+   "op": "request",
+   "strict": false,
+   "slots": 64,
+   "bytes_len": 14,
+   "bytes": "GET / HTTP/1.1",
+   "c": {
+    "verdict": "partial"
+   },
+   "rust": {
+    "verdict": "panic",
+    "error": "the parser panicked"
+   },
+   "httparse": {
+    "verdict": "partial"
+   },
+   "harness": {
+    "kind": "Divergence",
+    "how": "RustPanic"
+   },
+   "pattern": "PPP",
+   "explained_by": "agree",
+   "doc": null,
+   "mutant": "MissingBoundsCheck"
+  }
+ ],
+ "mutants": [
+  {
+   "name": "HeaderLenOffByOne",
+   "generator_inputs": 3,
+   "generator_seconds": "0.000035",
+   "generator_how": "ResultMismatch",
+   "first_failing_input": "Headers last_len=12 max_headers=8 strict=false trailer=false pieces=[151] data=\"Set-Cookie: /==\\n'+~a: ::cfjsyvawqdcgdufrvc\\nContent-Length: \\nHost: \\nAccept: a",
+   "budget": 2000000,
+   "targeted_case": null,
+   "targeted_how": null
+  },
+  {
+   "name": "MissingBoundsCheck",
+   "generator_inputs": 286,
+   "generator_seconds": "0.000985",
+   "generator_how": "RustPanic",
+   "first_failing_input": "Request last_len=0 max_headers=2 strict=false trailer=false pieces=[29] data=\"\\r\\nGET /q=0.9&;;q=0.9 HTTP/1.1\"",
+   "budget": 2000000,
+   "targeted_case": null,
+   "targeted_how": null
+  },
+  {
+   "name": "WrongStateAfterCrlf",
+   "generator_inputs": 8,
+   "generator_seconds": "0.000084",
+   "generator_how": "ResultMismatch",
+   "first_failing_input": "Chunked last_len=0 max_headers=32 strict=false trailer=true pieces=[104] data=\"1;ext=val\\r\\n�\\r\\n23\\r\\n3p\\u{f}Q�7�_G�{�\\u{b}�+\\u{17}��d��R�N�oc��,�\\u{15}.\\u{14}",
+   "budget": 2000000,
+   "targeted_case": null,
+   "targeted_how": null
+  },
+  {
+   "name": "OverheadRatio",
+   "generator_inputs": null,
+   "generator_seconds": "6.151769",
+   "generator_how": null,
+   "first_failing_input": null,
+   "budget": 2000000,
+   "targeted_case": 1,
+   "targeted_how": "ResultMismatch"
+  },
+  {
+   "name": "StatusGuard",
+   "generator_inputs": 10085,
+   "generator_seconds": "0.034901",
+   "generator_how": "ResultMismatch",
+   "first_failing_input": "Response last_len=0 max_headers=16 strict=false trailer=false pieces=[12] data=\"HTTP/1.1 .1 \"",
+   "budget": 2000000,
+   "targeted_case": 4,
+   "targeted_how": "ResultMismatch"
+  }
+ ],
+ "control": {
+  "inputs": 500000,
+  "targeted_cases": 9,
+  "divergences": 0,
+  "seconds": "1.568245"
+ }
+}
