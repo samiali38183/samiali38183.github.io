@@ -5,6 +5,7 @@ import re
 from html import escape as esc
 from pathlib import Path
 
+import bench_fuzzdiff_static as BF
 import bench_static as B
 import components as C
 
@@ -42,6 +43,7 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
             return C.key(p["strip_sets"][arg])
         if kind == "bench":
             return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption,
+                    "fuzzdiff": BF.parser_static, "fuzzdiff-cap": BF.parser_caption, "fuzzdiff-mutants": BF.mutants_panel, "fuzzdiff-sweep": BF.sweep_table,
                     "kev-risk": B.kev_risk_static, "kev-risk-cap": B.kev_risk_caption}[arg]()
         if kind == "snapshot":
             return {"figure": B.kev_snapshot_plate}[arg]()
@@ -304,6 +306,7 @@ def project_page(ctx: dict, slug: str) -> str:
     note = f'<p class="small muted">{esc(p["note"])}</p>' if p.get("note") else ""
     bench = ""
     if "bench" in f:
+        after = ex(f["bench-after"]) + chr(10) if "bench-after" in f else ""
         bench = f"""<section class="bench" data-bench="{p.get("bench", slug)}" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate {{{{n}}}}</span>
@@ -311,7 +314,7 @@ def project_page(ctx: dict, slug: str) -> str:
 {ex(f["bench"])}
 </div>
 <div class="bench-live" data-bench-mount hidden></div>
-<figcaption>{ex(f["bench-cap"])}</figcaption>
+{after}<figcaption>{ex(f["bench-cap"])}</figcaption>
 </figure>
 </section>"""
     return f"""<div class="sheet">
