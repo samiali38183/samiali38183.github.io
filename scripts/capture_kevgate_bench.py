@@ -30,6 +30,7 @@ and are not compared).
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import platform
 import re
@@ -462,7 +463,21 @@ def registry() -> dict:
         raise SystemExit("registry returned no digest for the image tag")
     idx, _ = http_json(base + "sha256-" + digest.split(":")[1], {**auth, "Accept": "application/vnd.oci.image.index.v1+json"})
     kinds = sorted(m["annotations"]["dev.sigstore.bundle.predicateType"] for m in idx["manifests"])
-    return {"image": IMAGE, "tag": IMAGE_TAG, "digest": digest, "anonymous_pull": True, "attached": kinds}
+    # The SBOM and provenance statements are in-toto statements in a DSSE envelope: read them and check the subject.
+    subjects_match, components = True, 0
+    for m in idx["manifests"]:
+        ptype = m["annotations"]["dev.sigstore.bundle.predicateType"]
+        if ptype not in ("https://cyclonedx.org/bom", "https://slsa.dev/provenance/v1"):
+            continue
+        man, _ = http_json(base + m["digest"], {**auth, "Accept": "application/vnd.oci.image.manifest.v1+json"})
+        bundle, _ = http_json(f"https://ghcr.io/v2/{OWNER_REPO}/blobs/" + man["layers"][0]["digest"], auth)
+        stmt = json.loads(base64.b64decode(bundle["dsseEnvelope"]["payload"]))
+        subjects_match = subjects_match and stmt["predicateType"] == ptype and [x["digest"]["sha256"] for x in stmt["subject"]] == [digest.split(":")[1]]
+        if ptype == "https://cyclonedx.org/bom":
+            components = len(stmt["predicate"]["components"])
+    if not subjects_match:
+        raise SystemExit("an attestation names a different subject than the image digest")
+    return {"image": IMAGE, "tag": IMAGE_TAG, "digest": digest, "anonymous_pull": True, "attached": kinds, "sbom_components": components}
 
 
 def capture(repo: Path, py: str) -> dict:

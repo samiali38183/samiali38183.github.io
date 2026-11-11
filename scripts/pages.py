@@ -6,6 +6,7 @@ from html import escape as esc
 from pathlib import Path
 
 import bench_fuzzdiff_static as BF
+import bench_kevgate_static as BK
 import bench_static as B
 import bench_vulnlab_static as BV
 import components as C
@@ -47,7 +48,10 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
                     "fuzzdiff": BF.parser_static, "fuzzdiff-cap": BF.parser_caption, "fuzzdiff-mutants": BF.mutants_panel, "fuzzdiff-sweep": BF.sweep_table,
                     "kev-risk": B.kev_risk_static, "kev-risk-cap": B.kev_risk_caption,
                     "kevgate-admit": B.admit_static, "kevgate-admit-cap": B.admit_caption,
-                    "vulnlab": BV.vulnlab_static, "vulnlab-cap": BV.vulnlab_caption}[arg]()
+                    "vulnlab": BV.vulnlab_static, "vulnlab-cap": BV.vulnlab_caption,
+                    "kevgate": BK.kevgate_static, "kevgate-cap": BK.kevgate_caption, "kevgate-what": BK.kevgate_what}[arg]()
+        if kind == "kgarch":
+            return BK.arch()
         if kind == "admitpath":
             return B.admit_path()
         if kind == "snapshot":
