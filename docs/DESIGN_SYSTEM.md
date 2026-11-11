@@ -1,6 +1,6 @@
 # Design system: "As Found / As Left"
 
-Every project page is a self-issued verification record: an instrument (the tool), a reference standard (what it was checked against), a reading as found and as left, limits, and traceability to CI runs. The calibration vocabulary appears only in labels and data objects; prose is plain English. Records always say "Self-issued verification record, not accredited". Never use accreditation or standards language (ISO/IEC 17025, NIST, ILAC, "certified") for them.
+Every project page is a self-issued verification record: an instrument (the tool), a reference standard (what it was checked against), a reading as found and as left, limits, and traceability to CI runs. The calibration vocabulary appears only in labels and data objects; prose is plain English. Records always say "Self-issued verification record, not accredited". Never use accreditation or standards-body language for them.
 
 Source of the decision: the design brief in the vault (`18-Portfolio-Design/DESIGN_BRIEF.md`). This file documents what is implemented.
 
