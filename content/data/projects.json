@@ -1,0 +1,923 @@
+{
+ "order": [
+  "tripline",
+  "sinkline",
+  "kevgate",
+  "kevgate-admit",
+  "fuzzdiff",
+  "kev-risk-prioritization"
+ ],
+ "projects": {
+  "tripline": {
+   "slug": "tripline",
+   "content": "tripline.html",
+   "name": "tripline",
+   "version": "v0.2.1",
+   "sheet": 1,
+   "kind": "Detection engineering",
+   "title": "tripline: a CI gate for detection rules | Sami Ali",
+   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events; a replacement rule matches 2.",
+   "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 10 passing, 4 pending (Windows); 186 tests.",
+   "labels": {
+    "found": "As found",
+    "left": "As left"
+   },
+   "found_title": "The stock setuid rule matched nothing",
+   "left_title": "A replacement rule matches the two chmod runs",
+   "record": {
+    "instrument": "tripline v0.2.1, commit e01b8b0",
+    "reference": "SigmaHQ rule c21c4eaa (Setuid and Setgid), replayed on telemetry recorded from Atomic Red Team T1548.001 tests on a GitHub-hosted Linux runner",
+    "measured": "2026-11-10, Python 3.12.2, fresh clone of main",
+    "reproduce": [
+     "tripline replay --all",
+     "tripline replay t1548-001-setuid-setgid --show-events"
+    ],
+    "reproduce_label": "$ tripline"
+   },
+   "reading": {
+    "num": "0",
+    "den": "/36",
+    "unit": "events matched by the stock rule",
+    "caption": "The stock SigmaHQ Setuid and Setgid rule matched 0 of 36 events in telemetry recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner. The replacement rule matches 2.",
+    "stamp": [
+     "fail",
+     "As found: fail"
+    ],
+    "run": "41838714456"
+   },
+   "strip_sets": {
+    "main": {
+     "unit": "events",
+     "total_label": "36 applicable events",
+     "phr": {
+      "hit": "matched",
+      "miss": "expected but not matched",
+      "neg": "not expected and not matched"
+     },
+     "rows": [
+      {
+       "label": "As found",
+       "runs": [
+        [
+         "neg",
+         13
+        ],
+        [
+         "miss",
+         1
+        ],
+        [
+         "neg",
+         17
+        ],
+        [
+         "miss",
+         1
+        ],
+        [
+         "neg",
+         4
+        ]
+       ],
+       "val": "<b>0</b> matched of 36 events"
+      },
+      {
+       "label": "As left",
+       "runs": [
+        [
+         "neg",
+         13
+        ],
+        [
+         "hit",
+         1
+        ],
+        [
+         "neg",
+         17
+        ],
+        [
+         "hit",
+         1
+        ],
+        [
+         "neg",
+         4
+        ]
+       ],
+       "val": "<b>2</b> matched of 36 events"
+      }
+     ]
+    },
+    "scenarios": {
+     "unit": "scenarios",
+     "phr": {
+      "hit": "passing",
+      "pend": "pending, no recording yet"
+     },
+     "rows": [
+      {
+       "label": "Gate",
+       "runs": [
+        [
+         "hit",
+         10
+        ],
+        [
+         "pend",
+         4
+        ]
+       ],
+       "val": "<b>10</b> passed, 4 pending, 0 failed"
+      }
+     ]
+    }
+   },
+   "home": {
+    "against": "SigmaHQ stock rule, 36 recorded events",
+    "reading": "0 to 2 of 36",
+    "run": "41838714456",
+    "found": "0 of 36 events matched by the stock rule",
+    "left": "Replacement rule: 2 of 36",
+    "tolerance": "One recording per scenario, no benign corpus; 4 Windows scenarios pending"
+   },
+   "links": [
+    [
+     "Repository",
+     "https://github.com/samiali38183/tripline"
+    ],
+    [
+     "Release v0.2.1",
+     "https://github.com/samiali38183/tripline/releases/tag/v0.2.1"
+    ],
+    [
+     "Docs",
+     "https://github.com/samiali38183/tripline/tree/main/docs"
+    ],
+    [
+     "CI run (main)",
+     "https://github.com/samiali38183/tripline/actions/runs/42957008252"
+    ],
+    [
+     "Live coverage report",
+     "https://samiali38183.github.io/tripline/"
+    ]
+   ],
+   "trace": [
+    [
+     "Release",
+     "link",
+     "https://github.com/samiali38183/tripline/releases/tag/v0.2.1",
+     "v0.2.1"
+    ],
+    [
+     "Gate run on main",
+     "run",
+     "42957008252"
+    ],
+    [
+     "Linux recording run (setuid finding)",
+     "run",
+     "41838714456"
+    ],
+    [
+     "Windows recording run",
+     "run",
+     "42917025570"
+    ],
+    [
+     "Finding F-001",
+     "link",
+     "https://github.com/samiali38183/tripline/blob/main/docs/findings.md",
+     "docs/findings.md"
+    ],
+    [
+     "Scorecard",
+     "link",
+     "https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json",
+     "docs/scorecard.json"
+    ],
+    [
+     "Changelog",
+     "link",
+     "https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md",
+     "CHANGELOG.md"
+    ]
+   ],
+   "commit": "e01b8b0"
+  },
+  "sinkline": {
+   "slug": "sinkline",
+   "content": "sinkline.html",
+   "name": "sinkline",
+   "version": "v0.4.1",
+   "sheet": 2,
+   "kind": "Application security",
+   "title": "sinkline: taint analysis for Python web apps | Sami Ali",
+   "desc": "sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark, Bandit 0.579.",
+   "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 91 tests; 109-line self-labeled benchmark.",
+   "labels": {
+    "found": "As found",
+    "left": "As left"
+   },
+   "found_title": "A shell injection in its own Action, and the benchmark misses",
+   "left_title": "The reading against Bandit on the same lines",
+   "record": {
+    "instrument": "sinkline v0.4.1, commit 9a36ba2",
+    "reference": "Bandit 1.9.4 on the same 109 labeled lines (bench/corpus, labeled by the author)",
+    "measured": "2026-11-10, Python 3.12.2, bandit 1.9.4, fresh clone",
+    "reproduce": [
+     "python bench/score.py",
+     "python bench/compare_bandit.py"
+    ],
+    "reproduce_label": "$ python bench/"
+   },
+   "reading": {
+    "num": "0.992",
+    "den": "",
+    "unit": "F1 on 109 labeled lines; Bandit 0.579",
+    "caption": "Precision 1.000, recall 0.984, F1 0.992 on sinkline's own 109-line benchmark, which is small and labeled by its author. Bandit 1.9.4 scores F1 0.579 on the same lines.",
+    "stamp": [
+     "limit",
+     "Self-labeled, 109 lines"
+    ],
+    "run": "42920168878"
+   },
+   "strip_sets": {
+    "main": {
+     "unit": "labeled lines",
+     "total_label": "109 labeled lines (61 vulnerable, 48 safe)",
+     "note": "Ticks are grouped by outcome, not in file order.",
+     "phr": {
+      "hit": "vulnerable lines reported",
+      "miss": "vulnerable lines missed",
+      "fp": "safe lines flagged",
+      "neg": "safe lines left alone"
+     },
+     "rows": [
+      {
+       "label": "Bandit 1.9.4",
+       "runs": [
+        [
+         "hit",
+         33
+        ],
+        [
+         "miss",
+         28
+        ],
+        [
+         "fp",
+         20
+        ],
+        [
+         "neg",
+         28
+        ]
+       ],
+       "val": "TP 33, FP 20, FN 28, TN 28. F1 <b>0.579</b>"
+      },
+      {
+       "label": "sinkline",
+       "runs": [
+        [
+         "hit",
+         60
+        ],
+        [
+         "miss",
+         1
+        ],
+        [
+         "neg",
+         48
+        ]
+       ],
+       "val": "TP 60, FP 0, FN 1, TN 48. F1 <b>0.992</b>"
+      }
+     ]
+    }
+   },
+   "home": {
+    "against": "Bandit 1.9.4, 109 self-labeled lines",
+    "reading": "F1 0.992 vs 0.579",
+    "run": "42920168878",
+    "found": "Bandit: TP 33, FP 20, FN 28, F1 0.579",
+    "left": "sinkline: TP 60, FP 0, FN 1, F1 0.992",
+    "tolerance": "Small benchmark labeled by its author"
+   },
+   "links": [
+    [
+     "Repository",
+     "https://github.com/samiali38183/sinkline"
+    ],
+    [
+     "Release v0.4.1",
+     "https://github.com/samiali38183/sinkline/releases/tag/v0.4.1"
+    ],
+    [
+     "Design doc",
+     "https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md"
+    ],
+    [
+     "CI run (main)",
+     "https://github.com/samiali38183/sinkline/actions/runs/42920168878"
+    ],
+    [
+     "Sample HTML report",
+     "https://samiali38183.github.io/sinkline/"
+    ]
+   ],
+   "trace": [
+    [
+     "Release",
+     "link",
+     "https://github.com/samiali38183/sinkline/releases/tag/v0.4.1",
+     "v0.4.1"
+    ],
+    [
+     "CI run on main",
+     "run",
+     "42920168878"
+    ],
+    [
+     "Security fix for the Action",
+     "link",
+     "https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md",
+     "CHANGELOG 0.4.1, Security"
+    ],
+    [
+     "Benchmark scripts",
+     "link",
+     "https://github.com/samiali38183/sinkline/tree/main/bench",
+     "bench/"
+    ],
+    [
+     "Public-project scans",
+     "link",
+     "https://github.com/samiali38183/sinkline/tree/main/docs/examples",
+     "docs/examples"
+    ],
+    [
+     "Action test",
+     "link",
+     "https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py",
+     "tests/test_action.py"
+    ]
+   ],
+   "commit": "9a36ba2"
+  },
+  "kevgate": {
+   "slug": "kevgate",
+   "content": "kevgate.html",
+   "name": "kevgate",
+   "version": "v0.1.1",
+   "sheet": 3,
+   "kind": "Vulnerability management and DevSecOps",
+   "title": "kevgate: KEV-ranked vulnerability intake | Sami Ali",
+   "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and CI that tests NetworkPolicy and Pod Security on kind.",
+   "fact": "A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests on main.",
+   "labels": {
+    "found": "As found",
+    "left": "As left"
+   },
+   "found_title": "Six defects survived the test suite",
+   "left_title": "Six mutants killed, and controls tested in CI",
+   "record": {
+    "instrument": "kevgate v0.1.1, commit 973c8c1 (evidence run on b08a920)",
+    "reference": "its own controls (authentication, rate limits, NetworkPolicy, Pod Security) and a list of six mutants, tested in a kind cluster in CI",
+    "measured": "2026-11-10, Python 3.12.2, fresh clone of main; CI runs 2026-11-11",
+    "reproduce": [
+     "pytest --cov=kevgate"
+    ],
+    "reproduce_label": "$ kevgate"
+   },
+   "reading": {
+    "num": "6",
+    "den": "/6",
+    "unit": "surviving mutants killed",
+    "caption": "Six defects had survived the test suite; tests added in 0.1.1 now fail when each one is reintroduced. The suite went from 227 to 277 tests.",
+    "stamp": [
+     "pass",
+     "As left: pass"
+    ],
+    "run": "42956666365"
+   },
+   "strip_sets": {
+    "main": {
+     "unit": "mutants",
+     "total_label": "6 mutants",
+     "phr": {
+      "hit": "killed by a test",
+      "miss": "survived the suite"
+     },
+     "rows": [
+      {
+       "label": "As found",
+       "runs": [
+        [
+         "miss",
+         6
+        ]
+       ],
+       "val": "<b>6</b> survived 227 tests"
+      },
+      {
+       "label": "As left",
+       "runs": [
+        [
+         "hit",
+         6
+        ]
+       ],
+       "val": "<b>6</b> killed by 277 tests"
+      }
+     ]
+    }
+   },
+   "home": {
+    "against": "Its own six surviving mutants; kind cluster in CI",
+    "reading": "6 of 6 mutants killed",
+    "run": "42956666365",
+    "found": "Six mutants survived 227 tests",
+    "left": "Six killed; 277 tests",
+    "tolerance": "Demonstration scope: one replica, SQLite, LocalStack only"
+   },
+   "links": [
+    [
+     "Repository",
+     "https://github.com/samiali38183/kevgate"
+    ],
+    [
+     "Release v0.1.1",
+     "https://github.com/samiali38183/kevgate/releases/tag/v0.1.1"
+    ],
+    [
+     "Hardening PR #2",
+     "https://github.com/samiali38183/kevgate/pull/2"
+    ],
+    [
+     "Docs",
+     "https://github.com/samiali38183/kevgate/tree/main/docs"
+    ],
+    [
+     "CI runs",
+     "#trace"
+    ]
+   ],
+   "trace": [
+    [
+     "Release",
+     "link",
+     "https://github.com/samiali38183/kevgate/releases/tag/v0.1.1",
+     "v0.1.1 (973c8c1)"
+    ],
+    [
+     "Tests run (ci)",
+     "run",
+     "42956666365"
+    ],
+    [
+     "Kind cluster controls (deploy-kind)",
+     "run",
+     "42956666404"
+    ],
+    [
+     "Release run, v0.1.1",
+     "run",
+     "42960813836"
+    ],
+    [
+     "Mutation tests",
+     "link",
+     "https://github.com/samiali38183/kevgate/blob/main/tests/test_mutation_kills.py",
+     "tests/test_mutation_kills.py"
+    ],
+    [
+     "Changelog",
+     "link",
+     "https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md",
+     "CHANGELOG 0.1.1"
+    ]
+   ],
+   "commit": "973c8c1"
+  },
+  "kevgate-admit": {
+   "slug": "kevgate-admit",
+   "content": "kevgate-admit.html",
+   "name": "kevgate-admit",
+   "version": "main",
+   "sheet": 4,
+   "kind": "Kubernetes security, Go",
+   "title": "kevgate-admit: Kubernetes admission webhook | Sami Ali",
+   "desc": "kevgate-admit is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, kind end-to-end run in CI.",
+   "fact": "An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, and a kind end-to-end run in CI. It does not scan images itself.",
+   "labels": {
+    "found": "Reference",
+    "left": "Reading"
+   },
+   "found_title": "What the webhook was checked against",
+   "left_title": "Five outcomes on kind, and coverage",
+   "record": {
+    "instrument": "kevgate-admit, main at commit bfa62fe (no release yet)",
+    "reference": "kevgate's Python risk score on 1000 generated vectors, and synthetic Trivy reports applied to a kind cluster",
+    "measured": "2026-11-10, Go 1.27.4, fresh clone of main",
+    "reproduce": [
+     "go test ./... -cover"
+    ],
+    "reproduce_label": "$ go test"
+   },
+   "reading": {
+    "num": "5",
+    "den": "/5",
+    "unit": "end-to-end outcomes as expected",
+    "caption": "On a kind cluster with synthetic evidence, five demo workloads were allowed, denied or warned exactly as expected, with the expected message text. The Go score matches the Python score on 1000 reference vectors.",
+    "stamp": [
+     "pass",
+     "5 of 5 as expected"
+    ],
+    "run": "42958591906"
+   },
+   "strip_sets": {
+    "main": {
+     "unit": "end-to-end outcomes",
+     "total_label": "5 outcomes",
+     "phr": {
+      "hit": "outcome matched the expected result"
+     },
+     "rows": [
+      {
+       "label": "Reading",
+       "runs": [
+        [
+         "hit",
+         5
+        ]
+       ],
+       "val": "<b>5</b> of 5 outcomes as expected"
+      }
+     ]
+    }
+   },
+   "home": {
+    "against": "Python score on 1000 vectors; synthetic reports on kind",
+    "reading": "5 of 5 outcomes",
+    "run": "42958591906",
+    "found": "No earlier failure recorded",
+    "left": "72 tests, 95.0% statement coverage",
+    "tolerance": "Does not scan images; synthetic evidence in the demo"
+   },
+   "links": [
+    [
+     "Repository",
+     "https://github.com/samiali38183/kevgate-admit"
+    ],
+    [
+     "Design notes",
+     "https://github.com/samiali38183/kevgate-admit/blob/main/docs/DESIGN.md"
+    ],
+    [
+     "Threat model",
+     "https://github.com/samiali38183/kevgate-admit/blob/main/docs/THREAT_MODEL.md"
+    ],
+    [
+     "CI runs",
+     "#trace"
+    ]
+   ],
+   "trace": [
+    [
+     "Unit tests and lint (ci)",
+     "run",
+     "42958592023"
+    ],
+    [
+     "Kind end to end (e2e-kind)",
+     "run",
+     "42958591906"
+    ],
+    [
+     "Scans (security)",
+     "run",
+     "42958591911"
+    ],
+    [
+     "Score parity script",
+     "link",
+     "https://github.com/samiali38183/kevgate-admit/blob/main/scripts/gen_parity.py",
+     "scripts/gen_parity.py"
+    ],
+    [
+     "End-to-end transcript",
+     "link",
+     "https://github.com/samiali38183/kevgate-admit#end-to-end-transcript",
+     "README"
+    ]
+   ],
+   "commit": "bfa62fe"
+  },
+  "fuzzdiff": {
+   "slug": "fuzzdiff",
+   "content": "fuzzdiff.html",
+   "name": "fuzzdiff",
+   "version": "main",
+   "sheet": 5,
+   "kind": "Memory safety and fuzzing, Rust",
+   "title": "fuzzdiff: picohttpparser in safe Rust | Sami Ali",
+   "desc": "fuzzdiff ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original with differential tests, property tests, seeded bugs and libFuzzer smoke runs.",
+   "fact": "picohttpparser ported from C to safe Rust and checked against the original with differential tests, seeded bugs and libFuzzer. 29 tests, 95.88% line coverage; Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.",
+   "labels": {
+    "found": "As found",
+    "left": "As left"
+   },
+   "found_title": "A harness exception that would have hidden a bug",
+   "left_title": "Three seeded bugs caught, and a clean control",
+   "record": {
+    "instrument": "fuzzdiff, main at commit 22c4034 (no release yet)",
+    "reference": "the C original, picohttpparser commit dd573d8, run on the same bytes",
+    "measured": "2026-11-11, Windows, rustc 1.99.1; fuzz runs in CI on Linux",
+    "reproduce": [
+     "cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --nocapture"
+    ],
+    "reproduce_label": "$ cargo test"
+   },
+   "reading": {
+    "num": "3",
+    "den": "/3",
+    "unit": "seeded bugs caught",
+    "caption": "The harness caught all three deliberately seeded bugs, after 3, 8 and 286 inputs. The control run with no bug seeded ran 500,000 inputs without a divergence.",
+    "stamp": [
+     "pass",
+     "3 of 3 caught"
+    ],
+    "run": "42961733885"
+   },
+   "strip_sets": {
+    "main": {
+     "unit": "seeded bugs",
+     "total_label": "3 seeded bugs",
+     "phr": {
+      "hit": "caught by the harness"
+     },
+     "rows": [
+      {
+       "label": "Reading",
+       "runs": [
+        [
+         "hit",
+         3
+        ]
+       ],
+       "val": "caught after <b>3</b>, <b>286</b> and <b>8</b> inputs"
+      }
+     ]
+    }
+   },
+   "home": {
+    "against": "The C original, same bytes",
+    "reading": "3 of 3 bugs caught",
+    "run": "42961733885",
+    "found": "Harness accepted any folded-header error as expected; narrowed (PR #2)",
+    "left": "3 of 3 seeded bugs caught; 500,000-input control clean",
+    "tolerance": "Short fuzz runs (120 s per target); no vulnerability found"
+   },
+   "links": [
+    [
+     "Repository",
+     "https://github.com/samiali38183/fuzzdiff"
+    ],
+    [
+     "Docs",
+     "https://github.com/samiali38183/fuzzdiff/tree/main/docs"
+    ],
+    [
+     "Bug classes and advisories",
+     "https://github.com/samiali38183/fuzzdiff/blob/main/docs/CVE_CLASSES.md"
+    ],
+    [
+     "CI runs",
+     "#trace"
+    ]
+   ],
+   "note": "No release tag yet, so there is no release link.",
+   "trace": [
+    [
+     "Tests and sanitizers (ci)",
+     "run",
+     "42962524230"
+    ],
+    [
+     "Fuzz run on main",
+     "run",
+     "42962523234"
+    ],
+    [
+     "Fuzz run with the counts below",
+     "run",
+     "42961733885"
+    ],
+    [
+     "Harness fix",
+     "link",
+     "https://github.com/samiali38183/fuzzdiff/pull/2",
+     "pull request #2"
+    ],
+    [
+     "Deviations",
+     "link",
+     "https://github.com/samiali38183/fuzzdiff/blob/main/docs/DEVIATIONS.md",
+     "docs/DEVIATIONS.md"
+    ],
+    [
+     "Findings",
+     "link",
+     "https://github.com/samiali38183/fuzzdiff/blob/main/docs/FINDINGS.md",
+     "docs/FINDINGS.md"
+    ]
+   ],
+   "commit": "22c4034"
+  },
+  "kev-risk-prioritization": {
+   "slug": "kev-risk-prioritization",
+   "content": "kev-risk.html",
+   "name": "kev-risk-prioritization",
+   "version": "main",
+   "sheet": 6,
+   "kind": "Vulnerability management",
+   "title": "kev-risk-prioritization | Sami Ali",
+   "desc": "A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample: 12 of 12 top slots are KEV findings, against 9 for a CVSS-only sort.",
+   "fact": "The scoring idea behind kevgate as a standard-library script, run on a 20-finding synthetic sample. Synthetic data only. 9 tests.",
+   "labels": {
+    "found": "As found",
+    "left": "As left"
+   },
+   "found_title": "A CVSS-only sort leaves KEV findings out of the top 12",
+   "left_title": "The risk score puts all 12 KEV findings first",
+   "record": {
+    "instrument": "kev-risk-prioritization, main at commit 597c1f7",
+    "reference": "a CVSS-only sort of the same 20 synthetic findings",
+    "measured": "2026-11-10, fresh clone, 9 tests pass",
+    "reproduce": [
+     "python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json"
+    ],
+    "reproduce_label": "$ python"
+   },
+   "reading": {
+    "num": "12",
+    "den": "/12",
+    "unit": "top slots held by KEV findings",
+    "caption": "On a synthetic 20-finding sample the risk score puts all 12 KEV findings in its top 12. A CVSS-only sort of the same findings puts 9 there.",
+    "stamp": [
+     "limit",
+     "Synthetic data"
+    ],
+    "run": "42134748636"
+   },
+   "strip_sets": {
+    "main": {
+     "unit": "top-12 slots",
+     "total_label": "12 top slots",
+     "phr": {
+      "hit": "KEV finding",
+      "miss": "non-KEV finding"
+     },
+     "rows": [
+      {
+       "label": "CVSS only",
+       "runs": [
+        [
+         "hit",
+         9
+        ],
+        [
+         "miss",
+         3
+        ]
+       ],
+       "val": "<b>9</b> KEV findings in the top 12"
+      },
+      {
+       "label": "Risk score",
+       "runs": [
+        [
+         "hit",
+         12
+        ]
+       ],
+       "val": "<b>12</b> KEV findings in the top 12"
+      }
+     ]
+    }
+   },
+   "home": {
+    "against": "CVSS-only sort, 20 synthetic findings",
+    "reading": "12 vs 9 KEV in the top 12",
+    "run": "42134748636",
+    "found": "CVSS-only top 12 holds 9 KEV findings",
+    "left": "Risk-score top 12 holds all 12",
+    "tolerance": "Synthetic data; weights not validated against outcomes"
+   },
+   "links": [
+    [
+     "Repository",
+     "https://github.com/samiali38183/kev-risk-prioritization"
+    ],
+    [
+     "Methodology",
+     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md"
+    ],
+    [
+     "CI run (main)",
+     "https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636"
+    ]
+   ],
+   "trace": [
+    [
+     "CI run on main",
+     "run",
+     "42134748636"
+    ],
+    [
+     "Methodology",
+     "link",
+     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md",
+     "docs/methodology.md"
+    ],
+    [
+     "Sample data",
+     "link",
+     "https://github.com/samiali38183/kev-risk-prioritization/tree/main/data",
+     "data/"
+    ]
+   ],
+   "commit": "597c1f7"
+  }
+ },
+ "failed_first": [
+  {
+   "project": "tripline",
+   "text": "The stock SigmaHQ Setuid and Setgid rule matched 0 of 36 recorded events. A replacement rule matches the 2 chmod executions.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "docs/findings.md, F-001",
+    "https://github.com/samiali38183/tripline/blob/main/docs/findings.md"
+   ]
+  },
+  {
+   "project": "tripline",
+   "text": "4 of the 7 Windows scenarios have no accepted recording yet and count as zero in the 68% weighted coverage.",
+   "state": [
+    "pend",
+    "Pending"
+   ],
+   "anchor": "limits",
+   "src": [
+    "README, scorecard",
+    "https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md"
+   ]
+  },
+  {
+   "project": "sinkline",
+   "text": "The GitHub Action put its inputs into a shell line, a script-injection flaw in its own code. Fixed in 0.4.1.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "CHANGELOG 0.4.1, Security",
+    "https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md"
+   ]
+  },
+  {
+   "project": "kevgate",
+   "text": "Six defects survived 227 tests, including a non-constant-time key comparison. 0.1.1 adds tests that kill all six.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "CHANGELOG 0.1.1",
+    "https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md"
+   ]
+  },
+  {
+   "project": "fuzzdiff",
+   "text": "The harness treated any folded-header error in strict mode as the documented deviation, which would have hidden a real bug. The exception is now narrowed.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "pull request #2",
+    "https://github.com/samiali38183/fuzzdiff/pull/2"
+   ]
+  }
+ ]
+}

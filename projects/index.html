@@ -4,88 +4,66 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Projects | Sami Ali</title>
-<meta name="description" content="Three security tools with test counts, benchmarks and CI evidence: tripline (detection gate), sinkline (taint analyzer), kevgate (vulnerability intake service).">
+<meta name="description" content="Six security tools, each checked against a reference: tripline, sinkline, kevgate, kevgate-admit, fuzzdiff and kev-risk-prioritization, with readings, limits and CI evidence.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0a58ad">
+<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="Projects | Sami Ali">
-<meta property="og:description" content="Three security tools with test counts, benchmarks and CI evidence: tripline (detection gate), sinkline (taint analyzer), kevgate (vulnerability intake service).">
+<meta property="og:description" content="Six security tools, each checked against a reference: tripline, sinkline, kevgate, kevgate-admit, fuzzdiff and kev-risk-prioritization, with readings, limits and CI evidence.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projects | Sami Ali">
-<meta name="twitter:description" content="Three security tools with test counts, benchmarks and CI evidence: tripline (detection gate), sinkline (taint analyzer), kevgate (vulnerability intake service).">
-<link rel="stylesheet" href="/styles.css">
+<meta name="twitter:description" content="Six security tools, each checked against a reference: tripline, sinkline, kevgate, kevgate-admit, fuzzdiff and kev-risk-prioritization, with readings, limits and CI evidence.">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
+<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css">
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-<div class="wrap">
+<div class="wrap head-row">
 <a class="brand" href="/">Sami Ali</a>
-<nav class="site-nav" aria-label="Main">
+<nav class="site-nav" aria-label="Primary">
 <ul>
-<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/projects/" aria-current="page">Work</a></li>
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" hidden>Dark theme</button></li>
+<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
+
 </header>
 <main id="main" class="wrap">
 <h1>Projects</h1>
-<p class="lede prose">Five tools, each with the measurements and CI runs behind its claims. Every page ends with a limitations section.</p>
-<ul class="cards">
-<li class="card">
-<h2><a href="/projects/tripline/">tripline</a></h2>
-<p class="tag">Detection engineering, v0.2.1</p>
-<p class="fact">A CI gate that replays recorded ATT&amp;CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 10 passing, 4 pending (Windows); 186 tests.</p>
-</li>
-<li class="card">
-<h2><a href="/projects/sinkline/">sinkline</a></h2>
-<p class="tag">Application security, v0.4.1</p>
-<p class="fact">A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 91 tests; 109-line self-labeled benchmark.</p>
-</li>
-<li class="card">
-<h2><a href="/projects/kevgate/">kevgate</a></h2>
-<p class="tag">Vulnerability management and DevSecOps, v0.1.1</p>
-<p class="fact">A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests on main.</p>
-</li>
+<p class="dek">Each project is an instrument. This page lists what it was checked against and what the check found.</p>
+<ul class="multi" aria-label="Six projects">
+<li><p class="tag label">Sheet 1 of 6 &middot; Detection engineering</p><h2><a href="/projects/tripline/">tripline</a></h2><p class="rd">0 to 2 of 36</p><div class="strips mini vt" style="--vt:strip-tripline"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 36 events: 34 not expected and not matched, 2 expected but not matched"><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 36 events: 34 not expected and not matched, 2 matched"><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="hit"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="hit"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div></div></div><p class="fact">A CI gate that replays recorded ATT&amp;CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 10 passing, 4 pending (Windows); 186 tests.</p></li><li><p class="tag label">Sheet 2 of 6 &middot; Application security</p><h2><a href="/projects/sinkline/">sinkline</a></h2><p class="rd">F1 0.992 vs 0.579</p><div class="strips mini vt" style="--vt:strip-sinkline"><div class="srow"><span class="label" aria-hidden="true">Bandit 1.9.4</span><div class="strip" role="img" aria-label="Bandit 1.9.4, 109 labeled lines: 33 vulnerable lines reported, 28 vulnerable lines missed, 20 safe lines flagged, 28 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div></div><div class="srow"><span class="label" aria-hidden="true">sinkline</span><div class="strip" role="img" aria-label="sinkline, 109 labeled lines: 60 vulnerable lines reported, 1 vulnerable lines missed, 48 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div></div></div><p class="fact">A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 91 tests; 109-line self-labeled benchmark.</p></li><li><p class="tag label">Sheet 3 of 6 &middot; Vulnerability management and DevSecOps</p><h2><a href="/projects/kevgate/">kevgate</a></h2><p class="rd">6 of 6 mutants killed</p><div class="strips mini vt" style="--vt:strip-kevgate"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 6 mutants: 6 survived the suite"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 6 mutants: 6 killed by a test"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div></div></div><p class="fact">A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests on main.</p></li><li><p class="tag label">Sheet 4 of 6 &middot; Kubernetes security, Go</p><h2><a href="/projects/kevgate-admit/">kevgate-admit</a></h2><p class="rd">5 of 5 outcomes</p><div class="strips mini vt" style="--vt:strip-kevgate-admit"><div class="srow"><span class="label" aria-hidden="true">Reading</span><div class="strip" role="img" aria-label="Reading, 5 end-to-end outcomes: 5 outcome matched the expected result"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div></div></div><p class="fact">An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, and a kind end-to-end run in CI. It does not scan images itself.</p></li><li><p class="tag label">Sheet 5 of 6 &middot; Memory safety and fuzzing, Rust</p><h2><a href="/projects/fuzzdiff/">fuzzdiff</a></h2><p class="rd">3 of 3 bugs caught</p><div class="strips mini vt" style="--vt:strip-fuzzdiff"><div class="srow"><span class="label" aria-hidden="true">Reading</span><div class="strip" role="img" aria-label="Reading, 3 seeded bugs: 3 caught by the harness"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div></div></div><p class="fact">picohttpparser ported from C to safe Rust and checked against the original with differential tests, seeded bugs and libFuzzer. 29 tests, 95.88% line coverage; Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.</p></li><li><p class="tag label">Sheet 6 of 6 &middot; Vulnerability management</p><h2><a href="/projects/kev-risk-prioritization/">kev-risk-prioritization</a></h2><p class="rd">12 vs 9 KEV in the top 12</p><div class="strips mini vt" style="--vt:strip-kev-risk-prioritization"><div class="srow"><span class="label" aria-hidden="true">CVSS only</span><div class="strip" role="img" aria-label="CVSS only, 12 top-12 slots: 9 KEV finding, 3 non-KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div></div><div class="srow"><span class="label" aria-hidden="true">Risk score</span><div class="strip" role="img" aria-label="Risk score, 12 top-12 slots: 12 KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div></div></div><p class="fact">The scoring idea behind kevgate as a standard-library script, run on a 20-finding synthetic sample. Synthetic data only. 9 tests.</p></li>
 </ul>
-
-<ul class="cards">
-<li class="card">
-<h2><a href="/projects/kevgate-admit/">kevgate-admit</a></h2>
-<p class="tag">Kubernetes security, Go</p>
-<p class="fact">An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, and a kind end-to-end run in CI. It does not scan images itself.</p>
-</li>
-</ul>
-
-<ul class="cards">
-<li class="card">
-<h2><a href="/projects/fuzzdiff/">fuzzdiff</a></h2>
-<p class="tag">Memory safety and fuzzing, Rust</p>
-<p class="fact">picohttpparser ported from C to safe Rust and checked against the original with differential tests, seeded bugs and libFuzzer. 29 tests, 95.88% line coverage; Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.</p>
-</li>
-</ul>
-
-<h2>Supporting work</h2>
-<ul class="cards">
-<li class="card">
-<h3><a href="/projects/kev-risk-prioritization/">kev-risk-prioritization</a></h3>
-<p class="fact">The scoring idea behind kevgate as a standard-library script, run on a 20-finding synthetic sample. Synthetic data only.</p>
-</li>
-</ul>
-
-<h2>Other repositories</h2>
-<p class="muted prose">Public, but not the work I would point to first.</p>
-<ul class="prose">
+<section aria-labelledby="ledger">
+<h2 id="ledger">Full ledger</h2>
+<p class="ledger-note">Where a project has no earlier failure on record, the columns read Reference and Reading instead, and the sheet says so. Small strips are reduced to at most 24 ticks; every sheet shows the real counts.</p>
+<table class="tbl wt"><caption class="vh">Full ledger: reference standard, reading as found and as left, limits, evidence and version for each project</caption><thead><tr><th scope="col">Instrument</th><th scope="col">Reference standard</th><th scope="col">As found</th><th scope="col">As left</th><th scope="col">Tolerance</th><th scope="col">Evidence</th><th scope="col" class="num">Version</th></tr></thead><tbody><tr><th scope="row" class="name"><a href="/projects/tripline/">tripline</a></th><td data-label="Reference standard">SigmaHQ rule c21c4eaa (Setuid and Setgid), replayed on telemetry recorded from Atomic Red Team T1548.001 tests on a GitHub-hosted Linux runner</td><td data-label="As found">0 of 36 events matched by the stock rule</td><td data-label="As left">Replacement rule: 2 of 36</td><td data-label="Tolerance">One recording per scenario, no benign corpus; 4 Windows scenarios pending</td><td data-label="Evidence"><a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a></td><td class="num" data-label="Version">v0.2.1</td></tr><tr><th scope="row" class="name"><a href="/projects/sinkline/">sinkline</a></th><td data-label="Reference standard">Bandit 1.9.4 on the same 109 labeled lines (bench/corpus, labeled by the author)</td><td data-label="As found">Bandit: TP 33, FP 20, FN 28, F1 0.579</td><td data-label="As left">sinkline: TP 60, FP 0, FN 1, F1 0.992</td><td data-label="Tolerance">Small benchmark labeled by its author</td><td data-label="Evidence"><a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/42920168878"><span class="st" aria-hidden="true"></span><span>run 42920168878</span> <span class="d">passed 2026-11-10</span></a></td><td class="num" data-label="Version">v0.4.1</td></tr><tr><th scope="row" class="name"><a href="/projects/kevgate/">kevgate</a></th><td data-label="Reference standard">Its own controls (authentication, rate limits, NetworkPolicy, Pod Security) and a list of six mutants, tested in a kind cluster in CI</td><td data-label="As found">Six mutants survived 227 tests</td><td data-label="As left">Six killed; 277 tests</td><td data-label="Tolerance">Demonstration scope: one replica, SQLite, LocalStack only</td><td data-label="Evidence"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666365"><span class="st" aria-hidden="true"></span><span>run 42956666365</span> <span class="d">passed 2026-11-11</span></a></td><td class="num" data-label="Version">v0.1.1</td></tr><tr><th scope="row" class="name"><a href="/projects/kevgate-admit/">kevgate-admit</a></th><td data-label="Reference standard">Kevgate&#x27;s Python risk score on 1000 generated vectors, and synthetic Trivy reports applied to a kind cluster</td><td data-label="As found">No earlier failure recorded</td><td data-label="As left">72 tests, 95.0% statement coverage</td><td data-label="Tolerance">Does not scan images; synthetic evidence in the demo</td><td data-label="Evidence"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591906"><span class="st" aria-hidden="true"></span><span>run 42958591906</span> <span class="d">passed 2026-11-11</span></a></td><td class="num" data-label="Version">commit bfa62fe</td></tr><tr><th scope="row" class="name"><a href="/projects/fuzzdiff/">fuzzdiff</a></th><td data-label="Reference standard">The C original, picohttpparser commit dd573d8, run on the same bytes</td><td data-label="As found">Harness accepted any folded-header error as expected; narrowed (PR #2)</td><td data-label="As left">3 of 3 seeded bugs caught; 500,000-input control clean</td><td data-label="Tolerance">Short fuzz runs (120 s per target); no vulnerability found</td><td data-label="Evidence"><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/42961733885"><span class="st" aria-hidden="true"></span><span>run 42961733885</span> <span class="d">passed 2026-11-11</span></a></td><td class="num" data-label="Version">commit 22c4034</td></tr><tr><th scope="row" class="name"><a href="/projects/kev-risk-prioritization/">kev-risk-prioritization</a></th><td data-label="Reference standard">A CVSS-only sort of the same 20 synthetic findings</td><td data-label="As found">CVSS-only top 12 holds 9 KEV findings</td><td data-label="As left">Risk-score top 12 holds all 12</td><td data-label="Tolerance">Synthetic data; weights not validated against outcomes</td><td data-label="Evidence"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636"><span class="st" aria-hidden="true"></span><span>run 42134748636</span> <span class="d">passed 2026-11-06</span></a></td><td class="num" data-label="Version">commit 597c1f7</td></tr></tbody></table>
+</section>
+<section class="section prose" aria-labelledby="other">
+<h2 id="other">Other repositories</h2>
+<p class="muted">Public, but not the work I would point to first.</p>
+<ul>
 <li><a href="https://github.com/samiali38183/call-kettle">call-kettle</a>: phone receptionist backend with booking rules enforced in code and per-tenant limits. A sanitized snapshot; no customers.</li>
 <li><a href="https://github.com/samiali38183/agent-engineering-lab">agent-engineering-lab</a>: notes on test gates, load tests and review rules for a private codebase. Writing, not a tool.</li>
 <li><a href="https://github.com/samiali38183/focuslog">focuslog</a>: a single-file Pomodoro timer and session log. An early project.</li>
 </ul>
+</section>
 </main>
 <footer class="site-footer">
 <div class="wrap">
@@ -98,6 +76,6 @@
 <p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
 </div>
 </footer>
-<script src="/site.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
 </body>
 </html>

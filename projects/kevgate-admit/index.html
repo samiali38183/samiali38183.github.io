@@ -7,71 +7,104 @@
 <meta name="description" content="kevgate-admit is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, kind end-to-end run in CI.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kevgate-admit/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0a58ad">
+<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kevgate-admit: Kubernetes admission webhook | Sami Ali">
 <meta property="og:description" content="kevgate-admit is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, kind end-to-end run in CI.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kevgate-admit/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kevgate-admit: Kubernetes admission webhook | Sami Ali">
 <meta name="twitter:description" content="kevgate-admit is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, kind end-to-end run in CI.">
-<link rel="stylesheet" href="/styles.css">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
+<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css">
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-<div class="wrap">
+<div class="wrap head-row">
 <a class="brand" href="/">Sami Ali</a>
-<nav class="site-nav" aria-label="Main">
+<nav class="site-nav" aria-label="Primary">
 <ul>
-<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/projects/" aria-current="true">Work</a></li>
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" hidden>Dark theme</button></li>
+<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
+<p class="wrap sheetline"><b>Sheet 4 of 6</b> &middot; kevgate-admit &middot; main</p>
 </header>
 <main id="main" class="wrap">
-<p class="crumbs"><a href="/projects/">Projects</a> / kevgate-admit</p>
+<div class="sheet">
+<header class="title">
 <h1>kevgate-admit</h1>
-<p class="lede prose">A Kubernetes validating admission webhook, written in Go. It denies or warns on workloads whose container images carry KEV-listed or over-threshold vulnerabilities, using the same risk model as <a href="/projects/kevgate/">kevgate</a>.</p>
-<ul class="links">
-<li><a href="https://github.com/samiali38183/kevgate-admit">Repository</a></li>
-<li><a href="https://github.com/samiali38183/kevgate-admit/blob/main/docs/DESIGN.md">Design notes</a></li>
-<li><a href="https://github.com/samiali38183/kevgate-admit/blob/main/docs/THREAT_MODEL.md">Threat model</a></li>
-<li><a href="#ci">CI runs</a></li>
-</ul>
+<p class="dek">A Kubernetes validating admission webhook, written in Go. It denies or warns on workloads whose container images carry KEV-listed or over-threshold vulnerabilities, using the same risk model as <a href="/projects/kevgate/">kevgate</a>.</p>
+<ul class="linkrow"><li><a href="https://github.com/samiali38183/kevgate-admit">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/main/docs/DESIGN.md">Design notes</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/main/docs/THREAT_MODEL.md">Threat model</a></li><li><a href="#trace">CI runs</a></li></ul>
 
-<h2>The problem</h2>
-<div class="prose">
-<p>Vulnerability scans usually run in a pipeline, and nothing stops a workload with a known-exploited vulnerability from reaching the cluster anyway. A tag is also not evidence: <code>nginx:1.25</code> can point at different bytes tomorrow, so a report about a tag says little about what a node will pull.</p>
+</header>
+<section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>kevgate-admit, main at commit bfa62fe (no release yet)</dd></div>
+<div><dt>Reference standard</dt><dd>kevgate&#x27;s Python risk score on 1000 generated vectors, and synthetic Trivy reports applied to a kind cluster</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-10, Go 1.27.4, fresh clone of main</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ go test"><code>go test ./... -cover</code></pre></dd></div>
+</dl>
+</section>
+<section class="reading-band" aria-label="The reading">
+<div class="hero-read">
+<p class="reading sm" role="img" aria-label="Reading: 5/5 end-to-end outcomes as expected"><span aria-hidden="true">5</span><span class="den" aria-hidden="true">/5</span></p>
+<div>
+<p class="why">On a kind cluster with synthetic evidence, five demo workloads were allowed, denied or warned exactly as expected, with the expected message text. The Go score matches the Python score on 1000 reference vectors.</p>
+<p class="chips"><span class="stamp pass">5 of 5 as expected</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591906"><span class="st" aria-hidden="true"></span><span>run 42958591906</span> <span class="d">passed 2026-11-11</span></a></p>
 </div>
-
-<h2>What it does</h2>
-<div class="prose">
-<p>For CREATE and UPDATE of Pods, Deployments, StatefulSets, DaemonSets, Jobs and CronJobs, it extracts every container, init container and ephemeral container image, looks up a Trivy report for each image digest, scores each finding, and applies the namespace's policy. The answer is allow, allow with warnings, or deny with a message naming the rule and the top findings.</p>
-<p>Policy is per namespace: <code>denyKev</code>, <code>maxRisk</code>, <code>requireDigest</code>, <code>requireEvidence</code>, allowed registries, exceptions with an expiry date, and an audit mode that admits but warns. It does not scan images itself; it enforces over reports a scan pipeline already produced.</p>
 </div>
-
-<figure class="diagram"><svg viewBox="0 0 440 462" role="img" aria-labelledby="kevgate-admit-t kevgate-admit-d"><title id="kevgate-admit-t">kevgate-admit admission path</title><desc id="kevgate-admit-d">The API server posts an AdmissionReview over TLS. The webhook decodes it and extracts every image, parses each reference by digest, looks up a vulnerability report per digest with time and size limits, scores findings and applies the namespace policy, then allows, warns or denies.</desc><rect class="box" x="20" y="4" width="400" height="54" rx="6"/><text x="220" y="26" text-anchor="middle" font-weight="600">kube-apiserver</text><text class="sub" x="220" y="45" text-anchor="middle">AdmissionReview v1 over TLS, CREATE and UPDATE</text><line class="arrow" x1="220" y1="58" x2="220" y2="78"/><path class="head" d="M215 77 L225 77 L220 84 Z"/><rect class="box" x="20" y="84" width="400" height="54" rx="6"/><text x="220" y="106" text-anchor="middle" font-weight="600">Strict decode, extract images</text><text class="sub" x="220" y="125" text-anchor="middle">containers, init, ephemeral; at most 128 images</text><line class="arrow" x1="220" y1="138" x2="220" y2="158"/><path class="head" d="M215 157 L225 157 L220 164 Z"/><rect class="box" x="20" y="164" width="400" height="54" rx="6"/><text x="220" y="186" text-anchor="middle" font-weight="600">Parse references by digest</text><text class="sub" x="220" y="205" text-anchor="middle">tags are never resolved</text><line class="arrow" x1="220" y1="218" x2="220" y2="238"/><path class="head" d="M215 237 L225 237 L220 244 Z"/><rect class="hi" x="20" y="244" width="400" height="54" rx="6"/><text x="220" y="266" text-anchor="middle" font-weight="600">Bounded evidence lookup</text><text class="sub" x="220" y="285" text-anchor="middle">Trivy report per digest; timeouts, concurrency cap</text><line class="arrow" x1="220" y1="298" x2="220" y2="318"/><path class="head" d="M215 317 L225 317 L220 324 Z"/><rect class="box" x="20" y="324" width="400" height="54" rx="6"/><text x="220" y="346" text-anchor="middle" font-weight="600">Score and apply namespace policy</text><text class="sub" x="220" y="365" text-anchor="middle">kevgate risk model; policy hot-reloaded</text><line class="arrow" x1="220" y1="378" x2="220" y2="398"/><path class="head" d="M215 397 L225 397 L220 404 Z"/><rect class="warn" x="20" y="404" width="400" height="54" rx="6"/><text x="220" y="426" text-anchor="middle" font-weight="600">Allow, warn (audit mode) or deny</text><text class="sub" x="220" y="445" text-anchor="middle">message names the rule and top findings</text></svg><figcaption>The API server posts an AdmissionReview over TLS. The webhook decodes it and extracts every image, parses each reference by digest, looks up a vulnerability report per digest with time and size limits, scores findings and applies the namespace policy, then allows, warns or denies.</figcaption></figure>
-
-<h2>Three implementation points</h2>
-<div class="prose">
-<h3>The Go score must equal the Python score</h3>
-<p>Two services that rank the same finding differently would be a bug nobody notices until an argument about a denial. Go can differ from Python in the last bit: constant expressions are evaluated with arbitrary precision, and the compiler may fuse multiply-adds on some architectures. <code>internal/risk</code> keeps the weights in variables so the arithmetic runs in <code>float64</code> at run time, forces explicit conversions to prevent fusing, and rounds to one decimal through the decimal expansion of the value, which is what Python's <code>round(x, 1)</code> does. <code>scripts/gen_parity.py</code> calls kevgate's own <code>risk_score</code> to generate 1000 reference vectors (a grid plus a seeded random sample) and a test compares every one, next to 12 hand-computed cases.</p>
-<h3>Only a digest names an image</h3>
-<p><code>internal/imageref</code> never resolves a tag. A malformed digest is an error rather than "unpinned", so an image that cannot be pulled is not confused with one that merely lacks a pin. Evidence is keyed by <code>sha256-&lt;hex&gt;.json</code>, and a report whose own metadata names a different digest is rejected as an evidence error, so a file renamed to another image's digest cannot vouch for it. An unpinned image gets a <code>requireDigest</code> denial that says tags are mutable.</p>
-<h3>Bounded work and last-good state</h3>
-<p>Admission sits on the critical path of every deploy, so the lookup is bounded. Each request has a time budget (8 s by default, to stay under the webhook timeout), each evidence lookup has its own (3 s), a semaphore caps concurrent lookups, a request may name at most 128 distinct images, and report files and HTTP bodies have size caps. If the evidence source fails, <code>--fail-mode closed</code> (the default) denies instead of waiting. Policy, KEV catalog, EPSS data and the TLS pair are hot reloaded by a generic <code>File[T]</code> that swaps a parsed copy atomically; a file that fails to parse never replaces the last good one, and a broken version is remembered by modification time and size so it is reported once per change, not on every tick.</p>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>outcome matched the expected result</li></ul>
+<div class="strips vt" style="--vt:strip-kevgate-admit"><div class="srow"><span class="label" aria-hidden="true">Reading</span><div class="strip" role="img" aria-label="Reading, 5 end-to-end outcomes: 5 outcome matched the expected result"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>5</b> of 5 outcomes as expected</p></div></div>
+</section>
+<section class="bench" data-bench="kevgate-admit" aria-label="Recorded readings">
+<figure class="plate">
+<span class="plate-label">Plate 1</span>
+<div class="bench-static">
+<div class="scroll"><table class="tbl">
+<caption>The five demo workloads applied to a kind cluster, and the result of each</caption>
+<thead><tr><th scope="col">Demo workload</th><th scope="col">Namespace</th><th scope="col">Expected</th><th scope="col">Result</th></tr></thead>
+<tbody>
+<tr><th scope="row">clean</th><td data-label="Namespace">demo-enforce</td><td data-label="Expected">Allowed</td><td data-label="Result">PASS</td></tr>
+<tr><th scope="row">kev-vulnerable</th><td data-label="Namespace">demo-enforce</td><td data-label="Expected">Denied ([denyKev], [maxRisk])</td><td data-label="Result">PASS</td></tr>
+<tr><th scope="row">over-threshold-enforce</th><td data-label="Namespace">demo-enforce</td><td data-label="Expected">Denied ([maxRisk])</td><td data-label="Result">PASS</td></tr>
+<tr><th scope="row">over-threshold-audit</th><td data-label="Namespace">demo-audit</td><td data-label="Expected">Warned, admitted</td><td data-label="Result">PASS</td></tr>
+<tr><th scope="row">tag-only</th><td data-label="Namespace">demo-enforce</td><td data-label="Expected">Denied ([requireDigest])</td><td data-label="Result">PASS</td></tr>
+</tbody>
+</table></div>
 </div>
-
-<h2>Evidence from real runs</h2>
+<div class="bench-live" data-bench-mount hidden></div>
+<figcaption><b>The same image is denied in an enforcing namespace and only warned about in an audit namespace.</b> Synthetic demo data from the end-to-end transcript in the repository README, not a production cluster.</figcaption>
+</figure>
+</section>
+<article class="record">
+<section class="section" id="as-found" aria-labelledby="found-h">
+<h2 id="found-h"><span class="label sec-label">Reference</span>What the webhook was checked against</h2>
+<div class="prose">
+<p>No earlier failure is recorded for this project, so this section says what the webhook was checked against rather than what was fixed.</p>
+<p>There are two references. The first is kevgate's Python risk score: two services that rank the same finding differently would be a bug nobody notices until an argument about a denial, so <code>scripts/gen_parity.py</code> calls kevgate's own <code>risk_score</code> to generate 1000 reference vectors and a test compares every one. The second is a real cluster: the <code>e2e-kind</code> workflow applies demo workloads against synthetic Trivy reports and fails unless every outcome and denial text matches.</p>
+</div>
+</section>
+<section class="section" id="as-left" aria-labelledby="left-h">
+<h2 id="left-h"><span class="label sec-label">Reading</span>Five outcomes on kind, and coverage</h2>
 <h3>Tests, re-run locally</h3>
-<p class="small muted">Run on 2026-11-10 from a fresh clone of <code>main</code> (commit bfa62fe), Go 1.27.4.</p>
-<pre data-copy><code>$ go test ./... -cover
+<div class="prose"><p>Run on 2026-11-10 from a fresh clone of <code>main</code> (commit bfa62fe), Go 1.27.4.</p></div>
+<pre data-copy data-label="$ go test ./... -cover"><code>$ go test ./... -cover
 ok   .../internal/admission   coverage: 98.0% of statements
 ok   .../internal/app         coverage: 96.9% of statements
 ok   .../internal/imageref    coverage: 100.0% of statements
@@ -82,10 +115,11 @@ ok   .../internal/risk        coverage: 87.5% of statements
 $ go test ./... -coverprofile=c.out; go tool cover -func=c.out | tail -1
 total:    (statements)    95.0%</code></pre>
 <p class="trim">Trimmed: 6 of 14 packages shown and the elapsed times removed. Counting passes in <code>go test -json</code> gave 72 top-level tests and 308 including subtests.</p>
-
 <h3>The kind end-to-end run</h3>
-<p class="prose">The <code>e2e-kind</code> workflow builds the image, creates a kind cluster, installs the Helm chart and applies demo workloads against synthetic evidence. It fails the job unless every outcome and denial text matches. This is the transcript from the repository README (the output of a passing CI run; the runner's file paths are shortened with <code>...</code>):</p>
-<pre data-copy><code>== clean in demo-enforce (expect: allowed)
+<div class="prose">
+<p>The <code>e2e-kind</code> workflow builds the image, creates a kind cluster, installs the Helm chart and applies demo workloads against synthetic evidence. It fails the job unless every outcome and denial text matches. This is the transcript from the repository README (the output of a passing CI run; the runner's file paths are shortened with <code>...</code>):</p>
+</div>
+<pre data-copy data-label="End-to-end transcript (README)"><code>== clean in demo-enforce (expect: allowed)
 deployment.apps/clean created
 RESULT clean: PASS
 
@@ -108,36 +142,47 @@ Error from server (Forbidden): ... denied the request: kevgate-admit: request de
 RESULT tag-only: PASS
 
 demo finished: all checks passed</code></pre>
-<p class="trim">Trimmed: namespace setup, Helm install output, the over-threshold enforce case and the metrics block removed; the rest is unedited. The full transcript is in the <a href="https://github.com/samiali38183/kevgate-admit#end-to-end-transcript">README</a>. The images are synthetic (<code>registry.example.com</code>) and the CVE-2099 entry is invented.</p>
-
-<h2 id="ci">CI evidence</h2>
-<section class="scroll" tabindex="0" aria-label="kevgate-admit CI evidence table">
-<table>
-<thead><tr><th scope="col">Workflow</th><th scope="col">What it covers</th><th scope="col">Run (main, bfa62fe)</th></tr></thead>
-<tbody>
-<tr><th scope="row">ci</th><td>vet, lint, tests with the race detector and an 85% coverage floor, 30 s fuzz runs of two targets, Helm lint, kubeconform, shellcheck, actionlint</td><td><a href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958592023">42958592023</a></td></tr>
-<tr><th scope="row">e2e-kind</th><td>kind cluster, chart install, allow, deny and warn outcomes with exact denial text</td><td><a href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591906">42958591906</a></td></tr>
-<tr><th scope="row">security</th><td>hadolint, gosec, govulncheck, Trivy filesystem and image scans, gitleaks (per the README)</td><td><a href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591911">42958591911</a></td></tr>
-</tbody>
-</table>
-</section>
-<p class="small muted prose">What each workflow covers is taken from the repository README.</p>
-
-<h2>Results</h2>
-<section class="scroll" tabindex="0" aria-label="kevgate-admit results table">
-<table>
+<p class="trim">Trimmed: namespace setup, Helm install output, the over-threshold enforce case and the metrics block removed; the rest is unedited. The full transcript, with all five outcomes, is in the <a href="https://github.com/samiali38183/kevgate-admit#end-to-end-transcript">README</a>. The images are synthetic (<code>registry.example.com</code>) and the CVE-2099 entry is invented.</p>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>outcome matched the expected result</li></ul>
+<div class="strips"><div class="srow"><span class="label" aria-hidden="true">Reading</span><div class="strip" role="img" aria-label="Reading, 5 end-to-end outcomes: 5 outcome matched the expected result"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>5</b> of 5 outcomes as expected</p></div></div>
+<div class="scroll wide"><table class="tbl">
+<caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests</th><td>72 top-level (308 with subtests and fuzz seed runs)</td><td>re-run for this page; <a href="https://github.com/samiali38183/kevgate-admit#verification-status">README</a></td></tr>
-<tr><th scope="row">Coverage</th><td>95.0% of statements across packages</td><td>re-run for this page (<code>go tool cover</code>)</td></tr>
-<tr><th scope="row">Score parity with Python</th><td>1000 generated vectors plus 12 hand-computed</td><td><a href="https://github.com/samiali38183/kevgate-admit/blob/main/scripts/gen_parity.py">scripts/gen_parity.py</a>; 1000 vectors counted in the committed file</td></tr>
-<tr><th scope="row">Fuzzing</th><td>2 targets (Trivy parser, AdmissionReview decoder), 25 s each locally, no findings</td><td>README (not re-run for this page)</td></tr>
-<tr><th scope="row">End-to-end</th><td>allow, deny (KEV, risk, unpinned tag) and audit-warn outcomes all pass on kind</td><td><a href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591906">e2e-kind run 42958591906</a></td></tr>
+<tr><th scope="row">Tests</th><td data-label="Value">72 top-level (308 with subtests and fuzz seed runs)</td><td data-label="Source">re-run for this page; <a href="https://github.com/samiali38183/kevgate-admit#verification-status">README</a></td></tr>
+<tr><th scope="row">Coverage</th><td data-label="Value">95.0% of statements across packages</td><td data-label="Source">re-run for this page (<code>go tool cover</code>)</td></tr>
+<tr><th scope="row">Score parity with Python</th><td data-label="Value">1000 generated vectors plus 12 hand-computed</td><td data-label="Source"><a href="https://github.com/samiali38183/kevgate-admit/blob/main/scripts/gen_parity.py">scripts/gen_parity.py</a>; 1000 vectors counted in the committed file</td></tr>
+<tr><th scope="row">Fuzzing</th><td data-label="Value">2 targets (Trivy parser, AdmissionReview decoder), 25 s each locally, no findings</td><td data-label="Source">README (not re-run for this page)</td></tr>
+<tr><th scope="row">End-to-end</th><td data-label="Value">allow, deny (KEV, risk, unpinned tag) and audit-warn outcomes all pass on kind: 5 of 5</td><td data-label="Source"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591906"><span class="st" aria-hidden="true"></span><span>run 42958591906</span> <span class="d">passed 2026-11-11</span></a> (e2e-kind)</td></tr>
 </tbody>
-</table>
+</table></div>
 </section>
-
-<h2>Limitations</h2>
+<section class="section" id="method" aria-labelledby="method-h">
+<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<h3>The problem</h3>
+<div class="prose">
+<p>Vulnerability scans usually run in a pipeline, and nothing stops a workload with a known-exploited vulnerability from reaching the cluster anyway. A tag is also not evidence: <code>nginx:1.25</code> can point at different bytes tomorrow, so a report about a tag says little about what a node will pull.</p>
+</div>
+<h3>What it does</h3>
+<div class="prose">
+<p>For CREATE and UPDATE of Pods, Deployments, StatefulSets, DaemonSets, Jobs and CronJobs, it extracts every container, init container and ephemeral container image, looks up a Trivy report for each image digest, scores each finding, and applies the namespace's policy. The answer is allow, allow with warnings, or deny with a message naming the rule and the top findings.</p>
+<p>Policy is per namespace: <code>denyKev</code>, <code>maxRisk</code>, <code>requireDigest</code>, <code>requireEvidence</code>, allowed registries, exceptions with an expiry date, and an audit mode that admits but warns. It does not scan images itself; it enforces over reports a scan pipeline already produced.<sup class="nref" aria-hidden="true"></sup></p>
+</div>
+<div class="note" role="note"><strong>An admission webhook</strong> is a service the Kubernetes API server asks to approve or reject an object before it is stored.</div>
+<figure class="plate diagram"><span class="plate-label">Plate 2</span><svg viewBox="0 0 320 621" role="img" aria-labelledby="kevgate-admit-t kevgate-admit-d"><title id="kevgate-admit-t">kevgate-admit admission path</title><desc id="kevgate-admit-d">The API server posts an AdmissionReview over TLS. The webhook decodes it and extracts every image, parses each reference by digest, looks up a vulnerability report per digest with time and size limits, scores findings and applies the namespace policy, then allows, warns or denies.</desc><rect x="26" y="4" width="290" height="77"/><text x="38" y="26" font-weight="600" font-size="14">kube-apiserver</text><text class="sub" x="38" y="44" font-size="13">AdmissionReview v1 over TLS,</text><text class="sub" x="38" y="61" font-size="13">CREATE and UPDATE</text><circle class="letter" cx="12" cy="16" r="9"/><text class="lt" x="12" y="20">A</text><path class="arrow" d="M171 81 V106"/><path class="head" d="M166 99 L171 106 L176 99"/><rect x="26" y="107" width="290" height="77"/><text x="38" y="129" font-weight="600" font-size="14">Strict decode, extract images</text><text class="sub" x="38" y="147" font-size="13">containers, init, ephemeral; at</text><text class="sub" x="38" y="164" font-size="13">most 128 images</text><circle class="letter" cx="12" cy="119" r="9"/><text class="lt" x="12" y="123">B</text><path class="arrow" d="M171 184 V209"/><path class="head" d="M166 202 L171 209 L176 202"/><rect x="26" y="210" width="290" height="60"/><text x="38" y="232" font-weight="600" font-size="14">Parse references by digest</text><text class="sub" x="38" y="250" font-size="13">tags are never resolved</text><circle class="letter" cx="12" cy="222" r="9"/><text class="lt" x="12" y="226">C</text><path class="arrow" d="M171 270 V295"/><path class="head" d="M166 288 L171 295 L176 288"/><rect class="hi" x="26" y="296" width="290" height="77"/><text x="38" y="318" font-weight="600" font-size="14">Bounded evidence lookup</text><text class="sub" x="38" y="336" font-size="13">Trivy report per digest;</text><text class="sub" x="38" y="353" font-size="13">timeouts, concurrency cap</text><circle class="letter" cx="12" cy="308" r="9"/><text class="lt" x="12" y="312">D</text><path class="arrow" d="M171 373 V398"/><path class="head" d="M166 391 L171 398 L176 391"/><rect x="26" y="399" width="290" height="96"/><text x="38" y="421" font-weight="600" font-size="14">Score and apply namespace</text><text x="38" y="440" font-weight="600" font-size="14">policy</text><text class="sub" x="38" y="458" font-size="13">kevgate risk model; policy</text><text class="sub" x="38" y="475" font-size="13">hot-reloaded</text><circle class="letter" cx="12" cy="411" r="9"/><text class="lt" x="12" y="415">E</text><path class="arrow" d="M171 495 V520"/><path class="head" d="M166 513 L171 520 L176 513"/><rect class="warn" x="26" y="521" width="290" height="96"/><path class="hatch-line" d="M26 617 l20 -20 M26 609 l8 -8 M34 617 l12 -12"/><text x="38" y="543" font-weight="600" font-size="14">Allow, warn (audit mode) or</text><text x="38" y="562" font-weight="600" font-size="14">deny</text><text class="sub" x="38" y="580" font-size="13">message names the rule and top</text><text class="sub" x="38" y="597" font-size="13">findings</text><circle class="letter" cx="12" cy="533" r="9"/><text class="lt" x="12" y="537">F</text></svg><figcaption>The API server posts an AdmissionReview over TLS. The webhook decodes it and extracts every image, parses each reference by digest, looks up a vulnerability report per digest with time and size limits, scores findings and applies the namespace policy, then allows, warns or denies.</figcaption></figure><details class="alt"><summary>Describe this diagram</summary><ol class="alt-list" type="A"><li><strong>kube-apiserver.</strong> AdmissionReview v1 over TLS, CREATE and UPDATE.</li><li><strong>Strict decode, extract images.</strong> containers, init, ephemeral; at most 128 images.</li><li><strong>Parse references by digest.</strong> tags are never resolved.</li><li><strong>Bounded evidence lookup.</strong> Trivy report per digest; timeouts, concurrency cap.</li><li><strong>Score and apply namespace policy.</strong> kevgate risk model; policy hot-reloaded.</li><li><strong>Allow, warn (audit mode) or deny.</strong> message names the rule and top findings.</li></ol></details>
+<h3>Three implementation points</h3>
+<div class="prose">
+<h4>The Go score must equal the Python score</h4>
+<p>Two services that rank the same finding differently would be a bug nobody notices until an argument about a denial. Go can differ from Python in the last bit: constant expressions are evaluated with arbitrary precision, and the compiler may fuse multiply-adds on some architectures. <code>internal/risk</code> keeps the weights in variables so the arithmetic runs in <code>float64</code> at run time, forces explicit conversions to prevent fusing, and rounds to one decimal through the decimal expansion of the value, which is what Python's <code>round(x, 1)</code> does. <code>scripts/gen_parity.py</code> calls kevgate's own <code>risk_score</code> to generate 1000 reference vectors (a grid plus a seeded random sample) and a test compares every one, next to 12 hand-computed cases.</p>
+<h4>Only a digest names an image</h4>
+<p><code>internal/imageref</code> never resolves a tag. A malformed digest is an error rather than "unpinned", so an image that cannot be pulled is not confused with one that merely lacks a pin. Evidence is keyed by <code>sha256-&lt;hex&gt;.json</code>, and a report whose own metadata names a different digest is rejected as an evidence error, so a file renamed to another image's digest cannot vouch for it. An unpinned image gets a <code>requireDigest</code> denial that says tags are mutable.</p>
+<h4>Bounded work and last-good state</h4>
+<p>Admission sits on the critical path of every deploy, so the lookup is bounded. Each request has a time budget (8 s by default, to stay under the webhook timeout), each evidence lookup has its own (3 s), a semaphore caps concurrent lookups, a request may name at most 128 distinct images, and report files and HTTP bodies have size caps. If the evidence source fails, <code>--fail-mode closed</code> (the default) denies instead of waiting. Policy, KEV catalog, EPSS data and the TLS pair are hot reloaded by a generic <code>File[T]</code> that swaps a parsed copy atomically; a file that fails to parse never replaces the last good one, and a broken version is remembered by modification time and size so it is reported once per change, not on every tick.</p>
+</div>
+</section>
+</article>
+<section class="limits section" id="limits" aria-labelledby="limits-h">
+<h2 id="limits-h"><span class="label sec-label">Tolerance and limits</span>What the numbers do not show</h2>
 <ul class="prose">
 <li><strong>It does not scan images.</strong> A digest with no report is "no evidence", handled by <code>requireEvidence</code>.</li>
 <li><strong>Evidence goes stale.</strong> <code>maxEvidenceAge</code> bounds it only when the report carries a timestamp.</li>
@@ -146,6 +191,24 @@ demo finished: all checks passed</code></pre>
 <li><strong>Exceptions are policy entries with an expiry, not signed attestations.</strong> Whoever can edit the policy can add one.</li>
 <li><strong>The demo uses synthetic evidence,</strong> and ConfigMap-hosted reports are limited to 1 MiB in total. The race detector was not run locally (it needs cgo); CI runs it.</li>
 </ul>
+</section>
+<section class="section" id="trace" aria-labelledby="trace-h">
+<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<dl class="trace"><div><dt>Unit tests and lint (ci)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958592023"><span class="st" aria-hidden="true"></span><span>run 42958592023</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Kind end to end (e2e-kind)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591906"><span class="st" aria-hidden="true"></span><span>run 42958591906</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Scans (security)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591911"><span class="st" aria-hidden="true"></span><span>run 42958591911</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Score parity script</dt><dd><a href="https://github.com/samiali38183/kevgate-admit/blob/main/scripts/gen_parity.py">scripts/gen_parity.py</a></dd></div><div><dt>End-to-end transcript</dt><dd><a href="https://github.com/samiali38183/kevgate-admit#end-to-end-transcript">README</a></dd></div></dl>
+<h3>CI evidence</h3>
+<div class="scroll wide"><table class="tbl">
+<caption>Workflows on main at bfa62fe; what each covers is taken from the repository README</caption>
+<thead><tr><th scope="col">Workflow</th><th scope="col">What it covers</th><th scope="col">Run</th></tr></thead>
+<tbody>
+<tr><th scope="row">ci</th><td data-label="What it covers">vet, lint, tests with the race detector and an 85% coverage floor, 30 s fuzz runs of two targets, Helm lint, kubeconform, shellcheck, actionlint</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958592023"><span class="st" aria-hidden="true"></span><span>run 42958592023</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">e2e-kind</th><td data-label="What it covers">kind cluster, chart install, allow, deny and warn outcomes with exact denial text</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591906"><span class="st" aria-hidden="true"></span><span>run 42958591906</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">security</th><td data-label="What it covers">hadolint, gosec, govulncheck, Trivy filesystem and image scans, gitleaks (per the README)</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/42958591911"><span class="st" aria-hidden="true"></span><span>run 42958591911</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+</tbody>
+</table></div>
+</section>
+<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/kevgate/"><span class="label">Previous sheet, 3 of 6</span><span class="n">kevgate</span></a><a class="next" href="/projects/fuzzdiff/"><span class="label">Next sheet, 5 of 6</span><span class="n">fuzzdiff</span></a></nav>
+</div>
 </main>
 <footer class="site-footer">
 <div class="wrap">
@@ -158,6 +221,6 @@ demo finished: all checks passed</code></pre>
 <p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
 </div>
 </footer>
-<script src="/site.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
 </body>
 </html>

@@ -1,23 +1,31 @@
-<p class="crumbs"><a href="/projects/">Projects</a> / kev-risk-prioritization</p>
-<h1>kev-risk-prioritization</h1>
-<p class="lede prose">A standard-library Python script that ranks scan findings with KEV status first. It is the scoring idea behind <a href="/projects/kevgate/">kevgate</a>, kept as a small stand-alone tool.</p>
-<ul class="links">
-<li><a href="https://github.com/samiali38183/kev-risk-prioritization">Repository</a></li>
-<li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">Methodology</a></li>
-<li><a href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636">CI run (main)</a></li>
-</ul>
+<!--@dek-->
+A standard-library Python script that ranks scan findings with KEV status first. It is the scoring idea behind <a href="/projects/kevgate/">kevgate</a>, kept as a small stand-alone tool.
 
+<!--@bench-->
+<div class="scroll"><table class="tbl">
+<caption>KEV findings among the top 12 of 20 synthetic findings</caption>
+<thead><tr><th scope="col">Ordering</th><th scope="col" class="num">KEV findings in the top 12</th><th scope="col" class="num">Non-KEV findings in the top 12</th></tr></thead>
+<tbody>
+<tr><th scope="row">CVSS only</th><td class="num">9</td><td class="num">3</td></tr>
+<tr><th scope="row">Risk score</th><td class="num"><b class="best">12</b></td><td class="num"><b class="best">0</b></td></tr>
+</tbody>
+</table></div>
+
+<!--@bench-cap-->
+<b>A CVSS-only sort ranks three non-KEV findings among the top 12; the risk score ranks none.</b> The sample has 12 KEV and 8 non-KEV findings, all synthetic.
+
+<!--@as-found-->
 <div class="callout"><p><strong>Everything here runs on synthetic data.</strong> The sample uses real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. It shows how the ordering behaves, not what any real environment looks like. No DHS or CBP data is involved.</p></div>
-
-<h2>What it does</h2>
 <div class="prose">
-<p>CVSS says how bad a flaw could be, not whether anyone is using it. The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it with the same formula as kevgate: KEV 0.40, asset criticality 0.25, EPSS 0.20, CVSS 0.20, normalized to 0 to 100. Ties break on EPSS, then CVSS. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison.</p>
-<p>The EPSS and asset-criticality terms and all the weights are this project's own design. They are not inputs of CISA BOD 26-04, which ties urgency to KEV status, exposure, automatability and technical impact.</p>
+<p>CVSS says how bad a flaw could be, not whether anyone is using it.<sup class="nref" aria-hidden="true"></sup> On this sample a CVSS-only sort puts 9 KEV findings in its top 12. The average CVSS of the two groups differs by 1.19, and the average EPSS by 0.906.</p>
 </div>
+<aside class="note"><strong>CVSS</strong> scores the severity of a flaw from 0 to 10. <strong>KEV</strong> is CISA's list of CVEs known to be exploited in the wild.</aside>
 
-<h2>Evidence from a real run</h2>
-<p class="small muted">Run on 2026-11-10 from a fresh clone (commit 597c1f7): 9 tests pass.</p>
-<pre data-copy><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14
+<!--@as-left-->
+<div class="prose"><p>Run on 2026-11-10 from a fresh clone (commit 597c1f7): 9 tests pass. The risk score puts all 12 KEV findings in its top 12.</p></div>
+{{key:main}}
+{{strips:main}}
+<pre data-copy data-label="$ python kev_prioritize.py ... --top 14"><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14
   #  risk  KEV CVE              CVSS  EPSS ACR days  asset
   1  99.4  yes CVE-2021-44228   10.0 0.970   8   42  web-portal-01
   2  99.0  yes CVE-2024-3400    10.0 0.950   8    9  fw-edge-01
@@ -32,9 +40,14 @@ KEV vs non-KEV population
   kev      n=12  avg CVSS 9.53  avg EPSS 0.935  avg days open 94.2
   non_kev  n=8   avg CVSS 8.34  avg EPSS 0.029  avg days open 101.5</code></pre>
 <p class="trim">Trimmed: rows 4 to 10 and the KEV concentration line removed.</p>
-<p class="prose">On this sample a CVSS-only sort puts 9 KEV findings in its top 12; the risk score puts all 12 there. The average CVSS of the two groups differs by 1.19, and the average EPSS by 0.906.</p>
 
-<h2>Limitations</h2>
+<!--@method-->
+<div class="prose">
+<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it with the same formula as kevgate: KEV 0.40, asset criticality 0.25, EPSS 0.20, CVSS 0.20, normalized to 0 to 100. Ties break on EPSS, then CVSS. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison.</p>
+<p>The EPSS and asset-criticality terms and all the weights are this project's own design. They are not inputs of CISA BOD 26-04, which ties urgency to KEV status, exposure, automatability and technical impact.</p>
+</div>
+
+<!--@limits-->
 <ul class="prose">
 <li>Synthetic data, so the results say nothing about real remediation.</li>
 <li>It uses CVSS and EPSS values you supply; it does not query NVD or the EPSS API. Live mode fetches only the KEV catalog.</li>

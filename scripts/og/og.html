@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:D;src:url(../../assets/fonts/ibm-plex-mono-latin-600-normal.woff2);font-weight:600}
+@font-face{font-family:D;src:url(../../assets/fonts/ibm-plex-mono-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:S;src:url(../../assets/fonts/source-serif-4-latin-wght-normal.woff2);font-weight:200 900}
+body{margin:0;width:1200px;height:630px;background:#F3EFE6;color:#1B1D21;font-family:S;position:relative}
+.t{position:absolute;left:64px;top:52px;font:600 44px/1.1 S;width:760px}
+.r{position:absolute;left:64px;top:190px;font:600 230px/1 D;letter-spacing:-.04em}
+.r span{font-weight:400;color:#656A72}
+.c{position:absolute;left:640px;top:250px;width:500px;font:400 28px/1.35 S}
+.s{position:absolute;left:64px;display:flex;gap:4px;align-items:flex-end}
+.s i{display:block;width:12px;height:44px;border:2px solid #7D7868;box-sizing:border-box}
+.s i.h{background:repeating-linear-gradient(45deg,#A82E1B 0 2px,#E6DFCF 2px 6px);border-color:#A82E1B}
+.s i.f{background:#1B1D21;border-color:#1B1D21}
+.l{position:absolute;left:64px;font:400 20px D;color:#4A4D54}
+.n{position:absolute;right:64px;bottom:40px;font:600 30px S}
+</style></head><body>
+<div class="t">Security tools, checked against what they claim.</div>
+<div class="r">0<span>/36</span></div>
+<div class="c">The stock SigmaHQ setuid rule matched 0 of 36 recorded events. The replacement matches 2.</div>
+<div class="l" style="top:470px">AS FOUND</div><div class="s" style="top:495px" id="a"></div>
+<div class="l" style="top:545px">AS LEFT</div><div class="s" style="top:570px" id="b"></div>
+<div class="n">Sami Ali</div>
+<script>
+function row(id,c){var h='';for(var i=0;i<36;i++){h+='<i class="'+((i==13||i==31)?c:'')+'"></i>'}document.getElementById(id).innerHTML=h}
+row('a','h');row('b','f');
+</script></body></html>
