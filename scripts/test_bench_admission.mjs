@@ -138,7 +138,7 @@ for (const x of all) {
   const warnPre = p.filter((e) => (e.attrs['data-label'] || '').startsWith('warnings'));
   eq(`${L}: denial text is the stored message`, msgPre.length ? msgPre[0].textContent : '', msgOf(rec));
   eq(`${L}: warnings are the stored warnings`, warnPre.length ? warnPre[0].textContent : '', warnsOf(rec).join('\n'));
-  const rawPre = p.filter((e) => (e.attrs['data-label'] || '').startsWith('JSON as returned'))[0];
+  const rawPre = p.filter((e) => (e.attrs['data-label'] || '').startsWith('POST /validate'))[0];
   eq(`${L}: raw JSON equals the stored response`, JSON.parse(rawPre.textContent), rec.raw);
   const tables = out().find((e) => e.tag === 'table');
   eq(`${L}: findings table rows`, tables.length ? rowsOf(tables[0]) : [], rec.findings.map((f) => [f.rule, f.cve, f.kev ? 'KEV' : 'no', f.risk.toFixed(1), f.pkg]));

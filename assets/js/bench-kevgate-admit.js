@@ -22,8 +22,8 @@ export function model(data, view, a, b) {
     const s = data.scanner, p = s.parser;
     return {
       view, spoken: 'Scanner report: ' + p.findings.length + ' findings parsed from ' + s.raw_entries + ' entries.',
-      head: 'Trivy ' + s.trivy + ' report for ' + p.artifact + ' (' + s.target + '), ' + s.raw_entries + ' vulnerability entries, parsed into ' + p.findings.length + ' findings.',
-      rows: p.findings.map((f) => [f.ID, f.Package, f.Installed, f.Fixed || 'no fix', f.Severity, String(f.CVSS), f.EPSS == null ? 'none' : String(f.EPSS), f.Risk.toFixed(1)]),
+      head: 'Trivy ' + s.trivy + ' report, target ' + s.target + ': ' + s.raw_entries + ' vulnerability entries, parsed into ' + p.findings.length + ' findings.',
+      rows: p.findings.map((f) => [f.ID, f.Package, f.Installed, f.Fixed || 'no fix', f.Severity, f.CVSS.toFixed(1), f.EPSS == null ? 'none' : String(f.EPSS), f.Risk.toFixed(1)]),
       note: s.scored_with + '. The fixture is ' + s.fixture + ', ' + s.bytes + ' bytes, trimmed by the repository from a longer report.',
     };
   }
@@ -44,7 +44,7 @@ export function model(data, view, a, b) {
     rules: v === 'denied' ? 'Rule fired: ' + rules : v === 'warned' ? 'Would have fired, admitted in audit mode: ' + rules : 'No rule fired',
     request: img.ref + ' in namespace ' + ns + ' (scope ' + scope + ')',
     policy: signed ? 'Policy requireSignedEvidence. Report store: ' + data.signed.states.find((s) => s.id === b).edit : pol.summary,
-    code: resp.status ? 'HTTP 403 Forbidden' : '',
+    code: resp.status ? String(resp.status.code) : '',
     raw: JSON.stringify(rec.raw, null, 2),
     spoken: img.label + ', ' + where + ': ' + STAMP[v][1].toLowerCase() + '. ' + (rec.rules.length ? 'Rules: ' + rules + '.' : 'No rule fired.'),
   };
@@ -107,16 +107,16 @@ export function mount(doc, root, data) {
       out.appendChild(t('p', { class: 'ad-req', text: m.note }));
     } else {
       out.appendChild(t('p', { class: 'sw-verdict' }, [t('span', { class: 'stamp ' + m.stamp[0], text: m.stamp[1] }), doc.createTextNode(' '), t('span', { class: 'sw-facts', text: m.rules })]));
-      out.appendChild(t('p', { class: 'ad-req' }, [t('span', { text: 'Request: ' }), t('code', { text: m.request }), t('span', { text: '. ' + m.policy })]));
-      if (m.message) out.appendChild(pre('status.message, ' + m.code, m.message));
-      if (m.warnings.length) out.appendChild(pre('warnings returned with the allowed response', m.warnings.join('\n')));
+      out.appendChild(t('p', { class: 'ad-req' }, [t('span', { text: 'Request: ' }), t('code', { text: m.request }), t('span', { text: '. Policy: ' + m.policy })]));
+      if (m.message) out.appendChild(pre('status.message (' + m.code + ')', m.message));
+      if (m.warnings.length) out.appendChild(pre('warnings (allowed)', m.warnings.join('\n')));
       if (!m.message && !m.warnings.length) out.appendChild(t('p', { class: 'ad-req', text: 'The response carries no message and no warnings.' }));
       if (m.findings.length) {
         out.appendChild(table('Findings listed in the denial text', ['Rule', 'CVE', 'In KEV', 'Risk', 'Package'], m.findings.map((f) => [f.rule, f.cve, f.kev ? 'KEV' : 'no', f.risk.toFixed(1), f.pkg])));
         out.appendChild(t('p', { class: 'ad-req', text: m.formula + ' (acr 4 is the default asset criticality):' }));
         out.appendChild(t('ul', { class: 'ad-w' }, m.worked.map((w) => t('li', {}, [t('code', { text: w })]))));
       }
-      out.appendChild(t('details', { class: 'alt' }, [t('summary', { text: 'Raw AdmissionReview response' }), pre('JSON as returned by POST /validate', m.raw)]));
+      out.appendChild(t('details', { class: 'alt' }, [t('summary', { text: 'Raw AdmissionReview response' }), pre('POST /validate response', m.raw)]));
     }
     status.textContent = m.spoken;
   }

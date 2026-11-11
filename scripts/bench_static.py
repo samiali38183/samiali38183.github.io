@@ -263,9 +263,9 @@ def admit_static() -> str:
     p = s["parser"]
     srows = "".join(
         f'<tr><th scope="row">{esc(f["ID"])}</th><td>{esc(f["Package"])}</td><td>{esc(f["Installed"])}</td><td>{esc(f["Fixed"] or "no fix")}</td>'
-        f'<td>{esc(f["Severity"])}</td><td class="num">{f["CVSS"]}</td><td class="num">{"none" if f["EPSS"] is None else f["EPSS"]}</td>'
+        f'<td>{esc(f["Severity"])}</td><td class="num">{f["CVSS"]:.1f}</td><td class="num">{"none" if f["EPSS"] is None else f["EPSS"]}</td>'
         f'<td class="num">{f["Risk"]:.1f}</td></tr>' for f in p["findings"])
-    t3 = (f'<h3 class="ad-h">Scanner report</h3><p class="sw-lead">Trivy {esc(s["trivy"])} report for {esc(p["artifact"])} ({esc(s["target"])}): '
+    t3 = (f'<h3 class="ad-h">Scanner report</h3><p class="sw-lead">Trivy {esc(s["trivy"])} report, target {esc(s["target"])}: '
           f'{s["raw_entries"]} vulnerability entries, parsed by the webhook\'s own parser into {len(p["findings"])} findings.</p>'
           '<div class="scroll"><table class="tbl wt"><caption>Findings as parsed by trivy.Parse</caption>'
           '<thead><tr><th scope="col">CVE</th><th scope="col">Package</th><th scope="col">Installed</th><th scope="col">Fixed in</th>'
