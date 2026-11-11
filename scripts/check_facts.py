@@ -61,6 +61,89 @@ def collected(py: str, repo: Path) -> int:
     return sum(int(x) for x in re.findall(r": (\d+)$", out, re.M))
 
 
+def fuzzdiff_checks(clones: Path) -> None:
+    """fuzzdiff v0.2.0. Needs cargo, cargo-llvm-cov, node and the gh CLI. The clone must be at the v0.2.0 tag."""
+    fz = clones / "fuzzdiff"
+    page = "projects/fuzzdiff/index.html"
+    tag = gh("repos/samiali38183/fuzzdiff/releases/latest")["tag_name"]
+    expect("fuzzdiff latest release", tag, page)
+    expect("fuzzdiff latest release on home", tag, "index.html")
+    sha = run(["git", "rev-list", "-n1", "v0.2.0"], fz).strip()
+    expect("fuzzdiff v0.2.0 tag commit", sha[:7], page)
+
+    out = run(["cargo", "test", "--all"], fz)
+    counts = [int(x) for x in re.findall(r"test result: ok\. (\d+) passed", out)]
+    total = sum(counts)
+    expect("fuzzdiff tests (cargo test --all)", str(total), page, f"{total} (")
+    mo = run(["cargo", "test", "--release", "-p", "fuzzdiff-harness", "--features", "mutants", "--test", "mutants", "--", "--nocapture"], fz)
+    caught = re.findall(r"generator caught after (\d+) inputs", mo)
+    needle = f"generator after {int(caught[0]):,}, {int(caught[1]):,}, {int(caught[2]):,} and {int(caught[3]):,} inputs" if len(caught) == 4 else "?"
+    expect("fuzzdiff seeded bugs caught by the generator after", ", ".join(caught), page, needle)
+    over = re.search(r"OverheadRatio: generator did not catch it in (\d+) inputs", mo)
+    results.append((bool(over) and "targeted case #1 catches it" in mo and "targeted case #4 catches it" in mo,
+                    f"fuzzdiff OverheadRatio not caught by the generator in {over.group(1) if over else '?'} inputs; targeted cases #1 and #4 catch the two that need them"))
+    ctl = re.search(r"control \(no mutant\): (\d+) inputs", mo)
+    expect("fuzzdiff mutant control run", ctl.group(1) if ctl else "missing", page, "500,000-input control" if ctl and ctl.group(1) == "500000" else "?")
+    rep = run(["cargo", "llvm-cov", "--workspace", "--summary-only"], fz)
+    lines = missed = 0
+    for ln in rep.splitlines():
+        parts = ln.split()
+        if parts and parts[0].replace("\\", "/") in ("src/chunked.rs", "src/error.rs", "src/message.rs", "src/mutants.rs"):
+            lines += int(parts[7])
+            missed += int(parts[8])
+    pct = "%.2f%%" % (100 * (lines - missed) / lines) if lines else "n/a"
+    expect("fuzzdiff src line coverage", pct, page)
+    readme = (fz / "README.md").read_text(encoding="utf-8")
+    results.append((f"{total} tests pass" in readme, f"fuzzdiff README says {total} tests pass"))
+    results.append((pct in readme, f"fuzzdiff README gives line coverage {pct}"))
+
+    # corpus composition
+    files = [f for f in (fz / "corpus").rglob("*") if f.is_file() and f.parent.name != "bench"]
+    pico = sum(1 for f in files if f.name.startswith("picohttpparser-"))
+    hand = sum(1 for f in files if f.name.startswith("hand-"))
+    expect("fuzzdiff corpus inputs", str(len(files)), page, f"{len(files)} inputs: {pico} from picohttpparser's own tests, {hand} hand-written")
+
+    # speed ratios from docs/BENCHMARKS.md
+    bm = (fz / "docs" / "BENCHMARKS.md").read_text(encoding="utf-8")
+    ratios = [float(m) for m in re.findall(r"\| (\d\.\d\d)x \|", bm)][:4]
+    results.append((bool(ratios) and round(min(ratios), 1) == 1.4 and round(max(ratios), 1) == 1.5, f"fuzzdiff head-parsing ratios {ratios}: about 1.4x to 1.5x"))
+    expect("fuzzdiff head-parsing speed", "1.4x to 1.5x", page, "about 1.4x to 1.5x slower")
+
+    # three-way comparison: the page uses a verbatim copy of the document's generated blocks
+    doc = (fz / "docs" / "DIFFERENTIAL_HTTPARSE.md").read_text(encoding="utf-8")
+    for name in ("curated", "sweep"):
+        blk = re.search(r"<!-- BEGIN GENERATED: " + name + r" -->\n(.*?)<!-- END GENERATED: " + name + r" -->", doc, re.S)
+        mine = (SITE / "assets" / "data" / "fuzzdiff-bench" / f"{name}-table.md").read_text(encoding="utf-8").replace("\r\n", "\n")
+        results.append((bool(blk) and blk.group(1).strip() + "\n" == mine, f"fuzzdiff {name} table copy equals docs/DIFFERENTIAL_HTTPARSE.md at the tag"))
+    sw = re.search(r"Inputs: (\d+) .*?disagreed on (\d+)\.", doc, re.S)
+    expect("fuzzdiff sweep inputs", f"{int(sw.group(1)):,}", page)
+    expect("fuzzdiff sweep disagreements", f"{int(sw.group(2)):,}", page)
+    expect("fuzzdiff picohttpparser vs fuzzdiff differences", "0", page, "0 differences between picohttpparser and fuzzdiff")
+
+    # bench data against a fresh run, and the parity test
+    cap = run([sys.executable, str(SITE / "scripts" / "capture_fuzzdiff_bench.py"), "--work", str(clones), "--check"], SITE).strip()
+    results.append((cap.startswith("OK"), f"capture_fuzzdiff_bench.py --check: {cap.splitlines()[-1] if cap else 'no output'}"))
+    nodes = run(["node", str(SITE / "scripts" / "test_bench_fuzzdiff.mjs")], SITE).strip()
+    results.append(("checks passed" in nodes, f"node scripts/test_bench_fuzzdiff.mjs: {nodes}"))
+
+    # CI: the runs shown (ci on main, the fuzz runs of pull request 3) and the libFuzzer counts of the first fuzz run
+    for rid in ("43037960324", "43035685955", "43037421227"):
+        r = gh(f"repos/samiali38183/fuzzdiff/actions/runs/{rid}")
+        results.append((r.get("conclusion") == "success", f"CI run fuzzdiff/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
+    jobs = gh("repos/samiali38183/fuzzdiff/actions/runs/43037960324/jobs")["jobs"]
+    results.append((len(jobs) == 7 and all(j["conclusion"] == "success" for j in jobs), f"fuzzdiff ci run 43037960324: {len(jobs)} jobs, all success ({', '.join(j['name'] for j in jobs)})"))
+    log = run(["gh", "run", "view", "43035685955", "-R", "samiali38183/fuzzdiff", "--log"])
+    for leg in ("diff", "diff-sse42", "rust_only", "c_only", "c_only-sse42"):
+        m = re.search(r"fuzz " + re.escape(leg) + r"\s.*Done (\d+) runs", log)
+        if m:
+            expect(f"fuzzdiff libFuzzer {leg} executions", f"{int(m.group(1)):,}", page)
+        else:
+            results.append((False, f"fuzzdiff libFuzzer {leg}: log line not found"))
+    mlog = run(["gh", "run", "view", "43037960324", "-R", "samiali38183/fuzzdiff", "--log"])
+    miri = sum(int(x) for x in re.findall(r"Miri[^\n]*test result: ok\. (\d+) passed", re.sub(r"\x1b\[[0-9;]*m", "", mlog)))
+    expect("fuzzdiff Miri tests", str(miri), page, f"Miri ran on the pure-Rust crate only: {miri} tests")
+
+
 def kev_risk_checks(clones: Path, venvs: dict[str, str]) -> None:
     """kev-risk-prioritization sheet: tool output, release, snapshot numbers, BOD 26-04 notes, Weight bench data."""
     page = "projects/kev-risk-prioritization/index.html"
@@ -211,7 +294,7 @@ def main() -> int:
     ap.add_argument("--clones", required=True)
     ap.add_argument("--venv", action="append", default=[])
     ap.add_argument("--go", default="go")
-    ap.add_argument("--only", choices=["sinkline", "tripline", "kev", "admit"], help="run only one project's checks (when the other toolchains are not installed)")
+    ap.add_argument("--only", choices=["sinkline", "tripline", "kev", "fuzzdiff", "admit"], help="run only one project's checks (when the other toolchains are not installed)")
     a = ap.parse_args()
     clones = Path(a.clones)
     venvs = dict(v.split("=", 1) for v in a.venv)
@@ -224,6 +307,10 @@ def main() -> int:
         tag = gh(f"repos/samiali38183/{repo}/releases/latest")["tag_name"]
         expect(f"{repo} latest release", tag, page)
         expect(f"{repo} latest release on home", tag, "index.html")
+
+    if a.only == "fuzzdiff":
+        fuzzdiff_checks(clones)
+        return report()
 
     if a.only == "kev":
         kev_risk_checks(clones, venvs)
@@ -411,38 +498,8 @@ def main() -> int:
     # kevgate-admit (Go)
     admit_checks(clones, a.go)
 
-    # fuzzdiff (Rust). Needs cargo and cargo-llvm-cov on PATH.
-    fz = clones / "fuzzdiff"
-    page = "projects/fuzzdiff/index.html"
-    out = run(["cargo", "test", "--all"], fz)
-    counts = [int(x) for x in re.findall(r"test result: ok\. (\d+) passed", out)]
-    total = sum(counts)
-    expect("fuzzdiff tests (cargo test --all)", str(total), page, f"{total} (")
-    mo = run(["cargo", "test", "--release", "-p", "fuzzdiff-harness", "--features", "mutants", "--test", "mutants", "--", "--nocapture"], fz)
-    caught = re.findall(r"caught after (\d+) inputs", mo)
-    expect("fuzzdiff mutants caught after", ", ".join(caught), page, f"after {caught[0]}, {caught[1]} and {caught[2]} inputs" if len(caught) == 3 else "?")
-    ctl = re.search(r"control \(no mutant\): (\d+) inputs, no divergence", mo)
-    expect("fuzzdiff mutant control run", ctl.group(1) if ctl else "missing", page, "500,000-input control" if ctl and ctl.group(1) == "500000" else "?")
-    run(["cargo", "llvm-cov", "--workspace", "--summary-only"], fz)
-    rep = run(["cargo", "llvm-cov", "report", "--summary-only"], fz)
-    lines = missed = 0
-    for ln in rep.splitlines():
-        parts = ln.split()
-        if parts and parts[0] in ("chunked.rs", "error.rs", "message.rs", "mutants.rs"):
-            lines += int(parts[7])
-            missed += int(parts[8])
-    pct = "%.2f%%" % (100 * (lines - missed) / lines) if lines else "n/a"
-    expect("fuzzdiff src line coverage", pct, page)
-    corpus = sum(1 for f in (fz / "corpus").rglob("*") if f.is_file())
-    results.append((True, f"fuzzdiff corpus files on disk (info, includes bench inputs and non-input files): {corpus}"))
-    log = run(["gh", "run", "view", "42961733885", "-R", "samiali38183/fuzzdiff", "--log"])
-    for tgt in ("diff", "rust_only", "c_only"):
-        m = re.search(r"fuzz " + tgt + r"\s.*Done (\d+) runs", log)
-        if m:
-            n_ = f"{int(m.group(1)):,}"
-            expect(f"fuzzdiff libFuzzer {tgt} executions", n_, page)
-        else:
-            results.append((False, f"fuzzdiff libFuzzer {tgt}: log line not found"))
+    # fuzzdiff (Rust). Needs cargo, cargo-llvm-cov, node.
+    fuzzdiff_checks(clones)
 
     return report()
 

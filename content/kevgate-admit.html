@@ -56,7 +56,7 @@ total:    (statements)    95.0%</code></pre>
 <p class="trim">Trimmed: 8 of 15 packages shown and the elapsed times removed. Counting passes in <code>go test -json</code> gave 93 top-level tests and 482 including subtests and fuzz seed runs, none failing.</p>
 <h3>A real scanner report</h3>
 <div class="prose">
-<p>Every other fixture is hand-written. One test parses a real report from Trivy 0.76.2 for <code>python:3.9-slim-bullseye</code>, trimmed to 10 vulnerabilities, with the image history removed after a public GPG key id tripped the secret scanner. The pull request that added it records that a full report gave 72 findings, equal to the 72 unique CVE ids among its 171 raw entries. That full file is not in the repository, so that figure was not re-run here. The committed file was: 10 entries, 10 findings, listed in the "Scanner report" view of Plate 1.</p>
+<p>Every other fixture is hand-written. One test parses a real report from Trivy 0.76.2 for <code>python:3.9-slim-bullseye</code>, trimmed to 10 vulnerabilities, with the image history removed after a public GPG key id tripped the secret scanner. The description of the pull request that added it (#2) says that a full report gave 72 findings, equal to the 72 unique CVE ids among 171 raw entries. The full report was not committed, so that figure is the pull request's own and is unverified here. The committed file was: 10 entries, 10 findings, listed in the "Scanner report" view of Plate 1.</p>
 </div>
 <h3>Fuzzing</h3>
 <div class="prose">

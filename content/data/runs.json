@@ -62,27 +62,6 @@
   "sha": "973c8c1",
   "workflow": "release"
  },
- "42961733885": {
-  "conclusion": "success",
-  "date": "2026-11-11",
-  "repo": "fuzzdiff",
-  "sha": "6bead52",
-  "workflow": "fuzz"
- },
- "42962523234": {
-  "conclusion": "success",
-  "date": "2026-11-11",
-  "repo": "fuzzdiff",
-  "sha": "22c4034",
-  "workflow": "fuzz"
- },
- "42962524230": {
-  "conclusion": "success",
-  "date": "2026-11-11",
-  "repo": "fuzzdiff",
-  "sha": "22c4034",
-  "workflow": "ci"
- },
  "43033758686": {
   "conclusion": "success",
   "date": "2026-11-11",
@@ -95,6 +74,27 @@
   "date": "2026-11-11",
   "repo": "sinkline",
   "sha": "9c58efd",
+  "workflow": "ci"
+ },
+ "43035685955": {
+  "conclusion": "success",
+  "date": "2026-11-11",
+  "repo": "fuzzdiff",
+  "sha": "99cddc4",
+  "workflow": "fuzz"
+ },
+ "43037421227": {
+  "conclusion": "success",
+  "date": "2026-11-11",
+  "repo": "fuzzdiff",
+  "sha": "41b8843",
+  "workflow": "fuzz"
+ },
+ "43037960324": {
+  "conclusion": "success",
+  "date": "2026-11-11",
+  "repo": "fuzzdiff",
+  "sha": "6ec1e6e",
   "workflow": "ci"
  },
  "43040235145": {
