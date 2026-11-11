@@ -2,18 +2,11 @@
 A CI gate for detection rules. It replays recorded attack telemetry through Sigma rules on every pull request and fails the build when a rule that should fire does not.
 
 <!--@bench-->
-<table class="tbl">
-<caption>Three command lines recorded from the Atomic Red Team tests, and what each rule did with them</caption>
-<thead><tr><th scope="col">Recorded command line</th><th scope="col">Stock rule c21c4eaa</th><th scope="col">Replacement rule</th></tr></thead>
-<tbody>
-<tr><td><code>sh -c sudo touch /tmp/evilBinary; sudo chown root /tmp/evilBinary; sudo chmod u+xs /tmp/evilBinary</code></td><td>No match</td><td>No match (the event is the <code>sh</code> wrapper, not <code>chmod</code>)</td></tr>
-<tr><td><code>chmod u+xs /tmp/evilBinary</code></td><td>No match</td><td>Match</td></tr>
-<tr><td><code>chmod g+xs /tmp/evilBinary</code></td><td>No match</td><td>Match</td></tr>
-</tbody>
-</table>
+{{benchtable:tripline}}
+{{benchevents:tripline}}
 
 <!--@bench-cap-->
-<b>The stock rule looks for the literal text <code>chmod u+s</code>, so the combined mode <code>u+xs</code> slips past it.</b> Command lines are copied from docs/findings.md F-001 (telemetry from run 41838714456). Across all 36 applicable events the stock rule matched 0 and the replacement matched 2.
+<b>The stock rule looks for the literal text <code>chmod u+s</code>, so <code>u+xs</code> slips past it; the replacement flags every setuid and setgid form tried.</b> The first three command lines are copied from docs/findings.md F-001 (telemetry from run 41838714456); across all 36 applicable events the stock rule matched 0 and the replacement matched 2. With JavaScript on, this plate becomes a bench where any command line can be tried. <b>The browser demo re-implements the two rules' conditions in JavaScript; the compiler in the tripline repository is the source of truth.</b> Rules: <a href="https://github.com/samiali38183/tripline/blob/main/rules/sigma/linux/proc_creation_lnx_setgid_setuid.yml">stock</a>, <a href="https://github.com/samiali38183/tripline/blob/main/rules/sigma/linux/tripline_lnx_chmod_setuid_setgid_any_form.yml">replacement</a>. Parity: <a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_tripline.mjs">scripts/test_bench_tripline.mjs</a> checks the demo against the compiler's verdicts on {{parity:tripline}} command lines.
 
 <!--@as-found-->
 <div class="prose">
