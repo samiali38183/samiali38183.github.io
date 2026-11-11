@@ -1,11 +1,10 @@
 # samiali38183.github.io
 
-Portfolio of Sami Ali (security engineering) as a Linux-style terminal. Live at https://samiali38183.github.io/
+Portfolio of Sami Ali. Live at https://samiali38183.github.io/
 
-Vanilla HTML, CSS and JavaScript. No framework, no build step, no tracking.
+Plain HTML and CSS, one shared stylesheet, a small optional script (theme toggle, copy buttons). No framework, no tracking, no external requests. It works with JavaScript disabled.
 
-- Boot log, then login, then a shell: `ls`, `cd`, `cat`, `pwd`, `tree`, `find`, `open`, `run`, `history`, `theme`, `help`. Tab completion, arrow-key history, clickable commands for visitors who don't type, and hidden files (`ls -a`).
-- `run tripline | sinkline | kev` replays measured results from the public repos.
-- Every fact comes from the résumé or a public repo. The boot sequence is skippable and is disabled for `prefers-reduced-motion`.
-- `resume.pdf`, `assets/certs/`: résumé and certificate PDFs. Other `*.html` files redirect old URLs.
-- `<noscript>` fallback with the same headline facts.
+- `content/` holds the page bodies; `scripts/build.py` wraps them with the shared header, footer and meta tags, and writes the redirect pages, `sitemap.xml` and `robots.txt`. The generated HTML is committed, so serving the site needs no build step. Edit `content/`, then run `python scripts/build.py`.
+- `scripts/check_facts.py` re-derives the numbers shown on the site from the project repos and GitHub. `docs/QC.md` records the last verification run.
+- `resume.pdf` (Security Engineering) and `resume-red-team.pdf`; `assets/certs/` holds certificate PDFs.
+- The old terminal-style portfolio was removed; it is in the git history.
