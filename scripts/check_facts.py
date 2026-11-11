@@ -91,6 +91,7 @@ def main() -> int:
                     f"tripline replay --all output: {ps} PASS, {pe} PENDING, gate passed={'gate passed' in out}"))
     n = collected(pybin(venvs, "tripline", "python"), t)
     expect("tripline tests (pytest collection)", str(n), "projects/tripline/index.html", f"{n} (89%")
+    expect("tripline 0 of 36 on home", "0 of 36", "index.html")
     expect("tripline tests on resume page", str(n), "resume/index.html", f"{n} tests")
     code = (
         "from pathlib import Path\n"
@@ -131,7 +132,7 @@ def main() -> int:
     if m:
         tp, fp, fn, tn, p_, r_, f1 = m.groups()
         expect("bandit benchmark", f"TP {tp}, FP {fp}, FN {fn}, TN {tn}", "projects/sinkline/index.html")
-        expect("bandit F1 on home", f1, "index.html", f"F1 of {f1}")
+        expect("bandit F1 on home", f1, "index.html", f"vs {f1}")
     else:
         results.append((False, "sinkline compare_bandit output not parsed"))
     n = collected(py, s)
@@ -145,7 +146,7 @@ def main() -> int:
     k = clones / "kevgate"
     n = collected(pybin(venvs, "kevgate", "python"), k)
     expect("kevgate tests (main)", str(n), "projects/kevgate/index.html", f"{n} collected")
-    expect("kevgate tests on home", str(n), "index.html", f"{n} tests")
+    expect("kevgate tests on resume page", str(n), "resume/index.html", f"{n} tests")
     tagsha = run(["git", "rev-list", "-n1", "v0.1.1"], k).strip()[:7]
     expect("kevgate v0.1.1 tag commit", tagsha, "projects/kevgate/index.html")
     for wf in ("ci", "security", "deploy-kind", "terraform", "release"):

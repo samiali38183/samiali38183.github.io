@@ -53,3 +53,16 @@ Added `/projects/fuzzdiff/`, a fifth entry on the projects index and a one-line 
 - `html-validate`: 0 errors. `scripts/check_links.py`: 200 internal references and 58 unique external URLs, all fine except LinkedIn (bot-blocked).
 - The resume PDFs were not touched in this change.
 - Not re-run locally: libFuzzer and the sanitizer jobs (Linux CI only; numbers come from the CI logs) and the benchmarks (one-machine numbers from `docs/BENCHMARKS.md`).
+
+## 8. Visual identity redesign (branch `redesign/identity`, 2026-11-11)
+
+New design system ("As Found / As Left", see `docs/DESIGN_SYSTEM.md`), a generator extended with strips, stamps, chips and a project template, and all 11 pages migrated.
+
+- **Layout** (headless Chrome via puppeteer-core, `chrome.exe` from Program Files): 12 pages (home, projects index, 6 project pages, experience, about, resume, 404) at 360, 390, 768, 1280 and 1600 px in light and dark = 120 page views; screenshots were viewed and fixed (strip tick labels colliding with the value line, label column wasting phone width, 5- and 7-column ledgers overflowing at 768 px, chips overflowing at 360 px, heading order on the projects index, landmarks without names). Result: no horizontal overflow at any width (`scrollWidth <= innerWidth` on every view).
+- **html-validate** 11.21.0 (recommended ruleset), 12 generated pages: 0 errors. Fixed: `details` placed before `figcaption`, unnamed landmarks (margin notes are `role="note"` divs).
+- **axe-core** (tags wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice), 120 page views: 0 violations, including contrast in both themes.
+- **Console and network**: no console errors or warnings, page errors, failed requests or HTTP 400+ responses on any view. No third-party requests (3 fonts, 1 stylesheet, 1 script, favicon, plus images on pages that have them).
+- **Links**: `python scripts/check_links.py`: 227 internal references, 63 unique external URLs, all fine except LinkedIn (999, bot-blocked). Result OK.
+- **Facts**: `python scripts/check_facts.py --clones ... ` against fresh clones at the commits shown on each page and live GitHub runs: 59 passed, 0 failed. Needles updated for the new home and resume text (0 of 36 on home, `vs 0.579` on home, kevgate 277 on the resume page). The admit-webhook transcript count (5 outcomes) was read from the README, not scripted.
+- **Sizes** (gzip, HTML + CSS + JS + three fonts, excluding screenshots): 90 to 98 KB per page. CSS 26.6 KB raw / 6.9 KB gzip, global JS 1.9 KB / 0.8 KB, fonts 81 KB, Open Graph image 14 KB. HTML raw: 3 to 38 KB; tripline (31 KB) and sinkline (38 KB) exceed the 30 KB raw target, all pages are under 10 KB gzip.
+- **Not verified**: Lighthouse and real-device performance numbers; cross-document view transition and scroll-driven strip entrance in a browser other than Chrome; forced-colors and print previews were not rendered; screen-reader output was not listened to.

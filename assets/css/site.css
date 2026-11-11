@@ -370,3 +370,4 @@ ol.rules h3{margin:0 0 var(--s-2);font-size:var(--step-1)}
   h2,h3{break-after:avoid}
   .plate,.limits,.record-head,tr{break-inside:avoid}
 }
+@media (max-width:39.99rem){.srow,.strips.mini .srow{grid-template-columns:minmax(0,1fr)}.srow>.val{grid-column:1}.tbl .chip{white-space:normal}}
