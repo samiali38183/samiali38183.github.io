@@ -15,7 +15,8 @@ What it does:
      only the harness crate's public API: it runs each curated input through picohttpparser (C), fuzzdiff (Rust) and
      httparse 1.10.1, classifies it with the harness's compare_case(), and times the seeded-bug detection loop.
   3. Writes assets/data/fuzzdiff-bench.json (inputs, results, seeded-bug table, control run) and copies the generated
-     "curated" table out of docs/DIFFERENTIAL_HTTPARSE.md to assets/data/fuzzdiff-bench/curated-table.md, so that
+     "curated" and "sweep" tables out of docs/DIFFERENTIAL_HTTPARSE.md to assets/data/fuzzdiff-bench/curated-table.md
+     and sweep-table.md (the page renders the sweep table from that copy), so that
      scripts/test_bench_fuzzdiff.mjs can check the bench against the document without a clone.
 
 Nothing in the data is edited by hand. Detection counts and results are deterministic; the *_seconds fields are
@@ -37,6 +38,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "data" / "fuzzdiff-bench.json"
 DOC_OUT = ROOT / "assets" / "data" / "fuzzdiff-bench" / "curated-table.md"
+SWEEP_OUT = ROOT / "assets" / "data" / "fuzzdiff-bench" / "sweep-table.md"
 PROGRAM = ROOT / "scripts" / "fuzzdiff_bench_capture.rs"
 
 REPO = "https://github.com/samiali38183/fuzzdiff"
@@ -90,6 +92,10 @@ def main() -> int:
     if not m:
         sys.exit("curated table not found in DIFFERENTIAL_HTTPARSE.md")
     table = m.group(1).strip() + "\n"
+    ms = re.search(r"<!-- BEGIN GENERATED: sweep -->\n(.*?)<!-- END GENERATED: sweep -->", doc, re.S)
+    if not ms:
+        sys.exit("sweep table not found in DIFFERENTIAL_HTTPARSE.md")
+    sweep = ms.group(1).strip() + "\n"
 
     # the harness's own expected pattern for each curated input must be the one in the document; the document's
     # "Stricter" column is copied into the data
@@ -109,12 +115,13 @@ def main() -> int:
     text = json.dumps(data, ensure_ascii=False, indent=1) + "\n"
     if a.check:
         old = json.loads(OUT.read_text(encoding="utf-8"))
-        same = strip_times(old) == strip_times(data) and DOC_OUT.read_text(encoding="utf-8").replace("\r\n", "\n") == table
+        same = strip_times(old) == strip_times(data) and DOC_OUT.read_text(encoding="utf-8").replace("\r\n", "\n") == table and SWEEP_OUT.read_text(encoding="utf-8").replace("\r\n", "\n") == sweep
         print("OK: stored bench data equals a fresh run" if same else "DIFFERENT: stored bench data does not equal a fresh run")
         return 0 if same else 1
     DOC_OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(text, encoding="utf-8", newline="\n")
     DOC_OUT.write_text(table, encoding="utf-8", newline="\n")
+    SWEEP_OUT.write_text(sweep, encoding="utf-8", newline="\n")
     print(f"wrote {OUT.relative_to(ROOT)} ({len(data['inputs'])} inputs, {len(data['mutants'])} seeded bugs) and {DOC_OUT.relative_to(ROOT)}")
     return 0
 

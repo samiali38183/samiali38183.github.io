@@ -931,7 +931,7 @@
   {
    "name": "HeaderLenOffByOne",
    "generator_inputs": 3,
-   "generator_seconds": "0.000044",
+   "generator_seconds": "0.000039",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Headers last_len=12 max_headers=8 strict=false trailer=false pieces=[151] data=\"Set-Cookie: /==\\n'+~a: ::cfjsyvawqdcgdufrvc\\nContent-Length: \\nHost: \\nAccept: a",
    "budget": 2000000,
@@ -941,7 +941,7 @@
   {
    "name": "MissingBoundsCheck",
    "generator_inputs": 286,
-   "generator_seconds": "0.001004",
+   "generator_seconds": "0.001030",
    "generator_how": "RustPanic",
    "first_failing_input": "Request last_len=0 max_headers=2 strict=false trailer=false pieces=[29] data=\"\\r\\nGET /q=0.9&;;q=0.9 HTTP/1.1\"",
    "budget": 2000000,
@@ -951,7 +951,7 @@
   {
    "name": "WrongStateAfterCrlf",
    "generator_inputs": 8,
-   "generator_seconds": "0.000060",
+   "generator_seconds": "0.000055",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Chunked last_len=0 max_headers=32 strict=false trailer=true pieces=[104] data=\"1;ext=val\\r\\n\\u{fffd}\\r\\n23\\r\\n3p\\u{f}Q\\u{fffd}7\\u{fffd}_G\\u{fffd}{\\u{fffd}\\u{b}\\u{fffd}+\\u{17}\\u{fffd}\\u{fffd}d\\u{fffd}\\u{fffd}R\\u{fffd}N\\u{fffd}oc\\u{fffd}\\u{fffd},\\u{fffd}\\u{15}.\\u{14}",
    "budget": 2000000,
@@ -961,7 +961,7 @@
   {
    "name": "OverheadRatio",
    "generator_inputs": null,
-   "generator_seconds": "6.171207",
+   "generator_seconds": "6.137098",
    "generator_how": null,
    "first_failing_input": null,
    "budget": 2000000,
@@ -971,7 +971,7 @@
   {
    "name": "StatusGuard",
    "generator_inputs": 10085,
-   "generator_seconds": "0.030611",
+   "generator_seconds": "0.030693",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Response last_len=0 max_headers=16 strict=false trailer=false pieces=[12] data=\"HTTP/1.1 .1 \"",
    "budget": 2000000,
@@ -983,6 +983,6 @@
   "inputs": 500000,
   "targeted_cases": 9,
   "divergences": 0,
-  "seconds": "1.532242"
+  "seconds": "1.545551"
  }
 }

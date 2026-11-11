@@ -5,6 +5,7 @@ import re
 from html import escape as esc
 from pathlib import Path
 
+import bench_fuzzdiff_static as BF
 import bench_static as B
 import components as C
 
@@ -41,7 +42,8 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
         if kind == "key":
             return C.key(p["strip_sets"][arg])
         if kind == "bench":
-            return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption}[arg]()
+            return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption,
+                    "fuzzdiff": BF.parser_static, "fuzzdiff-cap": BF.parser_caption, "fuzzdiff-mutants": BF.mutants_panel}[arg]()
         if kind == "kb":
             return f"{round((ROOT / arg).stat().st_size / 1000)} KB"
         if kind == "benchtable":
@@ -308,6 +310,7 @@ def project_page(ctx: dict, slug: str) -> str:
 {ex(f["bench"])}
 </div>
 <div class="bench-live" data-bench-mount hidden></div>
+{ex(f.get("bench-after", ""))}
 <figcaption>{ex(f["bench-cap"])}</figcaption>
 </figure>
 </section>"""
