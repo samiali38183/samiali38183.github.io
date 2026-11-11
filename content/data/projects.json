@@ -794,7 +794,7 @@
    "version": "v0.2.0",
    "sheet": 5,
    "kind": "Memory safety and fuzzing, Rust",
-   "title": "fuzzdiff: picohttpparser in safe Rust, checked against two parsers | Sami Ali",
+   "title": "fuzzdiff: picohttpparser ported to safe Rust | Sami Ali",
    "desc": "fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.",
    "fact": "picohttpparser ported from C to safe Rust, checked against the C original and against httparse. 39 tests, 95.53% line coverage, 5 of 5 seeded bugs detected, 0 differences from C in 2,000,000 inputs. Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.",
    "labels": {

@@ -129,6 +129,15 @@ def parser_caption() -> str:
     )
 
 
+def fmt_time(s: str) -> str:
+    v = float(s)
+    if v < 0.001:
+        return f"{v * 1e6:.0f} µs"
+    if v < 1:
+        return f"{v * 1e3:.1f} ms"
+    return f"{v:.2f} s"
+
+
 def half_decades(n: int) -> int:
     return max(1, math.ceil(2 * math.log10(n)))
 
@@ -145,7 +154,7 @@ def mutants_panel() -> str:
         how = mu["generator_how"] or mu["targeted_how"]
         rows.append(
             f'<tr data-mutant="{esc(mu["name"])}"><th scope="row"><code>{esc(mu["name"])}</code><p class="small muted">{esc(MUTANTS[mu["name"]])}</p></th>'
-            f'<td class="num">{gen}</td><td class="num">{float(mu["generator_seconds"]):.3g} s</td><td>{tgt}</td><td>{esc(how)}</td></tr>')
+            f'<td class="num">{gen}</td><td class="num">{fmt_time(mu["generator_seconds"])}</td><td>{tgt}</td><td>{esc(how)}</td></tr>')
         if gi is None:
             runs = [("miss", full)]
             val = f"<b>not caught</b> in {mu['budget']:,} inputs; caught by targeted case {mu['targeted_case']}"
@@ -154,7 +163,7 @@ def mutants_panel() -> str:
             runs = [("hit", k)] + ([("neg", full - k)] if full > k else [])
             val = f"caught after <b>{gi:,}</b> inputs"
         srows.append({"label": mu["name"], "runs": runs, "val": val})
-    sset = {"unit": "half-decades of inputs", "total_label": "effort until caught", "phr": {
+    sset = {"unit": "half-decades of inputs", "per": 1, "total_label": "effort until caught", "phr": {
         "hit": "half-decades of generated inputs until the harness caught the bug", "neg": "budget not needed",
         "miss": "half-decades searched without catching it"}, "rows": srows}
     c = d["control"]
@@ -163,7 +172,7 @@ def mutants_panel() -> str:
         '<div class="scroll wide"><table class="tbl bt"><caption>Measured detection effort for the five seeded bugs (the mutant test; deterministic generator, seed = input index + 1)</caption>'
         '<thead><tr><th scope="col">Seeded bug</th><th scope="col" class="num">Generator inputs until caught</th><th scope="col" class="num">Generator time</th>'
         '<th scope="col">Targeted case</th><th scope="col">How it showed</th></tr></thead><tbody>' + "".join(rows)
-        + f'<tr><th scope="row">Control (no bug seeded)</th><td class="num">{c["inputs"]:,} inputs</td><td class="num">{float(c["seconds"]):.3g} s</td>'
+        + f'<tr><th scope="row">Control (no bug seeded)</th><td class="num">{c["inputs"]:,} inputs</td><td class="num">{fmt_time(c["seconds"])}</td>'
         f'<td>{c["targeted_cases"]} targeted cases</td><td>{c["divergences"]} divergences</td></tr>'
         "</tbody></table></div>"
         + C.key(sset) + C.strip_rows(sset)

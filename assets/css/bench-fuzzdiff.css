@@ -23,6 +23,9 @@
 .fz-mut{margin-top:var(--s-6)}
 .fz-h{margin:0 0 var(--s-3);font-size:var(--step-1)}
 .fz-mut .tbl p{margin:.3em 0 0}
+.fz-mut .srow{grid-template-columns:13rem minmax(0,1fr);margin-bottom:var(--s-4)}
+.fz-mut .srow>.label{text-transform:none;letter-spacing:0;font-size:var(--step--1)}
+@media (max-width:39.99rem){.fz-mut .srow{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:48rem){
   .fz-cols{grid-template-columns:minmax(0,1fr)}
 }
