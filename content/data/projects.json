@@ -137,6 +137,7 @@
     },
     "evasion": {
      "unit": "variants",
+     "dense": true,
      "note": "One tick is one variant, in the order the sweep generates them.",
      "phr": {
       "hit": "caught by an expected rule",

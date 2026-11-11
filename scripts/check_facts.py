@@ -43,7 +43,20 @@ def run(cmd: list[str], cwd: Path | None = None) -> str:
 
 
 def gh(path: str) -> dict | list:
-    return json.loads(run(["gh", "api", path]))
+    """`gh api`, retried: GitHub's API fails transiently (outages print warnings that would corrupt the JSON)."""
+    import time
+    last = ""
+    for attempt in range(4):
+        p = subprocess.run(["gh", "api", path], capture_output=True, text=True, encoding="utf-8", errors="replace")
+        last = p.stdout
+        try:
+            data = json.loads(p.stdout)
+            if not (isinstance(data, dict) and "message" in data and "documentation_url" in data):  # API error body
+                return data
+        except json.JSONDecodeError:
+            pass
+        time.sleep(3 * (attempt + 1))
+    raise RuntimeError(f"gh api {path} failed after retries: {last[:200]!r}")
 
 
 def pybin(venvs: dict[str, str], name: str, exe: str) -> str:
