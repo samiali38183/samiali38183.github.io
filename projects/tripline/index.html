@@ -4,76 +4,129 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>tripline: a CI gate for detection rules | Sami Ali</title>
-<meta name="description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events.">
+<meta name="description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events; a replacement rule matches 2.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/tripline/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0a58ad">
+<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="tripline: a CI gate for detection rules | Sami Ali">
-<meta property="og:description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events.">
+<meta property="og:description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events; a replacement rule matches 2.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/tripline/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="tripline: a CI gate for detection rules | Sami Ali">
-<meta name="twitter:description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events.">
-<link rel="stylesheet" href="/styles.css">
+<meta name="twitter:description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events; a replacement rule matches 2.">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
+<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css">
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-<div class="wrap">
+<div class="wrap head-row">
 <a class="brand" href="/">Sami Ali</a>
-<nav class="site-nav" aria-label="Main">
+<nav class="site-nav" aria-label="Primary">
 <ul>
-<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/projects/" aria-current="true">Work</a></li>
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" hidden>Dark theme</button></li>
+<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
+<p class="wrap sheetline"><b>Sheet 1 of 6</b> &middot; tripline &middot; v0.2.1</p>
 </header>
 <main id="main" class="wrap">
-<p class="crumbs"><a href="/projects/">Projects</a> / tripline</p>
+<div class="sheet">
+<header class="title">
 <h1>tripline</h1>
-<p class="lede prose">A CI gate for detection rules. It replays recorded attack telemetry through Sigma rules on every pull request and fails the build when a rule that should fire does not.</p>
-<ul class="links">
-<li><a href="https://github.com/samiali38183/tripline">Repository</a></li>
-<li><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">Release v0.2.1</a></li>
-<li><a href="https://github.com/samiali38183/tripline/tree/main/docs">Docs</a></li>
-<li><a href="https://github.com/samiali38183/tripline/actions/runs/42957008252">CI run (main)</a></li>
-<li><a href="https://samiali38183.github.io/tripline/">Live coverage report</a></li>
-</ul>
+<p class="dek">A CI gate for detection rules. It replays recorded attack telemetry through Sigma rules on every pull request and fails the build when a rule that should fire does not.</p>
+<ul class="linkrow"><li><a href="https://github.com/samiali38183/tripline">Repository</a></li><li><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">Release v0.2.1</a></li><li><a href="https://github.com/samiali38183/tripline/tree/main/docs">Docs</a></li><li><a href="https://github.com/samiali38183/tripline/actions/runs/42957008252">CI run (main)</a></li><li><a href="https://samiali38183.github.io/tripline/">Live coverage report</a></li></ul>
 
-<h2>The problem</h2>
-<div class="prose">
-<p>Detection teams count rules and ATT&amp;CK tags. Neither number says whether a rule still fires on the behavior it is named after, and a syntax linter passes rules that never matched anything.</p>
-<p>tripline treats a rule like code under test: each scenario names a technique, the Sigma rules that must fire, and recorded telemetry to replay. If an expected rule misses, the exit code is 1.</p>
+</header>
+<section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>tripline v0.2.1, commit e01b8b0</dd></div>
+<div><dt>Reference standard</dt><dd>SigmaHQ rule c21c4eaa (Setuid and Setgid), replayed on telemetry recorded from Atomic Red Team T1548.001 tests on a GitHub-hosted Linux runner</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-10, Python 3.12.2, fresh clone of main</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ tripline"><code>tripline replay --all
+tripline replay t1548-001-setuid-setgid --show-events</code></pre></dd></div>
+</dl>
+</section>
+<section class="reading-band" aria-label="The reading">
+<div class="hero-read">
+<p class="reading sm" role="img" aria-label="Reading: 0/36 events matched by the stock rule"><span aria-hidden="true">0</span><span class="den" aria-hidden="true">/36</span></p>
+<div>
+<p class="why">The stock SigmaHQ Setuid and Setgid rule matched 0 of 36 events in telemetry recorded from Atomic Red Team&#x27;s T1548.001 tests on a GitHub-hosted Linux runner. The replacement rule matches 2.</p>
+<p class="chips"><span class="stamp fail">As found: fail</span> <a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a></p>
 </div>
-
-<h2>What it does</h2>
-<div class="prose">
-<p>14 scenarios cover 14 ATT&amp;CK techniques across AWS, Linux and Windows. Linux and Windows telemetry comes from Atomic Red Team tests run on GitHub-hosted CI runners; the AWS plane replays public CloudTrail data (Stratus Red Team detonation logs and the flaws.cloud dataset). Rules are compiled to Python and evaluated offline against committed NDJSON, so the whole gate runs in seconds with no SIEM. Output is a JSON scorecard, JUnit XML, an ATT&amp;CK Navigator layer and a static HTML report.</p>
-<p>Coverage is weighted by how common each technique is (weights 1 to 10 from the Red Canary 2026 Threat Detection Report ranking, mapped by hand), so breaking a common technique moves the headline more than breaking a rare one.</p>
 </div>
-
-<figure class="diagram"><svg viewBox="0 0 440 462" role="img" aria-labelledby="tripline-t tripline-d"><title id="tripline-t">tripline data flow</title><desc id="tripline-d">Recorded telemetry is committed as fixtures, Sigma rules are compiled to Python predicates, a logsource router decides which events each rule sees, and the scorer fails the build if an expected rule misses.</desc><rect class="box" x="20" y="4" width="400" height="54" rx="6"/><text x="220" y="26" text-anchor="middle" font-weight="600">Emulate and record</text><text class="sub" x="220" y="45" text-anchor="middle">Atomic Red Team on CI runners; public AWS logs</text><line class="arrow" x1="220" y1="58" x2="220" y2="78"/><path class="head" d="M215 77 L225 77 L220 84 Z"/><rect class="box" x="20" y="84" width="400" height="54" rx="6"/><text x="220" y="106" text-anchor="middle" font-weight="600">Fixtures committed to the repo</text><text class="sub" x="220" y="125" text-anchor="middle">run.ndjson + manifest.json, reviewed by a person</text><line class="arrow" x1="220" y1="138" x2="220" y2="158"/><path class="head" d="M215 157 L225 157 L220 164 Z"/><rect class="box" x="20" y="164" width="400" height="54" rx="6"/><text x="220" y="186" text-anchor="middle" font-weight="600">Compile Sigma rules to predicates</text><text class="sub" x="220" y="205" text-anchor="middle">pySigma parses; tripline walks the condition tree</text><line class="arrow" x1="220" y1="218" x2="220" y2="238"/><path class="head" d="M215 237 L225 237 L220 244 Z"/><rect class="box" x="20" y="244" width="400" height="54" rx="6"/><text x="220" y="266" text-anchor="middle" font-weight="600">Logsource router</text><text class="sub" x="220" y="285" text-anchor="middle">a rule only sees events its logsource matches</text><line class="arrow" x1="220" y1="298" x2="220" y2="318"/><path class="head" d="M215 317 L225 317 L220 324 Z"/><rect class="hi" x="20" y="324" width="400" height="54" rx="6"/><text x="220" y="346" text-anchor="middle" font-weight="600">Replay and score per scenario</text><text class="sub" x="220" y="365" text-anchor="middle">weights from technique prevalence</text><line class="arrow" x1="220" y1="378" x2="220" y2="398"/><path class="head" d="M215 397 L225 397 L220 404 Z"/><rect class="warn" x="20" y="404" width="400" height="54" rx="6"/><text x="220" y="426" text-anchor="middle" font-weight="600">Gate: exit 1 if an expected rule misses</text><text class="sub" x="220" y="445" text-anchor="middle">scorecard, JUnit, ATT&amp;CK Navigator layer, HTML</text></svg><figcaption>Recorded telemetry is committed as fixtures, Sigma rules are compiled to Python predicates, a logsource router decides which events each rule sees, and the scorer fails the build if an expected rule misses.</figcaption></figure>
-
-<h2>Three implementation points</h2>
-<div class="prose">
-<h3>Compiling the Sigma condition tree into Python predicates</h3>
-<p>pySigma parses each rule and applies value modifiers. tripline then walks the resulting condition tree and turns every leaf into a closure over an event (<code>tripline/engine/compiler.py</code>): <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>all</code>, <code>re</code>, <code>windash</code>, <code>base64offset</code>, <code>cidr</code>, <code>fieldref</code>, numeric comparisons, <code>1 of</code> and <code>all of</code>. Anything it cannot evaluate raises <code>UnsupportedRuleError</code>, and a scenario whose expected rule failed to compile counts as failed. A gate that cannot evaluate a rule must not pass it. A code review of 0.2.1 found tripline breaking its own rule: timestamp part modifiers such as <code>|hour</code> compiled but never matched. They now evaluate or raise.</p>
-<h3>Telemetry sliced by run GUID</h3>
-<p>The Linux workflow wraps every Atomic test in two marker commands, <code>tripline-marker RUN TEST start</code> and <code>... end</code>. They are ordinary <code>execve</code> events, so attribution lives inside the audit log itself. The collector merges auditd records by serial, hex-decodes EXECVE arguments and keeps only what falls between a pair of markers carrying the run's GUID. Before 0.2.1 a marker from another run in the same log could open or close a window, or leak events from an earlier run; markers with a foreign GUID are now ignored. For cloud data, <code>tripline cloud build</code> shifts <code>eventTime</code> while keeping offsets and appends <code>tripline/&lt;run-guid&gt;</code> to <code>userAgent</code>.</p>
-<h3>A routing problem is not a missed detection</h3>
-<p>A rule is evaluated only on events its <code>logsource</code> matches, and results read <code>1/7 applicable events</code>. If a rule has no applicable events at all, that is reported as a routing problem (wrong product, category or service). <code>0/7 applicable events (rule did not match)</code> is the real miss. They are separate values of <code>outcome</code> in <code>scorecard.json</code>, the CLI, JUnit and the HTML report, because the fix for each is different.</p>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="neg"></i></span>not expected and not matched</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>expected but not matched</li><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>matched</li></ul>
+<div class="strips vt" style="--vt:strip-tripline"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 36 events: 34 not expected and not matched, 2 expected but not matched"><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="10"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="20"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="30"></i><i data-s="neg"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val"><b>0</b> matched of 36 events</p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 36 events: 34 not expected and not matched, 2 matched"><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="10"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="hit"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="20"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="30"></i><i data-s="neg"></i><i data-s="hit"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val"><b>2</b> matched of 36 events</p></div></div>
+</section>
+<section class="bench" data-bench="tripline" aria-label="Recorded readings">
+<figure class="plate">
+<span class="plate-label">Plate 1</span>
+<div class="bench-static">
+<table class="tbl">
+<caption>Three command lines recorded from the Atomic Red Team tests, and what each rule did with them</caption>
+<thead><tr><th scope="col">Recorded command line</th><th scope="col">Stock rule c21c4eaa</th><th scope="col">Replacement rule</th></tr></thead>
+<tbody>
+<tr><td data-label="Recorded command line"><code>sh -c sudo touch /tmp/evilBinary; sudo chown root /tmp/evilBinary; sudo chmod u+xs /tmp/evilBinary</code></td><td data-label="Stock rule c21c4eaa">No match</td><td data-label="Replacement rule">No match (the event is the <code>sh</code> wrapper, not <code>chmod</code>)</td></tr>
+<tr><td data-label="Recorded command line"><code>chmod u+xs /tmp/evilBinary</code></td><td data-label="Stock rule c21c4eaa">No match</td><td data-label="Replacement rule">Match</td></tr>
+<tr><td data-label="Recorded command line"><code>chmod g+xs /tmp/evilBinary</code></td><td data-label="Stock rule c21c4eaa">No match</td><td data-label="Replacement rule">Match</td></tr>
+</tbody>
+</table>
 </div>
-
-<h2>Evidence from real runs</h2>
-<p class="small muted">Run on 2026-11-10 from a fresh clone of <code>main</code> (commit e01b8b0), Python 3.12.2.</p>
-<h3>The gate</h3>
-<pre data-copy><code>$ tripline replay --all
+<div class="bench-live" data-bench-mount hidden></div>
+<figcaption><b>The stock rule looks for the literal text <code>chmod u+s</code>, so the combined mode <code>u+xs</code> slips past it.</b> Command lines are copied from docs/findings.md F-001 (telemetry from run 41838714456). Across all 36 applicable events the stock rule matched 0 and the replacement matched 2.</figcaption>
+</figure>
+</section>
+<article class="record">
+<section class="section" id="as-found" aria-labelledby="found-h">
+<h2 id="found-h"><span class="label sec-label">As found</span>The stock setuid rule matched nothing</h2>
+<div class="prose">
+<p>SigmaHQ's <em>Setuid and Setgid</em> rule looks for the literal text <code> chmod u+s</code>.<sup class="nref" aria-hidden="true"></sup> Atomic Red Team's T1548.001 tests run <code>chmod u+xs</code>, and <code>chmod 4755</code>, <code>ug+s</code> or <code>a+s</code> would slip past the same way. Replaying the recorded fixture through both rules (a small script against tripline's own API):</p>
+</div>
+<aside class="note"><strong>setuid and setgid</strong> are file mode bits that make a program run with the privileges of its owner or group. A root-owned program with the bit set is a classic way to keep root access (ATT&amp;CK T1548.001).</aside>
+<pre data-copy data-label="Replay of the recorded T1548.001 fixture"><code>Setuid and Setgid                                    applicable  36  matched 0
+Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</code></pre>
+<div class="prose">
+<p>The first is the vendored upstream rule, unchanged. The second is the replacement described below. Write-up: <a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md, F-001</a>.</p>
+</div>
+<div class="scroll wide"><table class="tbl">
+<caption>Reading ledger</caption>
+<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
+<tbody>
+<tr class="row-fail"><th scope="row">Stock SigmaHQ rule c21c4eaa on the 36 applicable events</th><td data-label="Expected">A match on the two <code>chmod</code> executions</td><td data-label="Observed">0 matches</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a></td></tr>
+</tbody>
+</table></div>
+</section>
+<section class="section" id="as-left" aria-labelledby="left-h">
+<h2 id="left-h"><span class="label sec-label">As left</span>A replacement rule matches the two chmod runs</h2>
+<div class="prose">
+<p>The replacement rule anchors on the <code>chmod</code> binary and handles symbolic and octal forms. Its two matches are the two <code>chmod</code> executions. The upstream rule stays in the rule set, so a future upstream fix is picked up automatically.</p>
+</div>
+<div class="scroll wide"><table class="tbl">
+<caption>Reading ledger</caption>
+<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
+<tbody>
+<tr><th scope="row">Replacement rule on the same 36 events</th><td data-label="Expected">A match on the two <code>chmod</code> executions</td><td data-label="Observed">2 matches</td><td data-label="Verdict"><span class="stamp pass">As left: pass</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md F-001</a></td></tr>
+</tbody>
+</table></div>
+<div class="prose">
+<p>The gate over the committed fixtures, run on 2026-11-10 from a fresh clone of <code>main</code> (commit e01b8b0), Python 3.12.2:</p>
+</div>
+<pre data-copy data-label="$ tripline replay --all"><code>$ tripline replay --all
 [   PASS] t1003-001-lsass-memory-dump (T1003.001, windows) - 70 events
      + 646ea171-dded-4578-8a4d-65e9822892e3  Process Memory Dump Via Comsvcs.DLL  (2/6 applicable events)
      + 5ef9853e-4d0e-4a70-846f-a9ca37d876da  Potential Credential Dumping Activity Via LSASS  (1/4 applicable events)
@@ -90,43 +143,75 @@
 ...
 gate passed</code></pre>
 <p class="trim">Trimmed: 6 of the 14 scenarios shown. The full run reports 10 passed, 4 pending, exit code 0.</p>
-
-<h3>The finding: the stock setuid rule matched nothing</h3>
-<p class="prose">SigmaHQ's <em>Setuid and Setgid</em> rule looks for the literal text <code> chmod u+s</code>. Atomic Red Team's T1548.001 tests run <code>chmod u+xs</code>, and <code>chmod 4755</code>, <code>ug+s</code> or <code>a+s</code> would slip past the same way. Replaying the recorded fixture through both rules (a small script against tripline's own API):</p>
-<pre data-copy><code>Setuid and Setgid                                    applicable  36  matched 0
-Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</code></pre>
-<p class="prose">The first is the vendored upstream rule, unchanged. The second is a replacement that anchors on the <code>chmod</code> binary and handles symbolic and octal forms; its two matches are the two <code>chmod</code> executions. The upstream rule is kept so a future upstream fix is picked up automatically. Write-up: <a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md, F-001</a>.</p>
-
-<figure>
+<div class="plate wide">
+<span class="plate-label">Plate 2</span>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>passing</li><li><span class="strip" aria-hidden="true"><i data-s="pend"></i></span>pending, no recording yet</li></ul>
+<div class="strips"><div class="srow"><span class="label" aria-hidden="true">Gate</span><div class="strip" role="img" aria-label="Gate, 14 scenarios: 10 passing, 4 pending, no recording yet"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="pend"></i><i data-s="pend"></i><i data-s="pend"></i><i data-s="pend"></i></div><p class="val"><b>10</b> passed, 4 pending, 0 failed</p></div></div>
+<p class="cap"><b>The 14 scenarios: 10 pass, 4 are pending because no Windows recording has been accepted yet.</b> Counts from docs/scorecard.json.</p>
+</div>
+<figure class="plate wide">
+<span class="plate-label">Plate 3</span>
 <a href="https://samiali38183.github.io/tripline/"><img src="/assets/img/tripline-report.png" width="1300" height="1100" loading="lazy" alt="tripline coverage report: 68 percent weighted coverage, 10 of 14 scenarios passing, an ATT&amp;CK-style matrix by tactic with passing scenarios in green and pending Windows scenarios in grey"></a>
-<figcaption>Top of the live report, generated by <code>tripline report</code> from the committed scorecard (2026-11-11 04:06 UTC, tripline 0.2.1). <a href="https://samiali38183.github.io/tripline/">Open the live page</a>.</figcaption>
+<figcaption><b>The coverage report shows the same 10 and 4.</b> Top of the live report, generated by <code>tripline report</code> from the committed scorecard (2026-11-11 04:06 UTC, tripline 0.2.1). <a href="https://samiali38183.github.io/tripline/">Open the live page</a>.</figcaption>
 </figure>
-
-<h2>Results</h2>
-<section class="scroll" tabindex="0" aria-label="tripline results table">
-<table>
+<div class="scroll wide"><table class="tbl">
+<caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests</th><td>186 (89% line+branch coverage)</td><td><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG 0.2.1</a>; <a href="https://github.com/samiali38183/tripline/actions/runs/42957008252">CI run 42957008252</a></td></tr>
-<tr><th scope="row">Scenarios</th><td>14 techniques: 4 AWS, 3 Linux, 7 Windows</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md">docs/scorecard.md</a></td></tr>
-<tr><th scope="row">Gate</th><td>10 passed, 0 failed, 4 pending</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
-<tr><th scope="row">Weighted coverage</th><td>68% of all scenarios (42 of 62 points); 100% of scenarios that have fixtures</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
-<tr><th scope="row">Stock setuid rule</th><td>0 of 36 events; replacement 2 of 36</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md F-001</a>; <a href="https://github.com/samiali38183/tripline/actions/runs/41838714456">emulate-linux run 41838714456</a> (red, see below)</td></tr>
-<tr><th scope="row">Windows fixtures</th><td>3 of 7 scenarios recorded and passing (T1003.001, T1047, T1105)</td><td><a href="https://github.com/samiali38183/tripline/actions/runs/42917025570">emulate-windows run 42917025570</a> (the run itself shows red, see below)</td></tr>
-<tr><th scope="row">Release</th><td>v0.2.1</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">GitHub release</a></td></tr>
+<tr><th scope="row">Tests</th><td data-label="Value">186 (89% line+branch coverage)</td><td data-label="Source"><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG 0.2.1</a>; <a class="chip" data-s="pass" href="https://github.com/samiali38183/tripline/actions/runs/42957008252"><span class="st" aria-hidden="true"></span><span>run 42957008252</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">Scenarios</th><td data-label="Value">14 techniques: 4 AWS, 3 Linux, 7 Windows</td><td data-label="Source"><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md">docs/scorecard.md</a></td></tr>
+<tr><th scope="row">Gate</th><td data-label="Value">10 passed, 0 failed, 4 pending</td><td data-label="Source"><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
+<tr><th scope="row">Weighted coverage</th><td data-label="Value">68% of all scenarios (42 of 62 points); 100% of scenarios that have fixtures</td><td data-label="Source"><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
+<tr><th scope="row">Stock setuid rule</th><td data-label="Value">0 of 36 events; replacement 2 of 36</td><td data-label="Source"><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md F-001</a>; emulate-linux <a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a> (failed, see limits)</td></tr>
+<tr><th scope="row">Windows fixtures</th><td data-label="Value">3 of 7 scenarios recorded and passing (T1003.001, T1047, T1105)</td><td data-label="Source">emulate-windows <a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/42917025570"><span class="st" aria-hidden="true"></span><span>run 42917025570</span> <span class="d">failed 2026-11-10</span></a> (the run itself shows failed, see limits)</td></tr>
+<tr><th scope="row">Release</th><td data-label="Value">v0.2.1</td><td data-label="Source"><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">GitHub release</a></td></tr>
 </tbody>
-</table>
+</table></div>
 </section>
-
-<h2>Limitations</h2>
+<section class="section" id="method" aria-labelledby="method-h">
+<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<h3>The problem</h3>
+<div class="prose">
+<p>Detection teams count rules and ATT&amp;CK tags. Neither number says whether a rule still fires on the behavior it is named after, and a syntax linter passes rules that never matched anything.</p>
+<p>tripline treats a rule like code under test: each scenario names a technique, the Sigma rules that must fire, and recorded telemetry to replay. If an expected rule misses, the exit code is 1.</p>
+</div>
+<h3>What it does</h3>
+<div class="prose">
+<p>14 scenarios cover 14 ATT&amp;CK techniques across AWS, Linux and Windows. Linux and Windows telemetry comes from Atomic Red Team tests run on GitHub-hosted CI runners; the AWS plane replays public CloudTrail data (Stratus Red Team detonation logs and the flaws.cloud dataset). Rules are compiled to Python and evaluated offline against committed NDJSON, so the whole gate runs in seconds with no SIEM. Output is a JSON scorecard, JUnit XML, an ATT&amp;CK Navigator layer and a static HTML report.</p>
+<p>Coverage is weighted by how common each technique is (weights 1 to 10 from the Red Canary 2026 Threat Detection Report ranking, mapped by hand), so breaking a common technique moves the headline more than breaking a rare one.</p>
+</div>
+<figure class="plate diagram"><span class="plate-label">Plate 4</span><svg viewBox="0 0 320 621" role="img" aria-labelledby="tripline-t tripline-d"><title id="tripline-t">tripline data flow</title><desc id="tripline-d">Recorded telemetry is committed as fixtures, Sigma rules are compiled to Python predicates, a logsource router decides which events each rule sees, and the scorer fails the build if an expected rule misses.</desc><rect x="26" y="4" width="290" height="77"/><text x="38" y="26" font-weight="600" font-size="14">Emulate and record</text><text class="sub" x="38" y="44" font-size="13">Atomic Red Team on CI runners;</text><text class="sub" x="38" y="61" font-size="13">public AWS logs</text><circle class="letter" cx="12" cy="16" r="9"/><text class="lt" x="12" y="20">A</text><path class="arrow" d="M171 81 V106"/><path class="head" d="M166 99 L171 106 L176 99"/><rect x="26" y="107" width="290" height="77"/><text x="38" y="129" font-weight="600" font-size="14">Fixtures committed to the repo</text><text class="sub" x="38" y="147" font-size="13">run.ndjson and manifest.json,</text><text class="sub" x="38" y="164" font-size="13">reviewed by a person</text><circle class="letter" cx="12" cy="119" r="9"/><text class="lt" x="12" y="123">B</text><path class="arrow" d="M171 184 V209"/><path class="head" d="M166 202 L171 209 L176 202"/><rect x="26" y="210" width="290" height="96"/><text x="38" y="232" font-weight="600" font-size="14">Compile Sigma rules to</text><text x="38" y="251" font-weight="600" font-size="14">predicates</text><text class="sub" x="38" y="269" font-size="13">pySigma parses; tripline walks</text><text class="sub" x="38" y="286" font-size="13">the condition tree</text><circle class="letter" cx="12" cy="222" r="9"/><text class="lt" x="12" y="226">C</text><path class="arrow" d="M171 306 V331"/><path class="head" d="M166 324 L171 331 L176 324"/><rect x="26" y="332" width="290" height="77"/><text x="38" y="354" font-weight="600" font-size="14">Logsource router</text><text class="sub" x="38" y="372" font-size="13">a rule only sees events its</text><text class="sub" x="38" y="389" font-size="13">logsource matches</text><circle class="letter" cx="12" cy="344" r="9"/><text class="lt" x="12" y="348">D</text><path class="arrow" d="M171 409 V434"/><path class="head" d="M166 427 L171 434 L176 427"/><rect class="hi" x="26" y="435" width="290" height="60"/><text x="38" y="457" font-weight="600" font-size="14">Replay and score per scenario</text><text class="sub" x="38" y="475" font-size="13">weights from technique prevalence</text><circle class="letter" cx="12" cy="447" r="9"/><text class="lt" x="12" y="451">E</text><path class="arrow" d="M171 495 V520"/><path class="head" d="M166 513 L171 520 L176 513"/><rect class="warn" x="26" y="521" width="290" height="96"/><path class="hatch-line" d="M26 617 l20 -20 M26 609 l8 -8 M34 617 l12 -12"/><text x="38" y="543" font-weight="600" font-size="14">Gate: exit 1 if an expected</text><text x="38" y="562" font-weight="600" font-size="14">rule misses</text><text class="sub" x="38" y="580" font-size="13">scorecard, JUnit, ATT&amp;CK</text><text class="sub" x="38" y="597" font-size="13">Navigator layer, HTML</text><circle class="letter" cx="12" cy="533" r="9"/><text class="lt" x="12" y="537">F</text></svg><figcaption>Recorded telemetry is committed as fixtures, Sigma rules are compiled to Python predicates, a logsource router decides which events each rule sees, and the scorer fails the build if an expected rule misses.</figcaption><details class="alt"><summary>Describe this diagram</summary><ol class="alt-list" type="A"><li><strong>Emulate and record.</strong> Atomic Red Team on CI runners; public AWS logs.</li><li><strong>Fixtures committed to the repo.</strong> run.ndjson and manifest.json, reviewed by a person.</li><li><strong>Compile Sigma rules to predicates.</strong> pySigma parses; tripline walks the condition tree.</li><li><strong>Logsource router.</strong> a rule only sees events its logsource matches.</li><li><strong>Replay and score per scenario.</strong> weights from technique prevalence.</li><li><strong>Gate: exit 1 if an expected rule misses.</strong> scorecard, JUnit, ATT&amp;CK Navigator layer, HTML.</li></ol></details></figure>
+<h3>Three implementation points</h3>
+<div class="prose">
+<h4>Compiling the Sigma condition tree into Python predicates</h4>
+<p>pySigma parses each rule and applies value modifiers. tripline then walks the resulting condition tree and turns every leaf into a closure over an event (<code>tripline/engine/compiler.py</code>): <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>all</code>, <code>re</code>, <code>windash</code>, <code>base64offset</code>, <code>cidr</code>, <code>fieldref</code>, numeric comparisons, <code>1 of</code> and <code>all of</code>. Anything it cannot evaluate raises <code>UnsupportedRuleError</code>, and a scenario whose expected rule failed to compile counts as failed. A gate that cannot evaluate a rule must not pass it. A code review of 0.2.1 found tripline breaking its own rule: timestamp part modifiers such as <code>|hour</code> compiled but never matched. They now evaluate or raise.</p>
+<h4>Telemetry sliced by run GUID</h4>
+<p>The Linux workflow wraps every Atomic test in two marker commands, <code>tripline-marker RUN TEST start</code> and <code>... end</code>. They are ordinary <code>execve</code> events, so attribution lives inside the audit log itself. The collector merges auditd records by serial, hex-decodes EXECVE arguments and keeps only what falls between a pair of markers carrying the run's GUID. Before 0.2.1 a marker from another run in the same log could open or close a window, or leak events from an earlier run; markers with a foreign GUID are now ignored. For cloud data, <code>tripline cloud build</code> shifts <code>eventTime</code> while keeping offsets and appends <code>tripline/&lt;run-guid&gt;</code> to <code>userAgent</code>.</p>
+<h4>A routing problem is not a missed detection</h4>
+<p>A rule is evaluated only on events its <code>logsource</code> matches, and results read <code>1/7 applicable events</code>.<sup class="nref" aria-hidden="true"></sup> If a rule has no applicable events at all, that is reported as a routing problem (wrong product, category or service). <code>0/7 applicable events (rule did not match)</code> is the real miss. They are separate values of <code>outcome</code> in <code>scorecard.json</code>, the CLI, JUnit and the HTML report, because the fix for each is different.</p>
+</div>
+<aside class="note"><strong>Sigma</strong> is an open, vendor-neutral format for detection rules. A rule's <code>logsource</code> says which kind of log it applies to.</aside>
+</section>
+</article>
+<section class="limits section" id="limits" aria-labelledby="limits-h">
+<h2 id="limits-h"><span class="label sec-label">Tolerance and limits</span>What the numbers do not show</h2>
 <ul class="prose">
-<li><strong>The two emulation runs linked above are red on GitHub.</strong> Their last step, which asserts that the expected rules fire, failed: in the Linux run because the stock setuid rule missed (the finding itself), in the Windows run because some scenarios did not pass. The workflows still upload the recorded telemetry, and a maintainer reviews it before committing it as a fixture. The green gate is the <code>ci</code> run, which replays the committed fixtures.</li>
+<li><strong>The two emulation runs linked above are failed on GitHub.</strong> Their last step, which asserts that the expected rules fire, failed: in the Linux run because the stock setuid rule missed (the finding itself), in the Windows run because some scenarios did not pass. The workflows still upload the recorded telemetry, and a maintainer reviews it before committing it as a fixture. The passing gate is the <code>ci</code> run, which replays the committed fixtures.</li>
 <li><strong>A pass is a recall check on one recording.</strong> A scenario passes when each expected rule fires on at least one event. There is no benign corpus yet, so a rule that fires on everything would also pass, and there are no evasion variants.</li>
 <li><strong>Four Windows scenarios are still pending.</strong> T1059.001, T1059.003, T1027 and T1053.005 have no accepted recording yet; <a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-003</a> explains the rule and Atomic-test mismatches behind each. Pending scenarios count as zero in the 68%.</li>
 <li><strong>Small coverage.</strong> 14 techniques out of several hundred. The 68% is progress against this repo's own list, not a statement about any organization.</li>
 <li><strong>The cloud plane is replayed, not detonated by this project.</strong> The records are real CloudTrail from public datasets, but the cloud rules written for the project sit beside fixtures from the same datasets, so those passes show the wiring works, not that the rules generalize.</li>
 <li><strong>A different evaluator from production.</strong> There is no parity test against a real SIEM backend, so a pass is necessary, not sufficient.</li>
 </ul>
+</section>
+<section class="section" id="trace" aria-labelledby="trace-h">
+<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<dl class="trace"><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1</a></dd></div><div><dt>Gate run on main</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/tripline/actions/runs/42957008252"><span class="st" aria-hidden="true"></span><span>run 42957008252</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Linux recording run (setuid finding)</dt><dd><a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a></dd></div><div><dt>Windows recording run</dt><dd><a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/42917025570"><span class="st" aria-hidden="true"></span><span>run 42917025570</span> <span class="d">failed 2026-11-10</span></a></dd></div><div><dt>Finding F-001</dt><dd><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md</a></dd></div><div><dt>Scorecard</dt><dd><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></dd></div><div><dt>Changelog</dt><dd><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG.md</a></dd></div></dl>
+
+</section>
+<nav class="sheets" aria-label="Sheets"><a class="next" href="/projects/sinkline/"><span class="label">Next sheet, 2 of 6</span><span class="n">sinkline</span></a></nav>
+</div>
 </main>
 <footer class="site-footer">
 <div class="wrap">
@@ -139,6 +224,6 @@ Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</
 <p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
 </div>
 </footer>
-<script src="/site.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
 </body>
 </html>

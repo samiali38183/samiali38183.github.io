@@ -4,75 +4,117 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>kevgate: KEV-ranked vulnerability intake | Sami Ali</title>
-<meta name="description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. 277 tests, hashed scoped API keys, and CI that tests NetworkPolicy and Pod Security on kind.">
+<meta name="description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and CI that tests NetworkPolicy and Pod Security on kind.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kevgate/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0a58ad">
+<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kevgate: KEV-ranked vulnerability intake | Sami Ali">
-<meta property="og:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. 277 tests, hashed scoped API keys, and CI that tests NetworkPolicy and Pod Security on kind.">
+<meta property="og:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and CI that tests NetworkPolicy and Pod Security on kind.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kevgate/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kevgate: KEV-ranked vulnerability intake | Sami Ali">
-<meta name="twitter:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. 277 tests, hashed scoped API keys, and CI that tests NetworkPolicy and Pod Security on kind.">
-<link rel="stylesheet" href="/styles.css">
+<meta name="twitter:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and CI that tests NetworkPolicy and Pod Security on kind.">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
+<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css">
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-<div class="wrap">
+<div class="wrap head-row">
 <a class="brand" href="/">Sami Ali</a>
-<nav class="site-nav" aria-label="Main">
+<nav class="site-nav" aria-label="Primary">
 <ul>
-<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/projects/" aria-current="true">Work</a></li>
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" hidden>Dark theme</button></li>
+<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
+<p class="wrap sheetline"><b>Sheet 3 of 6</b> &middot; kevgate &middot; v0.1.1</p>
 </header>
 <main id="main" class="wrap">
-<p class="crumbs"><a href="/projects/">Projects</a> / kevgate</p>
+<div class="sheet">
+<header class="title">
 <h1>kevgate</h1>
-<p class="lede prose">A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls.</p>
-<ul class="links">
-<li><a href="https://github.com/samiali38183/kevgate">Repository</a></li>
-<li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">Release v0.1.1</a></li>
-<li><a href="https://github.com/samiali38183/kevgate/pull/2">Hardening PR #2</a></li>
-<li><a href="https://github.com/samiali38183/kevgate/tree/main/docs">Docs</a></li>
-<li><a href="#ci">CI runs</a></li>
-</ul>
+<p class="dek">A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls.</p>
+<ul class="linkrow"><li><a href="https://github.com/samiali38183/kevgate">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">Release v0.1.1</a></li><li><a href="https://github.com/samiali38183/kevgate/pull/2">Hardening PR #2</a></li><li><a href="https://github.com/samiali38183/kevgate/tree/main/docs">Docs</a></li><li><a href="#trace">CI runs</a></li></ul>
 
-<h2>The problem</h2>
-<div class="prose">
-<p>A raw scanner export sorts by CVSS, which puts a theoretical 9.8 ahead of a 7.5 that attackers are using today. KEV membership is the strongest prioritization signal that is freely available, so the service makes it the dominant factor and uses the rest to order everything else.</p>
-<p>The second question is whether a small service like this can be shipped the way a production team would, with the security controls tested rather than described.</p>
+</header>
+<section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>kevgate v0.1.1, commit 973c8c1 (evidence run on b08a920)</dd></div>
+<div><dt>Reference standard</dt><dd>its own controls (authentication, rate limits, NetworkPolicy, Pod Security) and a list of six mutants, tested in a kind cluster in CI</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-10, Python 3.12.2, fresh clone of main; CI runs 2026-11-11</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ kevgate"><code>pytest --cov=kevgate</code></pre></dd></div>
+</dl>
+</section>
+<section class="reading-band" aria-label="The reading">
+<div class="hero-read">
+<p class="reading sm" role="img" aria-label="Reading: 6/6 surviving mutants killed"><span aria-hidden="true">6</span><span class="den" aria-hidden="true">/6</span></p>
+<div>
+<p class="why">Six defects had survived the test suite; tests added in 0.1.1 now fail when each one is reintroduced. The suite went from 227 to 277 tests.</p>
+<p class="chips"><span class="stamp pass">As left: pass</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666365"><span class="st" aria-hidden="true"></span><span>run 42956666365</span> <span class="d">passed 2026-11-11</span></a></p>
 </div>
-
-<h2>What it does</h2>
-<div class="prose">
-<p>The score is <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>, from 0 to 100. The KEV weight equals the EPSS and CVSS weights combined, so a KEV finding never scores below a non-KEV finding on an asset with the same criticality; the one degenerate tie is broken in favor of KEV.</p>
-<p>The API takes JSON findings or a Nessus/Tenable CSV export, upserts on (CVE, asset), and serves a ranked <code>/queue</code>, per-CVE views and stats. Scopes are <code>findings:write</code>, <code>queue:read</code> and <code>admin</code>. There are health, readiness and Prometheus endpoints, and a separate CLI command refreshes the KEV file from CISA so the API process never makes outbound calls.</p>
 </div>
-
-<figure class="diagram"><svg viewBox="0 0 440 462" role="img" aria-labelledby="kevgate-t kevgate-d"><title id="kevgate-t">kevgate request path and delivery pipeline</title><desc id="kevgate-d">A request passes request-context and body-size middleware, then a scope check with a per-key rate limit, then scoring and SQLite storage. Separately, CI builds the image, scans it, deploys it to kind and tests the network and pod-security controls.</desc><rect class="box" x="20" y="4" width="400" height="54" rx="6"/><text x="220" y="26" text-anchor="middle" font-weight="600">Scanner or analyst, Bearer key</text><text class="sub" x="220" y="45" text-anchor="middle">JSON or Nessus/Tenable CSV in, ranked queue out</text><line class="arrow" x1="220" y1="58" x2="220" y2="78"/><path class="head" d="M215 77 L225 77 L220 84 Z"/><rect class="box" x="20" y="84" width="400" height="54" rx="6"/><text x="220" y="106" text-anchor="middle" font-weight="600">Middleware</text><text class="sub" x="220" y="125" text-anchor="middle">request id, JSON log, metrics, 1 MiB body limit</text><line class="arrow" x1="220" y1="138" x2="220" y2="158"/><path class="head" d="M215 157 L225 157 L220 164 Z"/><rect class="hi" x="20" y="164" width="400" height="54" rx="6"/><text x="220" y="186" text-anchor="middle" font-weight="600">Auth and rate limit</text><text class="sub" x="220" y="205" text-anchor="middle">constant-time key check, scopes, token bucket</text><line class="arrow" x1="220" y1="218" x2="220" y2="238"/><path class="head" d="M215 237 L225 237 L220 244 Z"/><rect class="box" x="20" y="244" width="400" height="54" rx="6"/><text x="220" y="266" text-anchor="middle" font-weight="600">Scoring and repository</text><text class="sub" x="220" y="285" text-anchor="middle">KEV, EPSS, CVSS, ACR; parameterised SQL on SQLite</text><line class="arrow" x1="220" y1="298" x2="220" y2="318"/><path class="head" d="M215 317 L225 317 L220 324 Z"/><rect class="box" x="20" y="324" width="400" height="54" rx="6"/><text x="220" y="346" text-anchor="middle" font-weight="600">CI: build, scan, sign</text><text class="sub" x="220" y="365" text-anchor="middle">Semgrep, Bandit, pip-audit, gitleaks, Trivy, cosign</text><line class="arrow" x1="220" y1="378" x2="220" y2="398"/><path class="head" d="M215 397 L225 397 L220 404 Z"/><rect class="warn" x="20" y="404" width="400" height="54" rx="6"/><text x="220" y="426" text-anchor="middle" font-weight="600">CI: kind with Calico</text><text class="sub" x="220" y="445" text-anchor="middle">NetworkPolicy, Pod Security restricted, ZAP baseline</text></svg><figcaption>A request passes request-context and body-size middleware, then a scope check with a per-key rate limit, then scoring and SQLite storage. Separately, CI builds the image, scans it, deploys it to kind and tests the network and pod-security controls.</figcaption></figure>
-
-<h2>Three implementation points</h2>
-<div class="prose">
-<h3>Key checks that do not leak timing</h3>
-<p>Keys are 256-bit random values and the server stores only their SHA-256. <code>KeyStore.authenticate</code> hashes the presented token and compares it against every stored digest with <code>hmac.compare_digest</code>, never exiting early, so response time does not reveal whether a key matched or how many bytes were right. A fast hash is deliberate: slow password hashes exist to protect low-entropy passwords, and running one on every request would hand an attacker a CPU lever. Coverage numbers do not show whether a test would notice this being broken, so <code>tests/test_mutation_kills.py</code> pins six defects that earlier survived the suite, including an early-exit comparison and <code>==</code> in place of <code>compare_digest</code>.</p>
-<h3>Limiters in the right order</h3>
-<p>A token bucket per API key returns 429 with <code>Retry-After</code>. A second limiter counts failed authentications per source address and is checked before any key is looked at, so a brute-force attempt is throttled instead of getting free guesses. The failure limiter uses <code>peek</code> and <code>charge</code> so that checking does not itself spend a token. Both are in memory, which is a stated limitation: they are per replica and reset on restart.</p>
-<h3>Controls proven by tests, and a hash-locked build</h3>
-<p>The kind job does not just render the Helm chart. <code>deploy/scripts/netpol-test.sh</code> starts a labeled pod that must reach the service, an unlabeled pod in the same namespace that must time out, checks that the kevgate pod cannot open an outbound HTTPS connection, and submits a privileged pod that Pod Security <code>restricted</code> must reject. A second script then confirms the three audit events that the repository's Sigma rules target are in the API server audit log. Dependencies are pinned in <code>requirements.lock</code> with hashes; CI and the Docker build install it with <code>--require-hashes</code>, <code>pip-audit</code> scans that exact file, and a weekly workflow fails if a fresh compile would change it.</p>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>survived the suite</li><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>killed by a test</li></ul>
+<div class="strips vt" style="--vt:strip-kevgate"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 6 mutants: 6 survived the suite"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>6</b> survived 227 tests</p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 6 mutants: 6 killed by a test"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>6</b> killed by 277 tests</p></div></div>
+</section>
+<section class="bench" data-bench="kevgate" aria-label="Recorded readings">
+<figure class="plate">
+<span class="plate-label">Plate 1</span>
+<div class="bench-static">
+<div class="scroll"><table class="tbl">
+<caption>The six mutants that survived the 227-test suite, and what 0.1.1 did about each</caption>
+<thead><tr><th scope="col">Mutant (a deliberate defect)</th><th scope="col">Before 0.1.1</th><th scope="col">0.1.1</th></tr></thead>
+<tbody>
+<tr><th scope="row">Early-exit key comparison</th><td data-label="Before 0.1.1">Survived</td><td data-label="0.1.1">Killed</td></tr>
+<tr><th scope="row"><code>==</code> in place of <code>hmac.compare_digest</code></th><td data-label="Before 0.1.1">Survived</td><td data-label="0.1.1">Killed</td></tr>
+<tr><th scope="row"><code>BEGIN</code> instead of <code>BEGIN IMMEDIATE</code></th><td data-label="Before 0.1.1">Survived</td><td data-label="0.1.1">Killed</td></tr>
+<tr><th scope="row">Body size counted from the last chunk only</th><td data-label="Before 0.1.1">Survived</td><td data-label="0.1.1">Killed</td></tr>
+<tr><th scope="row">CSV merge taking the minimum CVSS</th><td data-label="Before 0.1.1">Survived</td><td data-label="0.1.1">Killed</td></tr>
+<tr><th scope="row">Upsert skipping EPSS</th><td data-label="Before 0.1.1">Survived</td><td data-label="0.1.1">Killed</td></tr>
+</tbody>
+</table></div>
 </div>
-
-<h2>Evidence from real runs</h2>
-<p class="small muted">Run on 2026-11-10 from a fresh clone of <code>main</code> (commit b08a920), Python 3.12.2, on localhost (port 8765, shown as 8000 below). Production mode with a generated key file and the rate limit set to 6 per minute. The data is synthetic (real CVE IDs, invented assets and scores) and the KEV catalog is the 5-entry sample bundled with the repo. Keys shown as placeholders; they were throwaway keys for this run.</p>
-<pre data-copy><code>$ curl -si localhost:8000/queue            # no key
+<div class="bench-live" data-bench-mount hidden></div>
+<figcaption><b>Coverage did not show whether a test would notice each defect, so each one is now pinned by a test.</b> List from the repository's CHANGELOG 0.1.1; the tests are in <code>tests/test_mutation_kills.py</code>.</figcaption>
+</figure>
+</section>
+<article class="record">
+<section class="section" id="as-found" aria-labelledby="found-h">
+<h2 id="found-h"><span class="label sec-label">As found</span>Six defects survived the test suite</h2>
+<div class="prose">
+<p>Coverage numbers do not show whether a test would notice a defect being introduced.<sup class="nref" aria-hidden="true"></sup> The review round after the first release found six deliberate defects (mutants) that the 227-test suite did not catch.</p>
+<p>They included an early-exit key comparison and <code>==</code> in place of <code>compare_digest</code> in the authentication check, both of which would leak timing, and a body-size limit that counted only the last chunk. Release 0.1.1 adds the tests that kill all six and brings the suite to 277.</p>
+</div>
+<aside class="note"><strong>A mutant</strong> is a copy of the code with one deliberate defect. A test suite kills it if at least one test fails; a mutant that survives shows a check nobody was making.</aside>
+<div class="scroll wide"><table class="tbl">
+<caption>Reading ledger</caption>
+<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
+<tbody>
+<tr class="row-fail"><th scope="row">Six mutants against the suite before 0.1.1</th><td data-label="Expected">A failing test for each</td><td data-label="Observed">All 227 tests passed with each one in place</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md">CHANGELOG 0.1.1</a></td></tr>
+</tbody>
+</table></div>
+</section>
+<section class="section" id="as-left" aria-labelledby="left-h">
+<h2 id="left-h"><span class="label sec-label">As left</span>Six mutants killed, and controls tested in CI</h2>
+<div class="prose">
+<p>The six mutants are now killed by tests pinned in <code>tests/test_mutation_kills.py</code>, and the controls the README promises are tested in CI rather than described. Run on 2026-11-10 from a fresh clone of <code>main</code> (commit b08a920), Python 3.12.2, on localhost (port 8765, shown as 8000 below). Production mode with a generated key file and the rate limit set to 6 per minute. The data is synthetic (real CVE IDs, invented assets and scores) and the KEV catalog is the 5-entry sample bundled with the repo. Keys shown as placeholders; they were throwaway keys for this run.</p>
+</div>
+<pre data-copy data-label="curl against a local kevgate: auth, scopes, ingest"><code>$ curl -si localhost:8000/queue            # no key
 HTTP/1.1 401 Unauthorized
 www-authenticate: Bearer realm="kevgate"
 {"detail":"missing or malformed bearer token"}
@@ -85,8 +127,10 @@ $ curl -si -X POST localhost:8000/findings -H "Authorization: Bearer $SCANNER_KE
     -H "Content-Type: application/json" -d @seed.json
 HTTP/1.1 201 Created
 {"accepted":6}</code></pre>
+<div class="prose">
 <p>The ranked queue, reformatted from the JSON response. The two highest-CVSS non-KEV findings (9.8) rank below a KEV finding with CVSS 8.8, which is the point of the scoring:</p>
-<pre data-copy><code>$ curl -s "localhost:8000/queue?limit=6" -H "Authorization: Bearer $ANALYST_KEY"
+</div>
+<pre data-copy data-label="GET /queue?limit=6"><code>$ curl -s "localhost:8000/queue?limit=6" -H "Authorization: Bearer $ANALYST_KEY"
 risk  kev    cve              asset       acr  cvss  epss
 99.2  true   CVE-2024-3400    fw-edge-01    8  10.0  0.96
 97.1  true   CVE-2021-34527   dc-01         8   8.8  0.97
@@ -94,7 +138,7 @@ risk  kev    cve              asset       acr  cvss  epss
 91.8  true   CVE-2023-4966    vpn-02        6   9.4  0.94
 37.1  false  CVE-2023-38545   build-03      3   9.8  0.50
 34.4  false  CVE-2022-42889   app-07        4   9.8  0.20</code></pre>
-<pre data-copy><code>$ (8 requests) curl -s -o /dev/null -w "%{http_code}" localhost:8000/stats -H "Authorization: Bearer $BURST_KEY"
+<pre data-copy data-label="Rate limit and metrics"><code>$ (8 requests) curl -s -o /dev/null -w "%{http_code}" localhost:8000/stats -H "Authorization: Bearer $BURST_KEY"
 request 1 -> 200  ...  request 6 -> 200
 request 7 -> 429
 request 8 -> 429
@@ -117,37 +161,47 @@ kevgate_auth_failures_total{reason="forbidden"} 1.0
 kevgate_rate_limited_total 3.0
 kevgate_kev_entries 5.0</code></pre>
 <p class="trim">Trimmed: JSON bodies reflowed into a table; response headers other than the status line, <code>www-authenticate</code> and <code>retry-after</code> removed; the <code>/metrics</code> command is a simplified filter, and the full output also has duration histograms and <code>_created</code> series. The eight stats requests were a shell loop, written in short form here.</p>
-
-<h2 id="ci">CI evidence</h2>
-<p class="prose">Four workflows ran green on the merge commit of PR #2 (<code>b08a920</code>), and the release workflow ran on the tag. The results column is from the repository's own docs, which summarize those runs.</p>
-<section class="scroll" tabindex="0" aria-label="kevgate CI evidence table">
-<table>
-<thead><tr><th scope="col">Workflow</th><th scope="col">What it checks</th><th scope="col">Run</th></tr></thead>
-<tbody>
-<tr><th scope="row">ci</th><td>ruff, mypy, pytest with coverage, on Python 3.11 and 3.12; dependencies from the hashed lock</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666365">42956666365</a></td></tr>
-<tr><th scope="row">security</th><td>Semgrep (160 rules, 0 findings), Bandit, pip-audit on the lock, gitleaks, checkov, Trivy on the image (0 fixable HIGH/CRITICAL), container smoke test</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666346">42956666346</a></td></tr>
-<tr><th scope="row">deploy-kind</th><td>kind with Calico: 12 smoke checks, NetworkPolicy ingress and egress, Pod Security restricted rejects a privileged pod, Sigma-targeted audit events present, ZAP baseline (67 rules pass, 0 failures)</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666404">42956666404</a></td></tr>
-<tr><th scope="row">terraform</th><td>validate, checkov, <code>terraform test</code> on the OIDC trust policy, apply and destroy against LocalStack</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666367">42956666367</a></td></tr>
-<tr><th scope="row">release</th><td>Build, scan, push to GHCR, cosign keyless signature, SBOM and provenance attestations, signature verified in the same run</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42960813836">42960813836</a></td></tr>
-</tbody>
-</table>
-</section>
-
-<h2>Results</h2>
-<section class="scroll" tabindex="0" aria-label="kevgate results table">
-<table>
+<div class="scroll wide"><table class="tbl">
+<caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests on main</th><td>277 collected and passing; 99.92% coverage with branches (1092 statements, 0 missed)</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666365">ci run 42956666365</a>; <a href="https://github.com/samiali38183/kevgate#tests-and-quality">README</a></td></tr>
-<tr><th scope="row">Release</th><td>v0.1.1 (<code>973c8c1</code>) includes the hardening round (277 tests). v0.1.0 was the first release.</td><td><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">GitHub release</a></td></tr>
-<tr><th scope="row">Image</th><td>Signed with cosign (keyless), with SBOM (104 components) and provenance attestations</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42960813836">release run 42960813836</a> (v0.1.1; v0.1.0: <a href="https://github.com/samiali38183/kevgate/actions/runs/42922880036">42922880036</a>)</td></tr>
-<tr><th scope="row">ZAP baseline</th><td>67 rules pass, 0 warnings, 0 failures</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666404">deploy-kind run</a>; <a href="https://github.com/samiali38183/kevgate/blob/main/docs/PIPELINE.md">PIPELINE.md</a></td></tr>
-<tr><th scope="row">Terraform</th><td>20 resources applied to LocalStack, no drift on a second plan; checkov 0 failed</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666367">terraform run</a>; <a href="https://github.com/samiali38183/kevgate/blob/main/docs/DEPLOYMENT.md">DEPLOYMENT.md</a></td></tr>
+<tr><th scope="row">Tests on main</th><td data-label="Value">277 collected and passing; 99.92% coverage with branches (1092 statements, 0 missed)</td><td data-label="Source"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666365"><span class="st" aria-hidden="true"></span><span>run 42956666365</span> <span class="d">passed 2026-11-11</span></a> (ci); <a href="https://github.com/samiali38183/kevgate#tests-and-quality">README</a></td></tr>
+<tr><th scope="row">Release</th><td data-label="Value">v0.1.1 (<code>973c8c1</code>) includes the hardening round (277 tests). v0.1.0 was the first release.</td><td data-label="Source"><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">GitHub release</a></td></tr>
+<tr><th scope="row">Image</th><td data-label="Value">Signed with cosign (keyless), with SBOM (104 components) and provenance attestations</td><td data-label="Source"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960813836"><span class="st" aria-hidden="true"></span><span>run 42960813836</span> <span class="d">passed 2026-11-11</span></a> (v0.1.1; v0.1.0: <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42922880036"><span class="st" aria-hidden="true"></span><span>run 42922880036</span> <span class="d">passed 2026-11-10</span></a>)</td></tr>
+<tr><th scope="row">ZAP baseline</th><td data-label="Value">67 rules pass, 0 warnings, 0 failures</td><td data-label="Source"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666404"><span class="st" aria-hidden="true"></span><span>run 42956666404</span> <span class="d">passed 2026-11-11</span></a> (deploy-kind); <a href="https://github.com/samiali38183/kevgate/blob/main/docs/PIPELINE.md">PIPELINE.md</a></td></tr>
+<tr><th scope="row">Terraform</th><td data-label="Value">20 resources applied to LocalStack, no drift on a second plan; checkov 0 failed</td><td data-label="Source"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666367"><span class="st" aria-hidden="true"></span><span>run 42956666367</span> <span class="d">passed 2026-11-11</span></a> (terraform); <a href="https://github.com/samiali38183/kevgate/blob/main/docs/DEPLOYMENT.md">DEPLOYMENT.md</a></td></tr>
 </tbody>
-</table>
+</table></div>
 </section>
-
-<h2>Limitations</h2>
+<section class="section" id="method" aria-labelledby="method-h">
+<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<h3>The problem</h3>
+<div class="prose">
+<p>A raw scanner export sorts by CVSS, which puts a theoretical 9.8 ahead of a 7.5 that attackers are using today. KEV membership is the strongest prioritization signal that is freely available, so the service makes it the dominant factor and uses the rest to order everything else.</p>
+<p>The second question is whether a small service like this can be shipped the way a production team would, with the security controls tested rather than described.</p>
+</div>
+<h3>What it does</h3>
+<div class="prose">
+<p>The score is <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>, from 0 to 100.<sup class="nref" aria-hidden="true"></sup> The KEV weight equals the EPSS and CVSS weights combined, so a KEV finding never scores below a non-KEV finding on an asset with the same criticality; the one degenerate tie is broken in favor of KEV.</p>
+</div>
+<aside class="note"><strong>KEV</strong> is CISA's Known Exploited Vulnerabilities catalog: CVEs with evidence of exploitation in the wild. <strong>EPSS</strong> is a probability, from 0 to 1, that a CVE will be exploited in the next 30 days.</aside>
+<div class="prose">
+<p>The API takes JSON findings or a Nessus/Tenable CSV export, upserts on (CVE, asset), and serves a ranked <code>/queue</code>, per-CVE views and stats. Scopes are <code>findings:write</code>, <code>queue:read</code> and <code>admin</code>. There are health, readiness and Prometheus endpoints, and a separate CLI command refreshes the KEV file from CISA so the API process never makes outbound calls.</p>
+</div>
+<figure class="plate diagram"><span class="plate-label">Plate 2</span><svg viewBox="0 0 320 600" role="img" aria-labelledby="kevgate-t kevgate-d"><title id="kevgate-t">kevgate request path and delivery pipeline</title><desc id="kevgate-d">A request passes request-context and body-size middleware, then a scope check with a per-key rate limit, then scoring and SQLite storage. Separately, CI builds the image, scans it, deploys it to kind and tests the network and pod-security controls.</desc><rect x="26" y="4" width="290" height="77"/><text x="38" y="26" font-weight="600" font-size="14">Scanner or analyst, Bearer key</text><text class="sub" x="38" y="44" font-size="13">JSON or Nessus/Tenable CSV in,</text><text class="sub" x="38" y="61" font-size="13">ranked queue out</text><circle class="letter" cx="12" cy="16" r="9"/><text class="lt" x="12" y="20">A</text><path class="arrow" d="M171 81 V106"/><path class="head" d="M166 99 L171 106 L176 99"/><rect x="26" y="107" width="290" height="77"/><text x="38" y="129" font-weight="600" font-size="14">Middleware</text><text class="sub" x="38" y="147" font-size="13">request id, JSON log, metrics, 1</text><text class="sub" x="38" y="164" font-size="13">MiB body limit</text><circle class="letter" cx="12" cy="119" r="9"/><text class="lt" x="12" y="123">B</text><path class="arrow" d="M171 184 V209"/><path class="head" d="M166 202 L171 209 L176 202"/><rect class="hi" x="26" y="210" width="290" height="77"/><text x="38" y="232" font-weight="600" font-size="14">Auth and rate limit</text><text class="sub" x="38" y="250" font-size="13">constant-time key check, scopes,</text><text class="sub" x="38" y="267" font-size="13">token bucket</text><circle class="letter" cx="12" cy="222" r="9"/><text class="lt" x="12" y="226">C</text><path class="arrow" d="M171 287 V312"/><path class="head" d="M166 305 L171 312 L176 305"/><rect x="26" y="313" width="290" height="77"/><text x="38" y="335" font-weight="600" font-size="14">Scoring and repository</text><text class="sub" x="38" y="353" font-size="13">KEV, EPSS, CVSS, ACR;</text><text class="sub" x="38" y="370" font-size="13">parameterised SQL on SQLite</text><circle class="letter" cx="12" cy="325" r="9"/><text class="lt" x="12" y="329">D</text><path class="arrow" d="M171 390 V415"/><path class="head" d="M166 408 L171 415 L176 408"/><rect x="26" y="416" width="290" height="77"/><text x="38" y="438" font-weight="600" font-size="14">CI: build, scan, sign</text><text class="sub" x="38" y="456" font-size="13">Semgrep, Bandit, pip-audit,</text><text class="sub" x="38" y="473" font-size="13">gitleaks, Trivy, cosign</text><circle class="letter" cx="12" cy="428" r="9"/><text class="lt" x="12" y="432">E</text><path class="arrow" d="M171 493 V518"/><path class="head" d="M166 511 L171 518 L176 511"/><rect class="warn" x="26" y="519" width="290" height="77"/><path class="hatch-line" d="M26 596 l20 -20 M26 588 l8 -8 M34 596 l12 -12"/><text x="38" y="541" font-weight="600" font-size="14">CI: kind with Calico</text><text class="sub" x="38" y="559" font-size="13">NetworkPolicy, Pod Security</text><text class="sub" x="38" y="576" font-size="13">restricted, ZAP baseline</text><circle class="letter" cx="12" cy="531" r="9"/><text class="lt" x="12" y="535">F</text></svg><figcaption>A request passes request-context and body-size middleware, then a scope check with a per-key rate limit, then scoring and SQLite storage. Separately, CI builds the image, scans it, deploys it to kind and tests the network and pod-security controls.</figcaption><details class="alt"><summary>Describe this diagram</summary><ol class="alt-list" type="A"><li><strong>Scanner or analyst, Bearer key.</strong> JSON or Nessus/Tenable CSV in, ranked queue out.</li><li><strong>Middleware.</strong> request id, JSON log, metrics, 1 MiB body limit.</li><li><strong>Auth and rate limit.</strong> constant-time key check, scopes, token bucket.</li><li><strong>Scoring and repository.</strong> KEV, EPSS, CVSS, ACR; parameterised SQL on SQLite.</li><li><strong>CI: build, scan, sign.</strong> Semgrep, Bandit, pip-audit, gitleaks, Trivy, cosign.</li><li><strong>CI: kind with Calico.</strong> NetworkPolicy, Pod Security restricted, ZAP baseline.</li></ol></details></figure>
+<h3>Three implementation points</h3>
+<div class="prose">
+<h4>Key checks that do not leak timing</h4>
+<p>Keys are 256-bit random values and the server stores only their SHA-256. <code>KeyStore.authenticate</code> hashes the presented token and compares it against every stored digest with <code>hmac.compare_digest</code>, never exiting early, so response time does not reveal whether a key matched or how many bytes were right. A fast hash is deliberate: slow password hashes exist to protect low-entropy passwords, and running one on every request would hand an attacker a CPU lever.</p>
+<h4>Limiters in the right order</h4>
+<p>A token bucket per API key returns 429 with <code>Retry-After</code>. A second limiter counts failed authentications per source address and is checked before any key is looked at, so a brute-force attempt is throttled instead of getting free guesses. The failure limiter uses <code>peek</code> and <code>charge</code> so that checking does not itself spend a token. Both are in memory, which is a stated limitation: they are per replica and reset on restart.</p>
+<h4>Controls proven by tests, and a hash-locked build</h4>
+<p>The kind job does not just render the Helm chart. <code>deploy/scripts/netpol-test.sh</code> starts a labeled pod that must reach the service, an unlabeled pod in the same namespace that must time out, checks that the kevgate pod cannot open an outbound HTTPS connection, and submits a privileged pod that Pod Security <code>restricted</code> must reject. A second script then confirms the three audit events that the repository's Sigma rules target are in the API server audit log. Dependencies are pinned in <code>requirements.lock</code> with hashes; CI and the Docker build install it with <code>--require-hashes</code>, <code>pip-audit</code> scans that exact file, and a weekly workflow fails if a fresh compile would change it.</p>
+</div>
+</section>
+</article>
+<section class="limits section" id="limits" aria-labelledby="limits-h">
+<h2 id="limits-h"><span class="label sec-label">Tolerance and limits</span>What the numbers do not show</h2>
 <ul class="prose">
 <li><strong>Nothing is deployed to a real AWS account.</strong> The Terraform (ECR, reports bucket, KMS key, workload and CI roles) was applied only to LocalStack, and the service does not call AWS. Releases go to GHCR.</li>
 <li><strong>One replica, SQLite on one volume, <code>Recreate</code> rollouts.</strong> That is a demonstration scope; <a href="https://github.com/samiali38183/kevgate/blob/main/docs/DEPLOYMENT.md#what-would-change-for-production">DEPLOYMENT.md</a> lists what production would change. The rate limiter is per process.</li>
@@ -156,6 +210,27 @@ kevgate_kev_entries 5.0</code></pre>
 <li><strong>Coarse access control.</strong> Three scopes, no per-asset authorization, and no key expiry or rotation workflow.</li>
 <li><strong>Bundled KEV file is a 5-entry sample.</strong> <code>kevgate kev-refresh</code> downloads the real catalog; the demo above used the sample.</li>
 </ul>
+</section>
+<section class="section" id="trace" aria-labelledby="trace-h">
+<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<dl class="trace"><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">v0.1.1 (973c8c1)</a></dd></div><div><dt>Tests run (ci)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666365"><span class="st" aria-hidden="true"></span><span>run 42956666365</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Kind cluster controls (deploy-kind)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666404"><span class="st" aria-hidden="true"></span><span>run 42956666404</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release run, v0.1.1</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960813836"><span class="st" aria-hidden="true"></span><span>run 42960813836</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Mutation tests</dt><dd><a href="https://github.com/samiali38183/kevgate/blob/main/tests/test_mutation_kills.py">tests/test_mutation_kills.py</a></dd></div><div><dt>Changelog</dt><dd><a href="https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md">CHANGELOG 0.1.1</a></dd></div></dl>
+<h3>CI evidence</h3>
+<div class="prose"><p>Four workflows ran green on the merge commit of PR #2 (<code>b08a920</code>), and the release workflow ran on the tag. The results column is from the repository's own docs, which summarize those runs.</p></div>
+<div class="scroll wide"><table class="tbl">
+<caption>Workflows and what each checks</caption>
+<thead><tr><th scope="col">Workflow</th><th scope="col">What it checks</th><th scope="col">Run</th></tr></thead>
+<tbody>
+<tr><th scope="row">ci</th><td data-label="What it checks">ruff, mypy, pytest with coverage, on Python 3.11 and 3.12; dependencies from the hashed lock</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666365"><span class="st" aria-hidden="true"></span><span>run 42956666365</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">security</th><td data-label="What it checks">Semgrep (160 rules, 0 findings), Bandit, pip-audit on the lock, gitleaks, checkov, Trivy on the image (0 fixable HIGH/CRITICAL), container smoke test</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666346"><span class="st" aria-hidden="true"></span><span>run 42956666346</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">deploy-kind</th><td data-label="What it checks">kind with Calico: 12 smoke checks, NetworkPolicy ingress and egress, Pod Security restricted rejects a privileged pod, Sigma-targeted audit events present, ZAP baseline (67 rules pass, 0 failures)</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666404"><span class="st" aria-hidden="true"></span><span>run 42956666404</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">terraform</th><td data-label="What it checks">validate, checkov, <code>terraform test</code> on the OIDC trust policy, apply and destroy against LocalStack</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666367"><span class="st" aria-hidden="true"></span><span>run 42956666367</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">release</th><td data-label="What it checks">Build, scan, push to GHCR, cosign keyless signature, SBOM and provenance attestations, signature verified in the same run</td><td data-label="Run"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960813836"><span class="st" aria-hidden="true"></span><span>run 42960813836</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+</tbody>
+</table></div>
+</section>
+<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/sinkline/"><span class="label">Previous sheet, 2 of 6</span><span class="n">sinkline</span></a><a class="next" href="/projects/kevgate-admit/"><span class="label">Next sheet, 4 of 6</span><span class="n">kevgate-admit</span></a></nav>
+</div>
 </main>
 <footer class="site-footer">
 <div class="wrap">
@@ -168,6 +243,6 @@ kevgate_kev_entries 5.0</code></pre>
 <p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
 </div>
 </footer>
-<script src="/site.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
 </body>
 </html>

@@ -4,57 +4,106 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>kev-risk-prioritization | Sami Ali</title>
-<meta name="description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample.">
+<meta name="description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample: 12 of 12 top slots are KEV findings, against 9 for a CVSS-only sort.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kev-risk-prioritization/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0a58ad">
+<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kev-risk-prioritization | Sami Ali">
-<meta property="og:description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample.">
+<meta property="og:description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample: 12 of 12 top slots are KEV findings, against 9 for a CVSS-only sort.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kev-risk-prioritization/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kev-risk-prioritization | Sami Ali">
-<meta name="twitter:description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample.">
-<link rel="stylesheet" href="/styles.css">
+<meta name="twitter:description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample: 12 of 12 top slots are KEV findings, against 9 for a CVSS-only sort.">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
+<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css">
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-<div class="wrap">
+<div class="wrap head-row">
 <a class="brand" href="/">Sami Ali</a>
-<nav class="site-nav" aria-label="Main">
+<nav class="site-nav" aria-label="Primary">
 <ul>
-<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/projects/" aria-current="true">Work</a></li>
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" hidden>Dark theme</button></li>
+<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
+<p class="wrap sheetline"><b>Sheet 6 of 6</b> &middot; kev-risk-prioritization &middot; main</p>
 </header>
 <main id="main" class="wrap">
-<p class="crumbs"><a href="/projects/">Projects</a> / kev-risk-prioritization</p>
+<div class="sheet">
+<header class="title">
 <h1>kev-risk-prioritization</h1>
-<p class="lede prose">A standard-library Python script that ranks scan findings with KEV status first. It is the scoring idea behind <a href="/projects/kevgate/">kevgate</a>, kept as a small stand-alone tool.</p>
-<ul class="links">
-<li><a href="https://github.com/samiali38183/kev-risk-prioritization">Repository</a></li>
-<li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">Methodology</a></li>
-<li><a href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636">CI run (main)</a></li>
-</ul>
+<p class="dek">A standard-library Python script that ranks scan findings with KEV status first. It is the scoring idea behind <a href="/projects/kevgate/">kevgate</a>, kept as a small stand-alone tool.</p>
+<ul class="linkrow"><li><a href="https://github.com/samiali38183/kev-risk-prioritization">Repository</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">Methodology</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636">CI run (main)</a></li></ul>
 
-<div class="callout"><p><strong>Everything here runs on synthetic data.</strong> The sample uses real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. It shows how the ordering behaves, not what any real environment looks like. No DHS or CBP data is involved.</p></div>
-
-<h2>What it does</h2>
-<div class="prose">
-<p>CVSS says how bad a flaw could be, not whether anyone is using it. The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it with the same formula as kevgate: KEV 0.40, asset criticality 0.25, EPSS 0.20, CVSS 0.20, normalized to 0 to 100. Ties break on EPSS, then CVSS. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison.</p>
-<p>The EPSS and asset-criticality terms and all the weights are this project's own design. They are not inputs of CISA BOD 26-04, which ties urgency to KEV status, exposure, automatability and technical impact.</p>
+</header>
+<section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>kev-risk-prioritization, main at commit 597c1f7</dd></div>
+<div><dt>Reference standard</dt><dd>a CVSS-only sort of the same 20 synthetic findings</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-10, fresh clone, 9 tests pass</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ python"><code>python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json</code></pre></dd></div>
+</dl>
+</section>
+<section class="reading-band" aria-label="The reading">
+<div class="hero-read">
+<p class="reading sm" role="img" aria-label="Reading: 12/12 top slots held by KEV findings"><span aria-hidden="true">12</span><span class="den" aria-hidden="true">/12</span></p>
+<div>
+<p class="why">On a synthetic 20-finding sample the risk score puts all 12 KEV findings in its top 12. A CVSS-only sort of the same findings puts 9 there.</p>
+<p class="chips"><span class="stamp limit">Synthetic data</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636"><span class="st" aria-hidden="true"></span><span>run 42134748636</span> <span class="d">passed 2026-11-06</span></a></p>
 </div>
-
-<h2>Evidence from a real run</h2>
-<p class="small muted">Run on 2026-11-10 from a fresh clone (commit 597c1f7): 9 tests pass.</p>
-<pre data-copy><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14
+</div>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>KEV finding</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>non-KEV finding</li></ul>
+<div class="strips vt" style="--vt:strip-kev-risk-prioritization"><div class="srow"><span class="label" aria-hidden="true">CVSS only</span><div class="strip" role="img" aria-label="CVSS only, 12 top-12 slots: 9 KEV finding, 3 non-KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss" class="m" data-n="10"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>9</b> KEV findings in the top 12</p></div><div class="srow"><span class="label" aria-hidden="true">Risk score</span><div class="strip" role="img" aria-label="Risk score, 12 top-12 slots: 12 KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>12</b> KEV findings in the top 12</p></div></div>
+</section>
+<section class="bench" data-bench="kev-risk-prioritization" aria-label="Recorded readings">
+<figure class="plate">
+<span class="plate-label">Plate 1</span>
+<div class="bench-static">
+<div class="scroll"><table class="tbl">
+<caption>KEV findings among the top 12 of 20 synthetic findings</caption>
+<thead><tr><th scope="col">Ordering</th><th scope="col" class="num">KEV findings in the top 12</th><th scope="col" class="num">Non-KEV findings in the top 12</th></tr></thead>
+<tbody>
+<tr><th scope="row">CVSS only</th><td class="num" data-label="KEV findings in the top 12">9</td><td class="num" data-label="Non-KEV findings in the top 12">3</td></tr>
+<tr><th scope="row">Risk score</th><td class="num" data-label="KEV findings in the top 12"><b class="best">12</b></td><td class="num" data-label="Non-KEV findings in the top 12"><b class="best">0</b></td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="bench-live" data-bench-mount hidden></div>
+<figcaption><b>A CVSS-only sort ranks three non-KEV findings among the top 12; the risk score ranks none.</b> The sample has 12 KEV and 8 non-KEV findings, all synthetic.</figcaption>
+</figure>
+</section>
+<article class="record">
+<section class="section" id="as-found" aria-labelledby="found-h">
+<h2 id="found-h"><span class="label sec-label">As found</span>A CVSS-only sort leaves KEV findings out of the top 12</h2>
+<div class="callout"><p><strong>Everything here runs on synthetic data.</strong> The sample uses real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. It shows how the ordering behaves, not what any real environment looks like. No DHS or CBP data is involved.</p></div>
+<div class="prose">
+<p>CVSS says how bad a flaw could be, not whether anyone is using it.<sup class="nref" aria-hidden="true"></sup> On this sample a CVSS-only sort puts 9 KEV findings in its top 12. The average CVSS of the two groups differs by 1.19, and the average EPSS by 0.906.</p>
+</div>
+<aside class="note"><strong>CVSS</strong> scores the severity of a flaw from 0 to 10. <strong>KEV</strong> is CISA's list of CVEs known to be exploited in the wild.</aside>
+</section>
+<section class="section" id="as-left" aria-labelledby="left-h">
+<h2 id="left-h"><span class="label sec-label">As left</span>The risk score puts all 12 KEV findings first</h2>
+<div class="prose"><p>Run on 2026-11-10 from a fresh clone (commit 597c1f7): 9 tests pass. The risk score puts all 12 KEV findings in its top 12.</p></div>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>KEV finding</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>non-KEV finding</li></ul>
+<div class="strips"><div class="srow"><span class="label" aria-hidden="true">CVSS only</span><div class="strip" role="img" aria-label="CVSS only, 12 top-12 slots: 9 KEV finding, 3 non-KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss" class="m" data-n="10"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>9</b> KEV findings in the top 12</p></div><div class="srow"><span class="label" aria-hidden="true">Risk score</span><div class="strip" role="img" aria-label="Risk score, 12 top-12 slots: 12 KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>12</b> KEV findings in the top 12</p></div></div>
+<pre data-copy data-label="$ python kev_prioritize.py ... --top 14"><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14
   #  risk  KEV CVE              CVSS  EPSS ACR days  asset
   1  99.4  yes CVE-2021-44228   10.0 0.970   8   42  web-portal-01
   2  99.0  yes CVE-2024-3400    10.0 0.950   8    9  fw-edge-01
@@ -69,9 +118,17 @@ KEV vs non-KEV population
   kev      n=12  avg CVSS 9.53  avg EPSS 0.935  avg days open 94.2
   non_kev  n=8   avg CVSS 8.34  avg EPSS 0.029  avg days open 101.5</code></pre>
 <p class="trim">Trimmed: rows 4 to 10 and the KEV concentration line removed.</p>
-<p class="prose">On this sample a CVSS-only sort puts 9 KEV findings in its top 12; the risk score puts all 12 there. The average CVSS of the two groups differs by 1.19, and the average EPSS by 0.906.</p>
-
-<h2>Limitations</h2>
+</section>
+<section class="section" id="method" aria-labelledby="method-h">
+<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<div class="prose">
+<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it with the same formula as kevgate: KEV 0.40, asset criticality 0.25, EPSS 0.20, CVSS 0.20, normalized to 0 to 100. Ties break on EPSS, then CVSS. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison.</p>
+<p>The EPSS and asset-criticality terms and all the weights are this project's own design. They are not inputs of CISA BOD 26-04, which ties urgency to KEV status, exposure, automatability and technical impact.</p>
+</div>
+</section>
+</article>
+<section class="limits section" id="limits" aria-labelledby="limits-h">
+<h2 id="limits-h"><span class="label sec-label">Tolerance and limits</span>What the numbers do not show</h2>
 <ul class="prose">
 <li>Synthetic data, so the results say nothing about real remediation.</li>
 <li>It uses CVSS and EPSS values you supply; it does not query NVD or the EPSS API. Live mode fetches only the KEV catalog.</li>
@@ -79,6 +136,15 @@ KEV vs non-KEV population
 <li>No per-finding due dates against BOD 26-04; age is reported as an average per group.</li>
 <li>The weights are a starting point and have not been validated against outcomes.</li>
 </ul>
+</section>
+<section class="section" id="trace" aria-labelledby="trace-h">
+<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<dl class="trace"><div><dt>CI run on main</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636"><span class="st" aria-hidden="true"></span><span>run 42134748636</span> <span class="d">passed 2026-11-06</span></a></dd></div><div><dt>Methodology</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">docs/methodology.md</a></dd></div><div><dt>Sample data</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/tree/main/data">data/</a></dd></div></dl>
+
+</section>
+<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/fuzzdiff/"><span class="label">Previous sheet, 5 of 6</span><span class="n">fuzzdiff</span></a></nav>
+</div>
 </main>
 <footer class="site-footer">
 <div class="wrap">
@@ -91,6 +157,6 @@ KEV vs non-KEV population
 <p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
 </div>
 </footer>
-<script src="/site.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
 </body>
 </html>

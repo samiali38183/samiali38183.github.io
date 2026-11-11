@@ -203,7 +203,7 @@ def diagram(key_: str, number: int | None = None) -> str:
     height = y - gap + 4
     svg = (f'<svg viewBox="0 0 {vb_w} {height}" role="img" aria-labelledby="{key_}-t {key_}-d">'
            f'<title id="{key_}-t">{esc(title)}</title><desc id="{key_}-d">{esc(desc)}</desc>{"".join(parts)}</svg>')
-    label = f'<span class="plate-label">{f"Diagram {number}" if number else "Diagram"}</span>'
+    label = '<span class="plate-label">Plate {{n}}</span>'
     return (f'<figure class="plate diagram">{label}{svg}<figcaption>{esc(desc)}</figcaption>'
             f'<details class="alt"><summary>Describe this diagram</summary><ol class="alt-list" type="A">{"".join(alt)}</ol></details></figure>')
 

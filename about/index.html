@@ -4,35 +4,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About | Sami Ali</title>
-<meta name="description" content="Student at George Mason University focused on detection engineering, application security and vulnerability management.">
+<meta name="description" content="Student at George Mason University focused on detection engineering, application security and vulnerability management, and on checking that security tooling does what it says.">
 <link rel="canonical" href="https://samiali38183.github.io/about/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0a58ad">
+<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="About | Sami Ali">
-<meta property="og:description" content="Student at George Mason University focused on detection engineering, application security and vulnerability management.">
+<meta property="og:description" content="Student at George Mason University focused on detection engineering, application security and vulnerability management, and on checking that security tooling does what it says.">
 <meta property="og:url" content="https://samiali38183.github.io/about/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="About | Sami Ali">
-<meta name="twitter:description" content="Student at George Mason University focused on detection engineering, application security and vulnerability management.">
-<link rel="stylesheet" href="/styles.css">
+<meta name="twitter:description" content="Student at George Mason University focused on detection engineering, application security and vulnerability management, and on checking that security tooling does what it says.">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
+<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css">
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-<div class="wrap">
+<div class="wrap head-row">
 <a class="brand" href="/">Sami Ali</a>
-<nav class="site-nav" aria-label="Main">
+<nav class="site-nav" aria-label="Primary">
 <ul>
-<li><a href="/projects/">Projects</a></li>
+<li><a href="/projects/">Work</a></li>
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/" aria-current="page">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" hidden>Dark theme</button></li>
+<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
+
 </header>
 <main id="main" class="wrap">
 <h1>About</h1>
@@ -42,6 +52,28 @@
 <p>I'm studying for the OSCP and the AWS Security Specialty so that the defensive work is informed by how the attacks run.</p>
 <p>I'm looking for internships in security engineering, product and application security, detection engineering, vulnerability research, cloud security and offensive security. I'm a U.S. citizen. The quickest way to reach me is <a href="mailto:samiali38183@gmail.com">email</a>; I'm also on <a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a> and <a href="https://github.com/samiali38183">GitHub</a>.</p>
 </div>
+
+<section class="section" aria-labelledby="rules">
+<h2 id="rules">How I check my work</h2>
+<ol class="rules">
+<li><h3>Run the stock thing first</h3><p>Before writing a replacement, run what already exists on recorded data. The stock SigmaHQ setuid rule matched 0 of 36 events. <a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a></p></li>
+<li><h3>Test the tests</h3><p>Coverage says a line ran, not that a test would notice it breaking. Six deliberate defects survived kevgate's 227 tests until each got a test of its own. <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666365"><span class="st" aria-hidden="true"></span><span>run 42956666365</span> <span class="d">passed 2026-11-11</span></a></p></li>
+<li><h3>Compare against the original</h3><p>fuzzdiff runs the C parser and the Rust port on the same bytes; three seeded bugs were caught, and a 500,000-input control stayed clean. <a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/42961733885"><span class="st" aria-hidden="true"></span><span>run 42961733885</span> <span class="d">passed 2026-11-11</span></a></p></li>
+<li><h3>State the limits where the number is</h3><p>sinkline's F1 of 0.992 comes from a 109-line benchmark labeled by its author, and its page says so next to the number. <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/42920168878"><span class="st" aria-hidden="true"></span><span>run 42920168878</span> <span class="d">passed 2026-11-10</span></a></p></li>
+</ol>
+</section>
+
+<section class="section" aria-labelledby="issued">
+<h2 id="issued">Issued by</h2>
+<div class="record-head">
+<dl>
+<div><dt>Name</dt><dd>Sami Ali</dd></div>
+<div><dt>Contact</dt><dd><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></dd></div>
+<div><dt>GitHub</dt><dd><a href="https://github.com/samiali38183">github.com/samiali38183</a></dd></div>
+<div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">linkedin.com/in/sami-ali-1a4b89345</a></dd></div>
+</dl>
+</div>
+</section>
 </main>
 <footer class="site-footer">
 <div class="wrap">
@@ -54,6 +86,6 @@
 <p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
 </div>
 </footer>
-<script src="/site.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
 </body>
 </html>

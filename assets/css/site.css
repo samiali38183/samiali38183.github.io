@@ -89,14 +89,15 @@ main{display:block;padding-block:var(--s-7) var(--s-8)}
 .sheet{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter)}
 .sheet>*{grid-column:1/-1;min-width:0}
 .record{display:grid;grid-template-columns:subgrid;grid-column:1/-1}
-.record>*{grid-column:1/9;min-width:0}
-.record>.wide{grid-column:1/-1}
-.record>.note{grid-column:9/13}
-@supports not (grid-template-columns:subgrid){.record{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter)}}
+.record section{display:grid;grid-template-columns:subgrid;grid-column:1/-1}
+.record section>*{grid-column:1/9;min-width:0}
+.record section>:is(h2,.wide,pre,.scroll,.plate,figure,.tbl){grid-column:1/-1}
+.record section>.note{grid-column:9/13}
+@supports not (grid-template-columns:subgrid){.record,.record section{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter)}}
 .section{padding-top:var(--s-7)}
 .section>h2{margin-bottom:var(--s-5)}
 .sec-label{display:block;margin-bottom:var(--s-2)}
-@media (max-width:63.99rem){.record>*,.record>.note{grid-column:1/-1}.record>.prose{max-width:none}}
+@media (max-width:63.99rem){.record section>*,.record section>.note{grid-column:1/-1}}
 
 /* 5. Components */
 /* header and footer */
@@ -111,7 +112,7 @@ main{display:block;padding-block:var(--s-7) var(--s-8)}
 #theme{font:400 var(--step--1)/1 var(--mono);background:transparent;color:var(--ink);border:1px solid var(--edge);padding:.6rem .8rem;min-height:2.75rem;cursor:pointer}
 #theme[aria-pressed=true]{background:var(--ink);color:var(--paper)}
 #theme:hover{border-color:var(--ink)}
-.sheetline{margin:0;padding-bottom:var(--s-3);font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2)}
+.sheetline{margin:0 auto;padding-bottom:var(--s-3);font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2)}
 .sheetline b{font-weight:600;color:var(--ink)}
 .site-footer{border-top:2px solid var(--ink);padding-block:var(--s-6) var(--s-7);font-size:var(--step--1)}
 .site-footer ul{display:flex;flex-wrap:wrap;gap:var(--s-2) var(--s-5);list-style:none;padding:0;margin:0 0 var(--s-4)}
@@ -146,6 +147,7 @@ main{display:block;padding-block:var(--s-7) var(--s-8)}
 .strip i[data-s=miss]{background:repeating-linear-gradient(45deg,var(--stamp) 0 1.5px,var(--hatch) 1.5px 4px);border-color:var(--stamp)}
 .strip i[data-s=pend]{border-style:dotted;border-color:var(--ink-2)}
 .strip i[data-s=fp]{background:linear-gradient(to top,var(--ink) 50%,transparent 50%);border-color:var(--ink)}
+.strips:not(.mini) .strip{padding-bottom:16px}
 .strips.mini{--tick-w:5px;--tick-h:16px;--tick-gap:2px}
 .strips.mini .srow{grid-template-columns:4.5rem minmax(0,1fr);margin-bottom:var(--s-3)}
 .strips.mini .strip{row-gap:2px}
@@ -182,6 +184,15 @@ main{display:block;padding-block:var(--s-7) var(--s-8)}
 .bench [hidden]{display:none}
 .diagram{padding:var(--s-4)}
 .diagram svg{display:block;width:100%;max-width:34rem;margin-inline:auto;color:var(--ink)}
+.diagram figcaption{margin-top:var(--s-4)}
+.alt{margin-top:var(--s-3);font-size:var(--step--1)}
+.alt summary{cursor:pointer;font-family:var(--mono);padding:.4rem 0}
+.alt-list{margin:var(--s-2) 0 0}
+.trace{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-3) var(--s-6);margin:0 0 var(--s-5)}
+.trace>div{border-top:1px solid var(--rule);padding-top:var(--s-2)}
+.trace dt{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.trace dd{margin:var(--s-1) 0 0}
+@media (max-width:47.99rem){.trace{grid-template-columns:1fr}.plate{padding:var(--s-3)}}
 .diagram svg text{font-family:var(--mono);fill:currentColor}
 .diagram svg .sub{fill:var(--ink-2)}
 .diagram svg rect{fill:var(--sheet);stroke:currentColor;stroke-width:1.5}
@@ -236,6 +247,7 @@ pre:not([data-label])::before{content:"";}
   .scroll{overflow:visible}
 }
 /* limits box */
+.limits.section{padding:var(--s-5);margin-top:var(--s-7)}
 .limits{border:2px solid var(--warn);background:var(--warn-tint);padding:var(--s-5);margin:0}
 .limits h2{font-size:var(--step-2);color:var(--ink)}
 .limits h2 .sec-label{color:var(--warn)}
@@ -313,7 +325,8 @@ ol.rules h3{margin:0 0 var(--s-2);font-size:var(--step-1)}
 .vt{view-transition-name:var(--vt)}
 @media (prefers-reduced-motion:no-preference){
   @supports (animation-timeline:view()){
-    .strip i{animation:tick-in linear both;animation-timeline:view();animation-range:entry calc(var(--i,0) * .4%) entry calc(40% + var(--i,0) * .4%)}
+    .strip i{--i:0;animation:tick-in linear both;animation-timeline:view();animation-range:entry calc(var(--i) * .5%) entry calc(40% + var(--i) * .5%)}
+    .strip i:nth-child(n+11){--i:10}.strip i:nth-child(n+21){--i:20}.strip i:nth-child(n+31){--i:30}.strip i:nth-child(n+41){--i:40}.strip i:nth-child(n+51){--i:50}.strip i:nth-child(n+61){--i:60}.strip i:nth-child(n+71){--i:70}.strip i:nth-child(n+81){--i:80}.strip i:nth-child(n+91){--i:90}.strip i:nth-child(n+101){--i:100}
     .key .strip i,.strips.mini .strip i{animation:none}
     @keyframes tick-in{from{opacity:.15;transform:scaleY(.4)}to{opacity:1;transform:none}}
   }
