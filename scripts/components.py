@@ -95,7 +95,7 @@ def key(sset: dict) -> str:
 # Verdict stamp and evidence chip
 # ---------------------------------------------------------------------------------------------
 def stamp(kind: str, text: str) -> str:
-    assert kind in ("fail", "pass", "limit", "pend", "plain"), kind
+    assert kind in ("fail", "pass", "limit", "pend", "off", "plain"), kind
     cls = "stamp" + ("" if kind == "plain" else f" {kind}")
     return f'<span class="{cls}">{esc(text)}</span>'
 
