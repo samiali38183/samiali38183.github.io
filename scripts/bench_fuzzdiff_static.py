@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from html import escape as esc
 from pathlib import Path
 
@@ -169,3 +170,41 @@ def mutants_panel() -> str:
         + '<p class="small muted">Each tick is a factor of about 3.2 in generated inputs (half a decade), so a short strip means little input was needed; the counts in the table are exact. '
         f'The budget is {budget:,} inputs ({full} ticks). Times are one run on the capture machine and vary; the counts do not. '
         'The three bugs caught in under 300 inputs show the plumbing works; they do not show that every subtle bug would be found.</p></div>')
+
+
+SWEEP = ROOT / "assets" / "data" / "fuzzdiff-bench" / "sweep-table.md"
+
+
+def sweep_numbers() -> dict:
+    """Headline numbers of the 2,000,000-input sweep, read from the copy of the generated block in docs/DIFFERENTIAL_HTTPARSE.md."""
+    t = SWEEP.read_text(encoding="utf-8")
+    m = re.search(r"Inputs: (\d+) \((\d+) request, (\d+) response, (\d+) header block\)\. All three parsers did the same thing on (\d+) \(([\d.]+)%\); they disagreed on (\d+)\.", t)
+    k = re.search(r"differed on (\d+) inputs.*?explained by no known feature: (\d+)\. .*?earlier: (\d+)\.", t, re.S)
+    assert m and k, "sweep summary not found"
+    keys = ["inputs", "request", "response", "headers", "agree", "agree_pct", "disagree"]
+    out = dict(zip(keys, m.groups()))
+    out.update(zip(["c_vs_rust", "unexplained", "early_reject"], k.groups()))
+    return out
+
+
+def sweep_features() -> list[list[str]]:
+    t = SWEEP.read_text(encoding="utf-8")
+    block = t.split("Disagreements by attributed feature.")[1]
+    rows = [[c.strip() for c in ln.strip().strip("|").split(" | ")] for ln in block.splitlines() if ln.startswith("| ") and "---" not in ln]
+    return rows[1:]  # drop the header row
+
+
+def sweep_table() -> str:
+    n = sweep_numbers()
+    f = lambda x: f"{int(x):,}"  # noqa: E731
+    rows = "".join(
+        f'<tr><th scope="row"><code>{esc(r[0])}</code></th><td class="num">{f(r[1])}</td><td class="num">{f(r[2])}</td><td>{esc(r[3])}</td></tr>'
+        for r in sweep_features())
+    return (
+        f'<p class="prose">Sweep of {f(n["inputs"])} deterministic inputs ({f(n["request"])} request, {f(n["response"])} response, {f(n["headers"])} header block; '
+        f'half from the corpus, half from the well-formed generators, two thirds then mutated). All three parsers did the same thing on {f(n["agree"])} ({n["agree_pct"]}%) and disagreed on '
+        f'<b>{f(n["disagree"])}</b>. picohttpparser and fuzzdiff differed on <b>{f(n["c_vs_rust"])}</b>; disagreements that no documented class explains: <b>{f(n["unexplained"])}</b>; '
+        f'{f(n["early_reject"])} are only httparse rejecting an invalid prefix earlier than the other two. The share is large because the mutator produces folds, doubled spaces and version digits constantly, not because the parsers disagree on typical traffic.</p>'
+        '<div class="scroll wide"><table class="tbl bt fz-sweep"><caption>Disagreements by attributed feature, as in docs/DIFFERENTIAL_HTTPARSE.md. Patterns are picohttpparser, fuzzdiff, httparse: C complete, P partial, R reject, ! all complete but fields differ</caption>'
+        '<thead><tr><th scope="col">Feature</th><th scope="col" class="num">Inputs attributed</th><th scope="col" class="num">Alone</th><th scope="col">Patterns (count)</th></tr></thead><tbody>'
+        + rows + "</tbody></table></div>")

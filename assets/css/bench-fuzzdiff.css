@@ -1,0 +1,28 @@
+/* Side-by-side parser (fuzzdiff sheet only). Uses the tokens from site.css and the .sw-pick radio buttons from the
+   sinkline bench. Outcomes are always words in a stamp or a sentence; colour only reinforces them. */
+.fz-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));gap:var(--s-2) var(--s-5);margin:0 0 var(--s-4)}
+.fz-pick .sw-pick{margin:0}
+.fz-title{margin:var(--s-4) 0 var(--s-1);font-size:var(--step-1)}
+.fz-meta{margin:0 0 var(--s-3);font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2)}
+.fz-note{margin:0 0 var(--s-3);font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2)}
+.fz-bytes{white-space:pre-wrap;overflow-wrap:anywhere}
+.fz-bytes code{white-space:inherit}
+.fz-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-3);margin:0 0 var(--s-4)}
+.fz-col{min-width:0;border:1px solid var(--edge);background:var(--sheet);padding:var(--s-3) var(--s-4)}
+.fz-cn{margin:0 0 var(--s-2);font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.fz-res p{margin:0 0 .35em;font:400 var(--step--1)/1.4 var(--mono);overflow-wrap:anywhere}
+.fz-res p:first-child{font-weight:600}
+.fz-verdict{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2) var(--s-3);margin:0 0 var(--s-2)}
+.fz-hl{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.fz-htext{font-size:var(--step--1);color:var(--ink-2);flex:1 1 18rem}
+.fz-rel{margin:0 0 var(--s-3);font:400 var(--step--1)/1.45 var(--mono);color:var(--ink-2);max-width:62rem}
+.bench-live[hidden]{display:none}
+.fz-tbl td,.fz-tbl tbody th{font-size:.875rem}
+.fz-tbl td[data-fz]{font-family:var(--mono);font-size:.8125rem;overflow-wrap:anywhere;min-width:11rem}
+.fz-tbl code{overflow-wrap:anywhere}
+.fz-mut{margin-top:var(--s-6)}
+.fz-h{margin:0 0 var(--s-3);font-size:var(--step-1)}
+.fz-mut .tbl p{margin:.3em 0 0}
+@media (max-width:48rem){
+  .fz-cols{grid-template-columns:minmax(0,1fr)}
+}

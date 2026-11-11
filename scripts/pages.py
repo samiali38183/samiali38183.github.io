@@ -43,7 +43,7 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
             return C.key(p["strip_sets"][arg])
         if kind == "bench":
             return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption,
-                    "fuzzdiff": BF.parser_static, "fuzzdiff-cap": BF.parser_caption, "fuzzdiff-mutants": BF.mutants_panel}[arg]()
+                    "fuzzdiff": BF.parser_static, "fuzzdiff-cap": BF.parser_caption, "fuzzdiff-mutants": BF.mutants_panel, "fuzzdiff-sweep": BF.sweep_table}[arg]()
         if kind == "kb":
             return f"{round((ROOT / arg).stat().st_size / 1000)} KB"
         if kind == "benchtable":
@@ -303,6 +303,7 @@ def project_page(ctx: dict, slug: str) -> str:
     note = f'<p class="small muted">{esc(p["note"])}</p>' if p.get("note") else ""
     bench = ""
     if "bench" in f:
+        after = ex(f["bench-after"]) + chr(10) if "bench-after" in f else ""
         bench = f"""<section class="bench" data-bench="{slug}" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate {{{{n}}}}</span>
@@ -310,8 +311,7 @@ def project_page(ctx: dict, slug: str) -> str:
 {ex(f["bench"])}
 </div>
 <div class="bench-live" data-bench-mount hidden></div>
-{ex(f.get("bench-after", ""))}
-<figcaption>{ex(f["bench-cap"])}</figcaption>
+{after}<figcaption>{ex(f["bench-cap"])}</figcaption>
 </figure>
 </section>"""
     return f"""<div class="sheet">
