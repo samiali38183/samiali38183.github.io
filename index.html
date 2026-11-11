@@ -1,51 +1,114 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sami Ali — security engineering</title>
-<meta name="description" content="Sami Ali: cybersecurity student (George Mason). Detection and vulnerability tooling, measured: the stock Sigma setuid rule matched 0 of 36 events; sinkline F1 0.967 vs bandit 0.579. Security+ · AWS CCP.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sami Ali | Security engineering student</title>
+<meta name="description" content="Sami Ali, George Mason University. Detection, application-security and vulnerability-management tooling, with measured results and public code.">
 <link rel="canonical" href="https://samiali38183.github.io/">
-<meta property="og:title" content="Sami Ali — security engineering">
-<meta property="og:description" content="The stock Sigma rule for setuid matched 0 of 36 events. Detection and analysis tooling, measured instead of claimed.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0a58ad">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Sami Ali">
+<meta property="og:title" content="Sami Ali | Security engineering student">
+<meta property="og:description" content="Sami Ali, George Mason University. Detection, application-security and vulnerability-management tooling, with measured results and public code.">
 <meta property="og:url" content="https://samiali38183.github.io/">
-<meta name="theme-color" content="#0b0c0e">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
-<link rel="stylesheet" href="styles.css?v=10">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sami Ali | Security engineering student">
+<meta name="twitter:description" content="Sami Ali, George Mason University. Detection, application-security and vulnerability-management tooling, with measured results and public code.">
+<link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<div id="screen" class="screen" data-theme="dark">
-  <div id="term" class="term" role="log" aria-live="polite" aria-label="Terminal output"></div>
-
-  <form id="prompt" class="prompt" autocomplete="off" hidden>
-    <label for="cmd" id="ps1"></label>
-    <input id="cmd" type="text" spellcheck="false" autocapitalize="none" autocorrect="off" aria-label="Type a command, for example help">
-  </form>
-
-  <div id="chips" class="chips" hidden aria-label="Suggested commands"></div>
-
-  <div class="bar" aria-hidden="true">
-    <span class="bar-l"><b>[portfolio]</b> 0:bash*</span>
-    <span class="bar-r"><span id="bar-tip">Tab completes · ↑ history · try: help</span> <span id="clock"></span></span>
-  </div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="/">Sami Ali</a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="/projects/">Projects</a></li>
+<li><a href="/experience/">Experience</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/resume/">Resume</a></li>
+<li><button type="button" id="theme" hidden>Dark theme</button></li>
+</ul>
+</nav>
 </div>
+</header>
+<main id="main" class="wrap">
+<section class="hero" aria-labelledby="top">
+<h1 id="top">Sami Ali</h1>
+<p class="lede">Student at George Mason University building detection, application-security and vulnerability-management tooling.</p>
+<div class="row">
+<a class="btn big" href="/resume.pdf">Download resume (PDF)</a>
+<a class="btn alt big" href="https://github.com/samiali38183">GitHub</a>
+<a class="btn alt big" href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a>
+<a class="btn alt big" href="mailto:samiali38183@gmail.com">Email</a>
+</div>
+</section>
 
-<noscript>
-  <main style="font:16px/1.6 monospace;padding:2rem;max-width:60rem;margin:auto;background:#0b0c0e;color:#d7d3c8">
-    <h1>Sami Ali</h1>
-    <p>Cybersecurity student, George Mason University (B.S. IT, cybersecurity minor, May 2028). Security+ and AWS Cloud Practitioner. DHS HS-POWER intern on CBP’s Vulnerability Assessment Team, summer 2026.</p>
-    <ul>
-      <li><a href="https://github.com/samiali38183/tripline" style="color:#ff6a45">tripline</a>: detection quality gate; the stock Sigma setuid rule matched 0 of 36 events.</li>
-      <li><a href="https://github.com/samiali38183/sinkline" style="color:#ff6a45">sinkline</a>: taint analyzer for Python web apps; F1 0.967 vs bandit 0.579 on a 109-line hand-labeled benchmark.</li>
-      <li><a href="https://github.com/samiali38183/kev-risk-prioritization" style="color:#ff6a45">kev-risk-prioritization</a>: KEV/EPSS/CVSS prioritization case study.</li>
-    </ul>
-    <p><a href="resume.pdf" style="color:#ff6a45">Résumé</a> · <a href="mailto:samiali38183@gmail.com" style="color:#ff6a45">samiali38183@gmail.com</a> · <a href="https://github.com/samiali38183" style="color:#ff6a45">GitHub</a> · <a href="https://www.linkedin.com/in/sami-ali-1a4b89345" style="color:#ff6a45">LinkedIn</a></p>
-  </main>
-</noscript>
+<section aria-labelledby="proj">
+<h2 id="proj">Projects</h2>
+<ul class="cards three">
+<li class="card">
+<h3><a href="/projects/tripline/">tripline</a></h3>
+<p class="tag">CI gate for detection rules</p>
+<p class="fact">Replaying recorded Atomic Red Team telemetry showed the stock SigmaHQ setuid/setgid rule matching 0 of 36 events. A replacement rule matches the 2 that matter.</p>
+<ul class="links">
+<li><a href="https://github.com/samiali38183/tripline">Repository</a></li>
+<li><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1</a></li>
+<li><a href="https://github.com/samiali38183/tripline/actions/runs/42957008252">CI run</a></li>
+</ul>
+</li>
+<li class="card">
+<h3><a href="/projects/sinkline/">sinkline</a></h3>
+<p class="tag">Taint analysis for Python web apps</p>
+<p class="fact">On its own 109-line, self-labeled benchmark: precision 1.000, recall 0.984, F1 0.992, against Bandit's F1 of 0.579. Small benchmark; the page explains the caveats.</p>
+<ul class="links">
+<li><a href="https://github.com/samiali38183/sinkline">Repository</a></li>
+<li><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.4.1">v0.4.1</a></li>
+<li><a href="https://github.com/samiali38183/sinkline/actions/runs/42920168878">CI run</a></li>
+</ul>
+</li>
+<li class="card">
+<h3><a href="/projects/kevgate/">kevgate</a></h3>
+<p class="tag">Vulnerability intake service</p>
+<p class="fact">CI deploys it to a kind cluster and checks that an unlabeled pod is blocked, pod egress is denied and a privileged pod is rejected. 277 tests.</p>
+<ul class="links">
+<li><a href="https://github.com/samiali38183/kevgate">Repository</a></li>
+<li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.0">v0.1.0</a></li>
+<li><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666404">CI run</a></li>
+</ul>
+</li>
+</ul>
+<p class="prose"><strong><a href="/projects/kevgate-admit/">kevgate-admit</a></strong>, also public: a Go Kubernetes admission webhook that denies workloads whose image digests carry KEV-listed vulnerabilities, tested end to end on kind in CI. <a href="https://github.com/samiali38183/kevgate-admit">Repository</a></p>
+<p><a href="/projects/">All projects and evidence</a></p>
+</section>
 
-<script src="main.js?v=10" defer></script>
+<section aria-labelledby="exp" class="prose">
+<h2 id="exp">Experience</h2>
+<p><strong>U.S. Department of Homeland Security (CBP), HS-POWER Program</strong>, Vulnerability Assessment Team analyst intern, May to August 2026. Matched Nessus/Tenable scan results against the CISA KEV catalog, designed a risk-based prioritization method, and built a Power BI dashboard and executive briefing. <a href="/experience/">Details</a></p>
+</section>
+
+<section aria-labelledby="certs" class="prose">
+<h2 id="certs">Education and certifications</h2>
+<ul>
+<li>B.S. Information Technology, Cybersecurity Minor, George Mason University, expected May 2028</li>
+<li>CompTIA Security+ and AWS Certified Cloud Practitioner</li>
+<li>In progress: OSCP and AWS Certified Security - Specialty</li>
+</ul>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<ul>
+<li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
+<li><a href="https://github.com/samiali38183">GitHub</a></li>
+<li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
+<li><a href="/resume.pdf">Resume (PDF)</a></li>
+</ul>
+<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+</div>
+</footer>
+<script src="/site.js" defer></script>
 </body>
 </html>
