@@ -83,13 +83,13 @@ export function mount(doc, root, data) {
   const t = (tag, props, kids) => h(doc, tag, props, kids);
   const state = { id: data.inputs[0].id };
   const status = t('p', { class: 'vh', role: 'status' });
-  const title = t('h4', { class: 'fz-title' });
+  const title = t('h3', { class: 'fz-title' });
   const meta = t('p', { class: 'fz-meta' });
   const bytesCode = t('code');
   const bytesPre = t('pre', { class: 'fz-bytes', tabindex: '0' }, [bytesCode]);
   const bytesNote = t('p', { class: 'fz-note' });
   const cols = ['c', 'rust', 'hp'].map((k) => {
-    const name = t('h5', { class: 'fz-cn' });
+    const name = t('h4', { class: 'fz-cn' });
     const body = t('div', { class: 'fz-res' });
     return { k, name, body, el: t('div', { class: 'fz-col', 'data-col': k }, [name, body]) };
   });
@@ -136,6 +136,7 @@ export function mount(doc, root, data) {
     }
   }
 
+  root.appendChild(t('h2', { class: 'vh', text: 'Side-by-side parser' }));
   root.appendChild(t('p', { class: 'sw-lead', text: 'Recorded, not live. Pick an input to see what each parser returned. Nothing is parsed in your browser.' }));
   root.appendChild(picker);
   root.appendChild(title);

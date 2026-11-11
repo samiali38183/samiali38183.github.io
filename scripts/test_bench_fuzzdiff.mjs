@@ -168,7 +168,7 @@ const radios = rootEl.find((e) => e.tag === 'input');
 eq('one radio button per input', radios.length, data.inputs.length);
 eq('radios share one name (one keyboard group)', new Set(radios.map((r) => r.attrs.name)).size, 1);
 eq('radio groups by entry point', rootEl.find((e) => e.tag === 'legend').map((e) => e.textContent).join('|'), 'Request line|Headers|Response|Chunked body|Truncated input|Planted bug');
-const liveCols = () => rootEl.find((e) => e.attrs['data-col']).map((c) => ({ name: c.find((e) => e.tag === 'h5')[0].textContent, lines: c.find((e) => e.tag === 'p').map((p) => p.textContent) }));
+const liveCols = () => rootEl.find((e) => e.attrs['data-col']).map((c) => ({ name: c.find((e) => e.tag === 'h4')[0].textContent, lines: c.find((e) => e.tag === 'p').map((p) => p.textContent) }));
 const stamp = () => rootEl.find(cls('stamp'))[0];
 const bytesEl = () => rootEl.find(cls('fz-bytes'))[0].find((e) => e.tag === 'code')[0].textContent;
 const rel = () => rootEl.find(cls('fz-rel'))[0];

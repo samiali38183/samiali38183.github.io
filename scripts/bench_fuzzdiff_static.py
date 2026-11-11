@@ -108,7 +108,7 @@ def parser_static() -> str:
             + cells
             + f'<td>{C.stamp(kind, label)}<p data-fz="harness">{esc(htext)}</p><p class="small muted" data-fz="relation">{esc(relation(i))}</p></td></tr>')
     return (
-        f'<p class="sw-lead">Recorded, not live. All {len(d["inputs"])} inputs are listed here; with JavaScript on, a picker shows one at a time.</p>'
+        f'<h2 class="vh">Side-by-side parser</h2><p class="sw-lead">Recorded, not live. All {len(d["inputs"])} inputs are listed here; with JavaScript on, a picker shows one at a time.</p>'
         '<div class="scroll wide"><table class="tbl fz-tbl">'
         f'<caption>What each parser returned for {len(d["inputs"])} inputs, and how the harness classified the C and Rust results</caption>'
         '<thead><tr><th scope="col">Input (bytes with escapes)</th>'
