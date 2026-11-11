@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>sinkline: taint analysis for Python web apps | Sami Ali</title>
-<meta name="description" content="sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark, Bandit 0.579.">
+<meta name="description" content="sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/sinkline/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="sinkline: taint analysis for Python web apps | Sami Ali">
-<meta property="og:description" content="sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark, Bandit 0.579.">
+<meta property="og:description" content="sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/sinkline/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="sinkline: taint analysis for Python web apps | Sami Ali">
-<meta name="twitter:description" content="sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark, Bandit 0.579.">
+<meta name="twitter:description" content="sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
 <meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -42,81 +42,312 @@
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Sheet 2 of 6</b> &middot; sinkline &middot; v0.4.1</p>
+<p class="wrap sheetline"><b>Sheet 2 of 6</b> &middot; sinkline &middot; v0.5.0</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
 <header class="title">
 <h1>sinkline</h1>
 <p class="dek">A static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class.</p>
-<ul class="linkrow"><li><a href="https://github.com/samiali38183/sinkline">Repository</a></li><li><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.4.1">Release v0.4.1</a></li><li><a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md">Design doc</a></li><li><a href="https://github.com/samiali38183/sinkline/actions/runs/42920168878">CI run (main)</a></li><li><a href="https://samiali38183.github.io/sinkline/">Sample HTML report</a></li></ul>
+<ul class="linkrow"><li><a href="https://github.com/samiali38183/sinkline">Repository</a></li><li><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.5.0">Release v0.5.0</a></li><li><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">External benchmark</a></li><li><a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md">Design doc</a></li><li><a href="https://github.com/samiali38183/sinkline/actions/runs/43033758810">CI run (main)</a></li><li><a href="https://samiali38183.github.io/sinkline/">Sample HTML report</a></li></ul>
 
 </header>
 <section class="record-head" aria-label="Verification record">
 <dl>
-<div><dt>Instrument</dt><dd>sinkline v0.4.1, commit 9a36ba2</dd></div>
-<div><dt>Reference standard</dt><dd>Bandit 1.9.4 on the same 109 labeled lines (bench/corpus, labeled by the author)</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-10, Python 3.12.2, bandit 1.9.4, fresh clone</dd></div>
+<div><dt>Instrument</dt><dd>sinkline v0.5.0, commit 9c58efd (0.4.1, commit 9a36ba2, is the as-found reading)</dd></div>
+<div><dt>Reference standard</dt><dd>OWASP BenchmarkPython v0.1, commit f129148: 1,230 labeled Flask test cases; Bandit 1.9.4 and Semgrep OSS 1.185.0 on the same files</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-11, Python 3.12.2; sinkline 0.5.0 re-run on the suite for this page, other results from the repository (scored with its own script, not the official scorer)</dd></div>
 <div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ python bench/"><code>python bench/score.py
-python bench/compare_bandit.py</code></pre></dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ sinkline repo"><code>bench/external/run.sh WORKDIR v0.5.0 sinkline bandit semgrep
+python bench/score.py</code></pre></dd></div>
 </dl>
 </section>
 <section class="reading-band" aria-label="The reading">
 <div class="hero-read">
-<p class="reading sm" role="img" aria-label="Reading: 0.992 F1 on 109 labeled lines; Bandit 0.579"><span aria-hidden="true">0.992</span></p>
+<p class="reading sm" role="img" aria-label="Reading: +0.52 TPR minus FPR on the 10 taint categories (0.4.1: +0.21; Bandit +0.07)"><span aria-hidden="true">+0.52</span></p>
 <div>
-<p class="why">Precision 1.000, recall 0.984, F1 0.992 on sinkline&#x27;s own 109-line benchmark, which is small and labeled by its author. Bandit 1.9.4 scores F1 0.579 on the same lines.</p>
-<p class="chips"><span class="stamp limit">Self-labeled, 109 lines</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/42920168878"><span class="st" aria-hidden="true"></span><span>run 42920168878</span> <span class="d">passed 2026-11-10</span></a></p>
+<p class="why">On OWASP BenchmarkPython v0.1, ten taint categories, sinkline 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20). 0.5.0 scores +0.52 (0.73, 0.21), but its fixes were chosen by reading the failures of 0.4.1, so that is not a held-out score. Bandit 1.9.4 scores +0.07. Over all 14 categories Bandit leads, +0.36 to +0.27.</p>
+<p class="chips"><span class="stamp limit">Not held out</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43033758810"><span class="st" aria-hidden="true"></span><span>run 43033758810</span> <span class="d">passed 2026-11-11</span></a></p>
 </div>
 </div>
-<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>vulnerable lines reported</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable lines missed</li><li><span class="strip" aria-hidden="true"><i data-s="fp"></i></span>safe lines flagged</li><li><span class="strip" aria-hidden="true"><i data-s="neg"></i></span>safe lines left alone</li><li>Ticks are grouped by outcome, not in file order.</li></ul>
-<div class="strips vt" style="--vt:strip-sinkline"><div class="srow"><span class="label" aria-hidden="true">Bandit 1.9.4</span><div class="strip" role="img" aria-label="Bandit 1.9.4, 109 labeled lines: 33 vulnerable lines reported, 28 vulnerable lines missed, 20 safe lines flagged, 28 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="20"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="30"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="40"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="50"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="60"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp" class="m" data-n="70"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp" class="m" data-n="80"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="90"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="100"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 33, FP 20, FN 28, TN 28. F1 <b>0.579</b></p></div><div class="srow"><span class="label" aria-hidden="true">sinkline</span><div class="strip" role="img" aria-label="sinkline, 109 labeled lines: 60 vulnerable lines reported, 1 vulnerable lines missed, 48 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="20"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="30"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="40"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="50"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="60"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="70"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="80"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="90"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="100"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 60, FP 0, FN 1, TN 48. F1 <b>0.992</b></p></div></div>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>vulnerable cases reported</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable cases missed</li><li><span class="strip" aria-hidden="true"><i data-s="fp"></i></span>safe cases flagged</li><li><span class="strip" aria-hidden="true"><i data-s="neg"></i></span>safe cases left alone</li><li>Each tick is about 10 test cases; the counts are in the labels.</li></ul>
+<div class="strips vt" style="--vt:strip-sinkline"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 677 test cases: 99 vulnerable cases reported, 141 vulnerable cases missed, 89 safe cases flagged, 348 safe cases left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">sinkline 0.4.1: TP 99, FN 141, FP 89, TN 348. Score <b>+0.21</b></p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 677 test cases: 175 vulnerable cases reported, 65 vulnerable cases missed, 93 safe cases flagged, 344 safe cases left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">sinkline 0.5.0: TP 175, FN 65, FP 93, TN 344. Score <b>+0.52</b></p></div></div>
 </section>
 <section class="bench" data-bench="sinkline" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
 <div class="bench-static">
-<div class="scroll"><table class="tbl">
-<caption>The benchmark, line by line: how each tool read the 109 labeled lines</caption>
-<thead><tr><th scope="col">Tool</th><th scope="col" class="num">TP</th><th scope="col" class="num">FP</th><th scope="col" class="num">FN</th><th scope="col" class="num">TN</th><th scope="col" class="num">Precision</th><th scope="col" class="num">Recall</th><th scope="col" class="num">F1</th></tr></thead>
-<tbody>
-<tr><th scope="row">Bandit 1.9.4</th><td class="num" data-label="TP">33</td><td class="num" data-label="FP">20</td><td class="num" data-label="FN">28</td><td class="num" data-label="TN">28</td><td class="num" data-label="Precision">0.623</td><td class="num" data-label="Recall">0.541</td><td class="num" data-label="F1">0.579</td></tr>
-<tr><th scope="row">sinkline 0.4.1</th><td class="num" data-label="TP">60</td><td class="num" data-label="FP">0</td><td class="num" data-label="FN">1</td><td class="num" data-label="TN">48</td><td class="num" data-label="Precision"><b class="best">1.000</b></td><td class="num" data-label="Recall"><b class="best">0.984</b></td><td class="num" data-label="F1"><b class="best">0.992</b></td></tr>
-</tbody>
-</table></div>
+<p class="sw-lead">Recorded, not live. All nine runs are listed here; with JavaScript on, a switch shows one at a time.</p>
+<div class="sw-ex" role="group" aria-labelledby="sws-sql"><p class="sw-eh" id="sws-sql"><b>SQL injection (CWE-89)</b></p>
+<div class="sw-v"><p class="sw-vh"><span class="stamp fail">Finding</span> <b>Unsafe</b> <span class="sw-facts">SL-SQLI-001, CWE-89, critical, confidence high. Exit status 1.</span></p><pre data-label="sql-unsafe.py" tabindex="0"><code>import sqlite3
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+db = sqlite3.connect(&quot;app.db&quot;, check_same_thread=False)
+
+
+@app.route(&quot;/user&quot;)
+def user():
+    uid = request.args.get(&quot;id&quot;, &quot;&quot;)
+    cur = db.execute(&quot;SELECT name FROM users WHERE id = &quot; + uid)
+    return jsonify(cur.fetchall())
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low sql-unsafe.py" tabindex="0"><code>[CRITICAL] SL-SQLI-001 A03:2021 CWE-89  sql-unsafe.py:11:11
+  SQL built from tainted data
+  flask.request.args reaches sqlite3.Connection.execute without a sanitizer for CWE-89.
+  ┌ source     sql-unsafe.py:10  uid = request.args.get(&quot;id&quot;, &quot;&quot;)  # flask.request.args
+  │ propagate  sql-unsafe.py:10  uid = request.args.get(&quot;id&quot;, &quot;&quot;)  # .get()
+  │ propagate  sql-unsafe.py:11  cur = db.execute(&quot;SELECT name FROM users WHERE id = &quot; + uid)  # concat
+  └ sink       sql-unsafe.py:11  cur = db.execute(&quot;SELECT name FROM users WHERE id = &quot; + uid)  # sqlite3.Connection.execute
+  fix: Use parameterized queries: conn.execute(&#x27;... WHERE id = ?&#x27;, (user_id,))
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
+</code></pre></div>
+<div class="sw-v"><p class="sw-vh"><span class="stamp pass">No finding</span> <b>Right-class sanitizer</b> <span class="sw-facts">no rule fired. Exit status 0.</span></p><p class="sw-note">Lines that differ from the unsafe version: 11.</p><pre data-label="sql-right.py" tabindex="0"><code>import sqlite3
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+db = sqlite3.connect(&quot;app.db&quot;, check_same_thread=False)
+
+
+@app.route(&quot;/user&quot;)
+def user():
+    uid = request.args.get(&quot;id&quot;, &quot;&quot;)
+    cur = db.execute(&quot;SELECT name FROM users WHERE id = ?&quot;, (uid,))
+    return jsonify(cur.fetchall())
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low sql-right.py" tabindex="0"><code>0 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: none
+</code></pre></div>
+<div class="sw-v"><p class="sw-vh"><span class="stamp fail">Finding</span> <b>Wrong-class sanitizer</b> <span class="sw-facts">SL-SQLI-001, CWE-89, critical, confidence high. Exit status 1.</span></p><p class="sw-note">Lines that differ from the unsafe version: 1, 11. Recorded sanitizer step: shlex.quote: clears CWE-78. The finding is CWE-89.</p><pre data-label="sql-wrong.py" tabindex="0"><code>import shlex
+import sqlite3
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+db = sqlite3.connect(&quot;app.db&quot;, check_same_thread=False)
+
+
+@app.route(&quot;/user&quot;)
+def user():
+    uid = shlex.quote(request.args.get(&quot;id&quot;, &quot;&quot;))
+    cur = db.execute(&quot;SELECT name FROM users WHERE id = &quot; + uid)
+    return jsonify(cur.fetchall())
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low sql-wrong.py" tabindex="0"><code>[CRITICAL] SL-SQLI-001 A03:2021 CWE-89  sql-wrong.py:12:11
+  SQL built from tainted data
+  flask.request.args reaches sqlite3.Connection.execute without a sanitizer for CWE-89.
+  ┌ source     sql-wrong.py:11  uid = shlex.quote(request.args.get(&quot;id&quot;, &quot;&quot;))  # flask.request.args
+  │ propagate  sql-wrong.py:11  uid = shlex.quote(request.args.get(&quot;id&quot;, &quot;&quot;))  # .get()
+  │ sanitizer  sql-wrong.py:11  uid = shlex.quote(request.args.get(&quot;id&quot;, &quot;&quot;))  # shlex.quote: clears CWE-78
+  │ propagate  sql-wrong.py:11  uid = shlex.quote(request.args.get(&quot;id&quot;, &quot;&quot;))  # assigned to `uid`
+  │ propagate  sql-wrong.py:12  cur = db.execute(&quot;SELECT name FROM users WHERE id = &quot; + uid)  # concat
+  └ sink       sql-wrong.py:12  cur = db.execute(&quot;SELECT name FROM users WHERE id = &quot; + uid)  # sqlite3.Connection.execute
+  fix: Use parameterized queries: conn.execute(&#x27;... WHERE id = ?&#x27;, (user_id,))
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
+</code></pre></div>
+</div>
+<div class="sw-ex" role="group" aria-labelledby="sws-cmd"><p class="sw-eh" id="sws-cmd"><b>Command injection (CWE-78)</b></p>
+<div class="sw-v"><p class="sw-vh"><span class="stamp fail">Finding</span> <b>Unsafe</b> <span class="sw-facts">SL-CMDI-003, CWE-78, critical, confidence high. Exit status 1.</span></p><pre data-label="cmd-unsafe.py" tabindex="0"><code>import subprocess
+from flask import Flask, request
+
+app = Flask(__name__)
+
+
+@app.route(&quot;/ping&quot;)
+def ping():
+    try:
+        host = request.args[&quot;h&quot;]
+    except KeyError:
+        host = &quot;localhost&quot;
+    subprocess.run(&quot;ping -c 1 &quot; + host, shell=True)
+    return &quot;sent&quot;
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low cmd-unsafe.py" tabindex="0"><code>[CRITICAL] SL-CMDI-003 A03:2021 CWE-78  cmd-unsafe.py:13:5
+  subprocess with shell=True and tainted command
+  flask.request.args reaches subprocess.run without a sanitizer for CWE-78.
+  ┌ source     cmd-unsafe.py:10  host = request.args[&quot;h&quot;]  # flask.request.args
+  │ propagate  cmd-unsafe.py:10  host = request.args[&quot;h&quot;]  # assigned to `host`
+  │ propagate  cmd-unsafe.py:13  subprocess.run(&quot;ping -c 1 &quot; + host, shell=True)  # concat
+  └ sink       cmd-unsafe.py:13  subprocess.run(&quot;ping -c 1 &quot; + host, shell=True)  # subprocess.run
+  fix: Drop shell=True and pass an argument list.
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
+</code></pre></div>
+<div class="sw-v"><p class="sw-vh"><span class="stamp pass">No finding</span> <b>Right-class sanitizer</b> <span class="sw-facts">no rule fired. Exit status 0.</span></p><p class="sw-note">Lines that differ from the unsafe version: 1, 14.</p><pre data-label="cmd-right.py" tabindex="0"><code>import shlex
+import subprocess
+from flask import Flask, request
+
+app = Flask(__name__)
+
+
+@app.route(&quot;/ping&quot;)
+def ping():
+    try:
+        host = request.args[&quot;h&quot;]
+    except KeyError:
+        host = &quot;localhost&quot;
+    subprocess.run(&quot;ping -c 1 &quot; + shlex.quote(host), shell=True)
+    return &quot;sent&quot;
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low cmd-right.py" tabindex="0"><code>0 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: none
+</code></pre></div>
+<div class="sw-v"><p class="sw-vh"><span class="stamp fail">Finding</span> <b>Wrong-class sanitizer</b> <span class="sw-facts">SL-CMDI-003, CWE-78, critical, confidence high. Exit status 1.</span></p><p class="sw-note">Lines that differ from the unsafe version: 1, 14. Recorded sanitizer step: html.escape: clears CWE-79. The finding is CWE-78.</p><pre data-label="cmd-wrong.py" tabindex="0"><code>import html
+import subprocess
+from flask import Flask, request
+
+app = Flask(__name__)
+
+
+@app.route(&quot;/ping&quot;)
+def ping():
+    try:
+        host = request.args[&quot;h&quot;]
+    except KeyError:
+        host = &quot;localhost&quot;
+    subprocess.run(&quot;ping -c 1 &quot; + html.escape(host), shell=True)
+    return &quot;sent&quot;
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low cmd-wrong.py" tabindex="0"><code>[CRITICAL] SL-CMDI-003 A03:2021 CWE-78  cmd-wrong.py:14:5
+  subprocess with shell=True and tainted command
+  flask.request.args reaches subprocess.run without a sanitizer for CWE-78.
+  ┌ source     cmd-wrong.py:11  host = request.args[&quot;h&quot;]  # flask.request.args
+  │ propagate  cmd-wrong.py:11  host = request.args[&quot;h&quot;]  # assigned to `host`
+  │ sanitizer  cmd-wrong.py:14  subprocess.run(&quot;ping -c 1 &quot; + html.escape(host), shell=True)  # html.escape: clears CWE-79
+  │ propagate  cmd-wrong.py:14  subprocess.run(&quot;ping -c 1 &quot; + html.escape(host), shell=True)  # concat
+  └ sink       cmd-wrong.py:14  subprocess.run(&quot;ping -c 1 &quot; + html.escape(host), shell=True)  # subprocess.run
+  fix: Drop shell=True and pass an argument list.
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
+</code></pre></div>
+</div>
+<div class="sw-ex" role="group" aria-labelledby="sws-html"><p class="sw-eh" id="sws-html"><b>Cross-site scripting (CWE-79)</b></p>
+<div class="sw-v"><p class="sw-vh"><span class="stamp fail">Finding</span> <b>Unsafe</b> <span class="sw-facts">SL-XSS-004, CWE-79, high, confidence high. Exit status 1.</span></p><pre data-label="html-unsafe.py" tabindex="0"><code>from flask import Flask, request
+
+app = Flask(__name__)
+
+
+@app.route(&quot;/hello&quot;)
+def hello():
+    return request.args.get(&quot;name&quot;, &quot;&quot;).strip()
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low html-unsafe.py" tabindex="0"><code>[HIGH] SL-XSS-004 A03:2021 CWE-79  html-unsafe.py:8:5
+  Reflected XSS: tainted string returned from view
+  flask.request.args reaches __return_http__ without a sanitizer for CWE-79.
+  ┌ source     html-unsafe.py:8  return request.args.get(&quot;name&quot;, &quot;&quot;).strip()  # flask.request.args
+  │ propagate  html-unsafe.py:8  return request.args.get(&quot;name&quot;, &quot;&quot;).strip()  # .get()
+  └ sink       html-unsafe.py:8  return request.args.get(&quot;name&quot;, &quot;&quot;).strip()  # __return_http__
+  fix: Return a rendered template or escape the value with markupsafe.escape().
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
+</code></pre></div>
+<div class="sw-v"><p class="sw-vh"><span class="stamp pass">No finding</span> <b>Right-class sanitizer</b> <span class="sw-facts">no rule fired. Exit status 0.</span></p><p class="sw-note">Lines that differ from the unsafe version: 2, 9.</p><pre data-label="html-right.py" tabindex="0"><code>from flask import Flask, request
+from markupsafe import escape
+
+app = Flask(__name__)
+
+
+@app.route(&quot;/hello&quot;)
+def hello():
+    return escape(request.args.get(&quot;name&quot;, &quot;&quot;).strip())
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low html-right.py" tabindex="0"><code>0 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: none
+</code></pre></div>
+<div class="sw-v"><p class="sw-vh"><span class="stamp fail">Finding</span> <b>Wrong-class sanitizer</b> <span class="sw-facts">SL-XSS-004, CWE-79, high, confidence high. Exit status 1.</span></p><p class="sw-note">Lines that differ from the unsafe version: 1, 9, 10. Recorded sanitizer step: shlex.quote: clears CWE-78. The finding is CWE-79.</p><pre data-label="html-wrong.py" tabindex="0"><code>import shlex
+from flask import Flask, request
+
+app = Flask(__name__)
+
+
+@app.route(&quot;/hello&quot;)
+def hello():
+    name = shlex.quote(request.args.get(&quot;name&quot;, &quot;&quot;).strip())
+    return name
+</code></pre><pre data-label="$ sinkline scan --no-color --fail-on low html-wrong.py" tabindex="0"><code>[HIGH] SL-XSS-004 A03:2021 CWE-79  html-wrong.py:10:5
+  Reflected XSS: tainted string returned from view
+  flask.request.args reaches __return_http__ without a sanitizer for CWE-79.
+  ┌ source     html-wrong.py:9  name = shlex.quote(request.args.get(&quot;name&quot;, &quot;&quot;).strip())  # flask.request.args
+  │ propagate  html-wrong.py:9  name = shlex.quote(request.args.get(&quot;name&quot;, &quot;&quot;).strip())  # .get()
+  │ sanitizer  html-wrong.py:9  name = shlex.quote(request.args.get(&quot;name&quot;, &quot;&quot;).strip())  # shlex.quote: clears CWE-78
+  │ propagate  html-wrong.py:9  name = shlex.quote(request.args.get(&quot;name&quot;, &quot;&quot;).strip())  # assigned to `name`
+  └ sink       html-wrong.py:10  return name  # __return_http__
+  fix: Return a rendered template or escape the value with markupsafe.escape().
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
+</code></pre></div>
+</div>
 </div>
 <div class="bench-live" data-bench-mount hidden></div>
-<figcaption><b>On this small corpus sinkline reports almost every labeled vulnerability and none of the safe lines; Bandit misses 28 and flags 20 safe lines.</b> The filled square marks the best value in each column. The corpus has 61 vulnerable and 48 safe lines, labeled by the same person who wrote the engine, so read it as a regression check, not a generalization estimate. Output of <code>bench/score.py</code> and <code>bench/compare_bandit.py</code>, 2026-11-10.</figcaption>
+<figcaption><b>A sanitizer clears a finding only for its own bug class: <code>shlex.quote</code> clears command injection and leaves SQL injection and XSS reported, and <code>html.escape</code> leaves command injection reported.</b> Recorded, not live: every output is the unedited output of <code>sinkline scan --no-color --fail-on low FILE</code> (sinkline 0.5.0, tag v0.5.0, commit 9c58efd) on the file shown, run 2026-11-11. The page runs no analysis; the switch only chooses which recorded output to show. Files, outputs and the capture script: <a href="https://github.com/samiali38183/samiali38183.github.io/tree/main/assets/data/sinkline-bench">assets/data/sinkline-bench</a>, <code>scripts/capture_sinkline_bench.py</code>. Two unsafe files were missed by older versions, checked by running them: 0.4.0 reports nothing on the try/except file (join fix in 0.4.1) and 0.4.1 reports nothing on the XSS file, which returns a call result (fix in 0.5.0).</figcaption>
 </figure>
 </section>
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
-<h2 id="found-h"><span class="label sec-label">As found</span>A shell injection in its own Action, and the benchmark misses</h2>
+<h2 id="found-h"><span class="label sec-label">As found</span>On an independent benchmark 0.4.1 scored +0.21, and Bandit leads over all 14 categories</h2>
 <div class="prose">
-<p>Two things were wrong before 0.4.1, and both are in the repository's own changelog.</p>
-<p>The first was in sinkline's own GitHub Action. Its inputs (<code>path</code>, <code>fail-on</code>, <code>min-confidence</code>) were interpolated straight into a shell line with <code>${{ inputs.* }}</code>, so a workflow that passed an attacker-influenced value could run arbitrary commands on the runner.<sup class="nref" aria-hidden="true"></sup> Version 0.4.1 passes them through <code>env:</code>, quoted, and <code>tests/test_action.py</code> runs the script with hostile values.</p>
+<p>The first reading is on code the engine was not built around. OWASP's BenchmarkPython v0.1 (commit f129148) is 1,230 small Flask test cases, each labeled vulnerable or safe in a published file. Ten of its 14 categories are source-to-sink flows, which is what sinkline is for: 240 vulnerable cases and 437 safe ones.</p>
+<p>sinkline 0.4.1 reported 99 of the 240 vulnerable cases (TPR 0.41) and flagged 89 of the 437 safe ones (FPR 0.20), a score of +0.21 (TPR minus FPR). Two categories were close to blank: LDAP injection, 0 of 16, and XPath injection, 5 of 51. Command injection scored below zero (-0.26): it flagged 4 of 7 safe cases and only 4 of 13 vulnerable ones. Bandit 1.9.4 scored +0.07 and Semgrep OSS 1.185.0 +0.04 on the same ten categories, mostly because neither has rules for most of them.<sup class="nref" aria-hidden="true"></sup></p>
+</div>
+<div class="note" role="note"><strong>TPR minus FPR</strong> is the benchmark's score. TPR is the share of vulnerable cases reported; FPR is the share of safe cases reported anyway. 0 means no better than guessing, 1 is perfect.</div>
+<div class="prose">
+<p>Over all 14 categories the order flips. Bandit scores +0.36 against sinkline 0.4.1's +0.10, because Bandit checks weak hashes (71 of 71) and weak random numbers (77 of 99), and sinkline has nothing for weak hashes, weak random numbers, cookie flags or what is stored in the session. It scores 0 on those four categories. Bandit still leads over all 14 with 0.5.0.</p>
+</div>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>vulnerable cases reported</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable cases missed</li><li><span class="strip" aria-hidden="true"><i data-s="fp"></i></span>safe cases flagged</li><li><span class="strip" aria-hidden="true"><i data-s="neg"></i></span>safe cases left alone</li><li>Each tick is about 20 test cases; the counts are in the labels.</li></ul>
+<div class="strips"><div class="srow"><span class="label" aria-hidden="true">sinkline 0.4.1</span><div class="strip" role="img" aria-label="sinkline 0.4.1, 1230 test cases: 99 vulnerable cases reported, 353 vulnerable cases missed, 89 safe cases flagged, 689 safe cases left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 99, FN 353, FP 89, TN 689. Score <b>+0.10</b></p></div><div class="srow"><span class="label" aria-hidden="true">Bandit 1.9.4</span><div class="strip" role="img" aria-label="Bandit 1.9.4, 1230 test cases: 179 vulnerable cases reported, 273 vulnerable cases missed, 25 safe cases flagged, 753 safe cases left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 179, FN 273, FP 25, TN 753. Score <b>+0.36</b></p></div><div class="srow"><span class="label" aria-hidden="true">Semgrep OSS</span><div class="strip" role="img" aria-label="Semgrep OSS, 1230 test cases: 72 vulnerable cases reported, 380 vulnerable cases missed, 15 safe cases flagged, 763 safe cases left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 72, FN 380, FP 15, TN 763. Score <b>+0.14</b></p></div></div>
+<div class="prose">
+<p>Separately, a flaw was found in sinkline's own GitHub Action. Its inputs (<code>path</code>, <code>fail-on</code>, <code>min-confidence</code>) were interpolated straight into a shell line with <code>${{ inputs.* }}</code>, so a workflow that passed an attacker-influenced value could run arbitrary commands on the runner. Version 0.4.1 passes them through <code>env:</code>, quoted, and <code>tests/test_action.py</code> runs the script with hostile values.</p>
 </div>
 <div class="note" role="note"><strong>Script injection</strong> (CWE-78) happens when untrusted text is pasted into a shell command, so the shell runs it as code. Passing it as an environment variable keeps it as data.</div>
 <div class="prose">
-<p>The second was in the analysis. A <code>try</code>/<code>except</code> lost taint (a false negative): <code>host = request.args["h"]</code> followed by <code>except: host = "localhost"</code> reported nothing. The same release closed one of the benchmark's two remaining misses, a closure that reads tainted data, moving recall from 0.967 to 0.984 (changelog 0.4.1).</p>
+<p>One more analysis bug is in the changelog: a <code>try</code>/<code>except</code> lost taint, so <code>host = request.args["h"]</code> followed by <code>except: host = "localhost"</code> reported nothing (fixed in 0.4.1; the command-injection example on Plate 1 has that shape).</p>
 </div>
-<div class="scroll wide"><table class="tbl">
+<div class="scroll wide"><table class="tbl wt">
 <caption>Reading ledger</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
+<tr class="row-fail"><th scope="row">LDAP and XPath injection, 0.4.1</th><td data-label="Expected">Most vulnerable cases reported</td><td data-label="Observed">5 of 67 reported (LDAP 0 of 16, XPath 5 of 51)</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.4.1/summary.md">results/v0.4.1</a></td></tr>
+<tr class="row-fail"><th scope="row">Command injection, 0.4.1</th><td data-label="Expected">More vulnerable cases reported than safe ones</td><td data-label="Observed">4 of 13 vulnerable, 4 of 7 safe: score -0.26</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.4.1/summary.md">results/v0.4.1</a></td></tr>
+<tr><th scope="row">Weak hash, weak PRNG, cookie flags, trust boundary</th><td data-label="Expected">Out of scope, reported anyway</td><td data-label="Observed">0 of 212 vulnerable cases reported</td><td data-label="Verdict"><span class="stamp limit">No check</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">bench/external/README.md</a></td></tr>
+<tr><th scope="row">All 14 categories against Bandit, 0.5.0</th><td data-label="Expected">sinkline ahead</td><td data-label="Observed">+0.27 against Bandit +0.36</td><td data-label="Verdict"><span class="stamp limit">Bandit ahead</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.5.0/summary.md">results/v0.5.0</a></td></tr>
 <tr class="row-fail"><th scope="row">GitHub Action input handling, before 0.4.1</th><td data-label="Expected">Inputs reach the shell only as quoted data</td><td data-label="Observed">Inputs interpolated into a shell line</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1, Security</a></td></tr>
 <tr><th scope="row">The same Action, 0.4.1</th><td data-label="Expected">Hostile values stay data</td><td data-label="Observed">Tested with hostile values</td><td data-label="Verdict"><span class="stamp pass">As left: pass</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py">tests/test_action.py</a></td></tr>
 </tbody>
 </table></div>
 </section>
 <section class="section" id="as-left" aria-labelledby="left-h">
-<h2 id="left-h"><span class="label sec-label">As left</span>The reading against Bandit on the same lines</h2>
+<h2 id="left-h"><span class="label sec-label">As left</span>0.5.0 scores +0.52 on the taint categories; the fixes were chosen from the failures</h2>
 <div class="prose">
-<p>Run on 2026-11-10 from a fresh clone (commit 9a36ba2), Python 3.12.2, bandit 1.9.4.</p>
+<p>sinkline 0.5.0 (tag v0.5.0, commit 9c58efd, 2026-11-11) scores TPR 0.73 and FPR 0.21 on the same ten categories, +0.52 against 0.4.1's +0.21 (175 of 240 vulnerable cases reported, 93 of 437 safe ones flagged). The changes were more sink coverage (<code>codecs.open</code>, <code>elementpath.select</code>, <code>lxml</code> XPath, <code>pathlib</code> reads and writes), pruning of statically decided branches, correct handling of <code>match</code>, receiver types through helper functions, and treating a returned call result as XSS when it is the tainted string itself.</p>
+<p><b>This is not a held-out score.</b> The fixes were chosen by reading 0.4.1's failures on this same suite, so 0.5.0's number is what the fixes recover on the suite that motivated them. Treat 0.4.1 as the independent measurement. The false-positive rate did not fall (0.20 to 0.21): lists tracked as a whole container are the largest remaining source. The scorer is the repository's own script, not the benchmark's official one (BenchmarkUtils, not run).</p>
 </div>
-<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>vulnerable lines reported</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable lines missed</li><li><span class="strip" aria-hidden="true"><i data-s="fp"></i></span>safe lines flagged</li><li><span class="strip" aria-hidden="true"><i data-s="neg"></i></span>safe lines left alone</li><li>Ticks are grouped by outcome, not in file order.</li></ul>
-<div class="strips"><div class="srow"><span class="label" aria-hidden="true">Bandit 1.9.4</span><div class="strip" role="img" aria-label="Bandit 1.9.4, 109 labeled lines: 33 vulnerable lines reported, 28 vulnerable lines missed, 20 safe lines flagged, 28 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="20"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="30"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="40"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="50"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="60"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp" class="m" data-n="70"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp" class="m" data-n="80"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="90"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="100"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 33, FP 20, FN 28, TN 28. F1 <b>0.579</b></p></div><div class="srow"><span class="label" aria-hidden="true">sinkline</span><div class="strip" role="img" aria-label="sinkline, 109 labeled lines: 60 vulnerable lines reported, 1 vulnerable lines missed, 48 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="20"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="30"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="40"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="50"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="60"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="70"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="80"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="90"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="100"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 60, FP 0, FN 1, TN 48. F1 <b>0.992</b></p></div></div>
+<div class="scroll wide"><table class="tbl wt">
+<caption>Per category: TPR / FPR / TPR minus FPR, with real and safe case counts</caption>
+<thead><tr><th scope="col">Category</th><th scope="col" class="num">Real / safe</th><th scope="col" class="num">sinkline 0.4.1</th><th scope="col" class="num">sinkline 0.5.0</th><th scope="col" class="num">Bandit 1.9.4</th><th scope="col" class="num">Semgrep OSS 1.185.0</th></tr></thead>
+<tbody>
+<tr><th scope="row">sqli</th><td class="num" data-label="Real / safe">5 / 11</td><td class="num" data-label="sinkline 0.4.1">0.80 / 0.00 / +0.80</td><td class="num" data-label="sinkline 0.5.0">0.80 / 0.00 / +0.80</td><td class="num" data-label="Bandit 1.9.4">1.00 / 1.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">cmdi</th><td class="num" data-label="Real / safe">13 / 7</td><td class="num" data-label="sinkline 0.4.1">0.31 / 0.57 / -0.26</td><td class="num" data-label="sinkline 0.5.0">0.38 / 0.14 / +0.24</td><td class="num" data-label="Bandit 1.9.4">1.00 / 1.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.54 / 1.00 / -0.46</td></tr>
+<tr><th scope="row">codeinj</th><td class="num" data-label="Real / safe">20 / 33</td><td class="num" data-label="sinkline 0.4.1">0.65 / 0.52 / +0.13</td><td class="num" data-label="sinkline 0.5.0">0.75 / 0.39 / +0.36</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">xss</th><td class="num" data-label="Real / safe">31 / 58</td><td class="num" data-label="sinkline 0.4.1">0.74 / 0.50 / +0.24</td><td class="num" data-label="sinkline 0.5.0">0.77 / 0.31 / +0.46</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">pathtraver</th><td class="num" data-label="Real / safe">65 / 103</td><td class="num" data-label="sinkline 0.4.1">0.31 / 0.08 / +0.23</td><td class="num" data-label="sinkline 0.5.0">0.66 / 0.09 / +0.57</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.03 / 0.02 / +0.01</td></tr>
+<tr><th scope="row">redirect</th><td class="num" data-label="Real / safe">13 / 21</td><td class="num" data-label="sinkline 0.4.1">0.69 / 0.38 / +0.31</td><td class="num" data-label="sinkline 0.5.0">0.69 / 0.38 / +0.31</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">deserialization</th><td class="num" data-label="Real / safe">18 / 36</td><td class="num" data-label="sinkline 0.4.1">0.83 / 0.14 / +0.69</td><td class="num" data-label="sinkline 0.5.0">0.89 / 0.06 / +0.83</td><td class="num" data-label="Bandit 1.9.4">0.72 / 0.19 / +0.53</td><td class="num" data-label="Semgrep OSS 1.185.0">0.50 / 0.17 / +0.33</td></tr>
+<tr><th scope="row">ldapi</th><td class="num" data-label="Real / safe">16 / 13</td><td class="num" data-label="sinkline 0.4.1">0.00 / 0.00 / +0.00</td><td class="num" data-label="sinkline 0.5.0">0.69 / 0.15 / +0.53</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">xpathi</th><td class="num" data-label="Real / safe">51 / 135</td><td class="num" data-label="sinkline 0.4.1">0.10 / 0.04 / +0.06</td><td class="num" data-label="sinkline 0.5.0">0.80 / 0.22 / +0.58</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">xxe</th><td class="num" data-label="Real / safe">8 / 20</td><td class="num" data-label="sinkline 0.4.1">0.75 / 0.65 / +0.10</td><td class="num" data-label="sinkline 0.5.0">0.88 / 0.50 / +0.38</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr class="row-fail"><th scope="row">hash (no check in sinkline)</th><td class="num" data-label="Real / safe">71 / 80</td><td class="num" data-label="sinkline 0.4.1">0.00 / 0.00 / +0.00</td><td class="num" data-label="sinkline 0.5.0">0.00 / 0.00 / +0.00</td><td class="num" data-label="Bandit 1.9.4">1.00 / 0.00 / +1.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.76 / 0.00 / +0.76</td></tr>
+<tr class="row-fail"><th scope="row">weakrand (no check in sinkline)</th><td class="num" data-label="Real / safe">99 / 227</td><td class="num" data-label="sinkline 0.4.1">0.00 / 0.00 / +0.00</td><td class="num" data-label="sinkline 0.5.0">0.00 / 0.00 / +0.00</td><td class="num" data-label="Bandit 1.9.4">0.78 / 0.00 / +0.78</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr class="row-fail"><th scope="row">securecookie (no check in sinkline)</th><td class="num" data-label="Real / safe">24 / 15</td><td class="num" data-label="sinkline 0.4.1">0.00 / 0.00 / +0.00</td><td class="num" data-label="sinkline 0.5.0">0.00 / 0.00 / +0.00</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr class="row-fail"><th scope="row">trustbound (no check in sinkline)</th><td class="num" data-label="Real / safe">18 / 19</td><td class="num" data-label="sinkline 0.4.1">0.00 / 0.00 / +0.00</td><td class="num" data-label="sinkline 0.5.0">0.00 / 0.00 / +0.00</td><td class="num" data-label="Bandit 1.9.4">0.00 / 0.00 / +0.00</td><td class="num" data-label="Semgrep OSS 1.185.0">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">taint categories (10)</th><td class="num" data-label="Real / safe">240 / 437</td><td class="num" data-label="sinkline 0.4.1">0.41 / 0.20 / +0.21</td><td class="num" data-label="sinkline 0.5.0">0.73 / 0.21 / +0.52</td><td class="num" data-label="Bandit 1.9.4">0.13 / 0.06 / +0.07</td><td class="num" data-label="Semgrep OSS 1.185.0">0.07 / 0.03 / +0.04</td></tr>
+<tr><th scope="row">all categories (14)</th><td class="num" data-label="Real / safe">452 / 778</td><td class="num" data-label="sinkline 0.4.1">0.22 / 0.11 / +0.10</td><td class="num" data-label="sinkline 0.5.0">0.39 / 0.12 / +0.27</td><td class="num" data-label="Bandit 1.9.4">0.40 / 0.03 / +0.36</td><td class="num" data-label="Semgrep OSS 1.185.0">0.16 / 0.02 / +0.14</td></tr>
+</tbody>
+</table></div>
+<h3>The regression gate</h3>
+<div class="prose">
+<p>The repository also keeps a small self-labeled corpus: 109 lines (61 vulnerable, 48 safe) labeled alongside the engine. It is not independent, so it says little about accuracy on new code. It runs in CI to catch regressions, and it did not move between 0.4.1 and 0.5.0. Run on 2026-11-11 from a fresh clone of v0.5.0 (commit 9c58efd), Python 3.12.2, bandit 1.9.4.</p>
+</div>
+<ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>vulnerable lines reported</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable lines missed</li><li><span class="strip" aria-hidden="true"><i data-s="neg"></i></span>safe lines left alone</li><li><span class="strip" aria-hidden="true"><i data-s="fp"></i></span>safe lines flagged</li><li>Ticks are grouped by outcome, not in file order.</li></ul>
+<div class="strips"><div class="srow"><span class="label" aria-hidden="true">sinkline 0.5.0</span><div class="strip" role="img" aria-label="sinkline 0.5.0, 109 labeled lines: 60 vulnerable lines reported, 1 vulnerable lines missed, 48 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="20"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="30"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="40"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="50"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="60"></i><i data-s="miss"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="70"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="80"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="90"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="100"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 60, FP 0, FN 1, TN 48. F1 <b>0.992</b></p></div><div class="srow"><span class="label" aria-hidden="true">Bandit 1.9.4</span><div class="strip" role="img" aria-label="Bandit 1.9.4, 109 labeled lines: 33 vulnerable lines reported, 28 vulnerable lines missed, 20 safe lines flagged, 28 safe lines left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="20"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="30"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="40"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="50"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss" class="m" data-n="60"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp" class="m" data-n="70"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp" class="m" data-n="80"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="90"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg" class="m" data-n="100"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">TP 33, FP 20, FN 28, TN 28. F1 <b>0.579</b></p></div></div>
 <pre data-copy data-label="$ python bench/score.py; python bench/compare_bandit.py"><code>$ python bench/score.py
 corpus: 109 labeled lines (61 vuln, 48 safe)
 TP 60  FP 0  FN 1  TN 48
@@ -129,8 +360,8 @@ bandit: 84 raw issues on the corpus
 bandit on labeled lines: TP 33  FP 20  FN 28  TN 28
 precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN line counts)</code></pre>
 <div class="prose">
-<p>Read the Bandit row as scope, not a verdict: Bandit is a pattern linter with no data-flow model, and its false positives are mostly rules that fire on any string-built SQL or any <code>subprocess</code> call, including the labeled-safe variants. The figure also depends on the Bandit version (1.8.0 gives F1 0.561). No comparison against Semgrep or CodeQL has been run.</p>
-<h3>A cross-file finding on the benchmark corpus</h3>
+<p>Read the Bandit row as scope, not a verdict: Bandit is a pattern linter with no data-flow model, and its false positives are mostly rules that fire on any string-built SQL or any <code>subprocess</code> call, including the labeled-safe variants. The figure also depends on the Bandit version (1.8.0 gives F1 0.561).</p>
+<h3>A cross-file finding on the corpus</h3>
 <p>The source is in one file and the sink in another, reached through a method call on a locally constructed object.</p>
 </div>
 <pre data-copy data-label="$ sinkline scan bench/corpus"><code>$ sinkline scan bench/corpus
@@ -141,25 +372,22 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
   ┌ source     hard_app.py:34  Shell().run(request.args["cmd"])  # flask.request.args
   │ call       hard_app.py:34  Shell().run(request.args["cmd"])  # passed as `cmd` to Shell.run()
   └ sink       hard_helpers.py:17  subprocess.call(cmd, shell=True)  # subprocess.call inside Shell.run()</code></pre>
-<p class="trim">Trimmed: one finding of 71 shown, the benchmark's <code># VULN:CWE-78</code> label comments and padding whitespace removed from the source lines.</p>
-<figure class="plate wide">
-<span class="plate-label">Plate 2</span>
-<a href="https://samiali38183.github.io/sinkline/"><img src="/assets/img/sinkline-report.png" width="1300" height="596" loading="lazy" alt="sinkline HTML report for the benchmark corpus: 71 findings, 43 critical, 21 high, counts by OWASP category, and one expanded finding showing the source, call and sink lines of a command-injection flow"></a>
-<figcaption><b>The HTML report shows the same flow, with the source, call and sink lines.</b> Generated locally with <code>sinkline scan bench/corpus --format html</code> (headless Chrome screenshot; the header and one expanded finding are joined from the same page). The 71 findings include <code>smoke_app.py</code>, which the benchmark does not score. The <a href="https://samiali38183.github.io/sinkline/">published report</a> is the same scan.</figcaption>
-</figure>
+<p class="trim">Trimmed: one finding of 73 shown, the corpus's <code># VULN:CWE-78</code> label comments and padding whitespace removed from the source lines.</p>
 <div class="scroll wide"><table class="tbl">
 <caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests</th><td data-label="Value">91 (includes the corpus gate and the Action tests)</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1</a>; <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/42920168878"><span class="st" aria-hidden="true"></span><span>run 42920168878</span> <span class="d">passed 2026-11-10</span></a></td></tr>
-<tr><th scope="row">Benchmark, sinkline 0.4.1</th><td data-label="Value">TP 60, FP 0, FN 1, TN 48; P 1.000, R 0.984, F1 0.992</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/score.py</a>, README results table</td></tr>
-<tr><th scope="row">Benchmark, Bandit 1.9.4</th><td data-label="Value">TP 33, FP 20, FN 28, TN 28; P 0.623, R 0.541, F1 0.579</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/compare_bandit.py">bench/compare_bandit.py</a></td></tr>
+<tr><th scope="row">Tests</th><td data-label="Value">138 (includes the corpus gate, the Action tests and the external-benchmark fixes)</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.5.0</a>; <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43033758810"><span class="st" aria-hidden="true"></span><span>run 43033758810</span> <span class="d">passed 2026-11-11</span></a></td></tr>
+<tr><th scope="row">OWASP BenchmarkPython v0.1, 10 taint categories</th><td data-label="Value">sinkline 0.5.0: TPR 0.73, FPR 0.21, +0.52 (0.4.1: 0.41, 0.20, +0.21); Bandit 1.9.4: 0.13, 0.06, +0.07; Semgrep OSS 1.185.0: 0.07, 0.03, +0.04</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">bench/external/README.md</a>; sinkline 0.5.0 re-run for this page</td></tr>
+<tr><th scope="row">OWASP BenchmarkPython v0.1, all 14 categories</th><td data-label="Value">sinkline 0.5.0: 0.39, 0.12, +0.27; Bandit 1.9.4: 0.40, 0.03, +0.36; Semgrep OSS 1.185.0: 0.16, 0.02, +0.14</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.5.0/summary.md">results/v0.5.0</a></td></tr>
+<tr><th scope="row">Regression gate, self-labeled corpus</th><td data-label="Value">TP 60, FP 0, FN 1, TN 48; P 1.000, R 0.984, F1 0.992 (not independent)</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/score.py</a></td></tr>
+<tr><th scope="row">Same corpus, Bandit 1.9.4</th><td data-label="Value">TP 33, FP 20, FN 28, TN 28; P 0.623, R 0.541, F1 0.579</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/blob/main/bench/compare_bandit.py">bench/compare_bandit.py</a></td></tr>
 <tr><th scope="row">vulpy @ 5249cc8</th><td data-label="Value">3 findings, all CWE-89, all in <code>bad/</code>; 0 in <code>good/</code></td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
-<tr><th scope="row">Vulnerable-Flask-App @ b6a4f97</th><td data-label="Value">4 findings (SSTI, SQLi, XSS, MD5)</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
+<tr><th scope="row">Vulnerable-Flask-App @ b6a4f97</th><td data-label="Value">5 findings: SSTI and XSS on the same call, SQLi, XSS, MD5 (0.4.1 reported 4; the XSS finding on the template call is new in 0.5.0)</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
 <tr><th scope="row">dvpwa @ a1d8f89</th><td data-label="Value">2 findings (CWE-89, CWE-117)</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
 <tr><th scope="row">microblog @ a975ef6</th><td data-label="Value">0 findings</td><td data-label="Source">counts re-run for this page</td></tr>
-<tr><th scope="row">Rules</th><td data-label="Value">42 rules, 138 sink signatures</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline#how-it-works">README</a>; <code>sinkline rules</code></td></tr>
-<tr><th scope="row">Release</th><td data-label="Value">v0.4.1</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.4.1">GitHub release</a></td></tr>
+<tr><th scope="row">Rules</th><td data-label="Value">43 rules, 151 sink signatures</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline#how-it-works">README</a>; <code>sinkline rules</code></td></tr>
+<tr><th scope="row">Release</th><td data-label="Value">v0.5.0</td><td data-label="Source"><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.5.0">GitHub release</a></td></tr>
 </tbody>
 </table></div>
 </section>
@@ -172,15 +400,15 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 </div>
 <h3>What it does</h3>
 <div class="prose">
-<p>Pure Python on the standard <code>ast</code> module, with no dependencies. It knows Flask, FastAPI, Django and aiohttp sources, and has 42 rules with 138 sink signatures mapped to OWASP 2021 and CWE. Output is text, JSON, SARIF 2.1.0 (with code flows) or a self-contained HTML report. It also ships as a GitHub Action and a pre-commit hook, and supports <code>--baseline</code> so an existing codebase can fail only on new findings.</p>
+<p>Pure Python on the standard <code>ast</code> module, with no dependencies. It knows Flask, FastAPI, Django and aiohttp sources, and has 43 rules with 151 sink signatures mapped to OWASP 2021 and CWE. Output is text, JSON, SARIF 2.1.0 (with code flows) or a self-contained HTML report. It also ships as a GitHub Action and a pre-commit hook, and supports <code>--baseline</code> so an existing codebase can fail only on new findings.</p>
 </div>
-<figure class="plate diagram"><span class="plate-label">Plate 3</span><svg viewBox="0 0 320 621" role="img" aria-labelledby="sinkline-t sinkline-d"><title id="sinkline-t">sinkline analysis passes</title><desc id="sinkline-d">Python files are parsed and names resolved. Pass 1 computes a summary per function to a fixpoint. Pass 2 re-runs with real sources and uses the summaries at each call site. Findings come out as text, JSON, SARIF or HTML.</desc><rect x="26" y="4" width="290" height="77"/><text x="38" y="26" font-weight="600" font-size="14">Parse and resolve names</text><text class="sub" x="38" y="44" font-size="13">ast, imports, aliases, receiver</text><text class="sub" x="38" y="61" font-size="13">types</text><circle class="letter" cx="12" cy="16" r="9"/><text class="lt" x="12" y="20">A</text><path class="arrow" d="M171 81 V106"/><path class="head" d="M166 99 L171 106 L176 99"/><rect x="26" y="107" width="290" height="77"/><text x="38" y="129" font-weight="600" font-size="14">Pass 1: function summaries</text><text class="sub" x="38" y="147" font-size="13">parameters as labels, repeated to</text><text class="sub" x="38" y="164" font-size="13">a fixpoint</text><circle class="letter" cx="12" cy="119" r="9"/><text class="lt" x="12" y="123">B</text><path class="arrow" d="M171 184 V209"/><path class="head" d="M166 202 L171 209 L176 202"/><rect x="26" y="210" width="290" height="77"/><text x="38" y="232" font-weight="600" font-size="14">Pass 2: real sources</text><text class="sub" x="38" y="250" font-size="13">request data enters; summaries</text><text class="sub" x="38" y="267" font-size="13">used at call sites</text><circle class="letter" cx="12" cy="222" r="9"/><text class="lt" x="12" y="226">C</text><path class="arrow" d="M171 287 V312"/><path class="head" d="M166 305 L171 312 L176 305"/><rect class="hi" x="26" y="313" width="290" height="96"/><text x="38" y="335" font-weight="600" font-size="14">Taint with CWE-scoped</text><text x="38" y="354" font-weight="600" font-size="14">sanitizers</text><text class="sub" x="38" y="372" font-size="13">join: union of labels, intersect</text><text class="sub" x="38" y="389" font-size="13">cleared CWEs</text><circle class="letter" cx="12" cy="325" r="9"/><text class="lt" x="12" y="329">D</text><path class="arrow" d="M171 409 V434"/><path class="head" d="M166 427 L171 434 L176 427"/><rect x="26" y="435" width="290" height="77"/><text x="38" y="457" font-weight="600" font-size="14">Sink match</text><text class="sub" x="38" y="475" font-size="13">keyword gates, receiver types,</text><text class="sub" x="38" y="492" font-size="13">CWE not cleared</text><circle class="letter" cx="12" cy="447" r="9"/><text class="lt" x="12" y="451">E</text><path class="arrow" d="M171 512 V537"/><path class="head" d="M166 530 L171 537 L176 530"/><rect class="warn" x="26" y="538" width="290" height="79"/><path class="hatch-line" d="M26 617 l20 -20 M26 609 l8 -8 M34 617 l12 -12"/><text x="38" y="560" font-weight="600" font-size="14">Report with the source-to-sink</text><text x="38" y="579" font-weight="600" font-size="14">path</text><text class="sub" x="38" y="597" font-size="13">text, JSON, SARIF 2.1.0, HTML</text><circle class="letter" cx="12" cy="550" r="9"/><text class="lt" x="12" y="554">F</text></svg><figcaption>Python files are parsed and names resolved. Pass 1 computes a summary per function to a fixpoint. Pass 2 re-runs with real sources and uses the summaries at each call site. Findings come out as text, JSON, SARIF or HTML.</figcaption></figure><details class="alt"><summary>Describe this diagram</summary><ol class="alt-list" type="A"><li><strong>Parse and resolve names.</strong> ast, imports, aliases, receiver types.</li><li><strong>Pass 1: function summaries.</strong> parameters as labels, repeated to a fixpoint.</li><li><strong>Pass 2: real sources.</strong> request data enters; summaries used at call sites.</li><li><strong>Taint with CWE-scoped sanitizers.</strong> join: union of labels, intersect cleared CWEs.</li><li><strong>Sink match.</strong> keyword gates, receiver types, CWE not cleared.</li><li><strong>Report with the source-to-sink path.</strong> text, JSON, SARIF 2.1.0, HTML.</li></ol></details>
+<figure class="plate diagram"><span class="plate-label">Plate 2</span><svg viewBox="0 0 320 621" role="img" aria-labelledby="sinkline-t sinkline-d"><title id="sinkline-t">sinkline analysis passes</title><desc id="sinkline-d">Python files are parsed and names resolved. Pass 1 computes a summary per function to a fixpoint. Pass 2 re-runs with real sources and uses the summaries at each call site. Findings come out as text, JSON, SARIF or HTML.</desc><rect x="26" y="4" width="290" height="77"/><text x="38" y="26" font-weight="600" font-size="14">Parse and resolve names</text><text class="sub" x="38" y="44" font-size="13">ast, imports, aliases, receiver</text><text class="sub" x="38" y="61" font-size="13">types</text><circle class="letter" cx="12" cy="16" r="9"/><text class="lt" x="12" y="20">A</text><path class="arrow" d="M171 81 V106"/><path class="head" d="M166 99 L171 106 L176 99"/><rect x="26" y="107" width="290" height="77"/><text x="38" y="129" font-weight="600" font-size="14">Pass 1: function summaries</text><text class="sub" x="38" y="147" font-size="13">parameters as labels, repeated to</text><text class="sub" x="38" y="164" font-size="13">a fixpoint</text><circle class="letter" cx="12" cy="119" r="9"/><text class="lt" x="12" y="123">B</text><path class="arrow" d="M171 184 V209"/><path class="head" d="M166 202 L171 209 L176 202"/><rect x="26" y="210" width="290" height="77"/><text x="38" y="232" font-weight="600" font-size="14">Pass 2: real sources</text><text class="sub" x="38" y="250" font-size="13">request data enters; summaries</text><text class="sub" x="38" y="267" font-size="13">used at call sites</text><circle class="letter" cx="12" cy="222" r="9"/><text class="lt" x="12" y="226">C</text><path class="arrow" d="M171 287 V312"/><path class="head" d="M166 305 L171 312 L176 305"/><rect class="hi" x="26" y="313" width="290" height="96"/><text x="38" y="335" font-weight="600" font-size="14">Taint with CWE-scoped</text><text x="38" y="354" font-weight="600" font-size="14">sanitizers</text><text class="sub" x="38" y="372" font-size="13">join: union of labels, intersect</text><text class="sub" x="38" y="389" font-size="13">cleared CWEs</text><circle class="letter" cx="12" cy="325" r="9"/><text class="lt" x="12" y="329">D</text><path class="arrow" d="M171 409 V434"/><path class="head" d="M166 427 L171 434 L176 427"/><rect x="26" y="435" width="290" height="77"/><text x="38" y="457" font-weight="600" font-size="14">Sink match</text><text class="sub" x="38" y="475" font-size="13">keyword gates, receiver types,</text><text class="sub" x="38" y="492" font-size="13">CWE not cleared</text><circle class="letter" cx="12" cy="447" r="9"/><text class="lt" x="12" y="451">E</text><path class="arrow" d="M171 512 V537"/><path class="head" d="M166 530 L171 537 L176 530"/><rect class="warn" x="26" y="538" width="290" height="79"/><path class="hatch-line" d="M26 617 l20 -20 M26 609 l8 -8 M34 617 l12 -12"/><text x="38" y="560" font-weight="600" font-size="14">Report with the source-to-sink</text><text x="38" y="579" font-weight="600" font-size="14">path</text><text class="sub" x="38" y="597" font-size="13">text, JSON, SARIF 2.1.0, HTML</text><circle class="letter" cx="12" cy="550" r="9"/><text class="lt" x="12" y="554">F</text></svg><figcaption>Python files are parsed and names resolved. Pass 1 computes a summary per function to a fixpoint. Pass 2 re-runs with real sources and uses the summaries at each call site. Findings come out as text, JSON, SARIF or HTML.</figcaption></figure><details class="alt"><summary>Describe this diagram</summary><ol class="alt-list" type="A"><li><strong>Parse and resolve names.</strong> ast, imports, aliases, receiver types.</li><li><strong>Pass 1: function summaries.</strong> parameters as labels, repeated to a fixpoint.</li><li><strong>Pass 2: real sources.</strong> request data enters; summaries used at call sites.</li><li><strong>Taint with CWE-scoped sanitizers.</strong> join: union of labels, intersect cleared CWEs.</li><li><strong>Sink match.</strong> keyword gates, receiver types, CWE not cleared.</li><li><strong>Report with the source-to-sink path.</strong> text, JSON, SARIF 2.1.0, HTML.</li></ol></details>
 <h3>Three implementation points</h3>
 <div class="prose">
 <h4>Two-pass interprocedural summaries</h4>
 <p>Pass 1 analyzes each function with its parameters bound to symbolic labels (<code>param:0</code>, <code>param:1</code>, ...) and records which parameters reach the return value, which reach sinks, and whether the function is a thin sanitizer. It repeats until no summary changes, so a sink four helpers deep is found whatever order the helpers are defined in. Pass 2 re-runs with real sources and consults the summary at each call site. The cost is that summaries are context-insensitive: one per function, not per call site. Summary keys are module-qualified, so vulpy's <code>bad/</code> and <code>good/</code> trees, which define the same function names, give different results.</p>
 <h4>CWE-scoped sanitizers</h4>
-<p>A tainted value carries the set of CWEs it has been cleaned for.<sup class="nref" aria-hidden="true"></sup> <code>shlex.quote</code> clears command injection only, <code>html.escape</code> clears XSS only, and <code>int()</code> clears everything. A single global "sanitized" flag makes a shell-safe string look SQL-safe. At a branch join, taint labels are unioned and cleared CWEs are intersected, so a value stays clean only if every path cleaned it. Validation guards such as <code>if not x.isdigit(): abort()</code> work the same way and are scoped too: a <code>..</code> check is a path guard, not a shell guard.</p>
+<p>A tainted value carries the set of CWEs it has been cleaned for.<sup class="nref" aria-hidden="true"></sup> <code>shlex.quote</code> clears command injection only, <code>html.escape</code> clears XSS only, and <code>int()</code> clears everything. A single global "sanitized" flag makes a shell-safe string look SQL-safe. At a branch join, taint labels are unioned and cleared CWEs are intersected, so a value stays clean only if every path cleaned it. Validation guards such as <code>if not x.isdigit(): abort()</code> work the same way and are scoped too: a <code>..</code> check is a path guard, not a shell guard. Plate 1 shows this with recorded output: the sanitizer step appears in the path, with the CWE it clears.</p>
 </div>
 <div class="note" role="note"><strong>CWE</strong> numbers name bug classes: CWE-78 is OS command injection, CWE-79 cross-site scripting, CWE-89 SQL injection.</div>
 <div class="prose">
@@ -192,16 +420,20 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 <section class="limits section" id="limits" aria-labelledby="limits-h">
 <h2 id="limits-h"><span class="label sec-label">Tolerance and limits</span>What the numbers do not show</h2>
 <ul class="prose">
-<li><strong>The benchmark is small and self-labeled.</strong> 109 lines, labeled by the same person who wrote the engine, and it doubles as the regression suite. Two of the 0.4.0 changes were written to fix lines in it. Read the scores as "no regressions and the design limits are visible", not as a generalization estimate.</li>
+<li><strong>The 0.5.0 score is not held out.</strong> The fixes were chosen by reading the failures of 0.4.1 on the same benchmark. Only the 0.4.1 reading is an independent measurement, and it was +0.21 on the taint categories.</li>
+<li><strong>One synthetic suite.</strong> BenchmarkPython v0.1 is a preliminary release of templated cases (many share one shape), and the SQL, command and XXE categories have only 5 to 13 vulnerable cases. The scorer is the repository's own script, not the official one, so the benchmark's own scorecard may differ.</li>
+<li><strong>High false-positive rate.</strong> FPR is 0.21 on the taint categories. The largest remaining source is position-sensitive lists (a list is tracked as a whole), then deliberately obfuscated safe variants. Taint stored through <code>ConfigParser</code> or a user-defined request wrapper is lost.</li>
+<li><strong>Four categories have no checks:</strong> weak hash, weak PRNG, cookie flags and trust boundary. Over all 14 categories Bandit leads, +0.36 to +0.27.</li>
+<li><strong>The self-labeled corpus is not independent.</strong> 109 lines, labeled alongside the engine, kept as a regression gate. Its F1 of 0.992 is not an accuracy estimate.</li>
 <li><strong>The public-project scans are unlabeled.</strong> Three of the four are deliberately vulnerable training apps. Zero findings on microblog is consistent with its redirect check being treated as a guard, not proof the app is safe. No CVEs or real-world vulnerabilities are claimed.</li>
-<li><strong>Known design limits.</strong> Taint passed between requests through a module global (the one benchmark miss), returned closures, dynamic dispatch, and instance fields tracked per class rather than per object.</li>
-<li><strong>Python only, summaries context-insensitive,</strong> and no coverage for OWASP A04 and A06.</li>
+<li><strong>Plate 1 shows recorded runs of small files, not a benchmark.</strong> One case is worth knowing: <code>return shlex.quote(request.args.get("name", ""))</code>, is not reported in 0.5.0 (the changelog says a returned call result counts as XSS only when it is the tainted string itself, and an unknown call is not guessed at), while the same value assigned to a variable first is. The recorded run is in <code>assets/data/sinkline-bench/html-wrong-direct.txt</code>.</li>
+<li><strong>Known design limits.</strong> Taint passed between requests through a module global, returned closures, dynamic dispatch, and instance fields tracked per class rather than per object. Python only, summaries context-insensitive, and no coverage for OWASP A04 and A06.</li>
 </ul>
 </section>
 <section class="section" id="trace" aria-labelledby="trace-h">
 <h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
-<dl class="trace"><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.4.1">v0.4.1</a></dd></div><div><dt>CI run on main</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/42920168878"><span class="st" aria-hidden="true"></span><span>run 42920168878</span> <span class="d">passed 2026-11-10</span></a></dd></div><div><dt>Security fix for the Action</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1, Security</a></dd></div><div><dt>Benchmark scripts</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/</a></dd></div><div><dt>Public-project scans</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a></dd></div><div><dt>Action test</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py">tests/test_action.py</a></dd></div></dl>
+<dl class="trace"><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.5.0">v0.5.0</a></dd></div><div><dt>CI run on main (v0.5.0)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43033758810"><span class="st" aria-hidden="true"></span><span>run 43033758810</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Report workflow on main</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43033758686"><span class="st" aria-hidden="true"></span><span>run 43033758686</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>External benchmark, method and results</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">bench/external/README.md</a></dd></div><div><dt>Per-category results, 0.4.1 and 0.5.0</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/bench/external/results">bench/external/results</a></dd></div><div><dt>Changelog 0.5.0</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG.md</a></dd></div><div><dt>Security fix for the Action</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1, Security</a></dd></div><div><dt>Regression-gate scripts</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/</a></dd></div><div><dt>Public-project scans</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a></dd></div><div><dt>Sanitizer switch captures</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/tree/main/assets/data/sinkline-bench">assets/data/sinkline-bench</a></dd></div><div><dt>Action test</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py">tests/test_action.py</a></dd></div></dl>
 
 </section>
 <nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/tripline/"><span class="label">Previous sheet, 1 of 6</span><span class="n">tripline</span></a><a class="next" href="/projects/kevgate/"><span class="label">Next sheet, 3 of 6</span><span class="n">kevgate</span></a></nav>
@@ -219,5 +451,6 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>
+<script type="module" src="/assets/js/bench-sinkline.js"></script>
 </body>
 </html>
