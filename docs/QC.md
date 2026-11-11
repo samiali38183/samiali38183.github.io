@@ -43,3 +43,13 @@ Pages build for merge commit `ff40cc5` finished with status `built` and no error
 - Resume and certificate PDFs downloaded from the live site: `resume.pdf` and `resume-red-team.pdf` return 200 as `application/pdf`, 1 page each, text extractable, byte-identical to the repository files; the two certificate PDFs are the same.
 - Old URLs (`about.html`, `projects.html`, `services.html`, `contact.html`, `projects/kev.html`, `projects/power-bi.html`) return 200 and carry a meta refresh plus canonical to the new page. An unknown path returns the 404 page with status 404.
 - The puppeteer and axe run repeated against the live URLs (88 page views): 0 axe violations, no horizontal overflow, no console errors or failed requests.
+
+## 7. fuzzdiff page added (2026-11-11)
+
+Added `/projects/fuzzdiff/`, a fifth entry on the projects index and a one-line mention on the home page. Checks re-run on the branch before merge:
+
+- `scripts/check_facts.py` extended for fuzzdiff and re-run: 58 passed, 0 failed. New checks: `cargo test --all` total (29), seeded-bug detection counts (3, 286, 8 inputs) and the 500,000-input control, line coverage of `src/` from `cargo llvm-cov` (95.88%), the three libFuzzer execution counts parsed from the log of fuzz run 42961733885, and the conclusion of the three fuzzdiff CI runs linked on the page.
+- Browser checks (puppeteer + axe, 12 pages x 4 widths x 2 color schemes = 96 views): 0 axe violations, no horizontal overflow, no console errors or failed requests.
+- `html-validate`: 0 errors. `scripts/check_links.py`: 200 internal references and 58 unique external URLs, all fine except LinkedIn (bot-blocked).
+- The resume PDFs were not touched in this change.
+- Not re-run locally: libFuzzer and the sanitizer jobs (Linux CI only; numbers come from the CI logs) and the benchmarks (one-machine numbers from `docs/BENCHMARKS.md`).
