@@ -34,3 +34,12 @@ Mismatches and notes found:
 ## 5. Copy
 
 Spell-checked all page text (pyspellchecker) and read every page: only product names and technical terms were flagged. Banned-phrase grep (leverage, robust, cutting-edge, seamless, empower, passionate, journey, "in today", AI-assistance wording, clearance) returns nothing. About page: 167 words.
+
+## 6. Live site (after deploy, 2026-11-11)
+
+Pages build for merge commit `ff40cc5` finished with status `built` and no error.
+
+- `python scripts/check_links.py https://samiali38183.github.io`: 147 internal references fetched with HTTP 200 and anchors found, 39 unique external URLs 2xx or 3xx except LinkedIn (999, bot-blocked). Result OK.
+- Resume and certificate PDFs downloaded from the live site: `resume.pdf` and `resume-red-team.pdf` return 200 as `application/pdf`, 1 page each, text extractable, byte-identical to the repository files; the two certificate PDFs are the same.
+- Old URLs (`about.html`, `projects.html`, `services.html`, `contact.html`, `projects/kev.html`, `projects/power-bi.html`) return 200 and carry a meta refresh plus canonical to the new page. An unknown path returns the 404 page with status 404.
+- The puppeteer and axe run repeated against the live URLs (88 page views): 0 axe violations, no horizontal overflow, no console errors or failed requests.
