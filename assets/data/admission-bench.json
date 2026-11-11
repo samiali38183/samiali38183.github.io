@@ -1,0 +1,863 @@
+{
+ "provenance": {
+  "tool": "kevgate-admit",
+  "tag": "v0.1.0",
+  "commit": "161169a9cfbe2dff888acec1d3303bc702dc2587",
+  "repo": "https://github.com/samiali38183/kevgate-admit",
+  "binary": "kevgate-admit dev",
+  "go": "go version go1.27.4 windows/amd64",
+  "captured": "2026-11-11",
+  "command": "kevgate-admit serve --self-signed --policy-file deploy/demo/policy.yaml --kev-file deploy/demo/kev-demo.json --evidence-dir deploy/demo/reports",
+  "command_signed": "kevgate-admit serve --self-signed --policy-file signed-policy.yaml --kev-file deploy/demo/kev-demo.json --evidence-dir SIGNED_REPORTS --evidence-public-key-file report-key.pub.pem",
+  "regenerate": "python scripts/capture_admission_bench.py",
+  "label": "Synthetic demo data and test output from a locally run webhook, not a cluster run.",
+  "request": "{\"apiVersion\":\"admission.k8s.io/v1\",\"kind\":\"AdmissionReview\",\"request\":{\"uid\":\"u1\",\"kind\":{\"group\":\"apps\",\"version\":\"v1\",\"kind\":\"Deployment\"},\"resource\":{\"group\":\"apps\",\"version\":\"v1\",\"resource\":\"deployments\"},\"operation\":\"CREATE\",\"namespace\":\"NAMESPACE\",\"object\":{\"metadata\":{\"name\":\"web\"},\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"web\",\"image\":\"IMAGE\"}]}}}}}}",
+  "names_verified": [
+   "internal/admission/handler.go: Review",
+   "internal/admission/handler.go: resolve",
+   "internal/admission/handler.go: lookupBounded",
+   "internal/admission/decode.go: Extract",
+   "internal/imageref/imageref.go: Parse",
+   "internal/imageref/imageref.go: Pinned",
+   "internal/evidence/evidence.go: FileName",
+   "internal/evidence/evidence.go: Lookup",
+   "internal/evidence/evidence.go: checkSignature",
+   "internal/evsign/evsign.go: Verify",
+   "internal/trivy/trivy.go: ParseReader",
+   "internal/risk/risk.go: Score",
+   "internal/policy/policy.go: RuleFor",
+   "internal/policy/eval.go: Evaluate",
+   "internal/policy/eval.go: findings",
+   "internal/policy/eval.go: Message",
+   "internal/policy/eval.go: ResponseWarnings"
+  ],
+  "formula": "risk = 100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05"
+ },
+ "images": [
+  {
+   "id": "clean",
+   "label": "clean",
+   "ref": "registry.example.com/demo/clean@sha256:1111111111111111111111111111111111111111111111111111111111111111",
+   "what": "Digest-pinned; the report lists three low and medium findings, none in KEV."
+  },
+  {
+   "id": "kev",
+   "label": "kev-vulnerable",
+   "ref": "registry.example.com/demo/kev-vulnerable@sha256:2222222222222222222222222222222222222222222222222222222222222222",
+   "what": "Digest-pinned; the report lists CVE-2021-44228, which the demo KEV subset contains."
+  },
+  {
+   "id": "over",
+   "label": "over-threshold",
+   "ref": "registry.example.com/demo/over-threshold@sha256:3333333333333333333333333333333333333333333333333333333333333333",
+   "what": "Digest-pinned; no KEV finding, but CVE-2099-10004 scores above 40 (CVSS 9.8, EPSS 0.9)."
+  },
+  {
+   "id": "tag",
+   "label": "tag-only",
+   "ref": "registry.example.com/demo/clean:latest",
+   "what": "A tag, no digest. The webhook never resolves tags."
+  },
+  {
+   "id": "evil",
+   "label": "malformed reference",
+   "ref": "ghcr.io/org/../evil",
+   "what": "A path with a dot segment. Earlier builds accepted it; the strict OCI-grammar parser rejects it."
+  }
+ ],
+ "policies": [
+  {
+   "id": "enforce",
+   "namespace": "demo-enforce",
+   "scope": "demo-enforce",
+   "label": "demo-enforce",
+   "summary": "mode enforce; denyKev, maxRisk 40, requireDigest, requireEvidence deny, registry registry.example.com/demo only"
+  },
+  {
+   "id": "audit",
+   "namespace": "demo-audit",
+   "scope": "demo-audit",
+   "label": "demo-audit",
+   "summary": "same rules, mode audit: the request is admitted and the would-be denials come back as warnings"
+  },
+  {
+   "id": "default",
+   "namespace": "other",
+   "scope": "_default",
+   "label": "any other namespace",
+   "summary": "the policy's default rule: denyKev, requireDigest, requireEvidence deny; no maxRisk, no registry list"
+  }
+ ],
+ "results": [
+  {
+   "image": "clean",
+   "policy": "enforce",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true
+    }
+   },
+   "decision": "allowed",
+   "rules": [],
+   "findings": [],
+   "in_readme": null
+  },
+  {
+   "image": "kev",
+   "policy": "enforce",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": false,
+     "status": {
+      "metadata": {},
+      "status": "Failure",
+      "message": "kevgate-admit: request denied by policy (namespace \"demo-enforce\", scope \"demo-enforce\")\n- [denyKev] registry.example.com/demo/kev-vulnerable@sha256:222222222222: 1 finding(s) in the CISA KEV catalog\n    CVE-2021-44228   KEV  risk  87.5  log4j-core 2.14.1 (fixed 2.17.1)\n- [maxRisk] registry.example.com/demo/kev-vulnerable@sha256:222222222222: 1 finding(s) above max risk 40.0 (highest 87.5)\n    CVE-2021-44228   KEV  risk  87.5  log4j-core 2.14.1 (fixed 2.17.1)",
+      "reason": "Forbidden",
+      "code": 403
+     }
+    }
+   },
+   "decision": "denied",
+   "rules": [
+    "denyKev",
+    "maxRisk"
+   ],
+   "findings": [
+    {
+     "rule": "denyKev",
+     "image": "registry.example.com/demo/kev-vulnerable@sha256:222222222222",
+     "cve": "CVE-2021-44228",
+     "kev": true,
+     "risk": 87.5,
+     "pkg": "log4j-core 2.14.1 (fixed 2.17.1)",
+     "worked": "100 * (0.40*1 + 0.25*4/8 + 0.20*0.97 + 0.20*10/10) / 1.05 = 87.5"
+    },
+    {
+     "rule": "maxRisk",
+     "image": "registry.example.com/demo/kev-vulnerable@sha256:222222222222",
+     "cve": "CVE-2021-44228",
+     "kev": true,
+     "risk": 87.5,
+     "pkg": "log4j-core 2.14.1 (fixed 2.17.1)",
+     "worked": "100 * (0.40*1 + 0.25*4/8 + 0.20*0.97 + 0.20*10/10) / 1.05 = 87.5"
+    }
+   ],
+   "in_readme": true
+  },
+  {
+   "image": "over",
+   "policy": "enforce",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": false,
+     "status": {
+      "metadata": {},
+      "status": "Failure",
+      "message": "kevgate-admit: request denied by policy (namespace \"demo-enforce\", scope \"demo-enforce\")\n- [maxRisk] registry.example.com/demo/over-threshold@sha256:333333333333: 1 finding(s) above max risk 40.0 (highest 47.7)\n    CVE-2099-10004        risk  47.7  libwidget 3.2 (fixed 3.3)",
+      "reason": "Forbidden",
+      "code": 403
+     }
+    }
+   },
+   "decision": "denied",
+   "rules": [
+    "maxRisk"
+   ],
+   "findings": [
+    {
+     "rule": "maxRisk",
+     "image": "registry.example.com/demo/over-threshold@sha256:333333333333",
+     "cve": "CVE-2099-10004",
+     "kev": false,
+     "risk": 47.7,
+     "pkg": "libwidget 3.2 (fixed 3.3)",
+     "worked": "100 * (0.40*0 + 0.25*4/8 + 0.20*0.9 + 0.20*9.8/10) / 1.05 = 47.7"
+    }
+   ],
+   "in_readme": true
+  },
+  {
+   "image": "tag",
+   "policy": "enforce",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": false,
+     "status": {
+      "metadata": {},
+      "status": "Failure",
+      "message": "kevgate-admit: request denied by policy (namespace \"demo-enforce\", scope \"demo-enforce\")\n- [requireDigest] registry.example.com/demo/clean:latest: image is not pinned by digest; tags are mutable",
+      "reason": "Forbidden",
+      "code": 403
+     }
+    }
+   },
+   "decision": "denied",
+   "rules": [
+    "requireDigest"
+   ],
+   "findings": [],
+   "in_readme": true
+  },
+  {
+   "image": "evil",
+   "policy": "enforce",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": false,
+     "status": {
+      "metadata": {},
+      "status": "Failure",
+      "message": "kevgate-admit: request denied by policy (namespace \"demo-enforce\", scope \"demo-enforce\")\n- [imageRef] ghcr.io/org/../evil: malformed image reference: invalid image reference: malformed repository",
+      "reason": "Forbidden",
+      "code": 403
+     }
+    }
+   },
+   "decision": "denied",
+   "rules": [
+    "imageRef"
+   ],
+   "findings": [],
+   "in_readme": false
+  },
+  {
+   "image": "clean",
+   "policy": "audit",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true
+    }
+   },
+   "decision": "allowed",
+   "rules": [],
+   "findings": [],
+   "in_readme": null
+  },
+  {
+   "image": "kev",
+   "policy": "audit",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true,
+     "warnings": [
+      "kevgate-admit audit: would deny [denyKev] registry.example.com/demo/kev-vulnerable@sha256:222222222222: 1 finding(s) in the CISA KEV catalog",
+      "kevgate-admit audit: would deny [maxRisk] registry.example.com/demo/kev-vulnerable@sha256:222222222222: 1 finding(s) above max risk 40.0 (highest 87.5)"
+     ]
+    }
+   },
+   "decision": "warned",
+   "rules": [
+    "denyKev",
+    "maxRisk"
+   ],
+   "findings": [],
+   "in_readme": false
+  },
+  {
+   "image": "over",
+   "policy": "audit",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true,
+     "warnings": [
+      "kevgate-admit audit: would deny [maxRisk] registry.example.com/demo/over-threshold@sha256:333333333333: 1 finding(s) above max risk 40.0 (highest 47.7)"
+     ]
+    }
+   },
+   "decision": "warned",
+   "rules": [
+    "maxRisk"
+   ],
+   "findings": [],
+   "in_readme": true
+  },
+  {
+   "image": "tag",
+   "policy": "audit",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true,
+     "warnings": [
+      "kevgate-admit audit: would deny [requireDigest] registry.example.com/demo/clean:latest: image is not pinned by digest; tags are mutable"
+     ]
+    }
+   },
+   "decision": "warned",
+   "rules": [
+    "requireDigest"
+   ],
+   "findings": [],
+   "in_readme": false
+  },
+  {
+   "image": "evil",
+   "policy": "audit",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true,
+     "warnings": [
+      "kevgate-admit audit: would deny [imageRef] ghcr.io/org/../evil: malformed image reference: invalid image reference: malformed repository"
+     ]
+    }
+   },
+   "decision": "warned",
+   "rules": [
+    "imageRef"
+   ],
+   "findings": [],
+   "in_readme": false
+  },
+  {
+   "image": "clean",
+   "policy": "default",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true
+    }
+   },
+   "decision": "allowed",
+   "rules": [],
+   "findings": [],
+   "in_readme": null
+  },
+  {
+   "image": "kev",
+   "policy": "default",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": false,
+     "status": {
+      "metadata": {},
+      "status": "Failure",
+      "message": "kevgate-admit: request denied by policy (namespace \"other\", scope \"_default\")\n- [denyKev] registry.example.com/demo/kev-vulnerable@sha256:222222222222: 1 finding(s) in the CISA KEV catalog\n    CVE-2021-44228   KEV  risk  87.5  log4j-core 2.14.1 (fixed 2.17.1)",
+      "reason": "Forbidden",
+      "code": 403
+     }
+    }
+   },
+   "decision": "denied",
+   "rules": [
+    "denyKev"
+   ],
+   "findings": [
+    {
+     "rule": "denyKev",
+     "image": "registry.example.com/demo/kev-vulnerable@sha256:222222222222",
+     "cve": "CVE-2021-44228",
+     "kev": true,
+     "risk": 87.5,
+     "pkg": "log4j-core 2.14.1 (fixed 2.17.1)",
+     "worked": "100 * (0.40*1 + 0.25*4/8 + 0.20*0.97 + 0.20*10/10) / 1.05 = 87.5"
+    }
+   ],
+   "in_readme": false
+  },
+  {
+   "image": "over",
+   "policy": "default",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": true
+    }
+   },
+   "decision": "allowed",
+   "rules": [],
+   "findings": [],
+   "in_readme": null
+  },
+  {
+   "image": "tag",
+   "policy": "default",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": false,
+     "status": {
+      "metadata": {},
+      "status": "Failure",
+      "message": "kevgate-admit: request denied by policy (namespace \"other\", scope \"_default\")\n- [requireDigest] registry.example.com/demo/clean:latest: image is not pinned by digest; tags are mutable",
+      "reason": "Forbidden",
+      "code": 403
+     }
+    }
+   },
+   "decision": "denied",
+   "rules": [
+    "requireDigest"
+   ],
+   "findings": [],
+   "in_readme": false
+  },
+  {
+   "image": "evil",
+   "policy": "default",
+   "raw": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+     "uid": "u1",
+     "allowed": false,
+     "status": {
+      "metadata": {},
+      "status": "Failure",
+      "message": "kevgate-admit: request denied by policy (namespace \"other\", scope \"_default\")\n- [imageRef] ghcr.io/org/../evil: malformed image reference: invalid image reference: malformed repository",
+      "reason": "Forbidden",
+      "code": 403
+     }
+    }
+   },
+   "decision": "denied",
+   "rules": [
+    "imageRef"
+   ],
+   "findings": [],
+   "in_readme": false
+  }
+ ],
+ "signed": {
+  "policy": "version: 1\ndefault:\n  requireDigest: true\n  requireEvidence: deny\n  denyKev: true\n  maxRisk: 40\n  requireSignedEvidence: true\n",
+  "namespace": "demo-signed",
+  "scope": "_default",
+  "key": "ed25519",
+  "states": [
+   {
+    "id": "valid",
+    "label": "Valid signature",
+    "edit": "Every report signed with sign-report; nothing changed."
+   },
+   {
+    "id": "tampered",
+    "label": "Report edited after signing",
+    "edit": "One CVE id in the report renamed after it was signed (the signature file is untouched)."
+   },
+   {
+    "id": "missing",
+    "label": "Signature missing",
+    "edit": "The .sig files are absent; the report itself is unchanged."
+   }
+  ],
+  "images": [
+   "clean",
+   "kev",
+   "over"
+  ],
+  "results": [
+   {
+    "image": "clean",
+    "state": "valid",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": true
+     }
+    },
+    "decision": "allowed",
+    "rules": [],
+    "findings": [],
+    "in_readme": null
+   },
+   {
+    "image": "kev",
+    "state": "valid",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [denyKev] registry.example.com/demo/kev-vulnerable@sha256:222222222222: 1 finding(s) in the CISA KEV catalog\n    CVE-2021-44228   KEV  risk  87.5  log4j-core 2.14.1 (fixed 2.17.1)\n- [maxRisk] registry.example.com/demo/kev-vulnerable@sha256:222222222222: 1 finding(s) above max risk 40.0 (highest 87.5)\n    CVE-2021-44228   KEV  risk  87.5  log4j-core 2.14.1 (fixed 2.17.1)",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "denyKev",
+     "maxRisk"
+    ],
+    "findings": [
+     {
+      "rule": "denyKev",
+      "image": "registry.example.com/demo/kev-vulnerable@sha256:222222222222",
+      "cve": "CVE-2021-44228",
+      "kev": true,
+      "risk": 87.5,
+      "pkg": "log4j-core 2.14.1 (fixed 2.17.1)",
+      "worked": "100 * (0.40*1 + 0.25*4/8 + 0.20*0.97 + 0.20*10/10) / 1.05 = 87.5"
+     },
+     {
+      "rule": "maxRisk",
+      "image": "registry.example.com/demo/kev-vulnerable@sha256:222222222222",
+      "cve": "CVE-2021-44228",
+      "kev": true,
+      "risk": 87.5,
+      "pkg": "log4j-core 2.14.1 (fixed 2.17.1)",
+      "worked": "100 * (0.40*1 + 0.25*4/8 + 0.20*0.97 + 0.20*10/10) / 1.05 = 87.5"
+     }
+    ],
+    "in_readme": false
+   },
+   {
+    "image": "over",
+    "state": "valid",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [maxRisk] registry.example.com/demo/over-threshold@sha256:333333333333: 1 finding(s) above max risk 40.0 (highest 47.7)\n    CVE-2099-10004        risk  47.7  libwidget 3.2 (fixed 3.3)",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "maxRisk"
+    ],
+    "findings": [
+     {
+      "rule": "maxRisk",
+      "image": "registry.example.com/demo/over-threshold@sha256:333333333333",
+      "cve": "CVE-2099-10004",
+      "kev": false,
+      "risk": 47.7,
+      "pkg": "libwidget 3.2 (fixed 3.3)",
+      "worked": "100 * (0.40*0 + 0.25*4/8 + 0.20*0.9 + 0.20*9.8/10) / 1.05 = 47.7"
+     }
+    ],
+    "in_readme": false
+   },
+   {
+    "image": "clean",
+    "state": "tampered",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [requireEvidence] registry.example.com/demo/clean@sha256:111111111111: scan report signature is invalid (signature does not verify against a trusted key); signed evidence is required",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "requireEvidence"
+    ],
+    "findings": [],
+    "in_readme": false
+   },
+   {
+    "image": "kev",
+    "state": "tampered",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [requireEvidence] registry.example.com/demo/kev-vulnerable@sha256:222222222222: scan report signature is invalid (signature does not verify against a trusted key); signed evidence is required",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "requireEvidence"
+    ],
+    "findings": [],
+    "in_readme": false
+   },
+   {
+    "image": "over",
+    "state": "tampered",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [requireEvidence] registry.example.com/demo/over-threshold@sha256:333333333333: scan report signature is invalid (signature does not verify against a trusted key); signed evidence is required",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "requireEvidence"
+    ],
+    "findings": [],
+    "in_readme": false
+   },
+   {
+    "image": "clean",
+    "state": "missing",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [requireEvidence] registry.example.com/demo/clean@sha256:111111111111: scan report is unsigned (no signature file sha256-1111111111111111111111111111111111111111111111111111111111111111.json.sig); signed evidence is required",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "requireEvidence"
+    ],
+    "findings": [],
+    "in_readme": false
+   },
+   {
+    "image": "kev",
+    "state": "missing",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [requireEvidence] registry.example.com/demo/kev-vulnerable@sha256:222222222222: scan report is unsigned (no signature file sha256-2222222222222222222222222222222222222222222222222222222222222222.json.sig); signed evidence is required",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "requireEvidence"
+    ],
+    "findings": [],
+    "in_readme": false
+   },
+   {
+    "image": "over",
+    "state": "missing",
+    "raw": {
+     "kind": "AdmissionReview",
+     "apiVersion": "admission.k8s.io/v1",
+     "response": {
+      "uid": "u1",
+      "allowed": false,
+      "status": {
+       "metadata": {},
+       "status": "Failure",
+       "message": "kevgate-admit: request denied by policy (namespace \"demo-signed\", scope \"_default\")\n- [requireEvidence] registry.example.com/demo/over-threshold@sha256:333333333333: scan report is unsigned (no signature file sha256-3333333333333333333333333333333333333333333333333333333333333333.json.sig); signed evidence is required",
+       "reason": "Forbidden",
+       "code": 403
+      }
+     }
+    },
+    "decision": "denied",
+    "rules": [
+     "requireEvidence"
+    ],
+    "findings": [],
+    "in_readme": false
+   }
+  ]
+ },
+ "scanner": {
+  "fixture": "internal/trivy/testdata/real-trivy-0.76.2-python-3.9-slim-bullseye.json",
+  "bytes": 6934,
+  "trivy": "0.76.2",
+  "target": "python:3.9-slim-bullseye (debian 11.11)",
+  "raw_entries": 10,
+  "parser": {
+   "artifact": "python:3.9-slim-bullseye",
+   "created": "2026-11-11T08:43:42Z",
+   "digests": [
+    "sha256:ed6f8d42e44570055a5b6c16df05ff3ad5d129ce4a3bfc8baefad15949952a3f",
+    "sha256:b9e06687fbfc57f6fe563e94e4c8751e39513dde89afc120dc6f56afe5ffc761"
+   ],
+   "findings": [
+    {
+     "ID": "CVE-2022-3715",
+     "Package": "bash",
+     "Installed": "5.1-2+deb11u1",
+     "Fixed": "",
+     "Severity": "HIGH",
+     "CVSS": 7.8,
+     "EPSS": null,
+     "Risk": 26.8,
+     "title": "bash: a heap-buffer-overflow in valid_parameter_transform"
+    },
+    {
+     "ID": "CVE-2022-40897",
+     "Package": "setuptools",
+     "Installed": "58.1.0",
+     "Fixed": "65.5.1",
+     "Severity": "HIGH",
+     "CVSS": 7.5,
+     "EPSS": null,
+     "Risk": 26.2,
+     "title": "pypa-setuptools: Regular Expression Denial of Service (ReDoS) in package_index.py"
+    },
+    {
+     "ID": "CVE-2024-6345",
+     "Package": "setuptools",
+     "Installed": "58.1.0",
+     "Fixed": "70.0.0",
+     "Severity": "HIGH",
+     "CVSS": 8.8,
+     "EPSS": null,
+     "Risk": 28.7,
+     "title": "pypa/setuptools: Remote code execution via download functions in the package_index module in pypa/setuptools"
+    },
+    {
+     "ID": "CVE-2025-47273",
+     "Package": "setuptools",
+     "Installed": "58.1.0",
+     "Fixed": "78.1.1",
+     "Severity": "HIGH",
+     "CVSS": 8.8,
+     "EPSS": null,
+     "Risk": 28.7,
+     "title": "setuptools: Path Traversal Vulnerability in setuptools PackageIndex"
+    },
+    {
+     "ID": "CVE-2026-109518",
+     "Package": "apt",
+     "Installed": "2.2.4",
+     "Fixed": "",
+     "Severity": "HIGH",
+     "CVSS": 8.1,
+     "EPSS": null,
+     "Risk": 27.3,
+     "title": "apt: apt: Remote code execution via hard link reuse during package download retries"
+    },
+    {
+     "ID": "CVE-2026-24049",
+     "Package": "wheel",
+     "Installed": "0.45.1",
+     "Fixed": "0.46.2",
+     "Severity": "HIGH",
+     "CVSS": 7.1,
+     "EPSS": null,
+     "Risk": 25.4,
+     "title": "wheel: wheel: Privilege Escalation or Arbitrary Code Execution via malicious wheel file unpacking"
+    },
+    {
+     "ID": "CVE-2026-53613",
+     "Package": "bsdutils",
+     "Installed": "1:2.36.1-8+deb11u2",
+     "Fixed": "",
+     "Severity": "HIGH",
+     "CVSS": 7,
+     "EPSS": null,
+     "Risk": 25.2,
+     "title": "util-linux: TOCTOU in the mount program via ancestor directory swap on target path"
+    },
+    {
+     "ID": "CVE-2026-53615",
+     "Package": "bsdutils",
+     "Installed": "1:2.36.1-8+deb11u2",
+     "Fixed": "",
+     "Severity": "HIGH",
+     "CVSS": 8,
+     "EPSS": null,
+     "Risk": 27.1,
+     "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser"
+    },
+    {
+     "ID": "CVE-2026-76642",
+     "Package": "bsdutils",
+     "Installed": "1:2.36.1-8+deb11u2",
+     "Fixed": "",
+     "Severity": "HIGH",
+     "CVSS": 7.8,
+     "EPSS": null,
+     "Risk": 26.8,
+     "title": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks"
+    },
+    {
+     "ID": "CVE-2026-78408",
+     "Package": "bsdutils",
+     "Installed": "1:2.36.1-8+deb11u2",
+     "Fixed": "",
+     "Severity": "HIGH",
+     "CVSS": 7.9,
+     "EPSS": null,
+     "Risk": 27,
+     "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority"
+    }
+   ],
+   "skipped": 0
+  },
+  "scored_with": "risk.Score(cvss, epss, acr 4, kev false): no EPSS file, no KEV match, as under the demo policy"
+ }
+}

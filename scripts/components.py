@@ -131,8 +131,8 @@ DIAGRAMS = {
     "kevgate-admit": ("kevgate-admit admission path", "The API server posts an AdmissionReview over TLS. The webhook decodes it and extracts every image, parses each reference by digest, looks up a vulnerability report per digest with time and size limits, scores findings and applies the namespace policy, then allows, warns or denies.", [
         ("box", "kube-apiserver", "AdmissionReview v1 over TLS, CREATE and UPDATE"),
         ("box", "Strict decode, extract images", "containers, init, ephemeral; at most 128 images"),
-        ("box", "Parse references by digest", "tags are never resolved"),
-        ("hi", "Bounded evidence lookup", "Trivy report per digest; timeouts, concurrency cap"),
+        ("box", "Parse references strictly", "OCI grammar; tags are never resolved"),
+        ("hi", "Bounded evidence lookup", "Trivy report per digest, signature check optional; timeouts, concurrency cap"),
         ("box", "Score and apply namespace policy", "kevgate risk model; policy hot-reloaded"),
         ("warn", "Allow, warn (audit mode) or deny", "message names the rule and top findings"),
     ]),
