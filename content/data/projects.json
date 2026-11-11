@@ -791,66 +791,82 @@
    "slug": "fuzzdiff",
    "content": "fuzzdiff.html",
    "name": "fuzzdiff",
-   "version": "main",
+   "version": "v0.2.0",
    "sheet": 5,
    "kind": "Memory safety and fuzzing, Rust",
-   "title": "fuzzdiff: picohttpparser in safe Rust | Sami Ali",
-   "desc": "fuzzdiff ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original with differential tests, property tests, seeded bugs and libFuzzer smoke runs.",
-   "fact": "picohttpparser ported from C to safe Rust and checked against the original with differential tests, seeded bugs and libFuzzer. 29 tests, 95.88% line coverage; Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.",
+   "title": "fuzzdiff: picohttpparser in safe Rust, checked against two parsers | Sami Ali",
+   "desc": "fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.",
+   "fact": "picohttpparser ported from C to safe Rust, checked against the C original and against httparse. 39 tests, 95.53% line coverage, 5 of 5 seeded bugs detected, 0 differences from C in 2,000,000 inputs. Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
-   "found_title": "A harness exception that would have hidden a bug",
-   "left_title": "Three seeded bugs caught, and a clean control",
+   "found_title": "Two seeded bugs no test noticed, and a harness exception that would have hidden one",
+   "left_title": "Five seeded bugs detected, and a second parser to compare against",
    "record": {
-    "instrument": "fuzzdiff, main at commit 22c4034 (no release yet)",
-    "reference": "the C original, picohttpparser commit dd573d8, run on the same bytes",
-    "measured": "2026-11-11, Windows, rustc 1.99.1; fuzz runs in CI on Linux",
+    "instrument": "fuzzdiff v0.2.0 (tag, commit 6ec1e6e, released 2026-11-11)",
+    "reference": "the C original, picohttpparser commit dd573d8, run on the same bytes; httparse 1.10.1 as a second parser for the head-parsing comparison",
+    "measured": "2026-11-11, Windows, rustc 1.99.1; Miri, sanitizers and libFuzzer runs in CI on Linux",
     "reproduce": [
+     "cargo test --all",
      "cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --nocapture"
     ],
     "reproduce_label": "$ cargo test"
    },
    "reading": {
-    "num": "3",
-    "den": "/3",
-    "unit": "seeded bugs caught",
-    "caption": "The harness caught all three deliberately seeded bugs, after 3, 8 and 286 inputs. The control run with no bug seeded ran 500,000 inputs without a divergence.",
+    "num": "5",
+    "den": "/5",
+    "unit": "seeded bugs detected",
+    "caption": "The harness detected all five deliberately seeded bugs. Two of them (added in 0.2.0 after a mutation sweep) were missed by the 0.1.0 tests, and one of the five is caught only by a hand-built case, not by the random generator.",
     "stamp": [
      "pass",
-     "3 of 3 caught"
+     "5 of 5 detected"
     ],
-    "run": "42961733885"
+    "run": "43037960324"
    },
    "strip_sets": {
     "main": {
      "unit": "seeded bugs",
-     "total_label": "3 seeded bugs",
+     "total_label": "5 seeded bugs",
      "phr": {
-      "hit": "caught by the harness"
+      "hit": "detected",
+      "miss": "not detected by the 0.1.0 tests"
      },
      "rows": [
       {
-       "label": "Reading",
+       "label": "As found (0.1.0)",
        "runs": [
         [
          "hit",
          3
+        ],
+        [
+         "miss",
+         2
         ]
        ],
-       "val": "caught after <b>3</b>, <b>286</b> and <b>8</b> inputs"
+       "val": "<b>3</b> of 5 detected; <b>2</b> survived the 0.1.0 tests"
+      },
+      {
+       "label": "As left (0.2.0)",
+       "runs": [
+        [
+         "hit",
+         5
+        ]
+       ],
+       "val": "<b>5</b> of 5 detected; 4 by the generator, 1 only by a targeted case"
       }
      ]
     }
    },
    "home": {
-    "against": "The C original, same bytes",
-    "reading": "3 of 3 bugs caught",
-    "run": "42961733885",
-    "found": "Harness accepted any folded-header error as expected; narrowed (PR #2)",
-    "left": "3 of 3 seeded bugs caught; 500,000-input control clean",
-    "tolerance": "Short fuzz runs (120 s per target); no vulnerability found"
+    "against": "The C original and httparse, same bytes",
+    "reading": "5 of 5 seeded bugs detected",
+    "run": "43037960324",
+    "found": "2 of 5 seeded bugs not noticed by the 0.1.0 tests; harness accepted any folded-header error as expected (PR #2)",
+    "left": "5 of 5 detected; 0 differences from C in 2,000,000 inputs; 609,278 disagree with httparse, all in documented classes",
+    "tolerance": "Smoke fuzzing (120 s per leg); Miri on the pure-Rust crate only; no vulnerability found"
    },
    "links": [
     [
@@ -858,40 +874,55 @@
      "https://github.com/samiali38183/fuzzdiff"
     ],
     [
+     "Release v0.2.0",
+     "https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0"
+    ],
+    [
      "Docs",
      "https://github.com/samiali38183/fuzzdiff/tree/main/docs"
     ],
     [
-     "Bug classes and advisories",
-     "https://github.com/samiali38183/fuzzdiff/blob/main/docs/CVE_CLASSES.md"
+     "httparse comparison",
+     "https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md"
     ],
     [
      "CI runs",
      "#trace"
     ]
    ],
-   "note": "No release tag yet, so there is no release link.",
    "trace": [
     [
-     "Tests and sanitizers (ci)",
+     "Tests, sanitizers, Miri, coverage (ci on main)",
      "run",
-     "42962524230"
+     "43037960324"
     ],
     [
-     "Fuzz run on main",
+     "Fuzz run with the counts below (pull request 3)",
      "run",
-     "42962523234"
+     "43035685955"
     ],
     [
-     "Fuzz run with the counts below",
+     "Last fuzz run of pull request 3",
      "run",
-     "42961733885"
+     "43037421227"
+    ],
+    [
+     "Release",
+     "link",
+     "https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0",
+     "v0.2.0"
     ],
     [
      "Harness fix",
      "link",
      "https://github.com/samiali38183/fuzzdiff/pull/2",
      "pull request #2"
+    ],
+    [
+     "Three-way comparison",
+     "link",
+     "https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md",
+     "docs/DIFFERENTIAL_HTTPARSE.md"
     ],
     [
      "Deviations",
@@ -906,7 +937,7 @@
      "docs/FINDINGS.md"
     ]
    ],
-   "commit": "22c4034"
+   "commit": "6ec1e6e"
   },
   "kev-risk-prioritization": {
    "slug": "kev-risk-prioritization",
@@ -1101,6 +1132,19 @@
    "src": [
     "CHANGELOG 0.1.1",
     "https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md"
+   ]
+  },
+  {
+   "project": "fuzzdiff",
+   "text": "A mutation sweep found two one-line changes (a chunk-overhead ratio and a status-line guard) that none of the 0.1.0 tests noticed. 0.2.0 names them as seeded bugs and adds cases that catch them.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "README, seeded bugs",
+    "https://github.com/samiali38183/fuzzdiff#demo-the-harness-catching-seeded-bugs"
    ]
   },
   {
