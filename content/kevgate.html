@@ -3,7 +3,7 @@
 <p class="lede prose">A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls.</p>
 <ul class="links">
 <li><a href="https://github.com/samiali38183/kevgate">Repository</a></li>
-<li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.0">Release v0.1.0</a></li>
+<li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">Release v0.1.1</a></li>
 <li><a href="https://github.com/samiali38183/kevgate/pull/2">Hardening PR #2</a></li>
 <li><a href="https://github.com/samiali38183/kevgate/tree/main/docs">Docs</a></li>
 <li><a href="#ci">CI runs</a></li>
@@ -91,7 +91,7 @@ kevgate_kev_entries 5.0</code></pre>
 <tr><th scope="row">security</th><td>Semgrep (160 rules, 0 findings), Bandit, pip-audit on the lock, gitleaks, checkov, Trivy on the image (0 fixable HIGH/CRITICAL), container smoke test</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666346">42956666346</a></td></tr>
 <tr><th scope="row">deploy-kind</th><td>kind with Calico: 12 smoke checks, NetworkPolicy ingress and egress, Pod Security restricted rejects a privileged pod, Sigma-targeted audit events present, ZAP baseline (67 rules pass, 0 failures)</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666404">42956666404</a></td></tr>
 <tr><th scope="row">terraform</th><td>validate, checkov, <code>terraform test</code> on the OIDC trust policy, apply and destroy against LocalStack</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666367">42956666367</a></td></tr>
-<tr><th scope="row">release</th><td>Build, scan, push to GHCR, cosign keyless signature, SBOM and provenance attestations, signature verified in the same run</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42922880036">42922880036</a></td></tr>
+<tr><th scope="row">release</th><td>Build, scan, push to GHCR, cosign keyless signature, SBOM and provenance attestations, signature verified in the same run</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42960813836">42960813836</a></td></tr>
 </tbody>
 </table>
 </section>
@@ -102,8 +102,8 @@ kevgate_kev_entries 5.0</code></pre>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><th scope="row">Tests on main</th><td>277 collected and passing; 99.92% coverage with branches (1092 statements, 0 missed)</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666365">ci run 42956666365</a>; <a href="https://github.com/samiali38183/kevgate#tests-and-quality">README</a></td></tr>
-<tr><th scope="row">Release</th><td>v0.1.0, tagged at the merge of PR #1 (<code>8324f04</code>). PR #2 hardening is on <code>main</code> after the tag.</td><td><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.0">GitHub release</a></td></tr>
-<tr><th scope="row">Image</th><td>Signed with cosign (keyless), with SBOM (104 components) and provenance attestations</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42922880036">release run 42922880036</a></td></tr>
+<tr><th scope="row">Release</th><td>v0.1.1 (<code>973c8c1</code>) includes the hardening round (277 tests). v0.1.0 was the first release.</td><td><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">GitHub release</a></td></tr>
+<tr><th scope="row">Image</th><td>Signed with cosign (keyless), with SBOM (104 components) and provenance attestations</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42960813836">release run 42960813836</a> (v0.1.1; v0.1.0: <a href="https://github.com/samiali38183/kevgate/actions/runs/42922880036">42922880036</a>)</td></tr>
 <tr><th scope="row">ZAP baseline</th><td>67 rules pass, 0 warnings, 0 failures</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666404">deploy-kind run</a>; <a href="https://github.com/samiali38183/kevgate/blob/main/docs/PIPELINE.md">PIPELINE.md</a></td></tr>
 <tr><th scope="row">Terraform</th><td>20 resources applied to LocalStack, no drift on a second plan; checkov 0 failed</td><td><a href="https://github.com/samiali38183/kevgate/actions/runs/42956666367">terraform run</a>; <a href="https://github.com/samiali38183/kevgate/blob/main/docs/DEPLOYMENT.md">DEPLOYMENT.md</a></td></tr>
 </tbody>
