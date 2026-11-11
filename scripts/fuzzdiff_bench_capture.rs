@@ -564,8 +564,8 @@ fn main() {
             ("rust", rust_res),
             ("httparse", hp_res),
             ("harness", outcome_json(&outcome)),
-            ("pattern", tri_pattern.map_or(J::Null, s)),
-            ("explained_by", explained),
+            ("pattern", if mutant.is_some() { J::Null } else { tri_pattern.map_or(J::Null, s) }),
+            ("explained_by", if mutant.is_some() { J::Null } else { explained }),
             ("doc", doc),
             ("mutant", mutant.map_or(J::Null, |(_, nm)| s(nm))),
         ]));
@@ -586,7 +586,12 @@ fn main() {
                     DivergenceKind::ResultMismatch => "ResultMismatch",
                     DivergenceKind::CBadOffsets => "CBadOffsets",
                 };
-                found = Some((i + 1, how.into(), describe(&case).chars().take(160).collect()));
+                let text: String = describe(&case)
+                    .chars()
+                    .take(160)
+                    .map(|c| if c.is_ascii() { c.to_string() } else { format!("\\u{{{:x}}}", c as u32) })
+                    .collect();
+                found = Some((i + 1, how.into(), text));
                 break;
             }
         }

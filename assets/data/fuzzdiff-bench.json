@@ -865,8 +865,8 @@
     "kind": "Divergence",
     "how": "ResultMismatch"
    },
-   "pattern": "CCC",
-   "explained_by": "agree",
+   "pattern": null,
+   "explained_by": null,
    "doc": null,
    "mutant": "HeaderLenOffByOne"
   },
@@ -897,8 +897,8 @@
     "kind": "Divergence",
     "how": "RustPanic"
    },
-   "pattern": "PPP",
-   "explained_by": "agree",
+   "pattern": null,
+   "explained_by": null,
    "doc": null,
    "mutant": "MissingBoundsCheck"
   }
@@ -907,7 +907,7 @@
   {
    "name": "HeaderLenOffByOne",
    "generator_inputs": 3,
-   "generator_seconds": "0.000035",
+   "generator_seconds": "0.000039",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Headers last_len=12 max_headers=8 strict=false trailer=false pieces=[151] data=\"Set-Cookie: /==\\n'+~a: ::cfjsyvawqdcgdufrvc\\nContent-Length: \\nHost: \\nAccept: a",
    "budget": 2000000,
@@ -917,7 +917,7 @@
   {
    "name": "MissingBoundsCheck",
    "generator_inputs": 286,
-   "generator_seconds": "0.000985",
+   "generator_seconds": "0.001025",
    "generator_how": "RustPanic",
    "first_failing_input": "Request last_len=0 max_headers=2 strict=false trailer=false pieces=[29] data=\"\\r\\nGET /q=0.9&;;q=0.9 HTTP/1.1\"",
    "budget": 2000000,
@@ -927,9 +927,9 @@
   {
    "name": "WrongStateAfterCrlf",
    "generator_inputs": 8,
-   "generator_seconds": "0.000084",
+   "generator_seconds": "0.000061",
    "generator_how": "ResultMismatch",
-   "first_failing_input": "Chunked last_len=0 max_headers=32 strict=false trailer=true pieces=[104] data=\"1;ext=val\\r\\n�\\r\\n23\\r\\n3p\\u{f}Q�7�_G�{�\\u{b}�+\\u{17}��d��R�N�oc��,�\\u{15}.\\u{14}",
+   "first_failing_input": "Chunked last_len=0 max_headers=32 strict=false trailer=true pieces=[104] data=\"1;ext=val\\r\\n\\u{fffd}\\r\\n23\\r\\n3p\\u{f}Q\\u{fffd}7\\u{fffd}_G\\u{fffd}{\\u{fffd}\\u{b}\\u{fffd}+\\u{17}\\u{fffd}\\u{fffd}d\\u{fffd}\\u{fffd}R\\u{fffd}N\\u{fffd}oc\\u{fffd}\\u{fffd},\\u{fffd}\\u{15}.\\u{14}",
    "budget": 2000000,
    "targeted_case": null,
    "targeted_how": null
@@ -937,7 +937,7 @@
   {
    "name": "OverheadRatio",
    "generator_inputs": null,
-   "generator_seconds": "6.151769",
+   "generator_seconds": "6.081480",
    "generator_how": null,
    "first_failing_input": null,
    "budget": 2000000,
@@ -947,7 +947,7 @@
   {
    "name": "StatusGuard",
    "generator_inputs": 10085,
-   "generator_seconds": "0.034901",
+   "generator_seconds": "0.030410",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Response last_len=0 max_headers=16 strict=false trailer=false pieces=[12] data=\"HTTP/1.1 .1 \"",
    "budget": 2000000,
@@ -959,6 +959,6 @@
   "inputs": 500000,
   "targeted_cases": 9,
   "divergences": 0,
-  "seconds": "1.568245"
+  "seconds": "1.541157"
  }
 }
