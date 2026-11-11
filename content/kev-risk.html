@@ -1,28 +1,42 @@
 <!--@dek-->
-A standard-library Python script that ranks scan findings with KEV status first. It is the scoring idea behind <a href="/projects/kevgate/">kevgate</a>, kept as a small stand-alone tool.
+A standard-library Python script that ranks scan findings with a simple weighted score of its own design: known-exploited (CISA KEV) CVEs first, then asset criticality, EPSS and CVSS. It is not an implementation of CISA BOD 26-04.
 
 <!--@bench-->
-<div class="scroll"><table class="tbl">
-<caption>KEV findings among the top 12 of 20 synthetic findings</caption>
-<thead><tr><th scope="col">Ordering</th><th scope="col" class="num">KEV findings in the top 12</th><th scope="col" class="num">Non-KEV findings in the top 12</th></tr></thead>
-<tbody>
-<tr><th scope="row">CVSS only</th><td class="num">9</td><td class="num">3</td></tr>
-<tr><th scope="row">Risk score</th><td class="num"><b class="best">12</b></td><td class="num"><b class="best">0</b></td></tr>
-</tbody>
-</table></div>
+{{bench:kev-risk}}
 
 <!--@bench-cap-->
-<b>A CVSS-only sort ranks three non-KEV findings among the top 12; the risk score ranks none.</b> The sample has 12 KEV and 8 non-KEV findings, all synthetic.
+{{bench:kev-risk-cap}}
 
 <!--@as-found-->
-<div class="callout"><p><strong>Everything here runs on synthetic data.</strong> The sample uses real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. It shows how the ordering behaves, not what any real environment looks like. No DHS or CBP data is involved.</p></div>
+<div class="callout"><p><strong>The synthetic demo proves ordering behavior and nothing else.</strong> The 20 sample findings use real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. No DHS or CBP data is involved.</p></div>
 <div class="prose">
-<p>CVSS says how bad a flaw could be, not whether anyone is using it.<sup class="nref" aria-hidden="true"></sup> On this sample a CVSS-only sort puts 9 KEV findings in its top 12. The average CVSS of the two groups differs by 1.19, and the average EPSS by 0.906.</p>
+<p>The first version of this project said its score was "in the spirit of" CISA BOD 26-04 and showed a table of measurements computed on the invented sample values, such as an average EPSS of 0.935 for KEV against 0.029 for the rest. Both overstated the work. Those averages describe invented values, not vulnerabilities, and the score shares one input with the directive, not its method. The repository's changelog records both corrections for 0.2.0.</p>
+<p>The directive sets a remediation deadline per asset from four variables in a decision table, and it applies to federal civilian executive branch agencies.<sup class="nref" aria-hidden="true"></sup> The tool is a weighted sum. Of the four variables it models one:</p>
 </div>
-<aside class="note"><strong>CVSS</strong> scores the severity of a flaw from 0 to 10. <strong>KEV</strong> is CISA's list of CVEs known to be exploited in the wild.</aside>
+<aside class="note"><strong>BOD 26-04</strong> (CISA, June 2026) revokes BOD 19-02 and BOD 22-01. A private-sector tool is neither compliant nor non-compliant with it. <strong>EPSS</strong> is FIRST's 30-day exploitation probability. <strong>ACR</strong> is the asset criticality rating, 1 to 8.</aside>
+<div class="scroll"><table class="tbl">
+<caption>What BOD 26-04 uses and what this tool scores, from docs/bod-26-04.md in the repository</caption>
+<thead><tr><th scope="col">Input</th><th scope="col">In BOD 26-04</th><th scope="col">In this tool</th></tr></thead>
+<tbody>
+<tr><th scope="row">Publicly exposed</th><td>Yes, a decision variable</td><td>No. The optional <code>internet_exposed</code> column is carried through but not scored</td></tr>
+<tr><th scope="row">In the KEV</th><td>Yes, one of four</td><td>Yes, weight 0.40</td></tr>
+<tr><th scope="row">Automatable by adversary</th><td>Yes</td><td>No</td></tr>
+<tr><th scope="row">Technical impact (partial or total control)</th><td>Yes</td><td>No</td></tr>
+<tr><th scope="row">Deadlines of 3, 14 or 60 days, or fix on system upgrade, with forensic triage at the top</th><td>Yes, from Table 1</td><td>No</td></tr>
+<tr><th scope="row">Asset criticality (ACR)</th><td>No</td><td>Yes, weight 0.25</td></tr>
+<tr><th scope="row">EPSS</th><td>No</td><td>Yes, weight 0.20</td></tr>
+<tr><th scope="row">CVSS</th><td>No</td><td>Yes, weight 0.20</td></tr>
+</tbody>
+</table></div>
+<div class="prose">
+<p>KEV is also not the first sort key in the directive: a non-KEV CVE that is exposed, automatable and gives total control gets 3 days, while a KEV CVE that is not exposed, not automatable and gives partial control gets 14. The notes in the repository say Table 1 was transcribed by eye from an image and should be checked against the source before reuse.</p>
+<p>The limits that remain in the tool: the weights are a design choice with no outcome data behind them, and EPSS is trained partly on exploitation evidence that overlaps with KEV, so the two signals are not independent. Plate 1 shows the first point directly: move the weights and the order moves. With the defaults the KEV weight equals the EPSS and CVSS weights combined, so all 12 KEV findings land first largely by construction.</p>
+</div>
 
 <!--@as-left-->
-<div class="prose"><p>Run on 2026-11-10 from a fresh clone (commit 597c1f7): 9 tests pass. The risk score puts all 12 KEV findings in its top 12.</p></div>
+<div class="prose">
+<p>Run on 2026-11-11 from a fresh clone of tag v0.2.0 (commit d85495f, Python 3.12.2): 27 tests pass. On the synthetic sample the risk score puts all 12 KEV findings in its top 12, and a CVSS-only sort puts 9 KEV findings in its top 12. The lowest-scoring KEV finding scores 85.0 and the highest-scoring non-KEV finding 38.5.</p>
+</div>
 {{key:main}}
 {{strips:main}}
 <pre data-copy data-label="$ python kev_prioritize.py ... --top 14"><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14
@@ -39,19 +53,33 @@ A standard-library Python script that ranks scan findings with KEV status first.
 KEV vs non-KEV population
   kev      n=12  avg CVSS 9.53  avg EPSS 0.935  avg days open 94.2
   non_kev  n=8   avg CVSS 8.34  avg EPSS 0.029  avg days open 101.5</code></pre>
-<p class="trim">Trimmed: rows 4 to 10 and the KEV concentration line removed.</p>
+<p class="trim">Trimmed: rows 4 to 10 and the KEV concentration line removed. The group averages are properties of the invented inputs.</p>
+<div class="prose">
+<h3>The pinned real snapshot</h3>
+<p>The repository now carries real public data, pinned so the numbers can be reproduced: the CISA KEV catalog (<code>catalogVersion</code> 2026.11.10, 1,779 entries) and the FIRST EPSS file scored 2026-11-11 (model v2026.06.15, 404,864 CVEs), kept as a subset of 6,779 rows: every KEV CVE plus 5,000 non-KEV CVEs chosen by a seeded hash. Asset fields are still invented and CVSS is not used with the real data.</p>
+<p>What it shows: EPSS separates KEV from the sampled non-KEV CVEs with an AUC of 0.9515 (95% bootstrap interval 0.9454 to 0.9565). Of the 1,779 KEV CVEs, 1,338 (75.2%) have EPSS of at least 0.1, 909 (51.1%) at least 0.5 and 489 (27.5%) at least 0.9. Over the whole EPSS file, 16,203 non-KEV CVEs are also at 0.1 or above, so at population prevalence only 7.6% of the CVEs flagged by that threshold are KEV.</p>
+<p>On a 2,000-row mixed list (100 KEV and 1,900 non-KEV CVEs with invented asset criticality) the tool puts all 100 KEV findings in its top 100; EPSS alone puts 65 there. That too is largely by construction.</p>
+</div>
+{{key:snapshot}}
+{{strips:snapshot}}
+{{snapshot:figure}}
+<div class="prose">
+<p>What none of this shows: that the ranking improves remediation outcomes. KEV is an incomplete label (a CVE missing from it is not known to be safe), the snapshot is one point in time with no forecasting test, and the EPSS-against-KEV result is partly circular.</p>
+</div>
 
 <!--@method-->
 <div class="prose">
-<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it with the same formula as kevgate: KEV 0.40, asset criticality 0.25, EPSS 0.20, CVSS 0.20, normalized to 0 to 100. Ties break on EPSS, then CVSS. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison.</p>
-<p>The EPSS and asset-criticality terms and all the weights are this project's own design. They are not inputs of CISA BOD 26-04, which ties urgency to KEV status, exposure, automatability and technical impact.</p>
+<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it: <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>. Dividing by the weight total keeps the scale at 0 to 100 for any weights, so ordering does not depend on it. Ties break on EPSS, then CVSS. If a finding has no CVSS value, that term and its weight are dropped and the rest is renormalized, which is how the real snapshot is scored. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison. The <a href="/projects/kevgate/">kevgate</a> sheet documents the same weights.</p>
+<p>Plate 1 re-implements that formula in the browser and checks it against the tool: <code>scripts/gen_bench_kev.py</code> calls the tool's own <code>score_all</code> with custom weights for the four presets and 300 random weight vectors, and <code>scripts/test_bench_kev.mjs</code> requires the same order and the same scores to one decimal. Plate 2 is drawn at build time from the committed subset.</p>
 </div>
 
 <!--@limits-->
 <ul class="prose">
-<li>Synthetic data, so the results say nothing about real remediation.</li>
-<li>It uses CVSS and EPSS values you supply; it does not query NVD or the EPSS API. Live mode fetches only the KEV catalog.</li>
+<li>Not an implementation of BOD 26-04: it does not model exposure, automatability, technical impact, per-asset deadlines or forensic triage, and it is not a compliance tool.</li>
+<li>The 0.40 / 0.25 / 0.20 / 0.20 weights are a design choice with no outcome data behind them. The bench shows how the order depends on them; it cannot say which weights are right.</li>
+<li>The demo data is synthetic, so 12 of 12 shows how the formula orders findings, not what a real environment looks like.</li>
+<li>EPSS and KEV are related signals, so the AUC of 0.9515 is not independent validation of either, and it says nothing about the risk score.</li>
+<li>KEV is incomplete, the snapshot is one date, and CVSS was not available for the real data.</li>
+<li>It uses the CVSS and EPSS values you supply and does not query NVD or the EPSS API. Live mode fetches only the KEV catalog.</li>
 <li>A weighted sum cannot express a hard rule such as "KEV and internet-exposed always first".</li>
-<li>No per-finding due dates against BOD 26-04; age is reported as an average per group.</li>
-<li>The weights are a starting point and have not been validated against outcomes.</li>
 </ul>

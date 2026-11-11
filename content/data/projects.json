@@ -943,22 +943,22 @@
    "slug": "kev-risk-prioritization",
    "content": "kev-risk.html",
    "name": "kev-risk-prioritization",
-   "version": "main",
+   "version": "v0.2.0",
    "sheet": 6,
    "kind": "Vulnerability management",
    "title": "kev-risk-prioritization | Sami Ali",
-   "desc": "A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample: 12 of 12 top slots are KEV findings, against 9 for a CVSS-only sort.",
-   "fact": "The scoring idea behind kevgate as a standard-library script, run on a 20-finding synthetic sample. Synthetic data only. 9 tests.",
+   "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
+   "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. 27 tests.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
-   "found_title": "A CVSS-only sort leaves KEV findings out of the top 12",
-   "left_title": "The risk score puts all 12 KEV findings first",
+   "found_title": "The first version claimed more than it showed",
+   "left_title": "A pinned real snapshot, and what it does and does not show",
    "record": {
-    "instrument": "kev-risk-prioritization, main at commit 597c1f7",
-    "reference": "a CVSS-only sort of the same 20 synthetic findings",
-    "measured": "2026-11-10, fresh clone, 9 tests pass",
+    "instrument": "kev-risk-prioritization v0.2.0, commit d85495f",
+    "reference": "a CVSS-only sort of 20 synthetic findings, and a pinned real snapshot: CISA KEV 2026.11.10 and FIRST EPSS scored 2026-11-11",
+    "measured": "2026-11-11, fresh clone of tag v0.2.0, 27 tests pass",
     "reproduce": [
      "python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json"
     ],
@@ -968,12 +968,12 @@
     "num": "12",
     "den": "/12",
     "unit": "top slots held by KEV findings",
-    "caption": "On a synthetic 20-finding sample the risk score puts all 12 KEV findings in its top 12. A CVSS-only sort of the same findings puts 9 there.",
+    "caption": "On 20 synthetic findings the risk score puts all 12 KEV findings in its top 12; a CVSS-only sort puts 9. That shows how the formula orders findings, not that it improves remediation.",
     "stamp": [
      "limit",
      "Synthetic data"
     ],
-    "run": "42134748636"
+    "run": "43040235145"
    },
    "strip_sets": {
     "main": {
@@ -1009,15 +1009,68 @@
        "val": "<b>12</b> KEV findings in the top 12"
       }
      ]
+    },
+    "snapshot": {
+     "unit": "KEV CVEs",
+     "per": 100,
+     "note": "One tick is about 100 CVEs; the labels give the exact counts.",
+     "phr": {
+      "hit": "KEV CVE at or above the EPSS threshold",
+      "miss": "KEV CVE below the threshold"
+     },
+     "rows": [
+      {
+       "label": "EPSS >= 0.1",
+       "runs": [
+        [
+         "hit",
+         1338
+        ],
+        [
+         "miss",
+         441
+        ]
+       ],
+       "val": "<b>1,338</b> of 1,779 (75.2%)"
+      },
+      {
+       "label": "EPSS >= 0.5",
+       "runs": [
+        [
+         "hit",
+         909
+        ],
+        [
+         "miss",
+         870
+        ]
+       ],
+       "val": "<b>909</b> of 1,779 (51.1%)"
+      },
+      {
+       "label": "EPSS >= 0.9",
+       "runs": [
+        [
+         "hit",
+         489
+        ],
+        [
+         "miss",
+         1290
+        ]
+       ],
+       "val": "<b>489</b> of 1,779 (27.5%)"
+      }
+     ]
     }
    },
    "home": {
-    "against": "CVSS-only sort, 20 synthetic findings",
-    "reading": "12 vs 9 KEV in the top 12",
-    "run": "42134748636",
-    "found": "CVSS-only top 12 holds 9 KEV findings",
-    "left": "Risk-score top 12 holds all 12",
-    "tolerance": "Synthetic data; weights not validated against outcomes"
+    "against": "CVSS-only sort of 20 synthetic findings; pinned real KEV and EPSS snapshot",
+    "reading": "12 vs 9 KEV in the top 12 (synthetic demo)",
+    "run": "43040235145",
+    "found": "Earlier text called it KEV-first in the spirit of BOD 26-04 and showed measurements on invented values",
+    "left": "Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515",
+    "tolerance": "Weights not validated; EPSS and KEV are related signals; synthetic assets"
    },
    "links": [
     [
@@ -1025,34 +1078,67 @@
      "https://github.com/samiali38183/kev-risk-prioritization"
     ],
     [
+     "Release v0.2.0",
+     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0"
+    ],
+    [
      "Methodology",
      "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md"
     ],
     [
+     "BOD 26-04 notes",
+     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/bod-26-04.md"
+    ],
+    [
      "CI run (main)",
-     "https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636"
+     "https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43040235145"
     ]
    ],
    "trace": [
     [
      "CI run on main",
      "run",
-     "42134748636"
+     "43040235145"
     ],
     [
-     "Methodology",
+     "Release",
      "link",
-     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md",
-     "docs/methodology.md"
+     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0",
+     "v0.2.0"
+    ],
+    [
+     "Real-data analysis",
+     "link",
+     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/real_data_analysis.md",
+     "docs/real_data_analysis.md"
+    ],
+    [
+     "BOD 26-04 notes",
+     "link",
+     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/bod-26-04.md",
+     "docs/bod-26-04.md"
+    ],
+    [
+     "Snapshot",
+     "link",
+     "https://github.com/samiali38183/kev-risk-prioritization/tree/main/data/snapshot",
+     "data/snapshot/"
     ],
     [
      "Sample data",
      "link",
      "https://github.com/samiali38183/kev-risk-prioritization/tree/main/data",
      "data/"
+    ],
+    [
+     "Bench parity test",
+     "link",
+     "https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_kev.mjs",
+     "scripts/test_bench_kev.mjs"
     ]
    ],
-   "commit": "597c1f7"
+   "commit": "d85495f",
+   "bench": "kev-risk"
   }
  },
  "failed_first": [
@@ -1158,6 +1244,19 @@
    "src": [
     "pull request #2",
     "https://github.com/samiali38183/fuzzdiff/pull/2"
+   ]
+  },
+  {
+   "project": "kev-risk-prioritization",
+   "text": "Earlier text called the score \"in the spirit of\" CISA BOD 26-04, and a measurements table reported properties of invented values. Both were corrected: it is a weighted score of its own design, and the table was removed.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "CHANGELOG 0.2.0, Corrections",
+    "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md"
    ]
   }
  ]

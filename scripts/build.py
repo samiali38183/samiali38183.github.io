@@ -172,8 +172,9 @@ def render(ctx: dict, kind: str, arg: str | None, path: str) -> tuple[str, str, 
         body = P.project_page(ctx, arg)
         sheetline = (f'<p class="wrap sheetline"><b>Sheet {p["sheet"]} of 6</b> &middot; {html.escape(p["name"])}'
                      f' &middot; {html.escape(p["version"] if p["version"].startswith("v") else "main")}</p>')
-        if (ROOT / "assets/js" / f"bench-{arg}.js").exists():
-            extra = f'<script type="module" src="/assets/js/bench-{arg}.js"></script>\n'
+        bn = p.get("bench", arg)
+        if (ROOT / "assets/js" / f"bench-{bn}.js").exists():
+            extra = f'<script type="module" src="/assets/js/bench-{bn}.js"></script>\n'
     else:
         body = P.expand(ctx, (ROOT / "content" / arg).read_text(encoding="utf-8").strip())
     body = body.replace('<aside class="note">', '<div class="note" role="note">').replace('</aside>', '</div>')
@@ -195,8 +196,9 @@ def build() -> None:
                 href, (' aria-current="page"' if path == href else ' aria-current="true"') if k == key else "", label)
             for k, href, label in NAV)
         headextra = ""
-        if kind == "project" and (ROOT / "assets/css" / f"bench-{arg}.css").exists():
-            headextra = f'<link rel="stylesheet" href="/assets/css/bench-{arg}.css">\n'
+        bn = ctx["projects"]["projects"][arg].get("bench", arg) if kind == "project" else arg
+        if kind == "project" and (ROOT / "assets/css" / f"bench-{bn}.css").exists():
+            headextra = f'<link rel="stylesheet" href="/assets/css/bench-{bn}.css">\n'
         out = LAYOUT.format(
             headextra=headextra, title=html.escape(title), desc=html.escape(desc, quote=True), canon=BASE + path, og=OG_IMAGE,
             ogalt=html.escape(OG_ALT, quote=True), nav=nav, body=body, sheetline=sheetline, extra=extra)
