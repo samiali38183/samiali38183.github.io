@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sinkline: taint analysis for Python web apps | Sami Ali</title>
+<meta name="description" content="sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark.">
+<link rel="canonical" href="https://samiali38183.github.io/projects/sinkline/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0a58ad">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sami Ali">
+<meta property="og:title" content="sinkline: taint analysis for Python web apps | Sami Ali">
+<meta property="og:description" content="sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark.">
+<meta property="og:url" content="https://samiali38183.github.io/projects/sinkline/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sinkline: taint analysis for Python web apps | Sami Ali">
+<meta name="twitter:description" content="sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark.">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="/">Sami Ali</a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/experience/">Experience</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/resume/">Resume</a></li>
+<li><button type="button" id="theme" hidden>Dark theme</button></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main" class="wrap">
+<p class="crumbs"><a href="/projects/">Projects</a> / sinkline</p>
+<h1>sinkline</h1>
+<p class="lede prose">A static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class.</p>
+<ul class="links">
+<li><a href="https://github.com/samiali38183/sinkline">Repository</a></li>
+<li><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.4.1">Release v0.4.1</a></li>
+<li><a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md">Design doc</a></li>
+<li><a href="https://github.com/samiali38183/sinkline/actions/runs/42920168878">CI run (main)</a></li>
+<li><a href="https://samiali38183.github.io/sinkline/">Sample HTML report</a></li>
+</ul>
+
+<h2>The problem</h2>
+<div class="prose">
+<p>A pattern linter reports every <code>cursor.execute</code> whether the argument came from a config file or from <code>request.args</code>, so reviewers learn to ignore it. The useful question is whether attacker-controlled data can reach the sink without passing through something that neutralizes it for this bug class.</p>
+<p>In web apps that answer usually crosses a function or file boundary: a view reads <code>request.form</code> and a helper two files away builds the SQL.</p>
+</div>
+
+<h2>What it does</h2>
+<div class="prose">
+<p>Pure Python on the standard <code>ast</code> module, with no dependencies. It knows Flask, FastAPI, Django and aiohttp sources, and has 42 rules with 138 sink signatures mapped to OWASP 2021 and CWE. Output is text, JSON, SARIF 2.1.0 (with code flows) or a self-contained HTML report. It also ships as a GitHub Action and a pre-commit hook, and supports <code>--baseline</code> so an existing codebase can fail only on new findings.</p>
+</div>
+
+<figure class="diagram"><svg viewBox="0 0 440 462" role="img" aria-labelledby="sinkline-t sinkline-d"><title id="sinkline-t">sinkline analysis passes</title><desc id="sinkline-d">Python files are parsed and names resolved. Pass 1 computes a summary per function to a fixpoint. Pass 2 re-runs with real sources and uses the summaries at each call site. Findings come out as text, JSON, SARIF or HTML.</desc><rect class="box" x="20" y="4" width="400" height="54" rx="6"/><text x="220" y="26" text-anchor="middle" font-weight="600">Parse and resolve names</text><text class="sub" x="220" y="45" text-anchor="middle">ast, imports, aliases, receiver types</text><line class="arrow" x1="220" y1="58" x2="220" y2="78"/><path class="head" d="M215 77 L225 77 L220 84 Z"/><rect class="box" x="20" y="84" width="400" height="54" rx="6"/><text x="220" y="106" text-anchor="middle" font-weight="600">Pass 1: function summaries</text><text class="sub" x="220" y="125" text-anchor="middle">parameters as labels, repeated to a fixpoint</text><line class="arrow" x1="220" y1="138" x2="220" y2="158"/><path class="head" d="M215 157 L225 157 L220 164 Z"/><rect class="box" x="20" y="164" width="400" height="54" rx="6"/><text x="220" y="186" text-anchor="middle" font-weight="600">Pass 2: real sources</text><text class="sub" x="220" y="205" text-anchor="middle">request data enters; summaries used at call sites</text><line class="arrow" x1="220" y1="218" x2="220" y2="238"/><path class="head" d="M215 237 L225 237 L220 244 Z"/><rect class="hi" x="20" y="244" width="400" height="54" rx="6"/><text x="220" y="266" text-anchor="middle" font-weight="600">Taint with CWE-scoped sanitizers</text><text class="sub" x="220" y="285" text-anchor="middle">join: union of labels, intersect cleared CWEs</text><line class="arrow" x1="220" y1="298" x2="220" y2="318"/><path class="head" d="M215 317 L225 317 L220 324 Z"/><rect class="box" x="20" y="324" width="400" height="54" rx="6"/><text x="220" y="346" text-anchor="middle" font-weight="600">Sink match</text><text class="sub" x="220" y="365" text-anchor="middle">keyword gates, receiver types, CWE not cleared</text><line class="arrow" x1="220" y1="378" x2="220" y2="398"/><path class="head" d="M215 397 L225 397 L220 404 Z"/><rect class="warn" x="20" y="404" width="400" height="54" rx="6"/><text x="220" y="426" text-anchor="middle" font-weight="600">Report with the source-to-sink path</text><text class="sub" x="220" y="445" text-anchor="middle">text, JSON, SARIF 2.1.0, HTML</text></svg><figcaption>Python files are parsed and names resolved. Pass 1 computes a summary per function to a fixpoint. Pass 2 re-runs with real sources and uses the summaries at each call site. Findings come out as text, JSON, SARIF or HTML.</figcaption></figure>
+
+<h2>Three implementation points</h2>
+<div class="prose">
+<h3>Two-pass interprocedural summaries</h3>
+<p>Pass 1 analyzes each function with its parameters bound to symbolic labels (<code>param:0</code>, <code>param:1</code>, ...) and records which parameters reach the return value, which reach sinks, and whether the function is a thin sanitizer. It repeats until no summary changes, so a sink four helpers deep is found whatever order the helpers are defined in. Pass 2 re-runs with real sources and consults the summary at each call site. The cost is that summaries are context-insensitive: one per function, not per call site. Summary keys are module-qualified, so vulpy's <code>bad/</code> and <code>good/</code> trees, which define the same function names, give different results.</p>
+<h3>CWE-scoped sanitizers</h3>
+<p>A tainted value carries the set of CWEs it has been cleaned for. <code>shlex.quote</code> clears command injection only, <code>html.escape</code> clears XSS only, and <code>int()</code> clears everything. A single global "sanitized" flag makes a shell-safe string look SQL-safe. At a branch join, taint labels are unioned and cleared CWEs are intersected, so a value stays clean only if every path cleaned it. Validation guards such as <code>if not x.isdigit(): abort()</code> work the same way and are scoped too: a <code>..</code> check is a path guard, not a shell guard.</p>
+<h3>try/except needs a real join</h3>
+<p>Version 0.4.1 fixed a false negative where <code>host = request.args["h"]</code> followed by <code>except: host = "localhost"</code> lost the taint, because the handler body was visited in sequence after the try body. Taint after a <code>try</code> is now the join of the body (plus <code>else</code>) and each handler that does not exit, with handlers entered from the join of every state the body passed through. The same release closed a script-injection bug in its own GitHub Action: inputs were interpolated into a shell line with <code>${{ inputs.* }}</code>. They now go through <code>env:</code>, quoted, and <code>tests/test_action.py</code> runs the script with hostile values.</p>
+</div>
+
+<h2>Evidence from real runs</h2>
+<p class="small muted">Run on 2026-11-10 from a fresh clone (commit 9a36ba2), Python 3.12.2, bandit 1.9.4.</p>
+<h3>A cross-file finding on the benchmark corpus</h3>
+<pre data-copy><code>$ sinkline scan bench/corpus
+...
+[CRITICAL] SL-CMDI-003 A03:2021 CWE-78  hard_app.py:34:5
+  subprocess with shell=True and tainted command
+  flask.request.args reaches subprocess.call (inside Shell.run, hard_helpers.py:17) without a sanitizer for CWE-78.
+  ┌ source     hard_app.py:34  Shell().run(request.args["cmd"])  # flask.request.args
+  │ call       hard_app.py:34  Shell().run(request.args["cmd"])  # passed as `cmd` to Shell.run()
+  └ sink       hard_helpers.py:17  subprocess.call(cmd, shell=True)  # subprocess.call inside Shell.run()</code></pre>
+<p class="trim">Trimmed: one finding of 71 shown, the benchmark's <code># VULN:CWE-78</code> label comments and padding whitespace removed from the source lines.</p>
+<p class="prose">The source is in one file and the sink in another, reached through a method call on a locally constructed object.</p>
+
+<figure>
+<a href="https://samiali38183.github.io/sinkline/"><img src="/assets/img/sinkline-report.png" width="1300" height="596" loading="lazy" alt="sinkline HTML report for the benchmark corpus: 71 findings, 43 critical, 21 high, counts by OWASP category, and one expanded finding showing the source, call and sink lines of a command-injection flow"></a>
+<figcaption>HTML report generated locally with <code>sinkline scan bench/corpus --format html</code> (headless Chrome screenshot; the header and one expanded finding are joined from the same page). The 71 findings include <code>smoke_app.py</code>, which the benchmark does not score. The <a href="https://samiali38183.github.io/sinkline/">published report</a> is the same scan.</figcaption>
+</figure>
+
+<h3>The benchmark</h3>
+<pre data-copy><code>$ python bench/score.py
+corpus: 109 labeled lines (61 vuln, 48 safe)
+TP 60  FP 0  FN 1  TN 48
+precision 1.000  recall 0.984  F1 0.992
+  of which known-limitation: FN 1, FP 0
+  -> every miss is a documented design limit
+
+$ python bench/compare_bandit.py
+bandit: 84 raw issues on the corpus
+bandit on labeled lines: TP 33  FP 20  FN 28  TN 28
+precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN line counts)</code></pre>
+<p class="prose">Read the Bandit row as scope, not a verdict: Bandit is a pattern linter with no data-flow model, and its false positives are mostly rules that fire on any string-built SQL or any <code>subprocess</code> call, including the labeled-safe variants. The figure also depends on the Bandit version (1.8.0 gives F1 0.561). No comparison against Semgrep or CodeQL has been run.</p>
+
+<h2>Results</h2>
+<section class="scroll" tabindex="0" aria-label="sinkline results table">
+<table>
+<thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><th scope="row">Tests</th><td>91 (includes the corpus gate and the Action tests)</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1</a>; <a href="https://github.com/samiali38183/sinkline/actions/runs/42920168878">CI run 42920168878</a></td></tr>
+<tr><th scope="row">Benchmark, sinkline 0.4.1</th><td>TP 60, FP 0, FN 1, TN 48; P 1.000, R 0.984, F1 0.992</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/score.py</a>, README results table</td></tr>
+<tr><th scope="row">Benchmark, Bandit 1.9.4</th><td>TP 33, FP 20, FN 28, TN 28; P 0.623, R 0.541, F1 0.579</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/compare_bandit.py">bench/compare_bandit.py</a></td></tr>
+<tr><th scope="row">vulpy @ 5249cc8</th><td>3 findings, all CWE-89, all in <code>bad/</code>; 0 in <code>good/</code></td><td><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
+<tr><th scope="row">Vulnerable-Flask-App @ b6a4f97</th><td>4 findings (SSTI, SQLi, XSS, MD5)</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
+<tr><th scope="row">dvpwa @ a1d8f89</th><td>2 findings (CWE-89, CWE-117)</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
+<tr><th scope="row">microblog @ a975ef6</th><td>0 findings</td><td>counts re-run for this page</td></tr>
+<tr><th scope="row">Rules</th><td>42 rules, 138 sink signatures</td><td><a href="https://github.com/samiali38183/sinkline#how-it-works">README</a>; <code>sinkline rules</code></td></tr>
+<tr><th scope="row">Release</th><td>v0.4.1</td><td><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.4.1">GitHub release</a></td></tr>
+</tbody>
+</table>
+</section>
+
+<h2>Limitations</h2>
+<ul class="prose">
+<li><strong>The benchmark is small and self-labeled.</strong> 109 lines, labeled by the same person who wrote the engine, and it doubles as the regression suite. Two of the 0.4.0 changes were written to fix lines in it. Read the scores as "no regressions and the design limits are visible", not as a generalization estimate.</li>
+<li><strong>The public-project scans are unlabeled.</strong> Three of the four are deliberately vulnerable training apps. Zero findings on microblog is consistent with its redirect check being treated as a guard, not proof the app is safe. No CVEs or real-world vulnerabilities are claimed.</li>
+<li><strong>Known design limits.</strong> Taint passed between requests through a module global (the one benchmark miss), returned closures, dynamic dispatch, and instance fields tracked per class rather than per object.</li>
+<li><strong>Python only, summaries context-insensitive,</strong> and no coverage for OWASP A04 and A06.</li>
+</ul>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<ul>
+<li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
+<li><a href="https://github.com/samiali38183">GitHub</a></li>
+<li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
+<li><a href="/resume.pdf">Resume (PDF)</a></li>
+</ul>
+<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+</div>
+</footer>
+<script src="/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<h1>Projects</h1>
+<p class="lede prose">Four tools, each with the measurements and CI runs behind its claims. Every page ends with a limitations section.</p>
+<ul class="cards">
+<li class="card">
+<h2><a href="/projects/tripline/">tripline</a></h2>
+<p class="tag">Detection engineering, v0.2.1</p>
+<p class="fact">A CI gate that replays recorded ATT&amp;CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 10 passing, 4 pending (Windows); 186 tests.</p>
+</li>
+<li class="card">
+<h2><a href="/projects/sinkline/">sinkline</a></h2>
+<p class="tag">Application security, v0.4.1</p>
+<p class="fact">A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 91 tests; 109-line self-labeled benchmark.</p>
+</li>
+<li class="card">
+<h2><a href="/projects/kevgate/">kevgate</a></h2>
+<p class="tag">Vulnerability management and DevSecOps, v0.1.0</p>
+<p class="fact">A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests on main.</p>
+</li>
+</ul>
+
+<ul class="cards">
+<li class="card">
+<h2><a href="/projects/kevgate-admit/">kevgate-admit</a></h2>
+<p class="tag">Kubernetes security, Go</p>
+<p class="fact">An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, and a kind end-to-end run in CI. It does not scan images itself.</p>
+</li>
+</ul>
+
+<h2>Supporting work</h2>
+<ul class="cards">
+<li class="card">
+<h3><a href="/projects/kev-risk-prioritization/">kev-risk-prioritization</a></h3>
+<p class="fact">The scoring idea behind kevgate as a standard-library script, run on a 20-finding synthetic sample. Synthetic data only.</p>
+</li>
+</ul>
+
+<h2>Other repositories</h2>
+<p class="muted prose">Public, but not the work I would point to first.</p>
+<ul class="prose">
+<li><a href="https://github.com/samiali38183/call-kettle">call-kettle</a>: phone receptionist backend with booking rules enforced in code and per-tenant limits. A sanitized snapshot; no customers.</li>
+<li><a href="https://github.com/samiali38183/agent-engineering-lab">agent-engineering-lab</a>: notes on test gates, load tests and review rules for a private codebase. Writing, not a tool.</li>
+<li><a href="https://github.com/samiali38183/focuslog">focuslog</a>: a single-file Pomodoro timer and session log. An early project.</li>
+</ul>

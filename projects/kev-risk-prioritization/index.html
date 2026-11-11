@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kev-risk-prioritization | Sami Ali</title>
+<meta name="description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample.">
+<link rel="canonical" href="https://samiali38183.github.io/projects/kev-risk-prioritization/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0a58ad">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sami Ali">
+<meta property="og:title" content="kev-risk-prioritization | Sami Ali">
+<meta property="og:description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample.">
+<meta property="og:url" content="https://samiali38183.github.io/projects/kev-risk-prioritization/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kev-risk-prioritization | Sami Ali">
+<meta name="twitter:description" content="A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample.">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="/">Sami Ali</a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/experience/">Experience</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/resume/">Resume</a></li>
+<li><button type="button" id="theme" hidden>Dark theme</button></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main" class="wrap">
+<p class="crumbs"><a href="/projects/">Projects</a> / kev-risk-prioritization</p>
+<h1>kev-risk-prioritization</h1>
+<p class="lede prose">A standard-library Python script that ranks scan findings with KEV status first. It is the scoring idea behind <a href="/projects/kevgate/">kevgate</a>, kept as a small stand-alone tool.</p>
+<ul class="links">
+<li><a href="https://github.com/samiali38183/kev-risk-prioritization">Repository</a></li>
+<li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">Methodology</a></li>
+<li><a href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/42134748636">CI run (main)</a></li>
+</ul>
+
+<div class="callout"><p><strong>Everything here runs on synthetic data.</strong> The sample uses real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. It shows how the ordering behaves, not what any real environment looks like. No DHS or CBP data is involved.</p></div>
+
+<h2>What it does</h2>
+<div class="prose">
+<p>CVSS says how bad a flaw could be, not whether anyone is using it. The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it with the same formula as kevgate: KEV 0.40, asset criticality 0.25, EPSS 0.20, CVSS 0.20, normalized to 0 to 100. Ties break on EPSS, then CVSS. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison.</p>
+<p>The EPSS and asset-criticality terms and all the weights are this project's own design. They are not inputs of CISA BOD 26-04, which ties urgency to KEV status, exposure, automatability and technical impact.</p>
+</div>
+
+<h2>Evidence from a real run</h2>
+<p class="small muted">Run on 2026-11-10 from a fresh clone (commit 597c1f7): 9 tests pass.</p>
+<pre data-copy><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14
+  #  risk  KEV CVE              CVSS  EPSS ACR days  asset
+  1  99.4  yes CVE-2021-44228   10.0 0.970   8   42  web-portal-01
+  2  99.0  yes CVE-2024-3400    10.0 0.950   8    9  fw-edge-01
+  3  98.1  yes CVE-2023-4966     9.4 0.960   8   18  vpn-gw-02
+  ...
+ 11  86.9  yes CVE-2017-0144     8.1 0.970   5  210  file-srv-legacy
+ 12  85.0  yes CVE-2021-34527    8.8 0.960   4  160  print-srv-03
+ 13  38.5  -   CVE-2023-99996    8.8 0.050   7   22  backup-srv-02
+ 14  33.7  -   CVE-2023-99994    7.5 0.080   6   33  reporting-db-01
+
+KEV vs non-KEV population
+  kev      n=12  avg CVSS 9.53  avg EPSS 0.935  avg days open 94.2
+  non_kev  n=8   avg CVSS 8.34  avg EPSS 0.029  avg days open 101.5</code></pre>
+<p class="trim">Trimmed: rows 4 to 10 and the KEV concentration line removed.</p>
+<p class="prose">On this sample a CVSS-only sort puts 9 KEV findings in its top 12; the risk score puts all 12 there. The average CVSS of the two groups differs by 1.19, and the average EPSS by 0.906.</p>
+
+<h2>Limitations</h2>
+<ul class="prose">
+<li>Synthetic data, so the results say nothing about real remediation.</li>
+<li>It uses CVSS and EPSS values you supply; it does not query NVD or the EPSS API. Live mode fetches only the KEV catalog.</li>
+<li>A weighted sum cannot express a hard rule such as "KEV and internet-exposed always first".</li>
+<li>No per-finding due dates against BOD 26-04; age is reported as an average per group.</li>
+<li>The weights are a starting point and have not been validated against outcomes.</li>
+</ul>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<ul>
+<li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
+<li><a href="https://github.com/samiali38183">GitHub</a></li>
+<li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
+<li><a href="/resume.pdf">Resume (PDF)</a></li>
+</ul>
+<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+</div>
+</footer>
+<script src="/site.js" defer></script>
+</body>
+</html>
