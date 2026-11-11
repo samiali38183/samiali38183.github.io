@@ -4,7 +4,7 @@
 Usage:
   python scripts/check_facts.py --clones DIR [--venv tripline=PATH ...] [--go GOBIN]
 
-DIR holds fresh clones named tripline, sinkline, kevgate, kevgate-admit and kev-risk-prioritization.
+DIR holds fresh clones named tripline, sinkline, kevgate, kevgate-admit, vulnlab and kev-risk-prioritization.
 --venv gives the virtualenv directory (with the project installed with its dev extras) for a Python
 project; without it the current interpreter is used. Needs git, the gh CLI (authenticated) and Go.
 Exit code 1 if any check fails.
@@ -289,12 +289,91 @@ def admit_checks(clones: Path, env_go: str) -> None:
         results.append((r.get("conclusion") == "success", f"CI run {repo}/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
 
 
+def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
+    """vulnlab v0.1.0 sheet: release, tag commit, test count, sinkline results, CI run, demo lines, bug lines, Lab explorer data."""
+    page = "projects/vulnlab/index.html"
+    vl = clones / "vulnlab"
+    venvs = {k: str(Path(v).resolve()) for k, v in venvs.items()}  # the commands below run in other directories
+    py = pybin(venvs, "vulnlab", "python")
+    env = dict(os.environ)
+    if "vulnlab" in venvs:  # tools/sinkline_check.py and demo.sh call `sinkline` by name: use the venv's, not one on PATH
+        env["PATH"] = str(Path(py).parent) + os.pathsep + env.get("PATH", "")
+    tag = gh("repos/samiali38183/vulnlab/releases/latest")["tag_name"]
+    expect("vulnlab latest release", tag, page)
+    expect("vulnlab latest release on home", tag, "index.html")
+    tagsha = run(["git", "rev-list", "-n1", tag], vl).strip()
+    head = run(["git", "rev-parse", "HEAD"], vl).strip()
+    results.append((head == tagsha, f"vulnlab clone HEAD {head[:7]} is the {tag} commit {tagsha[:7]}"))
+    expect("vulnlab tag commit", tagsha[:7], page)
+
+    # tests: 43 collected, 43 passed
+    n = collected(py, vl)
+    expect("vulnlab collected tests", str(n), page, f"{n} in all")
+    expect("vulnlab tests on the projects page", str(n), "projects/index.html", f"{n} tests")
+    pt = subprocess.run([py, "-m", "pytest", "-q", "-p", "no:cacheprovider"], cwd=vl, capture_output=True, text=True, env=env).stdout
+    m = re.search(r"(\d+) passed", pt)
+    results.append((bool(m) and int(m.group(1)) == n and "failed" not in pt, f"vulnlab pytest -q: {pt.strip().splitlines()[-1] if pt.strip() else 'no output'}"))
+
+    # sinkline: findings per lab and version, from a fresh run
+    vuln_found = fixed_found = 0
+    for lab in sorted((vl / "labs").iterdir()):
+        for variant in ("vulnerable", "fixed"):
+            out = subprocess.run([pybin(venvs, "vulnlab", "sinkline"), "scan", variant, "--no-color", "--format", "json"], cwd=lab, capture_output=True, text=True, env=env).stdout
+            found = len(json.loads(out)["findings"])
+            if variant == "vulnerable":
+                vuln_found += found > 0
+            else:
+                fixed_found += found > 0
+    reading = f"sinkline {vuln_found} of 3 detected ({fixed_found} false positives on fixes)"
+    expect("vulnlab sinkline result", reading, "index.html")
+    expect("vulnlab sinkline result on the projects page", reading, "projects/index.html")
+    ck = subprocess.run([py, "tools/sinkline_check.py"], cwd=vl, capture_output=True, text=True, env=env)
+    results.append((ck.returncode == 0, f"vulnlab tools/sinkline_check.py exit {ck.returncode}"))
+    sg = subprocess.run([pybin(venvs, "vulnlab", "sigma"), "check", *sorted(str(x.relative_to(vl)) for x in vl.glob("labs/*/detection/*.yml"))], cwd=vl, capture_output=True, text=True, env=env).stdout
+    results.append(("Found 0 errors, 0 condition errors and 0 issues" in sg, "vulnlab sigma check: 0 errors, 0 condition errors, 0 issues"))
+
+    # the demo transcript on the page: every shown pytest and replay line appears in a real run of tools/demo.sh
+    demo = subprocess.run(["bash", "tools/demo.sh"], cwd=vl, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env).stdout
+    html = (SITE / page).read_text(encoding="utf-8")
+    shown = re.search(r'data-label="\$ bash tools/demo.sh[^"]*"><code>(.*?)</code>', html, re.S).group(1)
+    import html as _h
+    lines = [l for l in _h.unescape(shown).splitlines() if "(full output on Plate 1)" not in l]
+    missing = [l for l in lines if l.strip() not in demo]
+    results.append((not missing and len(lines) > 8, f"vulnlab demo transcript: {len(lines)} lines, {len(missing)} not found in a real run of tools/demo.sh {missing[:2]}"))
+
+    # the vulnerable lines the page quotes, at the lines it names
+    for lab, num, text in [("01-ssrf-redirect", 23, "upstream = requests.get(url, timeout=3)"), ("01-ssrf-redirect", 20, "if not host_allowed(url):"),
+                           ("02-sqli-order-by", 16, "ORDER BY {sort} {direction}"), ("03-idor-bola", 34, "if current_user() is None:"),
+                           ("03-idor-bola", 38, "return jsonify(invoices[object_id])")]:
+        src = (vl / "labs" / lab / "vulnerable" / "app.py").read_text(encoding="utf-8").splitlines()[num - 1]
+        results.append((text in src, f"vulnlab {lab} vulnerable/app.py line {num} contains {text!r}"))
+        expect(f"vulnlab page quotes {lab} line {num}", text, page)
+
+    # the latest run on main is the one on the page
+    runs = gh("repos/samiali38183/vulnlab/actions/runs?branch=main&per_page=1")["workflow_runs"]
+    rid = str(runs[0]["id"]) if runs else "?"
+    results.append((bool(runs) and runs[0]["conclusion"] == "success", f"vulnlab latest main run {rid}: {runs[0]['name']!r} {runs[0]['conclusion']} sha {runs[0]['head_sha'][:7]}" if runs else "no runs"))
+    expect("vulnlab latest CI run on the page", rid, page, f"run {rid}")
+    expect("vulnlab latest CI run on home", rid, "index.html", f"run {rid}")
+
+    # the stored bench data equals a fresh run, and the page equals the stored data
+    cap = subprocess.run([sys.executable, str(SITE / "scripts" / "capture_vulnlab_bench.py"), "--check", "--clone", str(vl)] + (["--venv", venvs["vulnlab"]] if "vulnlab" in venvs else []),
+                         capture_output=True, text=True, env=env)
+    results.append((cap.returncode == 0, "capture_vulnlab_bench.py --check: " + (cap.stdout.strip().splitlines() or ["no output"])[-1]))
+    nd = subprocess.run(["node", str(SITE / "scripts" / "test_bench_vulnlab.mjs")], capture_output=True, text=True)
+    results.append((nd.returncode == 0, "test_bench_vulnlab.mjs: " + (nd.stdout.strip().splitlines() or [nd.stderr[:120]])[-1]))
+    all_html = "".join(x.read_text(encoding="utf-8") for x in SITE.rglob("*.html") if "content" not in x.parts)
+    for repo, rid2 in sorted(set(re.findall(r"github\.com/samiali38183/(vulnlab)/actions/runs/(\d+)", all_html))):
+        r = gh(f"repos/samiali38183/{repo}/actions/runs/{rid2}")
+        results.append((r.get("conclusion") == "success", f"CI run {repo}/{rid2}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--clones", required=True)
     ap.add_argument("--venv", action="append", default=[])
     ap.add_argument("--go", default="go")
-    ap.add_argument("--only", choices=["sinkline", "tripline", "kev", "fuzzdiff", "admit"], help="run only one project's checks (when the other toolchains are not installed)")
+    ap.add_argument("--only", choices=["sinkline", "tripline", "kev", "fuzzdiff", "admit", "vulnlab"], help="run only one project's checks (when the other toolchains are not installed)")
     a = ap.parse_args()
     clones = Path(a.clones)
     venvs = dict(v.split("=", 1) for v in a.venv)
@@ -317,6 +396,9 @@ def main() -> int:
         return report()
     if a.only == "admit":
         admit_checks(clones, a.go)
+        return report()
+    if a.only == "vulnlab":
+        vulnlab_checks(clones, venvs)
         return report()
 
     # tripline
@@ -500,6 +582,7 @@ def main() -> int:
 
     # fuzzdiff (Rust). Needs cargo, cargo-llvm-cov, node.
     fuzzdiff_checks(clones)
+    vulnlab_checks(clones, venvs)
 
     return report()
 
