@@ -49,13 +49,14 @@ def describe(label: str, unit: str, runs: Runs, phr: dict[str, str]) -> str:
     return f"{label}, {total} {unit}: {parts}"
 
 
-def strip(runs: Runs, label: str, unit: str, phr: dict[str, str], mini: bool = False, true_runs: Runs | None = None) -> str:
+def strip(runs: Runs, label: str, unit: str, phr: dict[str, str], mini: bool = False, true_runs: Runs | None = None,
+          scaled: bool = False) -> str:
     """One strip. `runs` are drawn; `true_runs` (default `runs`) supply the accessible description."""
     states = expand(runs)
     aria = describe(label, unit, true_runs or runs, phr)
     ticks = []
     for i, s in enumerate(states, 1):
-        major = (not mini) and i % 10 == 0
+        major = (not mini) and (not scaled) and i % 10 == 0
         extra = ' class="m" data-n="%d"' % i if major else ""
         ticks.append('<i data-s="%s"%s></i>' % (s, extra))
     return f'<div class="strip" role="img" aria-label="{esc(aria, quote=True)}">{"".join(ticks)}</div>'
@@ -66,11 +67,17 @@ def strip_rows(sset: dict, mini: bool = False, vt: str | None = None, show_val: 
     rows = []
     for r in sset["rows"]:
         runs = [tuple(x) for x in r["runs"]]
-        drawn = normalize(runs, 24) if mini else runs
+        per = sset.get("per")  # one drawn tick stands for about `per` items; the label keeps the true counts
+        if mini:
+            drawn = normalize(runs, 24)
+        elif per:
+            drawn = normalize(runs, -(-sum(n for _, n in runs) // per))
+        else:
+            drawn = runs
         val = f'<p class="val">{r["val"]}</p>' if (show_val and not mini and r.get("val")) else ""
         rows.append(
             f'<div class="srow"><span class="label" aria-hidden="true">{esc(r["label"])}</span>'
-            f'{strip(drawn, r["label"], sset["unit"], sset["phr"], mini, runs)}{val}</div>')
+            f'{strip(drawn, r["label"], sset["unit"], sset["phr"], mini, runs, scaled=bool(per) and not mini)}{val}</div>')
     cls = "strips mini" if mini else "strips"
     if vt:
         cls += " vt"
