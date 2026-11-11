@@ -81,7 +81,7 @@ LAYOUT = """<!DOCTYPE html>
 <meta name="twitter:image:alt" content="{ogalt}">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
-<script>try{{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
+{headextra}<script>try{{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -194,8 +194,11 @@ def build() -> None:
             '<li><a href="{}"{}>{}</a></li>'.format(
                 href, (' aria-current="page"' if path == href else ' aria-current="true"') if k == key else "", label)
             for k, href, label in NAV)
+        headextra = ""
+        if kind == "project" and (ROOT / "assets/css" / f"bench-{arg}.css").exists():
+            headextra = f'<link rel="stylesheet" href="/assets/css/bench-{arg}.css">\n'
         out = LAYOUT.format(
-            title=html.escape(title), desc=html.escape(desc, quote=True), canon=BASE + path, og=OG_IMAGE,
+            headextra=headextra, title=html.escape(title), desc=html.escape(desc, quote=True), canon=BASE + path, og=OG_IMAGE,
             ogalt=html.escape(OG_ALT, quote=True), nav=nav, body=body, sheetline=sheetline, extra=extra)
         target = ROOT / path.strip("/") / "index.html" if path != "/" else ROOT / "index.html"
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -204,7 +207,7 @@ def build() -> None:
 
     nav404 = "\n".join('<li><a href="{}">{}</a></li>'.format(h, lab) for _, h, lab in NAV)
     body404 = P.expand(ctx, (ROOT / "content" / "404.html").read_text(encoding="utf-8").strip())
-    nf = LAYOUT.format(title="Page not found | Sami Ali", desc="Page not found.", canon=BASE + "/404.html", og=OG_IMAGE,
+    nf = LAYOUT.format(headextra="", title="Page not found | Sami Ali", desc="Page not found.", canon=BASE + "/404.html", og=OG_IMAGE,
                        ogalt=html.escape(OG_ALT, quote=True), nav=nav404, body=body404, sheetline="", extra="")
     nf = nf.replace('<meta name="description"', '<meta name="robots" content="noindex">\n<meta name="description"')
     (ROOT / "404.html").write_text(nf, encoding="utf-8", newline="\n")

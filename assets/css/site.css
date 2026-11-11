@@ -124,6 +124,7 @@ main{display:block;padding-block:var(--s-7) var(--s-8)}
 .stamp.pass{color:var(--ok)}
 .stamp.limit{color:var(--warn)}
 .stamp.pend{color:var(--ink-2);border-style:dotted}
+.stamp.off{color:var(--ink-2);border-style:dashed}
 /* evidence chip */
 .chip{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:.5em;font:400 var(--step--1)/1.3 var(--mono);color:var(--ink);text-decoration:none;border:1px solid var(--edge);background:var(--sheet);padding:.25em .55em;vertical-align:middle}
 .chip:hover{border-color:var(--ink);text-decoration:none}

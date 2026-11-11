@@ -44,8 +44,65 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
             return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption}[arg]()
         if kind == "kb":
             return f"{round((ROOT / arg).stat().st_size / 1000)} KB"
+        if kind == "benchtable":
+            return bench_table(arg)
+        if kind == "benchevents":
+            return bench_events(arg)
+        if kind == "parity":
+            return str(_bench_data(arg)[0]["meta"]["parity_cases"])
         raise KeyError(m.group(0))
     return re.sub(r"\{\{([a-z]+:[^{}]+)\}\}", sub, text)
+
+
+# ---------------------------------------------------------------------------------------------
+# Bench static state (tripline): generated from the same data the live bench and its parity test use
+# ---------------------------------------------------------------------------------------------
+def _bench_data(name: str) -> tuple[dict, dict]:
+    import json
+    data = json.loads((ROOT / f"assets/data/bench-{name}.json").read_text(encoding="utf-8"))
+    parity = json.loads((ROOT / f"assets/data/{name}-bench-parity.json").read_text(encoding="utf-8"))
+    return data, parity
+
+
+def _verdict(on: int) -> str:
+    return C.stamp("plain" if on else "off", "Flagged" if on else "Not flagged")
+
+
+def bench_table(name: str) -> str:
+    """Preset command lines with both rules' verdicts and reasons, from the generator's ground truth."""
+    data, parity = _bench_data(name)
+    cases = [c for c in parity["cases"] if c["g"] == "preset"]
+    assert len(cases) == len(data["presets"])
+    rows = []
+    for pre, c in zip(data["presets"], cases):
+        assert (pre["i"], pre["c"]) == (c["i"], c["c"])
+        rows.append(
+            f'<tr><th scope="row"><span class="label">{esc(pre["l"])}</span><br><code>{esc(c["c"])}</code>'
+            f'<br><span class="label">Image {esc(c["i"])}</span></th>'
+            f'<td>{_verdict(c["s"][2])}<p>{esc(c["w"][0])}</p></td>'
+            f'<td>{_verdict(c["r"][4])}<p>{esc(c["w"][1])}</p></td></tr>')
+    m = data["meta"]
+    return (f'<div class="scroll wide"><table class="tbl bt"><caption>Recorded verdicts: what each rule decides on {len(rows)} command lines '
+            f'(evaluated by tripline {esc(m["tripline"])}, commit {esc(m["commit"])})</caption>'
+            '<thead><tr><th scope="col">Command line</th><th scope="col">Stock rule c21c4eaa</th>'
+            '<th scope="col">Replacement rule</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table></div>")
+
+
+def bench_events(name: str) -> str:
+    """The 36 recorded events with both verdicts, inside a details element."""
+    data, _ = _bench_data(name)
+    rows = []
+    for n, e in enumerate(data["events"], 1):
+        exp = " (expected)" if n - 1 in data["expected"] else ""
+        rows.append(
+            f'<tr><th scope="row" class="num">{n}{exp}</th><td><code>{esc(e["i"])}</code></td><td><code>{esc(e["c"])}</code></td>'
+            f'<td>{"<b>Flagged</b>" if e["s"] else "Not flagged"}</td><td>{"<b>Flagged</b>" if e["r"] else "Not flagged"}</td></tr>')
+    return ('<details class="alt"><summary>All 36 recorded events and what each rule decided</summary>'
+            '<div class="scroll wide"><table class="tbl bt"><caption>Applicable events from the recorded run, in order; '
+            'command lines trimmed to 110 characters</caption>'
+            '<thead><tr><th scope="col">Event</th><th scope="col">Image</th><th scope="col">Command line</th>'
+            '<th scope="col">Stock rule</th><th scope="col">Replacement rule</th></tr></thead><tbody>'
+            + "".join(rows) + "</tbody></table></div></details>")
 
 
 # ---------------------------------------------------------------------------------------------
