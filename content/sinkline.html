@@ -2,31 +2,37 @@
 A static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class.
 
 <!--@bench-->
-<div class="scroll"><table class="tbl">
-<caption>The benchmark, line by line: how each tool read the 109 labeled lines</caption>
-<thead><tr><th scope="col">Tool</th><th scope="col" class="num">TP</th><th scope="col" class="num">FP</th><th scope="col" class="num">FN</th><th scope="col" class="num">TN</th><th scope="col" class="num">Precision</th><th scope="col" class="num">Recall</th><th scope="col" class="num">F1</th></tr></thead>
-<tbody>
-<tr><th scope="row">Bandit 1.9.4</th><td class="num">33</td><td class="num">20</td><td class="num">28</td><td class="num">28</td><td class="num">0.623</td><td class="num">0.541</td><td class="num">0.579</td></tr>
-<tr><th scope="row">sinkline 0.4.1</th><td class="num">60</td><td class="num">0</td><td class="num">1</td><td class="num">48</td><td class="num"><b class="best">1.000</b></td><td class="num"><b class="best">0.984</b></td><td class="num"><b class="best">0.992</b></td></tr>
-</tbody>
-</table></div>
+{{bench:sinkline}}
 
 <!--@bench-cap-->
-<b>On this small corpus sinkline reports almost every labeled vulnerability and none of the safe lines; Bandit misses 28 and flags 20 safe lines.</b> The filled square marks the best value in each column. The corpus has 61 vulnerable and 48 safe lines, labeled by the same person who wrote the engine, so read it as a regression check, not a generalization estimate. Output of <code>bench/score.py</code> and <code>bench/compare_bandit.py</code>, 2026-11-10.
+{{bench:sinkline-cap}}
 
 <!--@as-found-->
 <div class="prose">
-<p>Two things were wrong before 0.4.1, and both are in the repository's own changelog.</p>
-<p>The first was in sinkline's own GitHub Action. Its inputs (<code>path</code>, <code>fail-on</code>, <code>min-confidence</code>) were interpolated straight into a shell line with <code>${{ inputs.* }}</code>, so a workflow that passed an attacker-influenced value could run arbitrary commands on the runner.<sup class="nref" aria-hidden="true"></sup> Version 0.4.1 passes them through <code>env:</code>, quoted, and <code>tests/test_action.py</code> runs the script with hostile values.</p>
+<p>The first reading is on code the engine was not built around. OWASP's BenchmarkPython v0.1 (commit f129148) is 1,230 small Flask test cases, each labeled vulnerable or safe in a published file. Ten of its 14 categories are source-to-sink flows, which is what sinkline is for: 240 vulnerable cases and 437 safe ones.</p>
+<p>sinkline 0.4.1 reported 99 of the 240 vulnerable cases (TPR 0.41) and flagged 89 of the 437 safe ones (FPR 0.20), a score of +0.21 (TPR minus FPR). Two categories were close to blank: LDAP injection, 0 of 16, and XPath injection, 5 of 51. Command injection scored below zero (-0.26): it flagged 4 of 7 safe cases and only 4 of 13 vulnerable ones. Bandit 1.9.4 scored +0.07 and Semgrep OSS 1.185.0 +0.04 on the same ten categories, mostly because neither has rules for most of them.<sup class="nref" aria-hidden="true"></sup></p>
+</div>
+<aside class="note"><strong>TPR minus FPR</strong> is the benchmark's score. TPR is the share of vulnerable cases reported; FPR is the share of safe cases reported anyway. 0 means no better than guessing, 1 is perfect.</aside>
+<div class="prose">
+<p>Over all 14 categories the order flips. Bandit scores +0.36 against sinkline 0.4.1's +0.10, because Bandit checks weak hashes (71 of 71) and weak random numbers (77 of 99), and sinkline has nothing for weak hashes, weak random numbers, cookie flags or what is stored in the session. It scores 0 on those four categories. Bandit still leads over all 14 with 0.5.0.</p>
+</div>
+{{key:all14}}
+{{strips:all14}}
+<div class="prose">
+<p>Separately, a flaw was found in sinkline's own GitHub Action. Its inputs (<code>path</code>, <code>fail-on</code>, <code>min-confidence</code>) were interpolated straight into a shell line with <code>${{ inputs.* }}</code>, so a workflow that passed an attacker-influenced value could run arbitrary commands on the runner. Version 0.4.1 passes them through <code>env:</code>, quoted, and <code>tests/test_action.py</code> runs the script with hostile values.</p>
 </div>
 <aside class="note"><strong>Script injection</strong> (CWE-78) happens when untrusted text is pasted into a shell command, so the shell runs it as code. Passing it as an environment variable keeps it as data.</aside>
 <div class="prose">
-<p>The second was in the analysis. A <code>try</code>/<code>except</code> lost taint (a false negative): <code>host = request.args["h"]</code> followed by <code>except: host = "localhost"</code> reported nothing. The same release closed one of the benchmark's two remaining misses, a closure that reads tainted data, moving recall from 0.967 to 0.984 (changelog 0.4.1).</p>
+<p>One more analysis bug is in the changelog: a <code>try</code>/<code>except</code> lost taint, so <code>host = request.args["h"]</code> followed by <code>except: host = "localhost"</code> reported nothing (fixed in 0.4.1; the command-injection example on Plate 1 has that shape).</p>
 </div>
-<div class="scroll wide"><table class="tbl">
+<div class="scroll wide"><table class="tbl wt">
 <caption>Reading ledger</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
+<tr class="row-fail"><th scope="row">LDAP and XPath injection, 0.4.1</th><td>Most vulnerable cases reported</td><td>5 of 67 reported (LDAP 0 of 16, XPath 5 of 51)</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.4.1/summary.md">results/v0.4.1</a></td></tr>
+<tr class="row-fail"><th scope="row">Command injection, 0.4.1</th><td>More vulnerable cases reported than safe ones</td><td>4 of 13 vulnerable, 4 of 7 safe: score -0.26</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.4.1/summary.md">results/v0.4.1</a></td></tr>
+<tr><th scope="row">Weak hash, weak PRNG, cookie flags, trust boundary</th><td>Out of scope, reported anyway</td><td>0 of 212 vulnerable cases reported</td><td>{{stamp:limit:No check}}</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">bench/external/README.md</a></td></tr>
+<tr><th scope="row">All 14 categories against Bandit, 0.5.0</th><td>sinkline ahead</td><td>+0.27 against Bandit +0.36</td><td>{{stamp:limit:Bandit ahead}}</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.5.0/summary.md">results/v0.5.0</a></td></tr>
 <tr class="row-fail"><th scope="row">GitHub Action input handling, before 0.4.1</th><td>Inputs reach the shell only as quoted data</td><td>Inputs interpolated into a shell line</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1, Security</a></td></tr>
 <tr><th scope="row">The same Action, 0.4.1</th><td>Hostile values stay data</td><td>Tested with hostile values</td><td>{{stamp:pass:As left: pass}}</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py">tests/test_action.py</a></td></tr>
 </tbody>
@@ -34,10 +40,37 @@ A static analyzer for Python web apps. It follows attacker-controlled input acro
 
 <!--@as-left-->
 <div class="prose">
-<p>Run on 2026-11-10 from a fresh clone (commit 9a36ba2), Python 3.12.2, bandit 1.9.4.</p>
+<p>sinkline 0.5.0 (tag v0.5.0, commit 9c58efd, 2026-11-11) scores TPR 0.73 and FPR 0.21 on the same ten categories, +0.52 against 0.4.1's +0.21 (175 of 240 vulnerable cases reported, 93 of 437 safe ones flagged). The changes were more sink coverage (<code>codecs.open</code>, <code>elementpath.select</code>, <code>lxml</code> XPath, <code>pathlib</code> reads and writes), pruning of statically decided branches, correct handling of <code>match</code>, receiver types through helper functions, and treating a returned call result as XSS when it is the tainted string itself.</p>
+<p><b>This is not a held-out score.</b> The fixes were chosen by reading 0.4.1's failures on this same suite, so 0.5.0's number is what the fixes recover on the suite that motivated them. Treat 0.4.1 as the independent measurement. The false-positive rate did not fall (0.20 to 0.21): lists tracked as a whole container are the largest remaining source. The scorer is the repository's own script, not the benchmark's official one (BenchmarkUtils, not run).</p>
 </div>
-{{key:main}}
-{{strips:main}}
+<div class="scroll wide"><table class="tbl wt">
+<caption>Per category: TPR / FPR / TPR minus FPR, with real and safe case counts</caption>
+<thead><tr><th scope="col">Category</th><th scope="col" class="num">Real / safe</th><th scope="col" class="num">sinkline 0.4.1</th><th scope="col" class="num">sinkline 0.5.0</th><th scope="col" class="num">Bandit 1.9.4</th><th scope="col" class="num">Semgrep OSS 1.185.0</th></tr></thead>
+<tbody>
+<tr><th scope="row">sqli</th><td class="num">5 / 11</td><td class="num">0.80 / 0.00 / +0.80</td><td class="num">0.80 / 0.00 / +0.80</td><td class="num">1.00 / 1.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">cmdi</th><td class="num">13 / 7</td><td class="num">0.31 / 0.57 / -0.26</td><td class="num">0.38 / 0.14 / +0.24</td><td class="num">1.00 / 1.00 / +0.00</td><td class="num">0.54 / 1.00 / -0.46</td></tr>
+<tr><th scope="row">codeinj</th><td class="num">20 / 33</td><td class="num">0.65 / 0.52 / +0.13</td><td class="num">0.75 / 0.39 / +0.36</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">xss</th><td class="num">31 / 58</td><td class="num">0.74 / 0.50 / +0.24</td><td class="num">0.77 / 0.31 / +0.46</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">pathtraver</th><td class="num">65 / 103</td><td class="num">0.31 / 0.08 / +0.23</td><td class="num">0.66 / 0.09 / +0.57</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.03 / 0.02 / +0.01</td></tr>
+<tr><th scope="row">redirect</th><td class="num">13 / 21</td><td class="num">0.69 / 0.38 / +0.31</td><td class="num">0.69 / 0.38 / +0.31</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">deserialization</th><td class="num">18 / 36</td><td class="num">0.83 / 0.14 / +0.69</td><td class="num">0.89 / 0.06 / +0.83</td><td class="num">0.72 / 0.19 / +0.53</td><td class="num">0.50 / 0.17 / +0.33</td></tr>
+<tr><th scope="row">ldapi</th><td class="num">16 / 13</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.69 / 0.15 / +0.53</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">xpathi</th><td class="num">51 / 135</td><td class="num">0.10 / 0.04 / +0.06</td><td class="num">0.80 / 0.22 / +0.58</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">xxe</th><td class="num">8 / 20</td><td class="num">0.75 / 0.65 / +0.10</td><td class="num">0.88 / 0.50 / +0.38</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr class="row-fail"><th scope="row">hash (no check in sinkline)</th><td class="num">71 / 80</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">1.00 / 0.00 / +1.00</td><td class="num">0.76 / 0.00 / +0.76</td></tr>
+<tr class="row-fail"><th scope="row">weakrand (no check in sinkline)</th><td class="num">99 / 227</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.78 / 0.00 / +0.78</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr class="row-fail"><th scope="row">securecookie (no check in sinkline)</th><td class="num">24 / 15</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr class="row-fail"><th scope="row">trustbound (no check in sinkline)</th><td class="num">18 / 19</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td><td class="num">0.00 / 0.00 / +0.00</td></tr>
+<tr><th scope="row">taint categories (10)</th><td class="num">240 / 437</td><td class="num">0.41 / 0.20 / +0.21</td><td class="num">0.73 / 0.21 / +0.52</td><td class="num">0.13 / 0.06 / +0.07</td><td class="num">0.07 / 0.03 / +0.04</td></tr>
+<tr><th scope="row">all categories (14)</th><td class="num">452 / 778</td><td class="num">0.22 / 0.11 / +0.10</td><td class="num">0.39 / 0.12 / +0.27</td><td class="num">0.40 / 0.03 / +0.36</td><td class="num">0.16 / 0.02 / +0.14</td></tr>
+</tbody>
+</table></div>
+<h3>The regression gate</h3>
+<div class="prose">
+<p>The repository also keeps a small self-labeled corpus: 109 lines (61 vulnerable, 48 safe) labeled alongside the engine. It is not independent, so it says little about accuracy on new code. It runs in CI to catch regressions, and it did not move between 0.4.1 and 0.5.0. Run on 2026-11-11 from a fresh clone of v0.5.0 (commit 9c58efd), Python 3.12.2, bandit 1.9.4.</p>
+</div>
+{{key:gate}}
+{{strips:gate}}
 <pre data-copy data-label="$ python bench/score.py; python bench/compare_bandit.py"><code>$ python bench/score.py
 corpus: 109 labeled lines (61 vuln, 48 safe)
 TP 60  FP 0  FN 1  TN 48
@@ -50,8 +83,8 @@ bandit: 84 raw issues on the corpus
 bandit on labeled lines: TP 33  FP 20  FN 28  TN 28
 precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN line counts)</code></pre>
 <div class="prose">
-<p>Read the Bandit row as scope, not a verdict: Bandit is a pattern linter with no data-flow model, and its false positives are mostly rules that fire on any string-built SQL or any <code>subprocess</code> call, including the labeled-safe variants. The figure also depends on the Bandit version (1.8.0 gives F1 0.561). No comparison against Semgrep or CodeQL has been run.</p>
-<h3>A cross-file finding on the benchmark corpus</h3>
+<p>Read the Bandit row as scope, not a verdict: Bandit is a pattern linter with no data-flow model, and its false positives are mostly rules that fire on any string-built SQL or any <code>subprocess</code> call, including the labeled-safe variants. The figure also depends on the Bandit version (1.8.0 gives F1 0.561).</p>
+<h3>A cross-file finding on the corpus</h3>
 <p>The source is in one file and the sink in another, reached through a method call on a locally constructed object.</p>
 </div>
 <pre data-copy data-label="$ sinkline scan bench/corpus"><code>$ sinkline scan bench/corpus
@@ -62,25 +95,22 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
   ┌ source     hard_app.py:34  Shell().run(request.args["cmd"])  # flask.request.args
   │ call       hard_app.py:34  Shell().run(request.args["cmd"])  # passed as `cmd` to Shell.run()
   └ sink       hard_helpers.py:17  subprocess.call(cmd, shell=True)  # subprocess.call inside Shell.run()</code></pre>
-<p class="trim">Trimmed: one finding of 71 shown, the benchmark's <code># VULN:CWE-78</code> label comments and padding whitespace removed from the source lines.</p>
-<figure class="plate wide">
-<span class="plate-label">Plate {{n}}</span>
-<a href="https://samiali38183.github.io/sinkline/"><img src="/assets/img/sinkline-report.png" width="1300" height="596" loading="lazy" alt="sinkline HTML report for the benchmark corpus: 71 findings, 43 critical, 21 high, counts by OWASP category, and one expanded finding showing the source, call and sink lines of a command-injection flow"></a>
-<figcaption><b>The HTML report shows the same flow, with the source, call and sink lines.</b> Generated locally with <code>sinkline scan bench/corpus --format html</code> (headless Chrome screenshot; the header and one expanded finding are joined from the same page). The 71 findings include <code>smoke_app.py</code>, which the benchmark does not score. The <a href="https://samiali38183.github.io/sinkline/">published report</a> is the same scan.</figcaption>
-</figure>
+<p class="trim">Trimmed: one finding of 73 shown, the corpus's <code># VULN:CWE-78</code> label comments and padding whitespace removed from the source lines.</p>
 <div class="scroll wide"><table class="tbl">
 <caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests</th><td>91 (includes the corpus gate and the Action tests)</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1</a>; {{run:42920168878}}</td></tr>
-<tr><th scope="row">Benchmark, sinkline 0.4.1</th><td>TP 60, FP 0, FN 1, TN 48; P 1.000, R 0.984, F1 0.992</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/score.py</a>, README results table</td></tr>
-<tr><th scope="row">Benchmark, Bandit 1.9.4</th><td>TP 33, FP 20, FN 28, TN 28; P 0.623, R 0.541, F1 0.579</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/compare_bandit.py">bench/compare_bandit.py</a></td></tr>
+<tr><th scope="row">Tests</th><td>138 (includes the corpus gate, the Action tests and the external-benchmark fixes)</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.5.0</a>; {{run:43033758810}}</td></tr>
+<tr><th scope="row">OWASP BenchmarkPython v0.1, 10 taint categories</th><td>sinkline 0.5.0: TPR 0.73, FPR 0.21, +0.52 (0.4.1: 0.41, 0.20, +0.21); Bandit 1.9.4: 0.13, 0.06, +0.07; Semgrep OSS 1.185.0: 0.07, 0.03, +0.04</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">bench/external/README.md</a>; sinkline 0.5.0 re-run for this page</td></tr>
+<tr><th scope="row">OWASP BenchmarkPython v0.1, all 14 categories</th><td>sinkline 0.5.0: 0.39, 0.12, +0.27; Bandit 1.9.4: 0.40, 0.03, +0.36; Semgrep OSS 1.185.0: 0.16, 0.02, +0.14</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.5.0/summary.md">results/v0.5.0</a></td></tr>
+<tr><th scope="row">Regression gate, self-labeled corpus</th><td>TP 60, FP 0, FN 1, TN 48; P 1.000, R 0.984, F1 0.992 (not independent)</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/score.py</a></td></tr>
+<tr><th scope="row">Same corpus, Bandit 1.9.4</th><td>TP 33, FP 20, FN 28, TN 28; P 0.623, R 0.541, F1 0.579</td><td><a href="https://github.com/samiali38183/sinkline/blob/main/bench/compare_bandit.py">bench/compare_bandit.py</a></td></tr>
 <tr><th scope="row">vulpy @ 5249cc8</th><td>3 findings, all CWE-89, all in <code>bad/</code>; 0 in <code>good/</code></td><td><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
-<tr><th scope="row">Vulnerable-Flask-App @ b6a4f97</th><td>4 findings (SSTI, SQLi, XSS, MD5)</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
+<tr><th scope="row">Vulnerable-Flask-App @ b6a4f97</th><td>5 findings: SSTI and XSS on the same call, SQLi, XSS, MD5 (0.4.1 reported 4; the XSS finding on the template call is new in 0.5.0)</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
 <tr><th scope="row">dvpwa @ a1d8f89</th><td>2 findings (CWE-89, CWE-117)</td><td><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a>; counts re-run for this page</td></tr>
 <tr><th scope="row">microblog @ a975ef6</th><td>0 findings</td><td>counts re-run for this page</td></tr>
-<tr><th scope="row">Rules</th><td>42 rules, 138 sink signatures</td><td><a href="https://github.com/samiali38183/sinkline#how-it-works">README</a>; <code>sinkline rules</code></td></tr>
-<tr><th scope="row">Release</th><td>v0.4.1</td><td><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.4.1">GitHub release</a></td></tr>
+<tr><th scope="row">Rules</th><td>43 rules, 151 sink signatures</td><td><a href="https://github.com/samiali38183/sinkline#how-it-works">README</a>; <code>sinkline rules</code></td></tr>
+<tr><th scope="row">Release</th><td>v0.5.0</td><td><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.5.0">GitHub release</a></td></tr>
 </tbody>
 </table></div>
 
@@ -92,7 +122,7 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 </div>
 <h3>What it does</h3>
 <div class="prose">
-<p>Pure Python on the standard <code>ast</code> module, with no dependencies. It knows Flask, FastAPI, Django and aiohttp sources, and has 42 rules with 138 sink signatures mapped to OWASP 2021 and CWE. Output is text, JSON, SARIF 2.1.0 (with code flows) or a self-contained HTML report. It also ships as a GitHub Action and a pre-commit hook, and supports <code>--baseline</code> so an existing codebase can fail only on new findings.</p>
+<p>Pure Python on the standard <code>ast</code> module, with no dependencies. It knows Flask, FastAPI, Django and aiohttp sources, and has 43 rules with 151 sink signatures mapped to OWASP 2021 and CWE. Output is text, JSON, SARIF 2.1.0 (with code flows) or a self-contained HTML report. It also ships as a GitHub Action and a pre-commit hook, and supports <code>--baseline</code> so an existing codebase can fail only on new findings.</p>
 </div>
 {{diagram:sinkline}}
 <h3>Three implementation points</h3>
@@ -100,7 +130,7 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 <h4>Two-pass interprocedural summaries</h4>
 <p>Pass 1 analyzes each function with its parameters bound to symbolic labels (<code>param:0</code>, <code>param:1</code>, ...) and records which parameters reach the return value, which reach sinks, and whether the function is a thin sanitizer. It repeats until no summary changes, so a sink four helpers deep is found whatever order the helpers are defined in. Pass 2 re-runs with real sources and consults the summary at each call site. The cost is that summaries are context-insensitive: one per function, not per call site. Summary keys are module-qualified, so vulpy's <code>bad/</code> and <code>good/</code> trees, which define the same function names, give different results.</p>
 <h4>CWE-scoped sanitizers</h4>
-<p>A tainted value carries the set of CWEs it has been cleaned for.<sup class="nref" aria-hidden="true"></sup> <code>shlex.quote</code> clears command injection only, <code>html.escape</code> clears XSS only, and <code>int()</code> clears everything. A single global "sanitized" flag makes a shell-safe string look SQL-safe. At a branch join, taint labels are unioned and cleared CWEs are intersected, so a value stays clean only if every path cleaned it. Validation guards such as <code>if not x.isdigit(): abort()</code> work the same way and are scoped too: a <code>..</code> check is a path guard, not a shell guard.</p>
+<p>A tainted value carries the set of CWEs it has been cleaned for.<sup class="nref" aria-hidden="true"></sup> <code>shlex.quote</code> clears command injection only, <code>html.escape</code> clears XSS only, and <code>int()</code> clears everything. A single global "sanitized" flag makes a shell-safe string look SQL-safe. At a branch join, taint labels are unioned and cleared CWEs are intersected, so a value stays clean only if every path cleaned it. Validation guards such as <code>if not x.isdigit(): abort()</code> work the same way and are scoped too: a <code>..</code> check is a path guard, not a shell guard. Plate 1 shows this with recorded output: the sanitizer step appears in the path, with the CWE it clears.</p>
 </div>
 <aside class="note"><strong>CWE</strong> numbers name bug classes: CWE-78 is OS command injection, CWE-79 cross-site scripting, CWE-89 SQL injection.</aside>
 <div class="prose">
@@ -110,8 +140,12 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 
 <!--@limits-->
 <ul class="prose">
-<li><strong>The benchmark is small and self-labeled.</strong> 109 lines, labeled by the same person who wrote the engine, and it doubles as the regression suite. Two of the 0.4.0 changes were written to fix lines in it. Read the scores as "no regressions and the design limits are visible", not as a generalization estimate.</li>
+<li><strong>The 0.5.0 score is not held out.</strong> The fixes were chosen by reading the failures of 0.4.1 on the same benchmark. Only the 0.4.1 reading is an independent measurement, and it was +0.21 on the taint categories.</li>
+<li><strong>One synthetic suite.</strong> BenchmarkPython v0.1 is a preliminary release of templated cases (many share one shape), and the SQL, command and XXE categories have only 5 to 13 vulnerable cases. The scorer is the repository's own script, not the official one, so the benchmark's own scorecard may differ.</li>
+<li><strong>High false-positive rate.</strong> FPR is 0.21 on the taint categories. The largest remaining source is position-sensitive lists (a list is tracked as a whole), then deliberately obfuscated safe variants. Taint stored through <code>ConfigParser</code> or a user-defined request wrapper is lost.</li>
+<li><strong>Four categories have no checks:</strong> weak hash, weak PRNG, cookie flags and trust boundary. Over all 14 categories Bandit leads, +0.36 to +0.27.</li>
+<li><strong>The self-labeled corpus is not independent.</strong> 109 lines, labeled alongside the engine, kept as a regression gate. Its F1 of 0.992 is not an accuracy estimate.</li>
 <li><strong>The public-project scans are unlabeled.</strong> Three of the four are deliberately vulnerable training apps. Zero findings on microblog is consistent with its redirect check being treated as a guard, not proof the app is safe. No CVEs or real-world vulnerabilities are claimed.</li>
-<li><strong>Known design limits.</strong> Taint passed between requests through a module global (the one benchmark miss), returned closures, dynamic dispatch, and instance fields tracked per class rather than per object.</li>
-<li><strong>Python only, summaries context-insensitive,</strong> and no coverage for OWASP A04 and A06.</li>
+<li><strong>Plate 1 shows recorded runs of small files, not a benchmark.</strong> One case is worth knowing: <code>return shlex.quote(request.args.get("name", ""))</code>, is not reported in 0.5.0 (the changelog says a returned call result counts as XSS only when it is the tainted string itself, and an unknown call is not guessed at), while the same value assigned to a variable first is. The recorded run is in <code>assets/data/sinkline-bench/html-wrong-direct.txt</code>.</li>
+<li><strong>Known design limits.</strong> Taint passed between requests through a module global, returned closures, dynamic dispatch, and instance fields tracked per class rather than per object. Python only, summaries context-insensitive, and no coverage for OWASP A04 and A06.</li>
 </ul>
