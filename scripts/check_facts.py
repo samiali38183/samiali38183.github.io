@@ -146,8 +146,8 @@ def main() -> int:
     n = collected(pybin(venvs, "kevgate", "python"), k)
     expect("kevgate tests (main)", str(n), "projects/kevgate/index.html", f"{n} collected")
     expect("kevgate tests on home", str(n), "index.html", f"{n} tests")
-    tagsha = run(["git", "rev-list", "-n1", "v0.1.0"], k).strip()[:7]
-    expect("kevgate v0.1.0 tag commit", tagsha, "projects/kevgate/index.html")
+    tagsha = run(["git", "rev-list", "-n1", "v0.1.1"], k).strip()[:7]
+    expect("kevgate v0.1.1 tag commit", tagsha, "projects/kevgate/index.html")
     for wf in ("ci", "security", "deploy-kind", "terraform", "release"):
         pass
     html = (SITE / "projects/kevgate/index.html").read_text(encoding="utf-8")
