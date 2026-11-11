@@ -1,0 +1,44 @@
+/* Weight bench and snapshot plate (kev-risk-prioritization sheet only). Uses the tokens from site.css.
+   KEV is shown by a filled square plus the word, never by colour alone. */
+.bench-live code,.wb-f{overflow-wrap:anywhere}
+.bl-note{margin:0 0 var(--s-4);font-size:var(--step--1);color:var(--ink-2)}
+.bl-presets{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:var(--s-1) 0 var(--s-5)}
+.bl-b{font:400 var(--step--1)/1.2 var(--mono);color:var(--ink);background:var(--paper);border:1px solid var(--edge);padding:.5rem .75rem;min-height:2.75rem;cursor:pointer}
+.bl-b:hover{border-color:var(--ink)}
+.bl-b[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.bl-prov{margin:var(--s-5) 0 0;text-transform:none;letter-spacing:0}
+.wb-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-3) var(--s-6);margin:0 0 var(--s-4)}
+.wb-s{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 var(--s-3);min-width:0}
+.wb-s label{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.wb-s output{font:600 var(--step-0)/1 var(--mono);font-variant-numeric:tabular-nums}
+.wb-s input{grid-column:1/-1;width:100%;min-height:2.75rem;margin:0;accent-color:var(--ink)}
+.wb-fl{margin:0 0 var(--s-5);font-size:var(--step--1)}
+.wb-f{display:inline-block;max-width:100%}
+.wb-h{margin:var(--s-5) 0 var(--s-2);font-size:var(--step-1)}
+.wb-strips{max-width:60rem;margin-bottom:var(--s-5)}
+.wb-z{border-left:3px solid var(--warn);background:var(--warn-tint);padding:var(--s-3) var(--s-4);margin:0 0 var(--s-4);font-size:var(--step--1)}
+.scroll.wb-scroll{overflow-x:auto;margin:0 0 var(--s-4)}
+.wb-t{width:100%;min-width:44rem;border-collapse:collapse;font-size:var(--step--1);line-height:1.4;margin:0}
+.wb-t caption{text-align:left;font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2);padding-bottom:var(--s-2);position:sticky;left:0}
+.wb-t thead th{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);text-align:left;padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:2px solid var(--ink);vertical-align:bottom}
+.wb-t td,.wb-t tbody th{padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:1px solid var(--rule);vertical-align:middle;text-align:left;font-family:var(--mono);font-weight:400;font-size:.8125rem}
+.wb-t .num{text-align:right;font-variant-numeric:tabular-nums slashed-zero}
+.wb-t tr.cut>*{border-top:2px solid var(--ink)}
+.wb-t td:last-child{padding-right:0}
+.wb-t td[data-k="1"]{font-weight:600}
+.wb-sq{display:inline-block;width:.6em;height:.6em;border:1.5px solid var(--ink);margin-right:.45em;vertical-align:.02em}
+td[data-k="1"] .wb-sq{background:var(--ink)}
+.wb-sc{min-width:5.5rem}
+.wb-bar{display:block;height:4px;background:var(--ink);margin:0 0 3px auto;max-width:100%}
+.wb-mv{color:var(--ink-2)}
+@media (max-width:47.99rem){.wb-in{grid-template-columns:minmax(0,1fr)}}
+/* snapshot figure */
+.snapfig svg{display:block;width:100%;max-width:34rem;margin:0 auto var(--s-4);color:var(--ink)}
+.snapfig .g{stroke:var(--rule);stroke-width:1}
+.snapfig .t{font:13px var(--mono);fill:var(--ink-2)}
+.snapfig .t.b{fill:var(--ink);font-weight:600;paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
+.snapfig .c1{fill:none;stroke:var(--ink);stroke-width:2.5}
+.snapfig .c2{fill:none;stroke:var(--ink-2);stroke-width:2.5;stroke-dasharray:7 5}
+.snapfig .thr{stroke:var(--edge);stroke-width:1;stroke-dasharray:2 3}
+.snapfig .pt{fill:var(--ink)}
+.snap .tbl{margin-top:var(--s-2)}

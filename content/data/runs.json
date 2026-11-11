@@ -6,13 +6,6 @@
   "sha": "8934e2f",
   "workflow": "emulate-linux"
  },
- "42134748636": {
-  "conclusion": "success",
-  "date": "2026-11-06",
-  "repo": "kev-risk-prioritization",
-  "sha": "597c1f7",
-  "workflow": "ci"
- },
  "42917025570": {
   "conclusion": "failure",
   "date": "2026-11-10",
@@ -123,6 +116,13 @@
   "date": "2026-11-11",
   "repo": "sinkline",
   "sha": "9c58efd",
+  "workflow": "ci"
+ },
+ "43040235145": {
+  "conclusion": "success",
+  "date": "2026-11-11",
+  "repo": "kev-risk-prioritization",
+  "sha": "d85495f",
   "workflow": "ci"
  }
 }

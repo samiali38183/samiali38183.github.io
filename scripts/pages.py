@@ -41,7 +41,10 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
         if kind == "key":
             return C.key(p["strip_sets"][arg])
         if kind == "bench":
-            return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption}[arg]()
+            return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption,
+                    "kev-risk": B.kev_risk_static, "kev-risk-cap": B.kev_risk_caption}[arg]()
+        if kind == "snapshot":
+            return {"figure": B.kev_snapshot_plate}[arg]()
         if kind == "kb":
             return f"{round((ROOT / arg).stat().st_size / 1000)} KB"
         if kind == "benchtable":
@@ -301,7 +304,7 @@ def project_page(ctx: dict, slug: str) -> str:
     note = f'<p class="small muted">{esc(p["note"])}</p>' if p.get("note") else ""
     bench = ""
     if "bench" in f:
-        bench = f"""<section class="bench" data-bench="{slug}" aria-label="Recorded readings">
+        bench = f"""<section class="bench" data-bench="{p.get("bench", slug)}" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate {{{{n}}}}</span>
 <div class="bench-static">
