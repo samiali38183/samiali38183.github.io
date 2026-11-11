@@ -1,0 +1,12 @@
+[HIGH] SL-XSS-004 A03:2021 CWE-79  html-wrong.py:10:5
+  Reflected XSS: tainted string returned from view
+  flask.request.args reaches __return_http__ without a sanitizer for CWE-79.
+  ┌ source     html-wrong.py:9  name = shlex.quote(request.args.get("name", "").strip())  # flask.request.args
+  │ propagate  html-wrong.py:9  name = shlex.quote(request.args.get("name", "").strip())  # .get()
+  │ sanitizer  html-wrong.py:9  name = shlex.quote(request.args.get("name", "").strip())  # shlex.quote: clears CWE-78
+  │ propagate  html-wrong.py:9  name = shlex.quote(request.args.get("name", "").strip())  # assigned to `name`
+  └ sink       html-wrong.py:10  return name  # __return_http__
+  fix: Return a rendered template or escape the value with markupsafe.escape().
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
