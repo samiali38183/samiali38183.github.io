@@ -1,12 +1,12 @@
 <!--@dek-->
-A CI gate for detection rules. It replays recorded attack telemetry through Sigma rules on every pull request and fails the build when a rule that should fire does not.
+A CI gate for detection rules. It replays recorded attack telemetry through Sigma rules on every pull request and fails the build when a rule that should fire does not. Version 0.3.0 adds a benign corpus, a sweep of evasion variants and a coverage figure split by who wrote the passing rules.
 
 <!--@bench-->
 {{benchtable:tripline}}
 {{benchevents:tripline}}
 
 <!--@bench-cap-->
-<b>The stock rule looks for the literal text <code>chmod u+s</code>, so <code>u+xs</code> slips past it; the replacement flags every setuid and setgid form tried.</b> The first three command lines are copied from docs/findings.md F-001 (telemetry from run 41838714456); across all 36 applicable events the stock rule matched 0 and the replacement matched 2. With JavaScript on, this plate becomes a bench where any command line can be tried. <b>The browser demo re-implements the two rules' conditions in JavaScript; the compiler in the tripline repository is the source of truth.</b> Rules: <a href="https://github.com/samiali38183/tripline/blob/main/rules/sigma/linux/proc_creation_lnx_setgid_setuid.yml">stock</a>, <a href="https://github.com/samiali38183/tripline/blob/main/rules/sigma/linux/tripline_lnx_chmod_setuid_setgid_any_form.yml">replacement</a>. Parity: <a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_tripline.mjs">scripts/test_bench_tripline.mjs</a> checks the demo against the compiler's verdicts on {{parity:tripline}} command lines.
+<b>The stock rule looks for the literal text <code>chmod u+s</code>, so <code>u+xs</code> slips past it; the replacement flags the setuid and setgid forms in this table and misses two documented ones.</b> The first three command lines are copied from docs/findings.md F-001 (telemetry from run 41838714456); the last five come from the evasion sweep in docs/robustness.md, including the two the replacement misses. Across all 36 applicable recorded events the stock rule matched 0 and the replacement matched 2. With JavaScript on, this plate becomes a bench where any command line can be tried. <b>The browser demo re-implements the two rules' conditions in JavaScript; the compiler in the tripline repository is the source of truth.</b> Rules: <a href="https://github.com/samiali38183/tripline/blob/main/rules/sigma/linux/proc_creation_lnx_setgid_setuid.yml">stock</a>, <a href="https://github.com/samiali38183/tripline/blob/main/rules/sigma/linux/tripline_lnx_chmod_setuid_setgid_any_form.yml">replacement</a>. Parity: <a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_tripline.mjs">scripts/test_bench_tripline.mjs</a> checks the demo against the compiler's verdicts on {{parity:tripline}} command lines.
 
 <!--@as-found-->
 <div class="prose">
@@ -17,28 +17,58 @@ A CI gate for detection rules. It replays recorded attack telemetry through Sigm
 Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</code></pre>
 <div class="prose">
 <p>The first is the vendored upstream rule, unchanged. The second is the replacement described below. Write-up: <a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md, F-001</a>.</p>
+<p>The gate itself, as of <a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1</a>, also had gaps that the setuid finding did not show. The rows below are what a check of that version found.</p>
 </div>
 <div class="scroll wide"><table class="tbl">
-<caption>Reading ledger</caption>
+<caption>Reading ledger, as found (v0.2.1)</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
 <tr class="row-fail"><th scope="row">Stock SigmaHQ rule c21c4eaa on the 36 applicable events</th><td>A match on the two <code>chmod</code> executions</td><td>0 matches</td><td>{{stamp:fail:As found: fail}}</td><td>{{run:41838714456}}</td></tr>
+<tr><th scope="row">False positives</th><td>A count of benign events that match</td><td>No benign corpus. A rule that fired on every event would also pass</td><td>{{stamp:limit:As found: not measured}}</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1 README, limitations</a></td></tr>
+<tr><th scope="row">Evasion</th><td>A count of attack variants that still match</td><td>No variants beyond the three command lines of F-001</td><td>{{stamp:limit:As found: not measured}}</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1 README, limitations</a></td></tr>
+<tr><th scope="row">Weights</th><td>Each of the 62 weight points traceable to a source</td><td>Described as taken from Red Canary's 2026 ranking and mapped by hand; which points follow the ranking was not recorded</td><td>{{stamp:limit:As found: partial}}</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1 README</a></td></tr>
+<tr><th scope="row">ATT&amp;CK version</th><td>The current matrix</td><td>Navigator layer on ATT&amp;CK v16, with the tactic <em>Defense Evasion</em> (since split in two) and T1562.008 (since replaced)</td><td>{{stamp:limit:As found: out of date}}</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1 Navigator layer</a></td></tr>
+<tr><th scope="row">Workflow supply chain</th><td>Third-party actions pinned to a commit</td><td>22 action references pinned to version tags only; zizmor 1.32.0 (auditor persona) reports 42 findings, 19 of them high</td><td>{{stamp:limit:As found: unpinned}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG 0.3.0, Pipeline hygiene</a></td></tr>
+<tr><th scope="row">Windows scenarios</th><td>Recorded telemetry for all 7</td><td>3 recorded, 4 pending (T1059.001, T1059.003, T1027, T1053.005); 10 of 14 scenarios passing, 68% weighted coverage</td><td>{{stamp:pend:As found: 4 pending}}</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1 scorecard</a></td></tr>
 </tbody>
 </table></div>
 
 <!--@as-left-->
 <div class="prose">
-<p>The replacement rule anchors on the <code>chmod</code> binary and handles symbolic and octal forms. Its two matches are the two <code>chmod</code> executions. The upstream rule stays in the rule set, so a future upstream fix is picked up automatically.</p>
+<p>The replacement rule anchors on the <code>chmod</code> binary (and, since the sweep below found the gap, on <code>busybox chmod</code>) and handles symbolic and octal forms. Its two matches on the recorded fixture are the two <code>chmod</code> executions. The upstream rule stays in the rule set, so a future upstream fix is picked up automatically.</p>
+<p><strong>Rules written in this repository carry part of the headline.</strong> Six rules were written for this project (the setuid replacement, three AWS rules and two Windows rules), and five of the 13 passing scenarios depend on them. Coverage is therefore shown as two figures, always together: <strong>98% of weight points have a passing scenario (61 of 62), but only 52% (32 of 62, 8 scenarios) pass on unmodified SigmaHQ rules alone.</strong> tripline computes the split from each expected rule's author field.</p>
 </div>
 <div class="scroll wide"><table class="tbl">
-<caption>Reading ledger</caption>
-<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
+<caption>The five passing scenarios that need a rule written in this repository (29 of 62 weight points)</caption>
+<thead><tr><th scope="col">Scenario</th><th scope="col" class="num">Weight</th><th scope="col">Rule written in this repository</th><th scope="col">Telemetry</th></tr></thead>
 <tbody>
-<tr><th scope="row">Replacement rule on the same 36 events</th><td>A match on the two <code>chmod</code> executions</td><td>2 matches</td><td>{{stamp:pass:As left: pass}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md F-001</a></td></tr>
+<tr><th scope="row">T1078.004 console login without MFA</th><td class="num">10</td><td>AWS Console Login Without MFA</td><td>Public CloudTrail replay</td></tr>
+<tr><th scope="row">T1059.003 cmd output redirect</th><td class="num">8</td><td>CMD Output Redirected to a Relative Path From a Suspicious Working Directory; the SigmaHQ rule matched 0 of 11 applicable events</td><td>Recorded, {{run:43090565998}}</td></tr>
+<tr><th scope="row">T1530 S3 bucket exposure</th><td class="num">7</td><td>AWS S3 Bucket Made Public via ACL or Bucket Policy; AWS S3 Bucket Enumeration by IAM User from Non-AWS Tooling</td><td>Public CloudTrail replay</td></tr>
+<tr><th scope="row">T1053.005 scheduled task</th><td class="num">2</td><td>Scheduled Task Created With a Command Interpreter or LOLBin Action; the SigmaHQ rule matched 0 of 6</td><td>Recorded, {{run:43090565998}}</td></tr>
+<tr><th scope="row">T1548.001 setuid and setgid</th><td class="num">2</td><td>Setuid or Setgid Bit Set via Chmod (Any Mode Form); the SigmaHQ rule matched 0 of 36</td><td>Recorded, {{run:41838714456}}</td></tr>
 </tbody>
 </table></div>
 <div class="prose">
-<p>The gate over the committed fixtures, run on 2026-11-10 from a fresh clone of <code>main</code> (commit e01b8b0), Python 3.12.2:</p>
+<p>The two Windows rules were written from the first Windows run's failures and tuned to the command shape of those Atomic tests (<a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-003</a>); a pass on them shows the rule fits that recording, not that it generalizes. The third newly recorded Windows scenario, T1059.001, passes on the vendored SigmaHQ rule <em>Suspicious Execution of Powershell with Base64</em> (3 of 22 applicable events, including a real <code>powershell.exe -e</code> command line), after the scenario was narrowed: its download-cradle rule matched 0 of 75 script blocks because no automated atomic runs a cradle, so that half was removed rather than claimed.</p>
+</div>
+<div class="scroll wide"><table class="tbl">
+<caption>Reading ledger, as left (v0.3.0)</caption>
+<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
+<tbody>
+<tr><th scope="row">Replacement rule on the same 36 events</th><td>A match on the two <code>chmod</code> executions</td><td>2 matches</td><td>{{stamp:pass:As left: pass}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md F-001</a></td></tr>
+<tr><th scope="row">Gate over the committed fixtures</th><td>Every scenario with a fixture passes</td><td>13 passed, 0 failed, 1 pending (AWS 4 of 4, Linux 3 of 3, Windows 6 of 7)</td><td>{{stamp:pass:As left: pass}}</td><td>{{run:43100952362}}</td></tr>
+<tr><th scope="row">Weighted coverage, with its split</th><td>Both figures stated together</td><td>98% (61 of 62 points); 52% (32 of 62, 8 scenarios) on unmodified SigmaHQ rules alone</td><td>{{stamp:limit:As left: split}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md">docs/scorecard.md</a></td></tr>
+<tr><th scope="row">False positives on a benign corpus</th><td>A count</td><td>2 matches from 1 of 6 evaluated rules on 675 events (488 process creations); 20 of 26 rules not evaluated</td><td>{{stamp:limit:As left: measured}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/benign-corpus.md">docs/benign-corpus.md</a>; {{run:43090057704}}</td></tr>
+<tr><th scope="row">Evasion sweep, 251 command-line variants</th><td>A count of variants still caught</td><td>200 caught: setuid 106 of 108, history clearing 71 of 103, cron 23 of 40; 0 of 4 alternative-tool variants</td><td>{{stamp:limit:As left: measured}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/robustness.md">docs/robustness.md</a></td></tr>
+<tr><th scope="row">Weights</th><td>Each point traceable</td><td>45 of 62 points follow Red Canary's public 2026 top 10 (weight = 11 minus rank, seven scenarios); 17 are hand-assigned (seven scenarios)</td><td>{{stamp:pass:As left: documented}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/weights.md">docs/weights.md</a></td></tr>
+<tr><th scope="row">ATT&amp;CK version</th><td>The current matrix</td><td>ATT&amp;CK v20: Defense Evasion split into Stealth and Defense Impairment; T1562.008 became T1685.002; the tactic grid uses the v20 names</td><td>{{stamp:pass:As left: v20}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/attack-version.md">docs/attack-version.md</a></td></tr>
+<tr><th scope="row">Workflow supply chain</th><td>Actions pinned to a commit</td><td>Every action pinned to a full commit SHA; zizmor 1.32.0: 42 findings before, 0 after</td><td>{{stamp:pass:As left: pinned}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG 0.3.0</a></td></tr>
+<tr><th scope="row">Windows scenarios</th><td>Recorded telemetry for all 7</td><td>6 of 7 recorded and passing; T1027 still pending (its rule matched 0 of 15 events in the latest recording)</td><td>{{stamp:pend:As left: 1 pending}}</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-003</a>; {{run:43090565998}}</td></tr>
+</tbody>
+</table></div>
+<div class="prose">
+<p>The gate over the committed fixtures, run on 2026-11-11 from a fresh clone at tag <code>v0.3.0</code> (commit a0d6622), Python 3.12.2:</p>
 </div>
 <pre data-copy data-label="$ tripline replay --all"><code>$ tripline replay --all
 [   PASS] t1003-001-lsass-memory-dump (T1003.001, windows) - 70 events
@@ -49,6 +79,8 @@ Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</
 [   PASS] t1053-003-cron-persistence (T1053.003, linux) - 42 events
      + 6b14bac8-3e3a-4324-8109-42f0546a347f  Scheduled Cron Task/Job - Linux  (1/26 applicable events)
      + 6c4e2f43-d94d-4ead-b64d-97e53fa2bd05  New Cron File Created  (1/3 applicable events)
+[   PASS] t1059-003-cmd-suspicious-redirect (T1059.003, windows) - 26 events
+     + 467585b7-9de8-40e5-bb2a-6626902ae295  CMD Output Redirected to a Relative Path From a Suspicious Working Directory  (2/11 applicable events)
 [   PASS] t1078-004-console-login-without-mfa (T1078.004, aws) - 7 events
      + 3b1f0d2e-7c4a-4d5b-9e8f-2a6c1d0b9f41  AWS Console Login Without MFA  (1/7 applicable events)
      + 8ad1600d-e9dc-4251-b0ee-a65268f29add  AWS Root Credentials  (6/7 applicable events)
@@ -56,29 +88,43 @@ Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</
      + 7f3c2b1a-6d4e-4a9b-9c8d-1e2f3a4b5c6d  Setuid or Setgid Bit Set via Chmod (Any Mode Form)  (2/36 applicable events)
 ...
 gate passed</code></pre>
-<p class="trim">Trimmed: 6 of the 14 scenarios shown. The full run reports 10 passed, 4 pending, exit code 0.</p>
+<p class="trim">Trimmed: 6 of the 14 scenarios shown. The full run reports 13 passed, 0 failed, 1 pending, exit code 0.</p>
 <div class="plate wide">
 <span class="plate-label">Plate {{n}}</span>
 {{key:scenarios}}
 {{strips:scenarios}}
-<p class="cap"><b>The 14 scenarios: 10 pass, 4 are pending because no Windows recording has been accepted yet.</b> Counts from docs/scorecard.json.</p>
+<p class="cap"><b>The 14 scenarios: 13 pass and 1 is pending because no Windows recording has been accepted for it.</b> Counts from docs/scorecard.json. 5 of the 13 passes depend on a rule written in this repository.</p>
+</div>
+<div class="plate wide">
+<span class="plate-label">Plate {{n}}</span>
+{{key:evasion}}
+{{strips:evasion}}
+<p class="cap"><b>Evasion sweep: an expected rule catches 200 of 251 command-line variants of the three Linux attacks, and none of 4 alternative-tool variants.</b> Each tick is one variant, in the order <code>tripline robustness</code> generates them (seed 20261111); re-running the sweep for this page reproduced docs/robustness.md exactly. Hatched ticks are variants no expected rule caught: for cron, <code>crontab</code> given a path outside <code>/tmp/</code>; for history clearing, shell builtins, redirects and whitespace or quoting in the command line; for setuid, a file under <code>/usr/share/doc/</code> (excluded on purpose) and a renamed copy of <code>chmod</code>. The variant lists are hand-written, replayed as audit events and not executed, and not exhaustive, so a high count is not proof of robustness. The setuid replacement missed <code>busybox chmod u+s</code> until this sweep found it; that is fixed. The other misses are documented in <a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-004</a> and not fixed.</p>
+</div>
+<div class="plate wide">
+<span class="plate-label">Plate {{n}}</span>
+{{key:benign}}
+{{strips:benign}}
+<p class="cap"><b>False positives: 2 of 675 benign events matched a rule, both from SigmaHQ's <em>New Cron File Created</em> on a <code>chkrootkit</code> package install.</b> The corpus is one 33-second auditd recording of ordinary work (package installs, git, a build, <code>chmod</code> without setuid, reads of cron files) on one GitHub-hosted Ubuntu runner, {{run:43090057704}}. Only 6 of the 26 rules had applicable events: the 20 Windows and AWS rules were not evaluated, so this is a Linux-only figure, and zero matches on the other five rules does not show they are quiet on a real fleet. The workload deliberately avoids setuid chmod, so it does not test near misses.</p>
 </div>
 <figure class="plate wide">
 <span class="plate-label">Plate {{n}}</span>
-<a href="https://samiali38183.github.io/tripline/"><img src="/assets/img/tripline-report.png" width="1300" height="1100" loading="lazy" alt="tripline coverage report: 68 percent weighted coverage, 10 of 14 scenarios passing, an ATT&amp;CK-style matrix by tactic with passing scenarios in green and pending Windows scenarios in grey"></a>
-<figcaption><b>The coverage report shows the same 10 and 4.</b> Top of the live report, generated by <code>tripline report</code> from the committed scorecard (2026-11-11 04:06 UTC, tripline 0.2.1). <a href="https://samiali38183.github.io/tripline/">Open the live page</a>.</figcaption>
+<a href="https://samiali38183.github.io/tripline/"><img src="/assets/img/tripline-report.png" width="1300" height="1100" loading="lazy" alt="tripline coverage report: 98 percent weighted coverage next to 52 percent on unmodified SigmaHQ rules alone, 13 of 14 scenarios passing, 2 false-positive matches on 675 benign events, 200 of 251 evasion variants caught, and an ATT&amp;CK v20 matrix by tactic with Stealth and Defense Impairment columns"></a>
+<figcaption><b>The coverage report shows 98% and 52% side by side.</b> Top of the live report, generated by <code>tripline report</code> from the committed scorecard (2026-11-11 21:11 UTC, tripline 0.3.0). <a href="https://samiali38183.github.io/tripline/">Open the live page</a>.</figcaption>
 </figure>
 <div class="scroll wide"><table class="tbl">
 <caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests</th><td>186 (89% line+branch coverage)</td><td><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG 0.2.1</a>; {{run:42957008252}}</td></tr>
-<tr><th scope="row">Scenarios</th><td>14 techniques: 4 AWS, 3 Linux, 7 Windows</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md">docs/scorecard.md</a></td></tr>
-<tr><th scope="row">Gate</th><td>10 passed, 0 failed, 4 pending</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
-<tr><th scope="row">Weighted coverage</th><td>68% of all scenarios (42 of 62 points); 100% of scenarios that have fixtures</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
-<tr><th scope="row">Stock setuid rule</th><td>0 of 36 events; replacement 2 of 36</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md F-001</a>; emulate-linux {{run:41838714456}} (failed, see limits)</td></tr>
-<tr><th scope="row">Windows fixtures</th><td>3 of 7 scenarios recorded and passing (T1003.001, T1047, T1105)</td><td>emulate-windows {{run:42917025570}} (the run itself shows failed, see limits)</td></tr>
-<tr><th scope="row">Release</th><td>v0.2.1</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">GitHub release</a></td></tr>
+<tr><th scope="row">Tests</th><td>212 (91% line+branch coverage)</td><td><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG 0.3.0</a>; {{run:43100952362}}</td></tr>
+<tr><th scope="row">Scenarios</th><td>14 techniques: 4 AWS (public replay), 3 Linux and 7 Windows (recorded on runners)</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md">docs/scorecard.md</a></td></tr>
+<tr><th scope="row">Gate</th><td>13 passed, 0 failed, 1 pending</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
+<tr><th scope="row">Weighted coverage</th><td>98% of weight points have a passing scenario (61 of 62); 52% (32 of 62) on unmodified SigmaHQ rules alone, from 8 of the 13 passing scenarios</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/scorecard.json">docs/scorecard.json</a></td></tr>
+<tr><th scope="row">False positives</th><td>2 matches from 1 of 6 evaluated rules, 675 events; 20 of 26 rules not evaluated</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/benign-corpus.md">docs/benign-corpus.md</a>; {{run:43090057704}}</td></tr>
+<tr><th scope="row">Evasion sweep</th><td>200 of 251 command-line variants caught; 0 of 4 alternative-tool variants</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/robustness.md">docs/robustness.md</a></td></tr>
+<tr><th scope="row">Stock setuid rule</th><td>0 of 36 recorded events and 0 of 108 sweep variants; replacement 2 of 36 and 106 of 108</td><td><a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md F-001, F-004</a>; emulate-linux {{run:41838714456}} (failed, see limits)</td></tr>
+<tr><th scope="row">Windows fixtures</th><td>6 of 7 scenarios recorded and passing (T1003.001, T1047, T1105, T1059.001, T1059.003, T1053.005)</td><td>emulate-windows {{run:42917025570}} and {{run:43090565998}} (both show failed, see limits)</td></tr>
+<tr><th scope="row">Release</th><td>v0.3.0</td><td><a href="https://github.com/samiali38183/tripline/releases/tag/v0.3.0">GitHub release</a></td></tr>
 </tbody>
 </table></div>
 
@@ -86,12 +132,13 @@ gate passed</code></pre>
 <h3>The problem</h3>
 <div class="prose">
 <p>Detection teams count rules and ATT&amp;CK tags. Neither number says whether a rule still fires on the behavior it is named after, and a syntax linter passes rules that never matched anything.</p>
-<p>tripline treats a rule like code under test: each scenario names a technique, the Sigma rules that must fire, and recorded telemetry to replay. If an expected rule misses, the exit code is 1.</p>
+<p>tripline treats a rule like code under test: each scenario names a technique, the Sigma rules that must fire, and recorded telemetry to replay. If an expected rule misses, the exit code is 1. Separately, every rule is replayed over a benign corpus and over generated variants of the attack commands, and the counts are reported.</p>
+<p>It is not the first tool to test detections against recorded or generated telemetry: SigmaHQ's regression data, rsigma <code>backtest</code>, SCYTHE's pipeline and Splunk's <code>attack_data</code> each do a version of this. tripline adds a small scenario layer (the technique, the expected rules and the fixture live together in one repository), a plain-Python evaluator that runs offline, and a weighted scorecard. It does not replace any of them (<a href="https://github.com/samiali38183/tripline/blob/main/docs/related-work.md">comparison</a>).</p>
 </div>
 <h3>What it does</h3>
 <div class="prose">
-<p>14 scenarios cover 14 ATT&amp;CK techniques across AWS, Linux and Windows. Linux and Windows telemetry comes from Atomic Red Team tests run on GitHub-hosted CI runners; the AWS plane replays public CloudTrail data (Stratus Red Team detonation logs and the flaws.cloud dataset). Rules are compiled to Python and evaluated offline against committed NDJSON, so the whole gate runs in seconds with no SIEM. Output is a JSON scorecard, JUnit XML, an ATT&amp;CK Navigator layer and a static HTML report.</p>
-<p>Coverage is weighted by how common each technique is (weights 1 to 10 from the Red Canary 2026 Threat Detection Report ranking, mapped by hand), so breaking a common technique moves the headline more than breaking a rare one.</p>
+<p>14 scenarios cover 14 ATT&amp;CK techniques across AWS, Linux and Windows. Linux and Windows telemetry comes from Atomic Red Team tests run on GitHub-hosted CI runners; the AWS plane replays public CloudTrail data (Stratus Red Team detonation logs and the flaws.cloud dataset). Rules are compiled to Python and evaluated offline against committed NDJSON, so the whole gate runs in seconds with no SIEM. Output is a JSON scorecard, JUnit XML, an ATT&amp;CK Navigator layer (ATT&amp;CK v20) and a static HTML report.</p>
+<p>Coverage is weighted by how common each technique is, so breaking a common technique moves the headline more than breaking a rare one. Weights run from 1 to 10: 45 of the 62 points follow Red Canary's public 2026 top-10 ranking (weight = 11 minus rank, seven scenarios) and 17 are hand-assigned low values for the seven scenarios outside that top 10 (<a href="https://github.com/samiali38183/tripline/blob/main/docs/weights.md">docs/weights.md</a>).</p>
 </div>
 {{diagram:tripline}}
 <h3>Three implementation points</h3>
@@ -101,16 +148,18 @@ gate passed</code></pre>
 <h4>Telemetry sliced by run GUID</h4>
 <p>The Linux workflow wraps every Atomic test in two marker commands, <code>tripline-marker RUN TEST start</code> and <code>... end</code>. They are ordinary <code>execve</code> events, so attribution lives inside the audit log itself. The collector merges auditd records by serial, hex-decodes EXECVE arguments and keeps only what falls between a pair of markers carrying the run's GUID. Before 0.2.1 a marker from another run in the same log could open or close a window, or leak events from an earlier run; markers with a foreign GUID are now ignored. For cloud data, <code>tripline cloud build</code> shifts <code>eventTime</code> while keeping offsets and appends <code>tripline/&lt;run-guid&gt;</code> to <code>userAgent</code>.</p>
 <h4>A routing problem is not a missed detection</h4>
-<p>A rule is evaluated only on events its <code>logsource</code> matches, and results read <code>1/7 applicable events</code>.<sup class="nref" aria-hidden="true"></sup> If a rule has no applicable events at all, that is reported as a routing problem (wrong product, category or service). <code>0/7 applicable events (rule did not match)</code> is the real miss. They are separate values of <code>outcome</code> in <code>scorecard.json</code>, the CLI, JUnit and the HTML report, because the fix for each is different.</p>
+<p>A rule is evaluated only on events its <code>logsource</code> matches, and results read <code>1/7 applicable events</code>.<sup class="nref" aria-hidden="true"></sup> If a rule has no applicable events at all, that is reported as a routing problem (wrong product, category or service). <code>0/7 applicable events (rule did not match)</code> is the real miss. They are separate values of <code>outcome</code> in <code>scorecard.json</code>, the CLI, JUnit and the HTML report, because the fix for each is different. The benign corpus follows the same rule: a rule with no applicable benign events is listed as not evaluated, never as zero false positives.</p>
 </div>
 <aside class="note"><strong>Sigma</strong> is an open, vendor-neutral format for detection rules. A rule's <code>logsource</code> says which kind of log it applies to.</aside>
 
 <!--@limits-->
 <ul class="prose">
-<li><strong>The two emulation runs linked above are failed on GitHub.</strong> Their last step, which asserts that the expected rules fire, failed: in the Linux run because the stock setuid rule missed (the finding itself), in the Windows run because some scenarios did not pass. The workflows still upload the recorded telemetry, and a maintainer reviews it before committing it as a fixture. The passing gate is the <code>ci</code> run, which replays the committed fixtures.</li>
-<li><strong>A pass is a recall check on one recording.</strong> A scenario passes when each expected rule fires on at least one event. There is no benign corpus yet, so a rule that fires on everything would also pass, and there are no evasion variants.</li>
-<li><strong>Four Windows scenarios are still pending.</strong> T1059.001, T1059.003, T1027 and T1053.005 have no accepted recording yet; <a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-003</a> explains the rule and Atomic-test mismatches behind each. Pending scenarios count as zero in the 68%.</li>
-<li><strong>Small coverage.</strong> 14 techniques out of several hundred. The 68% is progress against this repo's own list, not a statement about any organization.</li>
+<li><strong>Three emulation runs linked above show failed.</strong> The Linux run 41838714456 failed because the stock setuid rule missed (the finding itself). The two Windows recording runs failed their last step, which asserts that expected rules fire. In the later one, 43090565998, that step failed four scenarios (T1027, T1053.005, T1059.001, T1059.003) against the scenario definitions of that commit; the scenarios were then changed (two now expect rules written in this repository, one was narrowed) and the committed fixtures pass against the changed definitions. The workflows still upload the recorded telemetry, and a maintainer reviews it before committing it as a fixture. The passing gate is the <code>ci</code> run, which replays the committed fixtures.</li>
+<li><strong>98% is not the whole story.</strong> Only 52% of weight points pass on unmodified SigmaHQ rules alone; the rest depend on rules written in this repository, two of them tuned to the Atomic tests' command shape. The pending scenario counts as zero in both figures.</li>
+<li><strong>A pass is a recall check on one recording.</strong> A scenario passes when each expected rule fires on at least one event. The benign corpus is one 33-second Linux recording, so a Windows or AWS rule that fired on everything would still pass.</li>
+<li><strong>The evasion sweep covers three Linux scenarios.</strong> Its variants are hand-written, evaluated as audit events and never executed, and a catch rate over them does not measure real-world evasion.</li>
+<li><strong>One Windows scenario is still pending.</strong> T1027 has no accepted recording: its expected rule matched 0 of 15 events in the latest recording, and re-labelling it to expect another rule would raise the number without testing an obfuscation rule (<a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-003</a>).</li>
+<li><strong>Small coverage.</strong> 14 techniques out of several hundred. The 98% and the 52% are progress against this repo's own list, not a statement about any organization. 17 of the 62 weight points are hand-assigned, and the ranking behind the other 45 is Red Canary's customer detections, a proxy for prevalence in other environments.</li>
 <li><strong>The cloud plane is replayed, not detonated by this project.</strong> The records are real CloudTrail from public datasets, but the cloud rules written for the project sit beside fixtures from the same datasets, so those passes show the wiring works, not that the rules generalize.</li>
 <li><strong>A different evaluator from production.</strong> There is no parity test against a real SIEM backend, so a pass is necessary, not sufficient.</li>
 </ul>

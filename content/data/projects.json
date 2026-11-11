@@ -13,25 +13,27 @@
    "slug": "tripline",
    "content": "tripline.html",
    "name": "tripline",
-   "version": "v0.2.1",
+   "version": "v0.3.0",
    "sheet": 1,
    "kind": "Detection engineering",
    "title": "tripline: a CI gate for detection rules | Sami Ali",
-   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. The stock SigmaHQ setuid rule matched 0 of 36 events; a replacement rule matches 2.",
-   "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 10 passing, 4 pending (Windows); 186 tests.",
+   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule matched 0 of 36 events; a replacement matches 2.",
+   "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 13 passing, 1 pending (Windows); 98% weighted coverage, 52% on unmodified SigmaHQ rules alone; 212 tests.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
-   "found_title": "The stock setuid rule matched nothing",
-   "left_title": "A replacement rule matches the two chmod runs",
+   "found_title": "The stock setuid rule matched nothing, and false positives and evasion were not measured",
+   "left_title": "A replacement rule matches the two chmod runs, and the gaps are now measured",
    "record": {
-    "instrument": "tripline v0.2.1, commit e01b8b0",
+    "instrument": "tripline v0.3.0, commit a0d6622",
     "reference": "SigmaHQ rule c21c4eaa (Setuid and Setgid), replayed on telemetry recorded from Atomic Red Team T1548.001 tests on a GitHub-hosted Linux runner",
-    "measured": "2026-11-10, Python 3.12.2, fresh clone of main",
+    "measured": "2026-11-11, Python 3.12.2, fresh clone at tag v0.3.0",
     "reproduce": [
      "tripline replay --all",
-     "tripline replay t1548-001-setuid-setgid --show-events"
+     "tripline replay t1548-001-setuid-setgid --show-events",
+     "tripline benign",
+     "tripline robustness"
     ],
     "reproduce_label": "$ tripline"
    },
@@ -114,7 +116,7 @@
      "unit": "scenarios",
      "phr": {
       "hit": "passing",
-      "pend": "pending, no recording yet"
+      "pend": "pending, no accepted recording"
      },
      "rows": [
       {
@@ -122,14 +124,249 @@
        "runs": [
         [
          "hit",
-         10
+         13
         ],
         [
          "pend",
+         1
+        ]
+       ],
+       "val": "<b>13</b> passed, 1 pending, 0 failed"
+      }
+     ]
+    },
+    "evasion": {
+     "unit": "variants",
+     "note": "One tick is one variant, in the order the sweep generates them.",
+     "phr": {
+      "hit": "caught by an expected rule",
+      "miss": "not caught by any expected rule"
+     },
+     "rows": [
+      {
+       "label": "Cron",
+       "runs": [
+        [
+         "hit",
+         4
+        ],
+        [
+         "miss",
+         5
+        ],
+        [
+         "hit",
+         4
+        ],
+        [
+         "miss",
+         5
+        ],
+        [
+         "hit",
+         4
+        ],
+        [
+         "miss",
+         2
+        ],
+        [
+         "hit",
+         2
+        ],
+        [
+         "miss",
+         1
+        ],
+        [
+         "hit",
+         5
+        ],
+        [
+         "miss",
+         2
+        ],
+        [
+         "hit",
+         4
+        ],
+        [
+         "miss",
+         2
+        ]
+       ],
+       "val": "<b>23</b> of 40 command-line variants caught (T1053.003)"
+      },
+      {
+       "label": "History",
+       "runs": [
+        [
+         "hit",
+         35
+        ],
+        [
+         "miss",
+         2
+        ],
+        [
+         "hit",
+         1
+        ],
+        [
+         "miss",
+         4
+        ],
+        [
+         "hit",
+         4
+        ],
+        [
+         "miss",
+         2
+        ],
+        [
+         "hit",
+         1
+        ],
+        [
+         "miss",
+         3
+        ],
+        [
+         "hit",
+         4
+        ],
+        [
+         "miss",
+         6
+        ],
+        [
+         "hit",
+         2
+        ],
+        [
+         "miss",
+         2
+        ],
+        [
+         "hit",
+         2
+        ],
+        [
+         "miss",
+         3
+        ],
+        [
+         "hit",
+         6
+        ],
+        [
+         "miss",
+         2
+        ],
+        [
+         "hit",
+         2
+        ],
+        [
+         "miss",
+         3
+        ],
+        [
+         "hit",
+         6
+        ],
+        [
+         "miss",
+         2
+        ],
+        [
+         "hit",
+         2
+        ],
+        [
+         "miss",
+         3
+        ],
+        [
+         "hit",
+         6
+        ]
+       ],
+       "val": "<b>71</b> of 103 command-line variants caught (T1070.003)"
+      },
+      {
+       "label": "Setuid",
+       "runs": [
+        [
+         "hit",
+         57
+        ],
+        [
+         "miss",
+         1
+        ],
+        [
+         "hit",
+         8
+        ],
+        [
+         "miss",
+         1
+        ],
+        [
+         "hit",
+         41
+        ]
+       ],
+       "val": "<b>106</b> of 108 command-line variants caught (T1548.001); the stock rule caught 0"
+      },
+      {
+       "label": "Setuid, other tools",
+       "runs": [
+        [
+         "miss",
          4
         ]
        ],
-       "val": "<b>10</b> passed, 4 pending, 0 failed"
+       "val": "<b>0</b> of 4 alternative-tool variants caught (not part of the 251)"
+      }
+     ]
+    },
+    "benign": {
+     "unit": "benign events",
+     "per": 10,
+     "note": "Each tick is about 10 events; the counts are in the labels.",
+     "phr": {
+      "neg": "matched no rule",
+      "fp": "matched a rule (false positive)"
+     },
+     "rows": [
+      {
+       "label": "Benign corpus",
+       "runs": [
+        [
+         "neg",
+         292
+        ],
+        [
+         "fp",
+         1
+        ],
+        [
+         "neg",
+         11
+        ],
+        [
+         "fp",
+         1
+        ],
+        [
+         "neg",
+         370
+        ]
+       ],
+       "val": "<b>2</b> of 675 events matched a rule: New Cron File Created, <code>/etc/cron.daily/chkrootkit</code>"
       }
      ]
     }
@@ -139,8 +376,8 @@
     "reading": "0 to 2 of 36",
     "run": "41838714456",
     "found": "0 of 36 events matched by the stock rule",
-    "left": "Replacement rule: 2 of 36",
-    "tolerance": "One recording per scenario, no benign corpus; 4 Windows scenarios pending"
+    "left": "Replacement rule: 2 of 36. Gate: 13 of 14 scenarios, 98% weighted, 52% on unmodified SigmaHQ rules alone",
+    "tolerance": "One recording per scenario; 675-event benign corpus, Linux only; 1 Windows scenario pending"
    },
    "links": [
     [
@@ -148,8 +385,8 @@
      "https://github.com/samiali38183/tripline"
     ],
     [
-     "Release v0.2.1",
-     "https://github.com/samiali38183/tripline/releases/tag/v0.2.1"
+     "Release v0.3.0",
+     "https://github.com/samiali38183/tripline/releases/tag/v0.3.0"
     ],
     [
      "Docs",
@@ -157,7 +394,7 @@
     ],
     [
      "CI run (main)",
-     "https://github.com/samiali38183/tripline/actions/runs/42957008252"
+     "https://github.com/samiali38183/tripline/actions/runs/43100952362"
     ],
     [
      "Live coverage report",
@@ -168,13 +405,13 @@
     [
      "Release",
      "link",
-     "https://github.com/samiali38183/tripline/releases/tag/v0.2.1",
-     "v0.2.1"
+     "https://github.com/samiali38183/tripline/releases/tag/v0.3.0",
+     "v0.3.0"
     ],
     [
      "Gate run on main",
      "run",
-     "42957008252"
+     "43100952362"
     ],
     [
      "Linux recording run (setuid finding)",
@@ -182,15 +419,43 @@
      "41838714456"
     ],
     [
-     "Windows recording run",
+     "Benign corpus recording run",
+     "run",
+     "43090057704"
+    ],
+    [
+     "Windows recording run (first three)",
      "run",
      "42917025570"
     ],
     [
-     "Finding F-001",
+     "Windows recording run (three more)",
+     "run",
+     "43090565998"
+    ],
+    [
+     "Findings F-001 to F-004",
      "link",
      "https://github.com/samiali38183/tripline/blob/main/docs/findings.md",
      "docs/findings.md"
+    ],
+    [
+     "Evasion sweep",
+     "link",
+     "https://github.com/samiali38183/tripline/blob/main/docs/robustness.md",
+     "docs/robustness.md"
+    ],
+    [
+     "Benign corpus",
+     "link",
+     "https://github.com/samiali38183/tripline/blob/main/docs/benign-corpus.md",
+     "docs/benign-corpus.md"
+    ],
+    [
+     "Weights",
+     "link",
+     "https://github.com/samiali38183/tripline/blob/main/docs/weights.md",
+     "docs/weights.md"
     ],
     [
      "Scorecard",
@@ -205,7 +470,7 @@
      "CHANGELOG.md"
     ]
    ],
-   "commit": "e01b8b0"
+   "commit": "a0d6622"
   },
   "sinkline": {
    "slug": "sinkline",
@@ -1401,15 +1666,54 @@
   },
   {
    "project": "tripline",
-   "text": "4 of the 7 Windows scenarios have no accepted recording yet and count as zero in the 68% weighted coverage.",
+   "text": "Weighted coverage is 98% (61 of 62 points), but only 52% (32 of 62, 8 scenarios) passes on unmodified SigmaHQ rules alone. The other 5 passing scenarios (29 points) need a rule written in the tripline repository.",
+   "state": [
+    "limit",
+    "Read with the split"
+   ],
+   "anchor": "as-left",
+   "src": [
+    "README, scorecard",
+    "https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md"
+   ]
+  },
+  {
+   "project": "tripline",
+   "text": "Against 251 generated command-line variants of three Linux attacks, the expected rules catch 200. The stock setuid rule catches 0 of 108 setuid variants; the replacement catches 106.",
+   "state": [
+    "limit",
+    "Open"
+   ],
+   "anchor": "as-left",
+   "src": [
+    "docs/robustness.md",
+    "https://github.com/samiali38183/tripline/blob/main/docs/robustness.md"
+   ]
+  },
+  {
+   "project": "tripline",
+   "text": "On a 675-event benign Linux corpus, SigmaHQ's New Cron File Created matched 2 events (a chkrootkit install). 20 of 26 rules, all Windows and AWS, were not evaluated.",
+   "state": [
+    "limit",
+    "Open"
+   ],
+   "anchor": "as-left",
+   "src": [
+    "docs/benign-corpus.md",
+    "https://github.com/samiali38183/tripline/blob/main/docs/benign-corpus.md"
+   ]
+  },
+  {
+   "project": "tripline",
+   "text": "1 of the 7 Windows scenarios (T1027) has no accepted recording and counts as zero in both the 98% and the 52%.",
    "state": [
     "pend",
     "Pending"
    ],
    "anchor": "limits",
    "src": [
-    "README, scorecard",
-    "https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md"
+    "F-003",
+    "https://github.com/samiali38183/tripline/blob/main/docs/findings.md"
    ]
   },
   {
