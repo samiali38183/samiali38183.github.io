@@ -205,6 +205,39 @@ def main() -> int:
     except OSError:
         pass
 
+    # fuzzdiff (Rust). Needs cargo and cargo-llvm-cov on PATH.
+    fz = clones / "fuzzdiff"
+    page = "projects/fuzzdiff/index.html"
+    out = run(["cargo", "test", "--all"], fz)
+    counts = [int(x) for x in re.findall(r"test result: ok\. (\d+) passed", out)]
+    total = sum(counts)
+    expect("fuzzdiff tests (cargo test --all)", str(total), page, f"{total} (")
+    mo = run(["cargo", "test", "--release", "-p", "fuzzdiff-harness", "--features", "mutants", "--test", "mutants", "--", "--nocapture"], fz)
+    caught = re.findall(r"caught after (\d+) inputs", mo)
+    expect("fuzzdiff mutants caught after", ", ".join(caught), page, f"after {caught[0]}, {caught[1]} and {caught[2]} inputs" if len(caught) == 3 else "?")
+    ctl = re.search(r"control \(no mutant\): (\d+) inputs, no divergence", mo)
+    expect("fuzzdiff mutant control run", ctl.group(1) if ctl else "missing", page, "500,000-input control" if ctl and ctl.group(1) == "500000" else "?")
+    run(["cargo", "llvm-cov", "--workspace", "--summary-only"], fz)
+    rep = run(["cargo", "llvm-cov", "report", "--summary-only"], fz)
+    lines = missed = 0
+    for ln in rep.splitlines():
+        parts = ln.split()
+        if parts and parts[0] in ("chunked.rs", "error.rs", "message.rs", "mutants.rs"):
+            lines += int(parts[7])
+            missed += int(parts[8])
+    pct = "%.2f%%" % (100 * (lines - missed) / lines) if lines else "n/a"
+    expect("fuzzdiff src line coverage", pct, page)
+    corpus = sum(1 for f in (fz / "corpus").rglob("*") if f.is_file())
+    results.append((True, f"fuzzdiff corpus files on disk (info, includes bench inputs and non-input files): {corpus}"))
+    log = run(["gh", "run", "view", "42961733885", "-R", "samiali38183/fuzzdiff", "--log"])
+    for tgt in ("diff", "rust_only", "c_only"):
+        m = re.search(r"fuzz " + tgt + r"\s.*Done (\d+) runs", log)
+        if m:
+            n_ = f"{int(m.group(1)):,}"
+            expect(f"fuzzdiff libFuzzer {tgt} executions", n_, page)
+        else:
+            results.append((False, f"fuzzdiff libFuzzer {tgt}: log line not found"))
+
     bad = 0
     for ok, msg in results:
         print(("PASS  " if ok else "FAIL  ") + msg)

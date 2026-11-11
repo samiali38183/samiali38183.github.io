@@ -33,6 +33,9 @@ PAGES = [
     ("/projects/kevgate-admit/", "projects", "kevgate-admit: Kubernetes admission webhook | Sami Ali",
      "kevgate-admit is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, kind end-to-end run in CI.",
      "kevgate-admit.html"),
+    ("/projects/fuzzdiff/", "projects", "fuzzdiff: picohttpparser in safe Rust | Sami Ali",
+     "fuzzdiff ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original with differential tests, property tests, seeded bugs and libFuzzer.",
+     "fuzzdiff.html"),
     ("/projects/kev-risk-prioritization/", "projects", "kev-risk-prioritization | Sami Ali",
      "A small standard-library script that ranks scan findings with KEV status first, run on a 20-finding synthetic sample.",
      "kev-risk.html"),
@@ -134,6 +137,14 @@ REDIRECTS = {
 
 # Architecture diagrams: vertical flows so they stay readable at phone width.
 DIAGRAMS = {
+    "fuzzdiff": ("fuzzdiff differential harness", "Fuzzer or test bytes are decoded into a case. The same case runs through the C original, which is compiled with sanitizers and fed exact-size heap copies, and through the safe Rust port. The harness compares the two results and classifies them as Equal, BothReject, RustStricter or Divergence.", [
+        ("box", "Input bytes", "corpus, generator, proptest, libFuzzer"),
+        ("box", "Decode into a case", "entry point, header capacity, last_len, chunk splits"),
+        ("box", "C original and Rust port, same case", "C: exact-size heap copy, ASan/UBSan; Rust: safe"),
+        ("hi", "compare()", "consumed length, fields, decoded bytes"),
+        ("box", "Equal, BothReject, RustStricter (D1, D2)", "expected outcomes"),
+        ("warn", "Divergence", "a bug in one side; fails tests and the CI fuzz job"),
+    ]),
     "kevgate-admit": ("kevgate-admit admission path", "The API server posts an AdmissionReview over TLS. The webhook decodes it and extracts every image, parses each reference by digest, looks up a vulnerability report per digest with time and size limits, scores findings and applies the namespace policy, then allows, warns or denies.", [
         ("box", "kube-apiserver", "AdmissionReview v1 over TLS, CREATE and UPDATE"),
         ("box", "Strict decode, extract images", "containers, init, ephemeral; at most 128 images"),

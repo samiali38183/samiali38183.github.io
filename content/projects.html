@@ -1,5 +1,5 @@
 <h1>Projects</h1>
-<p class="lede prose">Four tools, each with the measurements and CI runs behind its claims. Every page ends with a limitations section.</p>
+<p class="lede prose">Five tools, each with the measurements and CI runs behind its claims. Every page ends with a limitations section.</p>
 <ul class="cards">
 <li class="card">
 <h2><a href="/projects/tripline/">tripline</a></h2>
@@ -23,6 +23,14 @@
 <h2><a href="/projects/kevgate-admit/">kevgate-admit</a></h2>
 <p class="tag">Kubernetes security, Go</p>
 <p class="fact">An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, and a kind end-to-end run in CI. It does not scan images itself.</p>
+</li>
+</ul>
+
+<ul class="cards">
+<li class="card">
+<h2><a href="/projects/fuzzdiff/">fuzzdiff</a></h2>
+<p class="tag">Memory safety and fuzzing, Rust</p>
+<p class="fact">picohttpparser ported from C to safe Rust and checked against the original with differential tests, seeded bugs and libFuzzer. 29 tests, 95.88% line coverage; Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.</p>
 </li>
 </ul>
 

@@ -69,7 +69,7 @@ def main() -> int:
     internal_count = 0
     if live:
         pages = {}
-        for u in ["/", "/projects/", "/projects/tripline/", "/projects/sinkline/", "/projects/kevgate/",
+        for u in ["/", "/projects/", "/projects/tripline/", "/projects/sinkline/", "/projects/kevgate/", "/projects/kevgate-admit/", "/projects/fuzzdiff/",
                   "/projects/kev-risk-prioritization/", "/experience/", "/about/", "/resume/", "/404.html"]:
             r = requests.get(live + u, headers=UA, timeout=30)
             pages[u] = r.text

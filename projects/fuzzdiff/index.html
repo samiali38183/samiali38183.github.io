@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fuzzdiff: picohttpparser in safe Rust | Sami Ali</title>
+<meta name="description" content="fuzzdiff ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original with differential tests, property tests, seeded bugs and libFuzzer.">
+<link rel="canonical" href="https://samiali38183.github.io/projects/fuzzdiff/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0a58ad">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sami Ali">
+<meta property="og:title" content="fuzzdiff: picohttpparser in safe Rust | Sami Ali">
+<meta property="og:description" content="fuzzdiff ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original with differential tests, property tests, seeded bugs and libFuzzer.">
+<meta property="og:url" content="https://samiali38183.github.io/projects/fuzzdiff/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="fuzzdiff: picohttpparser in safe Rust | Sami Ali">
+<meta name="twitter:description" content="fuzzdiff ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original with differential tests, property tests, seeded bugs and libFuzzer.">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="/">Sami Ali</a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/experience/">Experience</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/resume/">Resume</a></li>
+<li><button type="button" id="theme" hidden>Dark theme</button></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main" class="wrap">
+<p class="crumbs"><a href="/projects/">Projects</a> / fuzzdiff</p>
+<h1>fuzzdiff</h1>
+<p class="lede prose">picohttpparser, an HTTP/1.x parser written in C, ported to safe Rust and checked against the C original by running both on the same input and reporting any difference.</p>
+<ul class="links">
+<li><a href="https://github.com/samiali38183/fuzzdiff">Repository</a></li>
+<li><a href="https://github.com/samiali38183/fuzzdiff/tree/main/docs">Docs</a></li>
+<li><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/CVE_CLASSES.md">Bug classes and advisories</a></li>
+<li><a href="#ci">CI runs</a></li>
+</ul>
+<p class="small muted">No release tag yet, so there is no release link.</p>
+
+<h2>The problem</h2>
+<div class="prose">
+<p>Network parsers written in C keep having the same bugs: reads past the end of a buffer, length arithmetic that wraps, off-by-ones, half-initialized output. Rewriting one in a memory-safe language is a fair answer only if the rewrite behaves like the original.</p>
+<p>picohttpparser is a good test subject: 715 lines of C, MIT or Perl licensed, hostile-input facing, and full of the pointer idioms that cause those bugs. The project asks whether a port can be shown to behave identically, instead of just saying so.</p>
+</div>
+
+<h2>What it does</h2>
+<div class="prose">
+<p>The Rust crate has <code>#![forbid(unsafe_code)]</code>, no dependencies and no allocation, and covers request heads, response heads, header blocks and an incremental in-place chunked decoder. The vendored C (commit dd573d8, unmodified, hashes checked) is built next to it. A harness decodes fuzzer bytes into a case (which entry point, header capacity, <code>last_len</code>, how a chunked body is split across calls), runs both, and classifies the result as <code>Equal</code>, <code>BothReject</code>, <code>RustStricter</code> (one of two documented deviations) or <code>Divergence</code>. A divergence fails the tests and the CI fuzz job.</p>
+</div>
+
+<figure class="diagram"><svg viewBox="0 0 440 462" role="img" aria-labelledby="fuzzdiff-t fuzzdiff-d"><title id="fuzzdiff-t">fuzzdiff differential harness</title><desc id="fuzzdiff-d">Fuzzer or test bytes are decoded into a case. The same case runs through the C original, which is compiled with sanitizers and fed exact-size heap copies, and through the safe Rust port. The harness compares the two results and classifies them as Equal, BothReject, RustStricter or Divergence.</desc><rect class="box" x="20" y="4" width="400" height="54" rx="6"/><text x="220" y="26" text-anchor="middle" font-weight="600">Input bytes</text><text class="sub" x="220" y="45" text-anchor="middle">corpus, generator, proptest, libFuzzer</text><line class="arrow" x1="220" y1="58" x2="220" y2="78"/><path class="head" d="M215 77 L225 77 L220 84 Z"/><rect class="box" x="20" y="84" width="400" height="54" rx="6"/><text x="220" y="106" text-anchor="middle" font-weight="600">Decode into a case</text><text class="sub" x="220" y="125" text-anchor="middle">entry point, header capacity, last_len, chunk splits</text><line class="arrow" x1="220" y1="138" x2="220" y2="158"/><path class="head" d="M215 157 L225 157 L220 164 Z"/><rect class="box" x="20" y="164" width="400" height="54" rx="6"/><text x="220" y="186" text-anchor="middle" font-weight="600">C original and Rust port, same case</text><text class="sub" x="220" y="205" text-anchor="middle">C: exact-size heap copy, ASan/UBSan; Rust: safe</text><line class="arrow" x1="220" y1="218" x2="220" y2="238"/><path class="head" d="M215 237 L225 237 L220 244 Z"/><rect class="hi" x="20" y="244" width="400" height="54" rx="6"/><text x="220" y="266" text-anchor="middle" font-weight="600">compare()</text><text class="sub" x="220" y="285" text-anchor="middle">consumed length, fields, decoded bytes</text><line class="arrow" x1="220" y1="298" x2="220" y2="318"/><path class="head" d="M215 317 L225 317 L220 324 Z"/><rect class="box" x="20" y="324" width="400" height="54" rx="6"/><text x="220" y="346" text-anchor="middle" font-weight="600">Equal, BothReject, RustStricter (D1, D2)</text><text class="sub" x="220" y="365" text-anchor="middle">expected outcomes</text><line class="arrow" x1="220" y1="378" x2="220" y2="398"/><path class="head" d="M215 397 L225 397 L220 404 Z"/><rect class="warn" x="20" y="404" width="400" height="54" rx="6"/><text x="220" y="426" text-anchor="middle" font-weight="600">Divergence</text><text class="sub" x="220" y="445" text-anchor="middle">a bug in one side; fails tests and the CI fuzz job</text></svg><figcaption>Fuzzer or test bytes are decoded into a case. The same case runs through the C original, which is compiled with sanitizers and fed exact-size heap copies, and through the safe Rust port. The harness compares the two results and classifies them as Equal, BothReject, RustStricter or Divergence.</figcaption></figure>
+
+<h2>Four implementation points</h2>
+<div class="prose">
+<h3>A chunked decoder with no pointer arithmetic</h3>
+<p>The C decoder walks the buffer with pointers. The Rust one (<code>src/chunked.rs</code>) is an eight-state machine (<code>Size</code>, <code>Ext</code>, <code>HeaderLf</code>, <code>Data</code>, <code>DataCr</code>, <code>DataLf</code>, <code>TrailerHead</code>, <code>TrailerMiddle</code>) over two indices into the slice. Every read is <code>buf.get(src)</code>, so running out of input is a <code>break</code> out of the loop, not an out-of-bounds read, and body bytes are moved to the front with <code>copy_within(src..src + take, dst)</code> where <code>take</code> is capped by what has arrived and what the chunk still needs. The hex-digit cap (<code>usize::BITS / 4</code>) and the framing-overhead ratio check after 102,400 bytes are kept, because the digit cap is what stops a long size line from wrapping, the class behind CVE-2013-2028 in nginx.</p>
+<h3>The request line has to fail in C's order</h3>
+<p>C reports "need more data" (-2) or "error" (-1) depending on which check it reaches first, so a port that validates in a different order disagrees on truncated input. <code>request()</code> follows the C sequence: skip a stray leading CRLF, read the method token, skip spaces, read the target, skip spaces, only then reject an empty method or path, then the version. Missing data anywhere propagates as <code>Partial</code> through <code>?</code>. The corpus replay tests every prefix length of every input with an incremental <code>last_len</code> to hold this down.</p>
+<h3>The seeded bugs vanish when the feature is off</h3>
+<p>To show the harness can see bugs, <code>src/mutants.rs</code> adds three deliberate ones behind a <code>mutants</code> feature: a header value one byte short, a missing end-of-buffer guard, and the wrong chunked state after a trailer line. Without the feature the check is <code>const fn active(..) -> bool { false }</code>, so the shipped parser contains none of it. With the feature on, the state lives in a thread-local, so tests can switch bugs on one at a time.</p>
+<h3>Exact-size copies so the sanitizer can see over-reads</h3>
+<p>A C over-read that lands inside a larger allocation goes unnoticed. The C shim (<code>c/shim.c</code>) copies each input into a heap block of exactly <code>len</code> bytes (<code>dup_exact</code>), so one byte past the end is outside the allocation and AddressSanitizer reports it. The shim also returns offsets instead of pointers so the harness can compare results by value.</p>
+</div>
+
+<h2>Evidence from real runs</h2>
+<p class="small muted">Run on 2026-11-11 from a fresh clone of <code>main</code> (commit 22c4034), Windows, rustc 1.99.1, MSVC build of the C code. The libFuzzer and sanitizer runs happen only in CI (Linux), so their numbers come from the CI logs.</p>
+<h3>Tests and seeded bugs, re-run locally</h3>
+<pre data-copy><code>$ cargo test --all
+...tests\vectors.rs   test result: ok. 10 passed
+...tests\corpus.rs    test result: ok. 12 passed
+...tests\props.rs     test result: ok.  5 passed
+...doc-tests          test result: ok.  2 passed
+
+$ cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --nocapture
+HeaderLenOffByOne: caught after 3 inputs in 62.2µs as ResultMismatch
+MissingBoundsCheck: caught after 286 inputs in 1.1512ms as RustPanic
+WrongStateAfterCrlf: caught after 8 inputs in 32.6µs as ResultMismatch
+control (no mutant): 500000 inputs, no divergence, 1.5422542s
+test result: ok. 1 passed
+
+$ cargo llvm-cov report --summary-only      # src/ files only
+chunked.rs   141 lines   1 missed
+error.rs      22 lines   0 missed
+message.rs   319 lines  19 missed
+mutants.rs     3 lines   0 missed           # 485 lines, 20 missed: 95.88%</code></pre>
+<p class="trim">Trimmed: per-test lines and timing removed, and the files summarized by line counts; the coverage percentage is computed from the four rows. The mutant run is trimmed of the failing-input lines it also prints. These mutants are easy for the generator, which shows the plumbing works, not that every subtle bug would be found.</p>
+
+<h3>libFuzzer, from CI</h3>
+<p class="prose">Each target ran for 120 s on nightly, seeded from the 204-input corpus. Numbers are libFuzzer's own "Done N runs" lines in the log of <a href="https://github.com/samiali38183/fuzzdiff/actions/runs/42961733885">fuzz run 42961733885</a>.</p>
+<section class="scroll" tabindex="0" aria-label="libFuzzer results table">
+<table>
+<thead><tr><th scope="col">Target</th><th scope="col">What it runs</th><th scope="col" class="num">Executions</th><th scope="col">Result</th></tr></thead>
+<tbody>
+<tr><th scope="row"><code>diff</code></th><td>C (ASan, coverage) against Rust; panics on a divergence</td><td class="num">5,027,708</td><td>no crash, no divergence</td></tr>
+<tr><th scope="row"><code>rust_only</code></th><td>Rust only, debug assertions, output invariants</td><td class="num">7,762,840</td><td>no crash</td></tr>
+<tr><th scope="row"><code>c_only</code></th><td>C only, ASan and UBSan</td><td class="num">6,509,270</td><td>no crash, no sanitizer report</td></tr>
+</tbody>
+</table>
+</section>
+
+<h2 id="ci">CI evidence</h2>
+<section class="scroll" tabindex="0" aria-label="fuzzdiff CI evidence table">
+<table>
+<thead><tr><th scope="col">Workflow</th><th scope="col">What it covers</th><th scope="col">Run (main, 22c4034)</th></tr></thead>
+<tbody>
+<tr><th scope="row">ci</th><td>6 jobs: tests on Ubuntu and Windows; the C code under ASan and UBSan in a portable and an SSE4.2 variant; coverage with a 90% line floor; cargo-deny</td><td><a href="https://github.com/samiali38183/fuzzdiff/actions/runs/42962524230">42962524230</a></td></tr>
+<tr><th scope="row">fuzz</th><td>the three libFuzzer targets, 120 s each</td><td><a href="https://github.com/samiali38183/fuzzdiff/actions/runs/42962523234">42962523234</a></td></tr>
+</tbody>
+</table>
+</section>
+<p class="small muted prose">The execution counts differ from run to run. The table above is from the earlier pull-request run named in the sentence before it; the run on <code>main</code> also finished green.</p>
+
+<h2>Results</h2>
+<section class="scroll" tabindex="0" aria-label="fuzzdiff results table">
+<table>
+<thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><th scope="row">Tests</th><td>29 (10 known-answer, 12 corpus replay, 5 property, 2 doc), plus 1 mutant test</td><td>re-run for this page; <a href="https://github.com/samiali38183/fuzzdiff#results">README</a></td></tr>
+<tr><th scope="row">Line coverage of <code>src/</code></th><td>95.88%</td><td>re-run for this page (cargo-llvm-cov)</td></tr>
+<tr><th scope="row">Seeded bugs</th><td>3 of 3 detected, after 3, 286 and 8 inputs; 500,000-input control clean</td><td>re-run for this page</td></tr>
+<tr><th scope="row">Corpus</th><td>204 inputs: 94 from picohttpparser's own tests, 110 hand-written</td><td><a href="https://github.com/samiali38183/fuzzdiff/tree/main/corpus">corpus/</a>; README</td></tr>
+<tr><th scope="row">Speed, head parsing</th><td>Rust about 1.4x to 1.5x slower than C (82 B GET: 59.4 ns vs 42.3 ns)</td><td><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/BENCHMARKS.md">docs/BENCHMARKS.md</a> (Ryzen 5 5600G, one run, not re-run)</td></tr>
+<tr><th scope="row">Speed, chunked decoding</th><td>level (0.99x and 1.01x)</td><td><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/BENCHMARKS.md">docs/BENCHMARKS.md</a></td></tr>
+<tr><th scope="row">Bugs found in the C original</th><td>none</td><td><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/FINDINGS.md">docs/FINDINGS.md</a></td></tr>
+</tbody>
+</table>
+</section>
+
+<h2>Limitations</h2>
+<ul class="prose">
+<li><strong>The fuzz runs are short.</strong> Two minutes per target is a smoke run, not assurance. Miri has not been run.</li>
+<li><strong>The SIMD C path is not reached by libFuzzer.</strong> The <code>diff</code> and <code>c_only</code> targets build the C side without <code>-msse4.2</code>. That path was exercised only by the sanitizer test job, with the corpus and property tests.</li>
+<li><strong>No new vulnerability was found.</strong> picohttpparser has no published security advisory, and the advisories discussed in <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/CVE_CLASSES.md">CVE_CLASSES.md</a> are examples of bug classes, mostly from other parsers.</li>
+<li><strong>The Rust port is slower</strong> on head parsing, and the cause was not profiled. On Windows the C side ran its portable path, so a Linux build with SIMD may widen the gap; that was not measured.</li>
+<li><strong>Two deliberate deviations.</strong> D1: optional rejection of folded header lines, off by default. D2: <code>last_len</code> larger than the buffer is an error in Rust, while C reads out of bounds. D2 was found by reading the code, has not been reproduced under a sanitizer, and the fuzz targets clamp <code>last_len</code>, so no fuzz run reaches it. Details in <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DEVIATIONS.md">DEVIATIONS.md</a>.</li>
+<li><strong>Blind generator.</strong> The 27.6 million-input seeded generator run in the README has no coverage feedback and is a stand-in for fuzzing, not a replacement.</li>
+</ul>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<ul>
+<li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
+<li><a href="https://github.com/samiali38183">GitHub</a></li>
+<li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
+<li><a href="/resume.pdf">Resume (PDF)</a></li>
+</ul>
+<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+</div>
+</footer>
+<script src="/site.js" defer></script>
+</body>
+</html>
