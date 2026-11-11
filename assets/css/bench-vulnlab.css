@@ -1,0 +1,27 @@
+/* Lab explorer (vulnlab sheet only). Uses the tokens from site.css and the radio group and code pane styles (.sw-*) of the
+   sinkline bench. Outcomes are text stamps and gutter marks (! and +), never colour alone. */
+.vl-out{margin-top:var(--s-4)}
+.vl-h{margin:var(--s-5) 0 var(--s-2);font-size:var(--step-1)}
+.vl-vh{margin:var(--s-4) 0 var(--s-2);font:600 var(--step-0)/1.3 var(--mono)}
+.vl-say{font-size:var(--step--1);line-height:1.45;max-width:60rem}
+.vl-code{max-height:30rem;overflow:auto}
+.sw-code .k-bug{background:var(--stamp);border-color:var(--stamp);color:var(--paper);font-weight:600}
+.sw-code .bg{background:var(--stamp-tint)}
+.sw-code .bg .n{color:var(--ink-2)}
+.sw-code .k-call,.sw-code .k-propagate{color:var(--ink-2)}
+.vl-out pre,.vl-sv pre{margin:0 0 var(--s-3)}
+.vl-out pre code,.vl-sv pre code{white-space:pre;overflow-wrap:normal}
+.vl-tab{width:100%;border-collapse:collapse;font-size:var(--step--1);line-height:1.4;margin:0 0 var(--s-4)}
+.vl-tab caption{text-align:left;font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2);padding-bottom:var(--s-2)}
+.vl-tab thead th{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);text-align:left;padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:2px solid var(--ink);vertical-align:bottom}
+.vl-tab td,.vl-tab tbody th{padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:1px solid var(--rule);vertical-align:top;text-align:left;font-weight:400}
+.vl-tab code{font-size:.8125rem;overflow-wrap:anywhere}
+.vl-tab td:last-child{padding-right:0}
+/* no-JS record */
+.bt th[scope=row]{font-weight:400}
+.bt th[scope=row] code{font-weight:600;overflow-wrap:anywhere}
+.bt td p{margin:.5em 0 0}
+.vl-lab{margin-top:var(--s-4)}
+.vl-lab summary{padding:.6rem 0}
+.vl-sv{margin:0 0 var(--s-5)}
+.vl-code{position:relative}

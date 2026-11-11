@@ -4,6 +4,7 @@
   "sinkline",
   "kevgate",
   "kevgate-admit",
+  "vulnlab",
   "fuzzdiff",
   "kev-risk-prioritization"
  ],
@@ -830,7 +831,7 @@
    "content": "fuzzdiff.html",
    "name": "fuzzdiff",
    "version": "v0.2.0",
-   "sheet": 5,
+   "sheet": 6,
    "kind": "Memory safety and fuzzing, Rust",
    "title": "fuzzdiff: picohttpparser ported to safe Rust | Sami Ali",
    "desc": "fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.",
@@ -982,7 +983,7 @@
    "content": "kev-risk.html",
    "name": "kev-risk-prioritization",
    "version": "v0.2.0",
-   "sheet": 6,
+   "sheet": 7,
    "kind": "Vulnerability management",
    "title": "kev-risk-prioritization | Sami Ali",
    "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
@@ -1177,6 +1178,211 @@
    ],
    "commit": "d85495f",
    "bench": "kev-risk"
+  },
+  "vulnlab": {
+   "slug": "vulnlab",
+   "content": "vulnlab.html",
+   "name": "vulnlab",
+   "version": "v0.1.0",
+   "sheet": 5,
+   "kind": "Web security training lab, Python",
+   "title": "vulnlab: localhost-only web vulnerability lab | Sami Ali",
+   "desc": "vulnlab v0.1.0 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 43 tests, loopback only.",
+   "fact": "A localhost-only lab of three small vulnerable Flask services: SSRF through a redirect, SQL injection in ORDER BY and IDOR. Each has a fix checked by the tests that show the impact, a sinkline record and a Sigma rule. 3 of 3 fixes verified; sinkline reports two of the three bugs and both fixes of those two. Training lab, loopback only, no CVEs.",
+   "labels": {
+    "found": "As found",
+    "left": "As left"
+   },
+   "found_title": "Three vulnerable services, one missing check each",
+   "left_title": "Three fixes, checked by the tests that showed the impact",
+   "record": {
+    "instrument": "vulnlab v0.1.0, tag commit 1fceaa8 (released 2026-11-11)",
+    "reference": "each lab's fixed service and its tests: the same checks that show the impact on the vulnerable service must fail against the fix; sinkline 0.5.0 and a Sigma rule per lab are the other two checks",
+    "measured": "2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.0; CI (Linux) run 43087241629",
+    "reproduce": [
+     "pip install -r requirements.lock",
+     "pytest -q",
+     "python tools/sinkline_check.py",
+     "sigma check labs/*/detection/*.yml"
+    ],
+    "reproduce_label": "$ vulnlab, from a clone at v0.1.0"
+   },
+   "reading": {
+    "num": "3",
+    "den": "/3",
+    "unit": "fixes verified by the lab's own tests",
+    "caption": "Each of the three vulnerable services shows its impact in a test, and the same checks fail against its fixed version. sinkline reports two of the three bugs and also both fixed versions of those two (false positives), and nothing on the IDOR, which is not a taint flow. The detection rules alert on the attempts either way.",
+    "stamp": [
+     "pass",
+     "As left: 3 of 3 fixes verified"
+    ],
+    "run": "43087241629"
+   },
+   "strip_sets": {
+    "main": {
+     "unit": "labs",
+     "total_label": "3 labs",
+     "phr": {
+      "hit": "fixed service blocks the impact",
+      "miss": "vulnerable service shows the impact"
+     },
+     "rows": [
+      {
+       "label": "As found",
+       "runs": [
+        [
+         "miss",
+         3
+        ]
+       ],
+       "val": "<b>3</b> vulnerable services show their impact in a test"
+      },
+      {
+       "label": "As left",
+       "runs": [
+        [
+         "hit",
+         3
+        ]
+       ],
+       "val": "<b>3</b> fixed services block it, checked by the same tests"
+      }
+     ]
+    },
+    "sinkline": {
+     "unit": "services",
+     "total_label": "3 vulnerable and 3 fixed services",
+     "phr": {
+      "hit": "vulnerable, reported",
+      "miss": "vulnerable, not reported",
+      "fp": "fixed, reported (false positive)",
+      "neg": "fixed, not reported"
+     },
+     "rows": [
+      {
+       "label": "Vulnerable",
+       "runs": [
+        [
+         "hit",
+         2
+        ],
+        [
+         "miss",
+         1
+        ]
+       ],
+       "val": "sinkline 0.5.0 reports <b>2</b> of 3: SSRF and SQL injection. The IDOR is not a taint flow"
+      },
+      {
+       "label": "Fixed",
+       "runs": [
+        [
+         "fp",
+         2
+        ],
+        [
+         "neg",
+         1
+        ]
+       ],
+       "val": "<b>2</b> of 3 reported anyway: false positives on the SSRF and SQL injection fixes"
+      }
+     ]
+    }
+   },
+   "home": {
+    "against": "Each lab's fixed service and its tests; sinkline 0.5.0; Sigma rules replayed on recorded logs",
+    "reading": "3 of 3 fixes verified; sinkline 2 of 3 detected (2 false positives on fixes)",
+    "run": "43087241629",
+    "found": "3 vulnerable services (SSRF, SQL injection, IDOR) show impact in their tests",
+    "left": "3 fixes block it; 43 tests pass; loopback only",
+    "tolerance": "Training lab; bugs simpler than real ones; no CVEs; detection fires on attempts, not impact"
+   },
+   "links": [
+    [
+     "Repository",
+     "https://github.com/samiali38183/vulnlab"
+    ],
+    [
+     "Release v0.1.0",
+     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0"
+    ],
+    [
+     "Method",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/METHOD.md"
+    ],
+    [
+     "Safety scope",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/SAFETY.md"
+    ],
+    [
+     "CI runs",
+     "#trace"
+    ]
+   ],
+   "trace": [
+    [
+     "CI on main, tag commit (ci, v0.1.0)",
+     "run",
+     "43087241629"
+    ],
+    [
+     "Release",
+     "link",
+     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0",
+     "v0.1.0"
+    ],
+    [
+     "Lab 01 write-up",
+     "link",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/01-ssrf-redirect/README.md",
+     "labs/01-ssrf-redirect/README.md"
+    ],
+    [
+     "Lab 02 write-up",
+     "link",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/02-sqli-order-by/README.md",
+     "labs/02-sqli-order-by/README.md"
+    ],
+    [
+     "Lab 03 write-up",
+     "link",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/03-idor-bola/README.md",
+     "labs/03-idor-bola/README.md"
+    ],
+    [
+     "Harness and replay code",
+     "link",
+     "https://github.com/samiali38183/vulnlab/tree/v0.1.0/vulnlab_common",
+     "vulnlab_common/"
+    ],
+    [
+     "Safety tests",
+     "link",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/tests/test_safety.py",
+     "tests/test_safety.py"
+    ],
+    [
+     "sinkline capture and check",
+     "link",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/tools/sinkline_check.py",
+     "tools/sinkline_check.py"
+    ],
+    [
+     "Lab explorer capture script",
+     "link",
+     "https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/capture_vulnlab_bench.py",
+     "scripts/capture_vulnlab_bench.py"
+    ],
+    [
+     "Lab explorer consistency test",
+     "link",
+     "https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_vulnlab.mjs",
+     "scripts/test_bench_vulnlab.mjs"
+    ]
+   ],
+   "commit": "1fceaa8",
+   "bench": "vulnlab"
   }
  },
  "failed_first": [
@@ -1269,6 +1475,19 @@
    "src": [
     "CHANGELOG 0.1.0, Hardening",
     "https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/CHANGELOG.md"
+   ]
+  },
+  {
+   "project": "vulnlab",
+   "text": "sinkline reports the fixed versions of the SSRF and SQL injection labs too, because it does not recognize a custom allow-list or address check as a sanitizer, and reports nothing on the IDOR lab, which is not a taint flow.",
+   "state": [
+    "limit",
+    "Open"
+   ],
+   "anchor": "limits",
+   "src": [
+    "README, labs and results",
+    "https://github.com/samiali38183/vulnlab/blob/v0.1.0/README.md"
    ]
   },
   {

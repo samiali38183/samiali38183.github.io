@@ -77,7 +77,6 @@ LABS = [
         "blocked": "Every record the user did not own answered 404 on read and on update, and the other user's memo never appeared.",
         "sinkline_note": {
             "vulnerable": "Not reported, as the write-up expects: a missing authorization check is not a taint flow.",
-            "fixed": "Nothing to report.",
         },
     },
 ]
