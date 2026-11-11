@@ -210,43 +210,181 @@
    "slug": "sinkline",
    "content": "sinkline.html",
    "name": "sinkline",
-   "version": "v0.4.1",
+   "version": "v0.5.0",
    "sheet": 2,
    "kind": "Application security",
    "title": "sinkline: taint analysis for Python web apps | Sami Ali",
-   "desc": "sinkline follows request data across functions and files to dangerous sinks. 91 tests; F1 0.992 on a 109-line self-labeled benchmark, Bandit 0.579.",
-   "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 91 tests; 109-line self-labeled benchmark.",
+   "desc": "sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.",
+   "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 138 tests; scored on OWASP BenchmarkPython v0.1.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
-   "found_title": "A shell injection in its own Action, and the benchmark misses",
-   "left_title": "The reading against Bandit on the same lines",
+   "found_title": "On an independent benchmark 0.4.1 scored +0.21, and Bandit leads over all 14 categories",
+   "left_title": "0.5.0 scores +0.52 on the taint categories; the fixes were chosen from the failures",
    "record": {
-    "instrument": "sinkline v0.4.1, commit 9a36ba2",
-    "reference": "Bandit 1.9.4 on the same 109 labeled lines (bench/corpus, labeled by the author)",
-    "measured": "2026-11-10, Python 3.12.2, bandit 1.9.4, fresh clone",
+    "instrument": "sinkline v0.5.0, commit 9c58efd (0.4.1, commit 9a36ba2, is the as-found reading)",
+    "reference": "OWASP BenchmarkPython v0.1, commit f129148: 1,230 labeled Flask test cases; Bandit 1.9.4 and Semgrep OSS 1.185.0 on the same files",
+    "measured": "2026-11-11, Python 3.12.2; sinkline 0.5.0 re-run on the suite for this page, other results from the repository (scored with its own script, not the official scorer)",
     "reproduce": [
-     "python bench/score.py",
-     "python bench/compare_bandit.py"
+     "bench/external/run.sh WORKDIR v0.5.0 sinkline bandit semgrep",
+     "python bench/score.py"
     ],
-    "reproduce_label": "$ python bench/"
+    "reproduce_label": "$ sinkline repo"
    },
    "reading": {
-    "num": "0.992",
+    "num": "+0.52",
     "den": "",
-    "unit": "F1 on 109 labeled lines; Bandit 0.579",
-    "caption": "Precision 1.000, recall 0.984, F1 0.992 on sinkline's own 109-line benchmark, which is small and labeled by its author. Bandit 1.9.4 scores F1 0.579 on the same lines.",
+    "unit": "TPR minus FPR on the 10 taint categories (0.4.1: +0.21; Bandit +0.07)",
+    "caption": "On OWASP BenchmarkPython v0.1, ten taint categories, sinkline 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20). 0.5.0 scores +0.52 (0.73, 0.21), but its fixes were chosen by reading the failures of 0.4.1, so that is not a held-out score. Bandit 1.9.4 scores +0.07. Over all 14 categories Bandit leads, +0.36 to +0.27.",
     "stamp": [
      "limit",
-     "Self-labeled, 109 lines"
+     "Not held out"
     ],
-    "run": "42920168878"
+    "run": "43033758810"
    },
    "strip_sets": {
     "main": {
+     "unit": "test cases",
+     "total_label": "677 test cases in the 10 taint categories (240 vulnerable, 437 safe)",
+     "per": 10,
+     "note": "Each tick is about 10 test cases; the counts are in the labels.",
+     "phr": {
+      "hit": "vulnerable cases reported",
+      "miss": "vulnerable cases missed",
+      "fp": "safe cases flagged",
+      "neg": "safe cases left alone"
+     },
+     "rows": [
+      {
+       "label": "As found",
+       "runs": [
+        [
+         "hit",
+         99
+        ],
+        [
+         "miss",
+         141
+        ],
+        [
+         "fp",
+         89
+        ],
+        [
+         "neg",
+         348
+        ]
+       ],
+       "val": "sinkline 0.4.1: TP 99, FN 141, FP 89, TN 348. Score <b>+0.21</b>"
+      },
+      {
+       "label": "As left",
+       "runs": [
+        [
+         "hit",
+         175
+        ],
+        [
+         "miss",
+         65
+        ],
+        [
+         "fp",
+         93
+        ],
+        [
+         "neg",
+         344
+        ]
+       ],
+       "val": "sinkline 0.5.0: TP 175, FN 65, FP 93, TN 344. Score <b>+0.52</b>"
+      }
+     ]
+    },
+    "all14": {
+     "unit": "test cases",
+     "total_label": "1,230 test cases, all 14 categories (452 vulnerable, 778 safe)",
+     "per": 20,
+     "note": "Each tick is about 20 test cases; the counts are in the labels.",
+     "phr": {
+      "hit": "vulnerable cases reported",
+      "miss": "vulnerable cases missed",
+      "fp": "safe cases flagged",
+      "neg": "safe cases left alone"
+     },
+     "rows": [
+      {
+       "label": "sinkline 0.4.1",
+       "runs": [
+        [
+         "hit",
+         99
+        ],
+        [
+         "miss",
+         353
+        ],
+        [
+         "fp",
+         89
+        ],
+        [
+         "neg",
+         689
+        ]
+       ],
+       "val": "TP 99, FN 353, FP 89, TN 689. Score <b>+0.10</b>"
+      },
+      {
+       "label": "Bandit 1.9.4",
+       "runs": [
+        [
+         "hit",
+         179
+        ],
+        [
+         "miss",
+         273
+        ],
+        [
+         "fp",
+         25
+        ],
+        [
+         "neg",
+         753
+        ]
+       ],
+       "val": "TP 179, FN 273, FP 25, TN 753. Score <b>+0.36</b>"
+      },
+      {
+       "label": "Semgrep OSS",
+       "runs": [
+        [
+         "hit",
+         72
+        ],
+        [
+         "miss",
+         380
+        ],
+        [
+         "fp",
+         15
+        ],
+        [
+         "neg",
+         763
+        ]
+       ],
+       "val": "TP 72, FN 380, FP 15, TN 763. Score <b>+0.14</b>"
+      }
+     ]
+    },
+    "gate": {
      "unit": "labeled lines",
-     "total_label": "109 labeled lines (61 vulnerable, 48 safe)",
+     "total_label": "109 labeled lines (61 vulnerable, 48 safe), self-labeled, not independent",
      "note": "Ticks are grouped by outcome, not in file order.",
      "phr": {
       "hit": "vulnerable lines reported",
@@ -255,6 +393,24 @@
       "neg": "safe lines left alone"
      },
      "rows": [
+      {
+       "label": "sinkline 0.5.0",
+       "runs": [
+        [
+         "hit",
+         60
+        ],
+        [
+         "miss",
+         1
+        ],
+        [
+         "neg",
+         48
+        ]
+       ],
+       "val": "TP 60, FP 0, FN 1, TN 48. F1 <b>0.992</b>"
+      },
       {
        "label": "Bandit 1.9.4",
        "runs": [
@@ -276,35 +432,17 @@
         ]
        ],
        "val": "TP 33, FP 20, FN 28, TN 28. F1 <b>0.579</b>"
-      },
-      {
-       "label": "sinkline",
-       "runs": [
-        [
-         "hit",
-         60
-        ],
-        [
-         "miss",
-         1
-        ],
-        [
-         "neg",
-         48
-        ]
-       ],
-       "val": "TP 60, FP 0, FN 1, TN 48. F1 <b>0.992</b>"
       }
      ]
     }
    },
    "home": {
-    "against": "Bandit 1.9.4, 109 self-labeled lines",
-    "reading": "F1 0.992 vs 0.579",
-    "run": "42920168878",
-    "found": "Bandit: TP 33, FP 20, FN 28, F1 0.579",
-    "left": "sinkline: TP 60, FP 0, FN 1, F1 0.992",
-    "tolerance": "Small benchmark labeled by its author"
+    "against": "OWASP BenchmarkPython v0.1, 10 taint categories; Bandit +0.07",
+    "reading": "+0.21 to +0.52 (not held out)",
+    "run": "43033758810",
+    "found": "0.4.1: TPR 0.41, FPR 0.20, score +0.21",
+    "left": "0.5.0: TPR 0.73, FPR 0.21, score +0.52",
+    "tolerance": "Fixes chosen from the 0.4.1 failures; Bandit leads over all 14 categories"
    },
    "links": [
     [
@@ -312,8 +450,12 @@
      "https://github.com/samiali38183/sinkline"
     ],
     [
-     "Release v0.4.1",
-     "https://github.com/samiali38183/sinkline/releases/tag/v0.4.1"
+     "Release v0.5.0",
+     "https://github.com/samiali38183/sinkline/releases/tag/v0.5.0"
+    ],
+    [
+     "External benchmark",
+     "https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md"
     ],
     [
      "Design doc",
@@ -321,7 +463,7 @@
     ],
     [
      "CI run (main)",
-     "https://github.com/samiali38183/sinkline/actions/runs/42920168878"
+     "https://github.com/samiali38183/sinkline/actions/runs/43033758810"
     ],
     [
      "Sample HTML report",
@@ -332,13 +474,36 @@
     [
      "Release",
      "link",
-     "https://github.com/samiali38183/sinkline/releases/tag/v0.4.1",
-     "v0.4.1"
+     "https://github.com/samiali38183/sinkline/releases/tag/v0.5.0",
+     "v0.5.0"
     ],
     [
-     "CI run on main",
+     "CI run on main (v0.5.0)",
      "run",
-     "42920168878"
+     "43033758810"
+    ],
+    [
+     "Report workflow on main",
+     "run",
+     "43033758686"
+    ],
+    [
+     "External benchmark, method and results",
+     "link",
+     "https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md",
+     "bench/external/README.md"
+    ],
+    [
+     "Per-category results, 0.4.1 and 0.5.0",
+     "link",
+     "https://github.com/samiali38183/sinkline/tree/main/bench/external/results",
+     "bench/external/results"
+    ],
+    [
+     "Changelog 0.5.0",
+     "link",
+     "https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md",
+     "CHANGELOG.md"
     ],
     [
      "Security fix for the Action",
@@ -347,7 +512,7 @@
      "CHANGELOG 0.4.1, Security"
     ],
     [
-     "Benchmark scripts",
+     "Regression-gate scripts",
      "link",
      "https://github.com/samiali38183/sinkline/tree/main/bench",
      "bench/"
@@ -359,13 +524,19 @@
      "docs/examples"
     ],
     [
+     "Sanitizer switch captures",
+     "link",
+     "https://github.com/samiali38183/samiali38183.github.io/tree/main/assets/data/sinkline-bench",
+     "assets/data/sinkline-bench"
+    ],
+    [
      "Action test",
      "link",
      "https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py",
      "tests/test_action.py"
     ]
    ],
-   "commit": "9a36ba2"
+   "commit": "9c58efd"
   },
   "kevgate": {
    "slug": "kevgate",
@@ -878,6 +1049,32 @@
    "src": [
     "README, scorecard",
     "https://github.com/samiali38183/tripline/blob/main/docs/scorecard.md"
+   ]
+  },
+  {
+   "project": "sinkline",
+   "text": "On the independent OWASP BenchmarkPython suite, 0.4.1 scored +0.21 on the 10 taint categories, with 0 of 16 LDAP and 5 of 51 XPath cases reported. 0.5.0 scores +0.52, but the fixes were chosen from those failures, so it is not a held-out score.",
+   "state": [
+    "limit",
+    "Not held out"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "bench/external/README.md",
+    "https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md"
+   ]
+  },
+  {
+   "project": "sinkline",
+   "text": "Over all 14 categories Bandit leads (+0.36 against +0.27): sinkline has no check for weak hashes, weak random numbers, cookie flags or session contents.",
+   "state": [
+    "limit",
+    "Open"
+   ],
+   "anchor": "limits",
+   "src": [
+    "results/v0.5.0",
+    "https://github.com/samiali38183/sinkline/blob/main/bench/external/results/v0.5.0/summary.md"
    ]
   },
   {

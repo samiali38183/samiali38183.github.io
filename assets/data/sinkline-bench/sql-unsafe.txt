@@ -1,0 +1,11 @@
+[CRITICAL] SL-SQLI-001 A03:2021 CWE-89  sql-unsafe.py:11:11
+  SQL built from tainted data
+  flask.request.args reaches sqlite3.Connection.execute without a sanitizer for CWE-89.
+  ┌ source     sql-unsafe.py:10  uid = request.args.get("id", "")  # flask.request.args
+  │ propagate  sql-unsafe.py:10  uid = request.args.get("id", "")  # .get()
+  │ propagate  sql-unsafe.py:11  cur = db.execute("SELECT name FROM users WHERE id = " + uid)  # concat
+  └ sink       sql-unsafe.py:11  cur = db.execute("SELECT name FROM users WHERE id = " + uid)  # sqlite3.Connection.execute
+  fix: Use parameterized queries: conn.execute('... WHERE id = ?', (user_id,))
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1

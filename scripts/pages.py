@@ -5,6 +5,7 @@ import re
 from html import escape as esc
 from pathlib import Path
 
+import bench_static as B
 import components as C
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -39,6 +40,8 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
             return C.strip_rows(p["strip_sets"][arg])
         if kind == "key":
             return C.key(p["strip_sets"][arg])
+        if kind == "bench":
+            return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption}[arg]()
         if kind == "kb":
             return f"{round((ROOT / arg).stat().st_size / 1000)} KB"
         if kind == "benchtable":

@@ -1,0 +1,368 @@
+{
+ "provenance": {
+  "tool": "sinkline",
+  "version": "0.5.0",
+  "commit": "9c58efd",
+  "captured": "2026-11-11",
+  "command": "sinkline scan --no-color --fail-on low FILE",
+  "cwd": "assets/data/sinkline-bench",
+  "python": "3.12"
+ },
+ "examples": [
+  {
+   "id": "sql",
+   "title": "SQL injection",
+   "cwe": "CWE-89",
+   "variants": [
+    {
+     "file": "sql-unsafe.py",
+     "code": "import sqlite3\nfrom flask import Flask, request, jsonify\n\napp = Flask(__name__)\ndb = sqlite3.connect(\"app.db\", check_same_thread=False)\n\n\n@app.route(\"/user\")\ndef user():\n    uid = request.args.get(\"id\", \"\")\n    cur = db.execute(\"SELECT name FROM users WHERE id = \" + uid)\n    return jsonify(cur.fetchall())\n",
+     "status": 1,
+     "out": "[CRITICAL] SL-SQLI-001 A03:2021 CWE-89  sql-unsafe.py:11:11\n  SQL built from tainted data\n  flask.request.args reaches sqlite3.Connection.execute without a sanitizer for CWE-89.\n  ┌ source     sql-unsafe.py:10  uid = request.args.get(\"id\", \"\")  # flask.request.args\n  │ propagate  sql-unsafe.py:10  uid = request.args.get(\"id\", \"\")  # .get()\n  │ propagate  sql-unsafe.py:11  cur = db.execute(\"SELECT name FROM users WHERE id = \" + uid)  # concat\n  └ sink       sql-unsafe.py:11  cur = db.execute(\"SELECT name FROM users WHERE id = \" + uid)  # sqlite3.Connection.execute\n  fix: Use parameterized queries: conn.execute('... WHERE id = ?', (user_id,))\n\n1 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+     "findings": [
+      {
+       "rule_id": "SL-SQLI-001",
+       "cwe": "CWE-89",
+       "severity": "critical",
+       "confidence": "high",
+       "title": "SQL built from tainted data",
+       "line": 11,
+       "fix": "Use parameterized queries: conn.execute('... WHERE id = ?', (user_id,))",
+       "route": [
+        {
+         "kind": "source",
+         "line": 10,
+         "note": "flask.request.args"
+        },
+        {
+         "kind": "propagate",
+         "line": 10,
+         "note": ".get()"
+        },
+        {
+         "kind": "propagate",
+         "line": 11,
+         "note": "concat"
+        },
+        {
+         "kind": "sink",
+         "line": 11,
+         "note": "sqlite3.Connection.execute"
+        }
+       ]
+      }
+     ],
+     "errors": [],
+     "id": "unsafe",
+     "label": "Unsafe",
+     "changed": []
+    },
+    {
+     "file": "sql-right.py",
+     "code": "import sqlite3\nfrom flask import Flask, request, jsonify\n\napp = Flask(__name__)\ndb = sqlite3.connect(\"app.db\", check_same_thread=False)\n\n\n@app.route(\"/user\")\ndef user():\n    uid = request.args.get(\"id\", \"\")\n    cur = db.execute(\"SELECT name FROM users WHERE id = ?\", (uid,))\n    return jsonify(cur.fetchall())\n",
+     "status": 0,
+     "out": "0 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: none\n",
+     "findings": [],
+     "errors": [],
+     "id": "right",
+     "label": "Right-class sanitizer",
+     "changed": [
+      11
+     ]
+    },
+    {
+     "file": "sql-wrong.py",
+     "code": "import shlex\nimport sqlite3\nfrom flask import Flask, request, jsonify\n\napp = Flask(__name__)\ndb = sqlite3.connect(\"app.db\", check_same_thread=False)\n\n\n@app.route(\"/user\")\ndef user():\n    uid = shlex.quote(request.args.get(\"id\", \"\"))\n    cur = db.execute(\"SELECT name FROM users WHERE id = \" + uid)\n    return jsonify(cur.fetchall())\n",
+     "status": 1,
+     "out": "[CRITICAL] SL-SQLI-001 A03:2021 CWE-89  sql-wrong.py:12:11\n  SQL built from tainted data\n  flask.request.args reaches sqlite3.Connection.execute without a sanitizer for CWE-89.\n  ┌ source     sql-wrong.py:11  uid = shlex.quote(request.args.get(\"id\", \"\"))  # flask.request.args\n  │ propagate  sql-wrong.py:11  uid = shlex.quote(request.args.get(\"id\", \"\"))  # .get()\n  │ sanitizer  sql-wrong.py:11  uid = shlex.quote(request.args.get(\"id\", \"\"))  # shlex.quote: clears CWE-78\n  │ propagate  sql-wrong.py:11  uid = shlex.quote(request.args.get(\"id\", \"\"))  # assigned to `uid`\n  │ propagate  sql-wrong.py:12  cur = db.execute(\"SELECT name FROM users WHERE id = \" + uid)  # concat\n  └ sink       sql-wrong.py:12  cur = db.execute(\"SELECT name FROM users WHERE id = \" + uid)  # sqlite3.Connection.execute\n  fix: Use parameterized queries: conn.execute('... WHERE id = ?', (user_id,))\n\n1 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+     "findings": [
+      {
+       "rule_id": "SL-SQLI-001",
+       "cwe": "CWE-89",
+       "severity": "critical",
+       "confidence": "high",
+       "title": "SQL built from tainted data",
+       "line": 12,
+       "fix": "Use parameterized queries: conn.execute('... WHERE id = ?', (user_id,))",
+       "route": [
+        {
+         "kind": "source",
+         "line": 11,
+         "note": "flask.request.args"
+        },
+        {
+         "kind": "propagate",
+         "line": 11,
+         "note": ".get()"
+        },
+        {
+         "kind": "sanitizer",
+         "line": 11,
+         "note": "shlex.quote: clears CWE-78"
+        },
+        {
+         "kind": "propagate",
+         "line": 11,
+         "note": "assigned to `uid`"
+        },
+        {
+         "kind": "propagate",
+         "line": 12,
+         "note": "concat"
+        },
+        {
+         "kind": "sink",
+         "line": 12,
+         "note": "sqlite3.Connection.execute"
+        }
+       ]
+      }
+     ],
+     "errors": [],
+     "id": "wrong",
+     "label": "Wrong-class sanitizer",
+     "changed": [
+      1,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cmd",
+   "title": "Command injection",
+   "cwe": "CWE-78",
+   "variants": [
+    {
+     "file": "cmd-unsafe.py",
+     "code": "import subprocess\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/ping\")\ndef ping():\n    try:\n        host = request.args[\"h\"]\n    except KeyError:\n        host = \"localhost\"\n    subprocess.run(\"ping -c 1 \" + host, shell=True)\n    return \"sent\"\n",
+     "status": 1,
+     "out": "[CRITICAL] SL-CMDI-003 A03:2021 CWE-78  cmd-unsafe.py:13:5\n  subprocess with shell=True and tainted command\n  flask.request.args reaches subprocess.run without a sanitizer for CWE-78.\n  ┌ source     cmd-unsafe.py:10  host = request.args[\"h\"]  # flask.request.args\n  │ propagate  cmd-unsafe.py:10  host = request.args[\"h\"]  # assigned to `host`\n  │ propagate  cmd-unsafe.py:13  subprocess.run(\"ping -c 1 \" + host, shell=True)  # concat\n  └ sink       cmd-unsafe.py:13  subprocess.run(\"ping -c 1 \" + host, shell=True)  # subprocess.run\n  fix: Drop shell=True and pass an argument list.\n\n1 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+     "findings": [
+      {
+       "rule_id": "SL-CMDI-003",
+       "cwe": "CWE-78",
+       "severity": "critical",
+       "confidence": "high",
+       "title": "subprocess with shell=True and tainted command",
+       "line": 13,
+       "fix": "Drop shell=True and pass an argument list.",
+       "route": [
+        {
+         "kind": "source",
+         "line": 10,
+         "note": "flask.request.args"
+        },
+        {
+         "kind": "propagate",
+         "line": 10,
+         "note": "assigned to `host`"
+        },
+        {
+         "kind": "propagate",
+         "line": 13,
+         "note": "concat"
+        },
+        {
+         "kind": "sink",
+         "line": 13,
+         "note": "subprocess.run"
+        }
+       ]
+      }
+     ],
+     "errors": [],
+     "id": "unsafe",
+     "label": "Unsafe",
+     "changed": []
+    },
+    {
+     "file": "cmd-right.py",
+     "code": "import shlex\nimport subprocess\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/ping\")\ndef ping():\n    try:\n        host = request.args[\"h\"]\n    except KeyError:\n        host = \"localhost\"\n    subprocess.run(\"ping -c 1 \" + shlex.quote(host), shell=True)\n    return \"sent\"\n",
+     "status": 0,
+     "out": "0 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: none\n",
+     "findings": [],
+     "errors": [],
+     "id": "right",
+     "label": "Right-class sanitizer",
+     "changed": [
+      1,
+      14
+     ]
+    },
+    {
+     "file": "cmd-wrong.py",
+     "code": "import html\nimport subprocess\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/ping\")\ndef ping():\n    try:\n        host = request.args[\"h\"]\n    except KeyError:\n        host = \"localhost\"\n    subprocess.run(\"ping -c 1 \" + html.escape(host), shell=True)\n    return \"sent\"\n",
+     "status": 1,
+     "out": "[CRITICAL] SL-CMDI-003 A03:2021 CWE-78  cmd-wrong.py:14:5\n  subprocess with shell=True and tainted command\n  flask.request.args reaches subprocess.run without a sanitizer for CWE-78.\n  ┌ source     cmd-wrong.py:11  host = request.args[\"h\"]  # flask.request.args\n  │ propagate  cmd-wrong.py:11  host = request.args[\"h\"]  # assigned to `host`\n  │ sanitizer  cmd-wrong.py:14  subprocess.run(\"ping -c 1 \" + html.escape(host), shell=True)  # html.escape: clears CWE-79\n  │ propagate  cmd-wrong.py:14  subprocess.run(\"ping -c 1 \" + html.escape(host), shell=True)  # concat\n  └ sink       cmd-wrong.py:14  subprocess.run(\"ping -c 1 \" + html.escape(host), shell=True)  # subprocess.run\n  fix: Drop shell=True and pass an argument list.\n\n1 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+     "findings": [
+      {
+       "rule_id": "SL-CMDI-003",
+       "cwe": "CWE-78",
+       "severity": "critical",
+       "confidence": "high",
+       "title": "subprocess with shell=True and tainted command",
+       "line": 14,
+       "fix": "Drop shell=True and pass an argument list.",
+       "route": [
+        {
+         "kind": "source",
+         "line": 11,
+         "note": "flask.request.args"
+        },
+        {
+         "kind": "propagate",
+         "line": 11,
+         "note": "assigned to `host`"
+        },
+        {
+         "kind": "sanitizer",
+         "line": 14,
+         "note": "html.escape: clears CWE-79"
+        },
+        {
+         "kind": "propagate",
+         "line": 14,
+         "note": "concat"
+        },
+        {
+         "kind": "sink",
+         "line": 14,
+         "note": "subprocess.run"
+        }
+       ]
+      }
+     ],
+     "errors": [],
+     "id": "wrong",
+     "label": "Wrong-class sanitizer",
+     "changed": [
+      1,
+      14
+     ]
+    }
+   ]
+  },
+  {
+   "id": "html",
+   "title": "Cross-site scripting",
+   "cwe": "CWE-79",
+   "variants": [
+    {
+     "file": "html-unsafe.py",
+     "code": "from flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    return request.args.get(\"name\", \"\").strip()\n",
+     "status": 1,
+     "out": "[HIGH] SL-XSS-004 A03:2021 CWE-79  html-unsafe.py:8:5\n  Reflected XSS: tainted string returned from view\n  flask.request.args reaches __return_http__ without a sanitizer for CWE-79.\n  ┌ source     html-unsafe.py:8  return request.args.get(\"name\", \"\").strip()  # flask.request.args\n  │ propagate  html-unsafe.py:8  return request.args.get(\"name\", \"\").strip()  # .get()\n  └ sink       html-unsafe.py:8  return request.args.get(\"name\", \"\").strip()  # __return_http__\n  fix: Return a rendered template or escape the value with markupsafe.escape().\n\n1 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+     "findings": [
+      {
+       "rule_id": "SL-XSS-004",
+       "cwe": "CWE-79",
+       "severity": "high",
+       "confidence": "high",
+       "title": "Reflected XSS: tainted string returned from view",
+       "line": 8,
+       "fix": "Return a rendered template or escape the value with markupsafe.escape().",
+       "route": [
+        {
+         "kind": "source",
+         "line": 8,
+         "note": "flask.request.args"
+        },
+        {
+         "kind": "propagate",
+         "line": 8,
+         "note": ".get()"
+        },
+        {
+         "kind": "sink",
+         "line": 8,
+         "note": "__return_http__"
+        }
+       ]
+      }
+     ],
+     "errors": [],
+     "id": "unsafe",
+     "label": "Unsafe",
+     "changed": []
+    },
+    {
+     "file": "html-right.py",
+     "code": "from flask import Flask, request\nfrom markupsafe import escape\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    return escape(request.args.get(\"name\", \"\").strip())\n",
+     "status": 0,
+     "out": "0 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: none\n",
+     "findings": [],
+     "errors": [],
+     "id": "right",
+     "label": "Right-class sanitizer",
+     "changed": [
+      2,
+      9
+     ]
+    },
+    {
+     "file": "html-wrong.py",
+     "code": "import shlex\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    name = shlex.quote(request.args.get(\"name\", \"\").strip())\n    return name\n",
+     "status": 1,
+     "out": "[HIGH] SL-XSS-004 A03:2021 CWE-79  html-wrong.py:10:5\n  Reflected XSS: tainted string returned from view\n  flask.request.args reaches __return_http__ without a sanitizer for CWE-79.\n  ┌ source     html-wrong.py:9  name = shlex.quote(request.args.get(\"name\", \"\").strip())  # flask.request.args\n  │ propagate  html-wrong.py:9  name = shlex.quote(request.args.get(\"name\", \"\").strip())  # .get()\n  │ sanitizer  html-wrong.py:9  name = shlex.quote(request.args.get(\"name\", \"\").strip())  # shlex.quote: clears CWE-78\n  │ propagate  html-wrong.py:9  name = shlex.quote(request.args.get(\"name\", \"\").strip())  # assigned to `name`\n  └ sink       html-wrong.py:10  return name  # __return_http__\n  fix: Return a rendered template or escape the value with markupsafe.escape().\n\n1 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+     "findings": [
+      {
+       "rule_id": "SL-XSS-004",
+       "cwe": "CWE-79",
+       "severity": "high",
+       "confidence": "high",
+       "title": "Reflected XSS: tainted string returned from view",
+       "line": 10,
+       "fix": "Return a rendered template or escape the value with markupsafe.escape().",
+       "route": [
+        {
+         "kind": "source",
+         "line": 9,
+         "note": "flask.request.args"
+        },
+        {
+         "kind": "propagate",
+         "line": 9,
+         "note": ".get()"
+        },
+        {
+         "kind": "sanitizer",
+         "line": 9,
+         "note": "shlex.quote: clears CWE-78"
+        },
+        {
+         "kind": "propagate",
+         "line": 9,
+         "note": "assigned to `name`"
+        },
+        {
+         "kind": "sink",
+         "line": 10,
+         "note": "__return_http__"
+        }
+       ]
+      }
+     ],
+     "errors": [],
+     "id": "wrong",
+     "label": "Wrong-class sanitizer",
+     "changed": [
+      1,
+      9,
+      10
+     ]
+    }
+   ]
+  }
+ ],
+ "extra": [
+  {
+   "file": "html-wrong-direct.py",
+   "code": "import shlex\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n\n@app.route(\"/hello\")\ndef hello():\n    return shlex.quote(request.args.get(\"name\", \"\").strip())\n",
+   "status": 0,
+   "out": "0 finding(s) in 1 file(s), 2 function(s) summarized\nby OWASP: none\n",
+   "findings": [],
+   "errors": []
+  }
+ ]
+}

@@ -20,13 +20,6 @@
   "sha": "5bb0856",
   "workflow": "emulate-windows"
  },
- "42920168878": {
-  "conclusion": "success",
-  "date": "2026-11-10",
-  "repo": "sinkline",
-  "sha": "9a36ba2",
-  "workflow": "ci"
- },
  "42922880036": {
   "conclusion": "success",
   "date": "2026-11-10",
@@ -116,6 +109,20 @@
   "date": "2026-11-11",
   "repo": "fuzzdiff",
   "sha": "22c4034",
+  "workflow": "ci"
+ },
+ "43033758686": {
+  "conclusion": "success",
+  "date": "2026-11-11",
+  "repo": "sinkline",
+  "sha": "9c58efd",
+  "workflow": "report"
+ },
+ "43033758810": {
+  "conclusion": "success",
+  "date": "2026-11-11",
+  "repo": "sinkline",
+  "sha": "9c58efd",
   "workflow": "ci"
  }
 }

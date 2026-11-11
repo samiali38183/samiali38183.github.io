@@ -1,0 +1,12 @@
+[CRITICAL] SL-CMDI-003 A03:2021 CWE-78  cmd-wrong.py:14:5
+  subprocess with shell=True and tainted command
+  flask.request.args reaches subprocess.run without a sanitizer for CWE-78.
+  ┌ source     cmd-wrong.py:11  host = request.args["h"]  # flask.request.args
+  │ propagate  cmd-wrong.py:11  host = request.args["h"]  # assigned to `host`
+  │ sanitizer  cmd-wrong.py:14  subprocess.run("ping -c 1 " + html.escape(host), shell=True)  # html.escape: clears CWE-79
+  │ propagate  cmd-wrong.py:14  subprocess.run("ping -c 1 " + html.escape(host), shell=True)  # concat
+  └ sink       cmd-wrong.py:14  subprocess.run("ping -c 1 " + html.escape(host), shell=True)  # subprocess.run
+  fix: Drop shell=True and pass an argument list.
+
+1 finding(s) in 1 file(s), 2 function(s) summarized
+by OWASP: A03:2021 Injection: 1
