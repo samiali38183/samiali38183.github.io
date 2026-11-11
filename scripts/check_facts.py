@@ -66,6 +66,7 @@ def main() -> int:
     ap.add_argument("--clones", required=True)
     ap.add_argument("--venv", action="append", default=[])
     ap.add_argument("--go", default="go")
+    ap.add_argument("--only", choices=["sinkline"], help="run only the sinkline checks (when the other toolchains are not installed)")
     a = ap.parse_args()
     clones = Path(a.clones)
     venvs = dict(v.split("=", 1) for v in a.venv)
@@ -73,47 +74,50 @@ def main() -> int:
     # Release tags from the GitHub API.
     for repo, page in [("tripline", "projects/tripline/index.html"), ("sinkline", "projects/sinkline/index.html"),
                        ("kevgate", "projects/kevgate/index.html")]:
+        if a.only and repo != a.only:
+            continue
         tag = gh(f"repos/samiali38183/{repo}/releases/latest")["tag_name"]
         expect(f"{repo} latest release", tag, page)
         expect(f"{repo} latest release on home", tag, "index.html")
 
     # tripline
-    t = clones / "tripline"
-    sc = json.loads((t / "docs" / "scorecard.json").read_text(encoding="utf-8"))["totals"]
-    expect("tripline gate", f"{sc['passed']} passed, {sc['failed']} failed, {sc['pending']} pending", "projects/tripline/index.html")
-    expect("tripline scenarios", str(sc["scenarios"]), "projects/tripline/index.html", f"{sc['scenarios']} scenarios")
-    pct = round(sc["weighted_coverage"] * 100)
-    expect("tripline weighted coverage", f"{pct}%", "projects/tripline/index.html")
-    out = run([pybin(venvs, "tripline", "tripline"), "replay", "--all"], t)
-    ps = len(re.findall(r"^\[\s+PASS\]", out, re.M))
-    pe = len(re.findall(r"^\[PENDING\]", out, re.M))
-    results.append((ps == sc["passed"] and pe == sc["pending"] and "gate passed" in out,
-                    f"tripline replay --all output: {ps} PASS, {pe} PENDING, gate passed={'gate passed' in out}"))
-    n = collected(pybin(venvs, "tripline", "python"), t)
-    expect("tripline tests (pytest collection)", str(n), "projects/tripline/index.html", f"{n} (89%")
-    expect("tripline 0 of 36 on home", "0 of 36", "index.html")
-    expect("tripline tests on resume page", str(n), "resume/index.html", f"{n} tests")
-    code = (
-        "from pathlib import Path\n"
-        "from tripline.engine.rules import load_rules, evaluate\n"
-        "from tripline.replay import load_fixture_events\n"
-        "from tripline.scenarios import load_scenarios\n"
-        "root=Path('.')\n"
-        "sc={s.id:s for s in load_scenarios(root/'scenarios')}['t1548-001-setuid-setgid']\n"
-        "ev=load_fixture_events(sc,root)\n"
-        "rs={r.id:r for r in load_rules(root/'rules'/'sigma').rules}\n"
-        "for rid in ('c21c4eaa-ba2e-419a-92b2-8371703cbe21','7f3c2b1a-6d4e-4a9b-9c8d-1e2f3a4b5c6d'):\n"
-        "    res=[evaluate(rs[rid],e) for e in ev]\n"
-        "    print(sum(x is not None for x in res), sum(x is True for x in res))\n"
-    )
-    o = run([pybin(venvs, "tripline", "python"), "-c", code], t).split()
-    if len(o) == 4:
-        expect("tripline stock rule hits", f"{o[1]} of {o[0]}", "projects/tripline/index.html")
-        expect("tripline replacement rule hits", f"{o[3]} of {o[2]}", "projects/tripline/index.html")
-    else:
-        results.append((False, f"tripline F-001 derivation failed: {o}"))
+    if not a.only:
+        t = clones / "tripline"
+        sc = json.loads((t / "docs" / "scorecard.json").read_text(encoding="utf-8"))["totals"]
+        expect("tripline gate", f"{sc['passed']} passed, {sc['failed']} failed, {sc['pending']} pending", "projects/tripline/index.html")
+        expect("tripline scenarios", str(sc["scenarios"]), "projects/tripline/index.html", f"{sc['scenarios']} scenarios")
+        pct = round(sc["weighted_coverage"] * 100)
+        expect("tripline weighted coverage", f"{pct}%", "projects/tripline/index.html")
+        out = run([pybin(venvs, "tripline", "tripline"), "replay", "--all"], t)
+        ps = len(re.findall(r"^\[\s+PASS\]", out, re.M))
+        pe = len(re.findall(r"^\[PENDING\]", out, re.M))
+        results.append((ps == sc["passed"] and pe == sc["pending"] and "gate passed" in out,
+                        f"tripline replay --all output: {ps} PASS, {pe} PENDING, gate passed={'gate passed' in out}"))
+        n = collected(pybin(venvs, "tripline", "python"), t)
+        expect("tripline tests (pytest collection)", str(n), "projects/tripline/index.html", f"{n} (89%")
+        expect("tripline 0 of 36 on home", "0 of 36", "index.html")
+        expect("tripline tests on resume page", str(n), "resume/index.html", f"{n} tests")
+        code = (
+            "from pathlib import Path\n"
+            "from tripline.engine.rules import load_rules, evaluate\n"
+            "from tripline.replay import load_fixture_events\n"
+            "from tripline.scenarios import load_scenarios\n"
+            "root=Path('.')\n"
+            "sc={s.id:s for s in load_scenarios(root/'scenarios')}['t1548-001-setuid-setgid']\n"
+            "ev=load_fixture_events(sc,root)\n"
+            "rs={r.id:r for r in load_rules(root/'rules'/'sigma').rules}\n"
+            "for rid in ('c21c4eaa-ba2e-419a-92b2-8371703cbe21','7f3c2b1a-6d4e-4a9b-9c8d-1e2f3a4b5c6d'):\n"
+            "    res=[evaluate(rs[rid],e) for e in ev]\n"
+            "    print(sum(x is not None for x in res), sum(x is True for x in res))\n"
+        )
+        o = run([pybin(venvs, "tripline", "python"), "-c", code], t).split()
+        if len(o) == 4:
+            expect("tripline stock rule hits", f"{o[1]} of {o[0]}", "projects/tripline/index.html")
+            expect("tripline replacement rule hits", f"{o[3]} of {o[2]}", "projects/tripline/index.html")
+        else:
+            results.append((False, f"tripline F-001 derivation failed: {o}"))
 
-    # sinkline
+    # sinkline (the clone must be at the v0.5.0 tag or main at that commit)
     s = clones / "sinkline"
     py = pybin(venvs, "sinkline", "python")
     sco = run([py, "bench/score.py"], s)
@@ -122,7 +126,6 @@ def main() -> int:
         tp, fp, fn, tn, p_, r_, f1 = m.groups()
         expect("sinkline benchmark counts", f"TP {tp}, FP {fp}, FN {fn}, TN {tn}", "projects/sinkline/index.html")
         expect("sinkline benchmark P/R/F1", f"{p_} {r_} {f1}", "projects/sinkline/index.html", f"P {p_}, R {r_}, F1 {f1}")
-        expect("sinkline F1 on home", f1, "index.html", f"F1 {f1}")
         lab = re.search(r"corpus: (\d+) labeled lines", sco)
         expect("sinkline corpus size", lab.group(1), "projects/sinkline/index.html", f"{lab.group(1)} lines")
     else:
@@ -132,7 +135,6 @@ def main() -> int:
     if m:
         tp, fp, fn, tn, p_, r_, f1 = m.groups()
         expect("bandit benchmark", f"TP {tp}, FP {fp}, FN {fn}, TN {tn}", "projects/sinkline/index.html")
-        expect("bandit F1 on home", f1, "index.html", f"vs {f1}")
     else:
         results.append((False, "sinkline compare_bandit output not parsed"))
     n = collected(py, s)
@@ -141,6 +143,75 @@ def main() -> int:
     m = re.search(r"(\d+) rules, (\d+) sink signatures", rules)
     if m:
         expect("sinkline rules and sinks", m.group(0), "projects/sinkline/index.html", f"{m.group(1)} rules, {m.group(2)} sink signatures")
+
+    # sinkline external benchmark (OWASP BenchmarkPython v0.1): the committed per-category results, and the self-labeled gate
+    ext = s / "bench" / "external" / "results"
+    res = {}
+    for label in ("v0.4.1", "v0.5.0"):
+        res[label] = {(r["tool"], r["category"]): tuple(int(r[k]) for k in ("TP", "FN", "FP", "TN"))
+                      for r in csv.DictReader((ext / label / "summary.csv").open(encoding="utf-8"))}
+
+    def rates(c):
+        tp, fn, fp, tn = c
+        tpr, fpr = tp / (tp + fn), fp / (fp + tn)
+        return tpr, fpr, tpr - fpr
+
+    page = "projects/sinkline/index.html"
+    for label, tool, cat in [("v0.4.1", "sinkline", "taint categories (10)"), ("v0.5.0", "sinkline", "taint categories (10)"),
+                             ("v0.4.1", "sinkline", "all categories (14)"), ("v0.5.0", "bandit", "all categories (14)"),
+                             ("v0.5.0", "semgrep", "all categories (14)")]:
+        tp, fn, fp, tn = res[label][(tool, cat)]
+        expect(f"external {tool} {label} {cat} counts", f"TP {tp}, FN {fn}, FP {fp}, TN {tn}", page)
+    for label, tool, cat in [("v0.4.1", "sinkline", "taint categories (10)"), ("v0.5.0", "sinkline", "taint categories (10)"),
+                             ("v0.5.0", "bandit", "taint categories (10)"), ("v0.5.0", "semgrep", "taint categories (10)")]:
+        tpr, fpr, sc = rates(res[label][(tool, cat)])
+        needle = f"TPR {tpr:.2f}, FPR {fpr:.2f}, {sc:+.2f}" if (label, tool) == ("v0.5.0", "sinkline") else f"{tpr:.2f}, {fpr:.2f}, {sc:+.2f}"
+        expect(f"external {tool} {label} taint TPR/FPR/score on the page", needle, page)
+    # every cell of the per-category table, computed from counts (not from the README, which rounds twice)
+    cats = sorted({c for (_t, c) in res["v0.5.0"]})
+    bad = []
+    for cat in cats:
+        cells = [res["v0.4.1"][("sinkline", cat)], res["v0.5.0"][("sinkline", cat)], res["v0.5.0"][("bandit", cat)], res["v0.5.0"][("semgrep", cat)]]
+        for c in cells:
+            tpr, fpr, sc = rates(c)
+            if f"{tpr:.2f} / {fpr:.2f} / {sc:+.2f}" not in text_of(page):
+                bad.append((cat, c))
+    results.append((not bad, f"sinkline per-category table: {len(cats) * 4} cells recomputed from bench/external/results counts; mismatches: {bad}"))
+    for tool in ("bandit", "semgrep"):
+        same = all(res["v0.4.1"][(tool, c)] == res["v0.5.0"][(tool, c)] for c in cats)
+        results.append((same, f"external {tool} results identical in v0.4.1 and v0.5.0 result sets"))
+    reals = {c: res["v0.5.0"][("sinkline", c)][0] + res["v0.5.0"][("sinkline", c)][1] for c in cats}
+    safes = {c: res["v0.5.0"][("sinkline", c)][2] + res["v0.5.0"][("sinkline", c)][3] for c in cats}
+    expect("taint categories real / safe", f"{reals['taint categories (10)']} vulnerable, {safes['taint categories (10)']} safe", page,
+           f"{reals['taint categories (10)']} vulnerable cases and {safes['taint categories (10)']} safe ones")
+    expect("no-check categories real total", str(sum(reals[c] for c in ("hash", "weakrand", "securecookie", "trustbound"))), page, "0 of 212 vulnerable cases")
+    expect("sinkline 0.4.1 LDAP and XPath cases reported", "ldapi 0 of 16, xpathi 5 of 51", page, "LDAP 0 of 16, XPath 5 of 51")
+    tp, fn, _fp, _tn = res["v0.4.1"][("sinkline", "xpathi")]
+    results.append((tp == 5 and tp + fn == 51 and res["v0.4.1"][("sinkline", "ldapi")][0] == 0 and sum(res["v0.4.1"][("sinkline", "ldapi")][:2]) == 16,
+                    f"LDAP/XPath 0.4.1 counts in results: xpathi {tp} of {tp + fn}"))
+    # BenchmarkPython pin and benchmark README facts
+    readme = (s / "bench" / "external" / "README.md").read_text(encoding="utf-8")
+    results.append(("f1291485808b66e20ddb6b01b10dc71b3df8c8ba" in readme and "1,230" in readme,
+                    "bench/external/README.md pins BenchmarkPython f1291485 and 1,230 cases"))
+    expect("BenchmarkPython pin (short) on the page", "f129148", page)
+    expect("sinkline home reading", "+0.21 to +0.52", "index.html")
+    expect("sinkline release v0.5.0 commit", run(["git", "rev-list", "-n1", "v0.5.0"], s).strip()[:7], page)
+
+    # sinkline Sanitizer switch: stored data against the committed captures (the CLI re-run is capture_sinkline_bench.py --check)
+    bench = json.loads((SITE / "assets" / "data" / "bench-sinkline.json").read_text(encoding="utf-8"))
+    pv = bench["provenance"]
+    results.append((pv["version"] == "0.5.0" and run([pybin(venvs, "sinkline", "sinkline"), "--version"], s).strip() == "sinkline 0.5.0",
+                    f"sanitizer-switch captures are from sinkline {pv['version']}; installed CLI matches"))
+    expect("sanitizer-switch caption version and commit", f"{pv['version']} {pv['commit']}", page, f"sinkline {pv['version']}, tag v{pv['version']}, commit {pv['commit']}")
+    nodes = run(["node", str(SITE / "scripts" / "test_bench_sinkline.mjs")], SITE).strip()
+    results.append(("checks passed" in nodes, f"node scripts/test_bench_sinkline.mjs: {nodes}"))
+
+    if a.only == "sinkline":
+        all_html = "".join(p.read_text(encoding="utf-8") for p in SITE.rglob("*.html") if "content" not in p.parts)
+        for repo, rid in sorted(set(re.findall(r"github\.com/samiali38183/(sinkline)/actions/runs/(\d+)", all_html))):
+            r = gh(f"repos/samiali38183/{repo}/actions/runs/{rid}")
+            results.append((r.get("conclusion") == "success", f"CI run {repo}/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
+        return report()
 
     # kevgate
     k = clones / "kevgate"
@@ -239,6 +310,10 @@ def main() -> int:
         else:
             results.append((False, f"fuzzdiff libFuzzer {tgt}: log line not found"))
 
+    return report()
+
+
+def report() -> int:
     bad = 0
     for ok, msg in results:
         print(("PASS  " if ok else "FAIL  ") + msg)
