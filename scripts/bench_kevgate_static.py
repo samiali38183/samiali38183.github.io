@@ -177,9 +177,11 @@ def lane_svg(items: list[tuple], n: int, first_letter: int) -> tuple[str, list[t
     for i, item in enumerate(items):
         kind = item[0]
         if kind == "lane":
-            tl, sl = C.wrap(item[1], 30), C.wrap(item[2], 40)
-            parts.append(f'<text x="{x0 - 14}" y="{y + 14}" font-weight="600" font-size="14" text-decoration="underline">{C.esc(tl[0])}</text>')
-            y += 20
+            tl, sl = C.wrap(item[1], 36), C.wrap(item[2], 40)
+            for ln in tl:
+                parts.append(f'<text x="{x0 - 14}" y="{y + 14}" font-weight="600" font-size="14" text-decoration="underline">{C.esc(ln)}</text>')
+                y += 18
+            y += 2
             for ln in sl:
                 parts.append(f'<text class="sub" x="{x0 - 14}" y="{y + 12}" font-size="12">{C.esc(ln)}</text>')
                 y += 15

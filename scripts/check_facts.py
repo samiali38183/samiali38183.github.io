@@ -368,12 +368,58 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
         results.append((r.get("conclusion") == "success", f"CI run {repo}/{rid2}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
 
 
+def kevgate_checks(clones: Path, venvs: dict[str, str]) -> None:
+    """kevgate v0.1.1 sheet: tests, coverage, tag commit, mutants, latest main runs, release image, matrix data and page."""
+    page = "projects/kevgate/index.html"
+    k = clones / "kevgate"
+    py = pybin(venvs, "kevgate", "python")
+    tag = gh("repos/samiali38183/kevgate/releases/latest")["tag_name"]
+    expect("kevgate latest release", tag, page)
+    expect("kevgate latest release on home", tag, "index.html")
+    tagsha = run(["git", "rev-list", "-n1", tag], k).strip()
+    expect("kevgate tag commit", tagsha[:7], page)
+    n = collected(py, k)
+    expect("kevgate tests", str(n), page, f"{n} collected")
+    expect("kevgate tests on resume page", str(n), "resume/index.html", f"{n} tests")
+    cov = run([py, "-m", "pytest", "--cov", "-p", "no:cacheprovider"], k)
+    m = re.search(r"Total coverage: ([\d.]+)%", cov)
+    results.append((bool(m) and f"{n} passed" in cov, f"kevgate pytest --cov: {n} passed, coverage {m.group(1) if m else '?'}%"))
+    if m:
+        expect("kevgate coverage", m.group(1) + "%", page)
+    for tool, cmd in (("ruff check", [py, "-m", "ruff", "check", "."]), ("mypy --strict src", [py, "-m", "mypy", "--strict", "src"])):
+        p = subprocess.run(cmd, cwd=k, capture_output=True, text=True)
+        results.append((p.returncode == 0, f"kevgate {tool} exit {p.returncode}"))
+    # latest push runs on main per workflow: the page links the latest green one
+    for wf in ("ci", "security", "deploy-kind", "terraform"):
+        runs = gh(f"repos/samiali38183/kevgate/actions/workflows/{wf}.yml/runs?branch=main&event=push&per_page=1")["workflow_runs"]
+        rid = str(runs[0]["id"])
+        results.append((runs[0]["conclusion"] == "success", f"kevgate latest {wf} run on main {rid}: {runs[0]['conclusion']} sha {runs[0]['head_sha'][:7]}"))
+        expect(f"kevgate latest {wf} run on the page", rid, page, f"run {rid}")
+    rel = gh("repos/samiali38183/kevgate/actions/runs/42960813836")
+    results.append((rel["conclusion"] == "success" and rel["head_branch"] == tag, f"kevgate release run 42960813836: {rel['conclusion']} on {rel['head_branch']}"))
+    mut = subprocess.run([sys.executable, str(SITE / "scripts" / "rerun_kevgate_mutants.py"), "--clone", str(k), "--python", py], capture_output=True, text=True)
+    results.append((mut.returncode == 0, "rerun_kevgate_mutants.py: " + (mut.stdout.strip().splitlines() or ["no output"])[-1]))
+    cap = subprocess.run([sys.executable, str(SITE / "scripts" / "capture_kevgate_bench.py"), "--check", "--clone", str(k), "--venv", str(Path(py).parent.parent)],
+                         capture_output=True, text=True)
+    results.append((cap.returncode == 0, "capture_kevgate_bench.py --check: " + (cap.stdout.strip().splitlines() or [cap.stderr[-120:]])[-1]))
+    nd = subprocess.run(["node", str(SITE / "scripts" / "test_bench_kevgate.mjs")], capture_output=True, text=True)
+    results.append((nd.returncode == 0, "test_bench_kevgate.mjs: " + (nd.stdout.strip().splitlines() or [nd.stderr[:120]])[-1]))
+    data = json.loads((SITE / "assets/data/kevgate-bench.json").read_text(encoding="utf-8"))
+    expect("kevgate matrix control count", str(len(data["controls"])), page, f"Every one of {len(data['controls'])} controls")
+    expect("kevgate matrix cited tests", str(data["meta"]["tests_cited"]), page, f"{data['meta']['tests_cited']} cited tests")
+    expect("kevgate matrix collected tests", str(data["meta"]["tests_total"]), page, f"of {data['meta']['tests_total']} collected")
+    all_html = "".join(x.read_text(encoding="utf-8") for x in SITE.rglob("*.html") if "content" not in x.parts)
+    for rid in sorted(set(re.findall(r"github\.com/samiali38183/kevgate/actions/runs/(\d+)", all_html))):
+        r = gh(f"repos/samiali38183/kevgate/actions/runs/{rid}")
+        results.append((r.get("conclusion") == "success", f"CI run kevgate/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--clones", required=True)
     ap.add_argument("--venv", action="append", default=[])
     ap.add_argument("--go", default="go")
-    ap.add_argument("--only", choices=["sinkline", "tripline", "kev", "fuzzdiff", "admit", "vulnlab"], help="run only one project's checks (when the other toolchains are not installed)")
+    ap.add_argument("--only", choices=["sinkline", "tripline", "kev", "fuzzdiff", "admit", "vulnlab", "kevgate"], help="run only one project's checks (when the other toolchains are not installed)")
     a = ap.parse_args()
     clones = Path(a.clones)
     venvs = dict(v.split("=", 1) for v in a.venv)
@@ -399,6 +445,9 @@ def main() -> int:
         return report()
     if a.only == "vulnlab":
         vulnlab_checks(clones, venvs)
+        return report()
+    if a.only == "kevgate":
+        kevgate_checks(clones, venvs)
         return report()
 
     # tripline
@@ -583,6 +632,7 @@ def main() -> int:
     # fuzzdiff (Rust). Needs cargo, cargo-llvm-cov, node.
     fuzzdiff_checks(clones)
     vulnlab_checks(clones, venvs)
+    kevgate_checks(clones, venvs)
 
     return report()
 
