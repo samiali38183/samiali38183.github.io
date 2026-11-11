@@ -112,6 +112,19 @@ def main() -> int:
         expect("tripline replacement rule hits", f"{o[3]} of {o[2]}", "projects/tripline/index.html")
     else:
         results.append((False, f"tripline F-001 derivation failed: {o}"))
+    # tripline Rule bench: data file against the clone's rule YAML and the page text
+    import yaml
+    bd = json.loads((SITE / "assets/data/bench-tripline.json").read_text(encoding="utf-8"))
+    ys = yaml.safe_load((t / bd["meta"]["stock"]["file"]).read_text(encoding="utf-8"))["detection"]
+    yc = yaml.safe_load((t / bd["meta"]["custom"]["file"]).read_text(encoding="utf-8"))["detection"]
+    same = (bd["stock"]["perm"] == ys["selection_perm"]["CommandLine|contains"]
+            and bd["stock"]["root"] == [ys["selection_root"]["CommandLine|contains"]]
+            and bd["custom"] == {"image": yc["selection_image"]["Image|endswith"], "symbolic": yc["selection_symbolic"]["CommandLine|re"],
+                                 "octal": yc["selection_octal"]["CommandLine|re"], "filter": yc["filter_tmp_runner"]["CommandLine|re"]})
+    results.append((same, "bench rule patterns equal the YAML in the tripline clone"))
+    ev = bd["events"]
+    results.append((len(ev) == 36 and sum(e["s"] for e in ev) == 0 and sum(e["r"] for e in ev) == 2, "bench events: 36, stock 0, replacement 2"))
+    expect("bench parity cases", str(bd["meta"]["parity_cases"]), "projects/tripline/index.html", f"on {bd['meta']['parity_cases']} command lines")
 
     # sinkline
     s = clones / "sinkline"
