@@ -200,3 +200,120 @@ def kev_snapshot_plate() -> str:
            f'KEV catalog {esc(m["kev_catalog"])}, EPSS file {esc(m["epss_date"])}, model {esc(m["epss_model"])}.')
     return (f'<figure class="plate snap"><span class="plate-label">Plate {{{{n}}}}</span><div class="snapfig">{svg}</div>{table}'
             f'<figcaption>{cap}</figcaption></figure>')
+
+# ---------------------------------------------------------------------------------------------
+# kevgate-admit: Admission desk (no-JS state), evidence lookup path, from assets/data/admission-bench.json.
+# The file is written by scripts/capture_admission_bench.py from a running kevgate-admit; this only formats it.
+# ---------------------------------------------------------------------------------------------
+def _admit() -> dict:
+    return json.loads((ROOT / "assets/data/admission-bench.json").read_text(encoding="utf-8"))
+
+
+_ADMIT_STAMP = {"allowed": ("pass", "Allowed"), "denied": ("fail", "Denied"), "warned": ("limit", "Allowed with warning")}
+
+
+def _admit_rules(rec: dict) -> str:
+    if rec["decision"] == "denied":
+        return "Rule fired: " + ", ".join(rec["rules"])
+    if rec["decision"] == "warned":
+        return "Would have fired, admitted in audit mode: " + ", ".join(rec["rules"])
+    return "No rule fired"
+
+
+def _admit_text(rec: dict) -> str:
+    r = rec["raw"]["response"]
+    parts = []
+    msg = (r.get("status") or {}).get("message", "")
+    if msg:
+        parts.append(msg)
+    parts += r.get("warnings") or []
+    return "\n".join(parts) if parts else "(no message, no warnings)"
+
+
+def _admit_rows(d: dict, recs: list[dict], first: str) -> str:
+    rows = []
+    for rec in recs:
+        img = next(i for i in d["images"] if i["id"] == rec["image"])
+        if first == "policy":
+            other = next(p for p in d["policies"] if p["id"] == rec["policy"])["label"]
+        else:
+            other = next(s for s in d["signed"]["states"] if s["id"] == rec["state"])["label"]
+        kind, word = _ADMIT_STAMP[rec["decision"]]
+        rows.append(
+            f'<tr><th scope="row">{esc(img["label"])}</th><td>{esc(other)}</td>'
+            f'<td>{C.stamp(kind, word)}<p>{esc(_admit_rules(rec))}</p></td>'
+            f'<td><code class="ad-msg">{esc(_admit_text(rec))}</code></td></tr>')
+    return "".join(rows)
+
+
+def admit_static() -> str:
+    d = _admit()
+    pv = d["provenance"]
+    n1, n2 = len(d["results"]), len(d["signed"]["results"])
+    head = ('<thead><tr><th scope="col">Workload image</th><th scope="col">{}</th><th scope="col">Result</th>'
+            '<th scope="col">Text the webhook returned (denial message, or warnings)</th></tr></thead>')
+    t1 = (f'<div class="scroll"><table class="tbl wt"><caption>{n1} recorded responses: {len(d["images"])} images in {len(d["policies"])} namespace scopes '
+          f'(policy deploy/demo/policy.yaml)</caption>' + head.format("Namespace policy")
+          + "<tbody>" + _admit_rows(d, d["results"], "policy") + "</tbody></table></div>")
+    t2 = (f'<h3 class="ad-h">Signed evidence</h3><p class="sw-lead">The same webhook with <code>requireSignedEvidence: true</code> and an Ed25519 key. '
+          f'{n2} recorded responses for three states of the report store.</p>'
+          f'<div class="scroll"><table class="tbl wt"><caption>{n2} recorded responses with signed evidence required</caption>'
+          + head.format("Report store") + "<tbody>" + _admit_rows(d, d["signed"]["results"], "state") + "</tbody></table></div>")
+    s = d["scanner"]
+    p = s["parser"]
+    srows = "".join(
+        f'<tr><th scope="row">{esc(f["ID"])}</th><td>{esc(f["Package"])}</td><td>{esc(f["Installed"])}</td><td>{esc(f["Fixed"] or "no fix")}</td>'
+        f'<td>{esc(f["Severity"])}</td><td class="num">{f["CVSS"]}</td><td class="num">{"none" if f["EPSS"] is None else f["EPSS"]}</td>'
+        f'<td class="num">{f["Risk"]:.1f}</td></tr>' for f in p["findings"])
+    t3 = (f'<h3 class="ad-h">Scanner report</h3><p class="sw-lead">Trivy {esc(s["trivy"])} report for {esc(p["artifact"])} ({esc(s["target"])}): '
+          f'{s["raw_entries"]} vulnerability entries, parsed by the webhook\'s own parser into {len(p["findings"])} findings.</p>'
+          '<div class="scroll"><table class="tbl wt"><caption>Findings as parsed by trivy.Parse</caption>'
+          '<thead><tr><th scope="col">CVE</th><th scope="col">Package</th><th scope="col">Installed</th><th scope="col">Fixed in</th>'
+          '<th scope="col">Severity</th><th scope="col" class="num">CVSS</th><th scope="col" class="num">EPSS</th><th scope="col" class="num">Risk</th></tr></thead>'
+          f'<tbody>{srows}</tbody></table></div>'
+          f'<p class="sw-lead">{esc(s["scored_with"])}. Fixture: <code>{esc(s["fixture"])}</code>, {s["bytes"]} bytes.</p>')
+    lead = ('<p class="sw-lead">Recorded, not live. All responses are listed here; with JavaScript on, a desk shows one at a time. '
+            f'Risk formula: <code>{esc(pv["formula"])}</code>.</p>')
+    return lead + t1 + t2 + t3
+
+
+def admit_caption() -> str:
+    pv = _admit()["provenance"]
+    return (
+        "<b>The same image is denied where the namespace enforces, only warned about where it audits, and a malformed reference is rejected "
+        "before any report is looked up.</b> "
+        f"Recorded, not live: every result is the raw AdmissionReview response of <code>{esc(pv['tool'])}</code> {esc(pv['tag'])} "
+        f"(commit {esc(pv['commit'][:7])}, {esc(pv['go'])}), started with <code>{esc(pv['command'])}</code> and sent one POST per pair, {esc(pv['captured'])}. "
+        "The page evaluates no policy; the desk only chooses which recorded response to show. "
+        "Synthetic demo data and test output, not a cluster run. Regenerate with <code>python scripts/capture_admission_bench.py</code>; "
+        "<code>node scripts/test_bench_admission.mjs</code> checks that the page shows exactly the stored responses.")
+
+
+# The six steps of the evidence lookup path. Every identifier is checked against the clone by capture_admission_bench.py (NAMES).
+ADMIT_PATH = [
+    ("Image digest", "The reference is parsed under the OCI grammar and never resolved. A tag has no digest, so the lookup stops there and requireDigest fires.",
+     ["admission.Extract", "imageref.Parse", "Ref.Pinned"]),
+    ("Report file", "The digest becomes the file name sha256-HEX.json. The lookup is bounded by a timeout and a concurrency cap.",
+     ["evidence.FileName", "DirProvider.Lookup", "Handler.lookupBounded"]),
+    ("Parse and check", "Findings are de-duplicated by CVE id and validated. A report naming another digest is refused. With signed evidence the signature is verified over digest plus bytes.",
+     ["trivy.ParseReader", "DirProvider.checkSignature", "Verifier.Verify"]),
+    ("Score", "Each finding gets a 0 to 100 risk from CVSS, EPSS, asset criticality and KEV membership.",
+     ["risk.Score", "evaluator.findings"]),
+    ("Policy rules", "The namespace picks the rule set. Registry list, digest, evidence, signed evidence, denyKev and maxRisk are applied in that order.",
+     ["Policy.RuleFor", "Policy.Evaluate"]),
+    ("Verdict", "The decision becomes an AdmissionResponse: denied with a message, allowed, or allowed with warnings in audit mode.",
+     ["Handler.Review", "Decision.Message", "Decision.ResponseWarnings"]),
+]
+
+
+def admit_path() -> str:
+    items = "".join(
+        f'<li><span class="ap-n" aria-hidden="true">{chr(65 + i)}</span><b>{esc(t)}</b><span class="ap-d">{esc(desc)}</span>'
+        f'<span class="ap-c">{" ".join("<code>" + esc(n) + "</code>" for n in names)}</span></li>'
+        for i, (t, desc, names) in enumerate(ADMIT_PATH))
+    return ('<figure class="plate admit-path"><span class="plate-label">Plate {{n}}</span>'
+            f'<ol class="ap" aria-label="Evidence lookup path, six steps">{items}</ol>'
+            '<figcaption><b>From an image digest to a verdict, in six steps.</b> The names are Go identifiers in kevgate-admit v0.1.0, '
+            'each checked against the tagged source by the capture script; the packages are <code>internal/admission</code>, <code>imageref</code>, '
+            '<code>evidence</code>, <code>evsign</code>, <code>trivy</code>, <code>risk</code> and <code>policy</code>. '
+            'Formula: <code>risk = 100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>, rounded to one decimal.</figcaption></figure>')

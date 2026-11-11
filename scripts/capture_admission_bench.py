@@ -71,11 +71,11 @@ IMAGES = [
      "what": "A path with a dot segment. Earlier builds accepted it; the strict OCI-grammar parser rejects it."},
 ]
 POLICIES = [
-    {"id": "enforce", "namespace": "demo-enforce", "label": "demo-enforce",
+    {"id": "enforce", "namespace": "demo-enforce", "scope": "demo-enforce", "label": "demo-enforce",
      "summary": "mode enforce; denyKev, maxRisk 40, requireDigest, requireEvidence deny, registry registry.example.com/demo only"},
-    {"id": "audit", "namespace": "demo-audit", "label": "demo-audit",
+    {"id": "audit", "namespace": "demo-audit", "scope": "demo-audit", "label": "demo-audit",
      "summary": "same rules, mode audit: the request is admitted and the would-be denials come back as warnings"},
-    {"id": "default", "namespace": "other", "label": "any other namespace",
+    {"id": "default", "namespace": "other", "scope": "_default", "label": "any other namespace",
      "summary": "the policy's default rule: denyKev, requireDigest, requireEvidence deny; no maxRisk, no registry list"},
 ]
 # The policy used in the repository's TestServeWithSignedEvidence (internal/app/sign_test.go), applied to one namespace.
@@ -97,25 +97,17 @@ SIGNED_STATES = [
 TAMPER = {D_CLEAN: ("CVE-2099-10002", "CVE-2099-00000"), D_KEV: ("CVE-2021-44228", "CVE-2021-00000"),
           D_OVER: ("CVE-2099-10004", "CVE-2099-00000")}
 
-# Names the page's "evidence lookup path" strip cites, each as (file, regex that must match in that file).
+# Go functions the page's "evidence lookup path" cites, each as (file, function or method name) that must exist at the tag.
 NAMES = [
-    ("internal/admission/handler.go", r"func \(h \*Handler\) Review\("),
-    ("internal/admission/handler.go", r"func \(h \*Handler\) resolve\("),
-    ("internal/admission/handler.go", r"func \(h \*Handler\) lookupBounded\("),
-    ("internal/admission/decode.go", r"func Extract\("),
-    ("internal/imageref/imageref.go", r"func Parse\("),
-    ("internal/imageref/imageref.go", r"func \(r Ref\) Pinned\("),
-    ("internal/evidence/evidence.go", r"func FileName\("),
-    ("internal/evidence/evidence.go", r"func \(p \*DirProvider\) Lookup\("),
-    ("internal/evidence/evidence.go", r"func \(p \*DirProvider\) checkSignature\("),
-    ("internal/evsign/evsign.go", r"func \(v \*Verifier\) Verify\("),
-    ("internal/trivy/trivy.go", r"func ParseReader\("),
-    ("internal/risk/risk.go", r"func Score\("),
-    ("internal/policy/policy.go", r"func \(p \*Policy\) RuleFor\("),
-    ("internal/policy/eval.go", r"func \(p \*Policy\) Evaluate\("),
-    ("internal/policy/eval.go", r"func \(e \*evaluator\) findings\("),
-    ("internal/policy/eval.go", r"func \(d \*Decision\) Message\("),
-    ("internal/policy/eval.go", r"func \(d \*Decision\) ResponseWarnings\("),
+    ("internal/admission/handler.go", "Review"), ("internal/admission/handler.go", "resolve"),
+    ("internal/admission/handler.go", "lookupBounded"), ("internal/admission/decode.go", "Extract"),
+    ("internal/imageref/imageref.go", "Parse"), ("internal/imageref/imageref.go", "Pinned"),
+    ("internal/evidence/evidence.go", "FileName"), ("internal/evidence/evidence.go", "Lookup"),
+    ("internal/evidence/evidence.go", "checkSignature"), ("internal/evsign/evsign.go", "Verify"),
+    ("internal/trivy/trivy.go", "ParseReader"), ("internal/risk/risk.go", "Score"),
+    ("internal/policy/policy.go", "RuleFor"), ("internal/policy/eval.go", "Evaluate"),
+    ("internal/policy/eval.go", "findings"), ("internal/policy/eval.go", "Message"),
+    ("internal/policy/eval.go", "ResponseWarnings"),
 ]
 
 DUMP_GO = """package main
@@ -410,9 +402,9 @@ def capture(go: str, repo: str) -> tuple[dict, dict]:
         }
 
         # names cited on the page
-        for rel, pat in NAMES:
-            if not re.search(pat, (clone / rel).read_text(encoding="utf-8")):
-                raise SystemExit(f"{rel} has no match for {pat}")
+        for rel, fn in NAMES:
+            if not re.search(r"^func (\([^)]*\) )?" + fn + r"\(", (clone / rel).read_text(encoding="utf-8"), re.M):
+                raise SystemExit(f"{rel} has no function {fn}")
         readme = (clone / "README.md").read_text(encoding="utf-8").replace("\r\n", "\n")
         blocks = readme_blocks(readme)
         alltext = "\n".join(blocks)
@@ -423,6 +415,9 @@ def capture(go: str, repo: str) -> tuple[dict, dict]:
             parts += warns
             r["in_readme"] = all(p in alltext for p in parts) if parts else None
 
+        fm = re.search(r"`(risk = 100 \* [^`]+)`", readme)
+        if not fm:
+            raise SystemExit("risk formula not found in the README")
         data = {
             "provenance": {
                 "tool": "kevgate-admit", "tag": TAG, "commit": commit, "repo": REPO_URL, "binary": version,
@@ -432,10 +427,10 @@ def capture(go: str, repo: str) -> tuple[dict, dict]:
                 "regenerate": "python scripts/capture_admission_bench.py",
                 "label": "Synthetic demo data and test output from a locally run webhook, not a cluster run.",
                 "request": review("NAMESPACE", "IMAGE"),
-                "names_verified": len(NAMES),
+                "names_verified": [f"{rel}: {fn}" for rel, fn in NAMES], "formula": fm.group(1),
             },
             "images": IMAGES, "policies": POLICIES, "results": results,
-            "signed": {"policy": SIGNED_POLICY, "namespace": SIGNED_NS, "key": "ed25519", "states": SIGNED_STATES,
+            "signed": {"policy": SIGNED_POLICY, "namespace": SIGNED_NS, "scope": "_default", "key": "ed25519", "states": SIGNED_STATES,
                        "images": ["clean", "kev", "over"], "results": sresults},
             "scanner": scanner,
         }

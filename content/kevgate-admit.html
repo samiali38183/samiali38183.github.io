@@ -1,42 +1,67 @@
 <!--@dek-->
-A Kubernetes validating admission webhook, written in Go. It denies or warns on workloads whose container images carry KEV-listed or over-threshold vulnerabilities, using the same risk model as <a href="/projects/kevgate/">kevgate</a>.
+A Kubernetes validating admission webhook, written in Go. It denies or warns on workloads whose container images carry KEV-listed or over-threshold vulnerabilities, using the same risk model as <a href="/projects/kevgate/">kevgate</a>. Release v0.1.0 adds strict image-reference parsing, optional signed scan reports and a signed image on GHCR.
 
 <!--@bench-->
-<div class="scroll"><table class="tbl">
-<caption>The five demo workloads applied to a kind cluster, and the result of each</caption>
-<thead><tr><th scope="col">Demo workload</th><th scope="col">Namespace</th><th scope="col">Expected</th><th scope="col">Result</th></tr></thead>
-<tbody>
-<tr><th scope="row">clean</th><td>demo-enforce</td><td>Allowed</td><td>PASS</td></tr>
-<tr><th scope="row">kev-vulnerable</th><td>demo-enforce</td><td>Denied ([denyKev], [maxRisk])</td><td>PASS</td></tr>
-<tr><th scope="row">over-threshold-enforce</th><td>demo-enforce</td><td>Denied ([maxRisk])</td><td>PASS</td></tr>
-<tr><th scope="row">over-threshold-audit</th><td>demo-audit</td><td>Warned, admitted</td><td>PASS</td></tr>
-<tr><th scope="row">tag-only</th><td>demo-enforce</td><td>Denied ([requireDigest])</td><td>PASS</td></tr>
-</tbody>
-</table></div>
+{{bench:kevgate-admit}}
 
 <!--@bench-cap-->
-<b>The same image is denied in an enforcing namespace and only warned about in an audit namespace.</b> Synthetic demo data from the end-to-end transcript in the repository README, not a production cluster.
+{{bench:kevgate-admit-cap}}
 
 <!--@as-found-->
 <div class="prose">
-<p>No earlier failure is recorded for this project, so this section says what the webhook was checked against rather than what was fixed.</p>
-<p>There are two references. The first is kevgate's Python risk score: two services that rank the same finding differently would be a bug nobody notices until an argument about a denial, so <code>scripts/gen_parity.py</code> calls kevgate's own <code>risk_score</code> to generate 1000 reference vectors and a test compares every one. The second is a real cluster: the <code>e2e-kind</code> workflow applies demo workloads against synthetic Trivy reports and fails unless every outcome and denial text matches.</p>
+<p>This page described commit bfa62fe, before any release. A review of that version found five weaknesses, listed in the repository's changelog under "Hardening since the first review". The first two were reproduced for this page by running the current tests against bfa62fe; the other three are absences, read from the changelog and from that version's own limits list.</p>
 </div>
+{{key:main}}
+{{strips:main}}
+<div class="scroll wide"><table class="tbl">
+<caption>The five weaknesses in commit bfa62fe</caption>
+<thead><tr><th scope="col">Weakness</th><th scope="col">What it meant</th><th scope="col">Evidence on bfa62fe</th></tr></thead>
+<tbody>
+<tr class="row-fail"><th scope="row">A malformed image reference was accepted</th><td><code>imageref.Parse("ghcr.io/org/../evil")</code> returned registry <code>ghcr.io</code> and repository <code>org/../evil</code>. An allow-list entry <code>ghcr.io/org</code> matched it as text. <code>::0</code> was accepted too. The design notes add that a runtime would probably have refused such an image, but an allow-list should not depend on that.</td><td>Reproduced: both calls returned no error.</td></tr>
+<tr class="row-fail"><th scope="row"><code>ignoreUnfixed</code> could drop a KEV finding</th><td>With <code>ignoreUnfixed: true</code>, an exploited CVE that has no fixed version passed <code>denyKev</code> and <code>maxRisk</code>.</td><td>Reproduced: three of the current policy tests fail on that commit (outcome allow, want deny).</td></tr>
+<tr class="row-fail"><th scope="row">Availability was unproven</th><td>Nothing showed what the API server does while the webhook is down, or that <code>kube-system</code> and the webhook's own namespace stay ungated.</td><td>No outage step in the end-to-end run; the changelog says it "now also" covers one.</td></tr>
+<tr class="row-fail"><th scope="row">Evidence was unauthenticated</th><td>A report file was trusted as found, so anyone who could write the report store could change a verdict.</td><td>No signature option existed.</td></tr>
+<tr class="row-fail"><th scope="row">No published image</th><td>The chart's default image tag did not exist and the release workflow had never run.</td><td>The earlier version of this page said there was no release and that the release workflow had never run. The README now says the chart's default image "now exists".</td></tr>
+</tbody>
+</table></div>
 
 <!--@as-left-->
+<h3>What v0.1.0 changed</h3>
+<div class="prose"><p>Release v0.1.0 (tag commit 161169a, 2026-11-11). Each row has its evidence and the limit that remains.</p></div>
+<div class="scroll wide"><table class="tbl">
+<caption>The five changes, their evidence and the limit each keeps</caption>
+<thead><tr><th scope="col">Change</th><th scope="col">Evidence</th><th scope="col">Limit that remains</th></tr></thead>
+<tbody>
+<tr><th scope="row">Strict image-reference parsing under the OCI grammar</th><td>The webhook now answers <code>ghcr.io/org/../evil</code> with an <code>imageRef</code> denial (recorded on Plate 1). <code>imageref</code> has 97.4% coverage and a fuzz target. The README records a differential run against <code>distribution/reference</code>: 14,907,530 executions, no input accepted here that the library rejects.</td><td>The differential harness lives in a scratch module outside the repository, so it was not re-run. The parser is deliberately stricter than the library in a few documented places.</td></tr>
+<tr><th scope="row"><code>ignoreUnfixed</code> never drops a KEV finding</th><td>Five policy test cases cover it, including a finding the report itself marks as KEV; three of them fail on bfa62fe. Only an explicit CVE exception with an expiry date can waive one.</td><td>Exceptions are policy entries, not signed attestations; whoever can edit the policy can add one.</td></tr>
+<tr><th scope="row">Outage behaviour proven on kind</th><td>The end-to-end run now scales the webhook to zero. Under <code>failurePolicy: Fail</code> the API server rejects the Pod with "failed calling webhook"; under <code>Ignore</code> it admits a Pod the policy would deny; <code>kube-system</code> and <code>kevgate-system</code> stay ungated; decisions resume after recovery. {{run:43081479456}}</td><td>It does not cover <code>--fail-mode</code>, slow responses, node drains or <code>helm upgrade</code>, and the demo runs one replica.</td></tr>
+<tr><th scope="row">Optional signed evidence</th><td>Ed25519 or ECDSA P-256 detached signatures bind a report to its digest. A report that is unsigned, or edited after signing, is never scored and counts as missing evidence. Plate 1 shows the three states.</td><td>The signature authenticates the report store only: not the scanner, and not the image. The policy and KEV files are still unsigned ConfigMaps.</td></tr>
+<tr><th scope="row">A signed image on GHCR</th><td>The release workflow built, scanned, pushed, signed (cosign, keyless) and attached a CycloneDX SBOM attestation, then verified both. {{run:43080641309}}</td><td>The webhook does not verify image signatures at admission; the signature proves which workflow built the image, nothing more.</td></tr>
+</tbody>
+</table></div>
 <h3>Tests, re-run locally</h3>
-<div class="prose"><p>Run on 2026-11-10 from a fresh clone of <code>main</code> (commit bfa62fe), Go 1.27.4.</p></div>
+<div class="prose"><p>Run on 2026-11-11 from a fresh clone at tag v0.1.0 (commit 161169a), Go 1.27.4, on Windows.</p></div>
 <pre data-copy data-label="$ go test ./... -cover"><code>$ go test ./... -cover
 ok   .../internal/admission   coverage: 98.0% of statements
-ok   .../internal/app         coverage: 96.9% of statements
-ok   .../internal/imageref    coverage: 100.0% of statements
-ok   .../internal/policy      coverage: 97.6% of statements
-ok   .../internal/reload      coverage: 92.7% of statements
+ok   .../internal/app         coverage: 96.4% of statements
+ok   .../internal/evidence    coverage: 92.8% of statements
+ok   .../internal/evsign      coverage: 93.8% of statements
+ok   .../internal/imageref    coverage: 97.4% of statements
+ok   .../internal/policy      coverage: 98.0% of statements
 ok   .../internal/risk        coverage: 87.5% of statements
+ok   .../internal/trivy       coverage: 98.9% of statements
 ...
 $ go test ./... -coverprofile=c.out; go tool cover -func=c.out | tail -1
 total:    (statements)    95.0%</code></pre>
-<p class="trim">Trimmed: 6 of 14 packages shown and the elapsed times removed. Counting passes in <code>go test -json</code> gave 72 top-level tests and 308 including subtests.</p>
+<p class="trim">Trimmed: 8 of 15 packages shown and the elapsed times removed. Counting passes in <code>go test -json</code> gave 93 top-level tests and 482 including subtests and fuzz seed runs, none failing.</p>
+<h3>A real scanner report</h3>
+<div class="prose">
+<p>Every other fixture is hand-written. One test parses a real report from Trivy 0.76.2 for <code>python:3.9-slim-bullseye</code>, trimmed to 10 vulnerabilities, with the image history removed after a public GPG key id tripped the secret scanner. The pull request that added it records that a full report gave 72 findings, equal to the 72 unique CVE ids among its 171 raw entries. That full file is not in the repository, so that figure was not re-run here. The committed file was: 10 entries, 10 findings, listed in the "Scanner report" view of Plate 1.</p>
+</div>
+<h3>Fuzzing</h3>
+<div class="prose">
+<p>Three fuzz targets: the image-reference parser, the Trivy parser and the AdmissionReview decoder. The README records a 60 second run of each with no findings (17,574,522, 3,552,242 and 1,758,884 executions). CI runs each for 30 seconds. A 5 second run of each on 2026-11-11 also found nothing; a longer run was not repeated.</p>
+</div>
 <h3>The kind end-to-end run</h3>
 <div class="prose">
 <p>The <code>e2e-kind</code> workflow builds the image, creates a kind cluster, installs the Helm chart and applies demo workloads against synthetic evidence. It fails the job unless every outcome and denial text matches. This is the transcript from the repository README (the output of a passing CI run; the runner's file paths are shortened with <code>...</code>):</p>
@@ -64,18 +89,35 @@ Error from server (Forbidden): ... denied the request: kevgate-admit: request de
 RESULT tag-only: PASS
 
 demo finished: all checks passed</code></pre>
-<p class="trim">Trimmed: namespace setup, Helm install output, the over-threshold enforce case and the metrics block removed; the rest is unedited. The full transcript, with all five outcomes, is in the <a href="https://github.com/samiali38183/kevgate-admit#end-to-end-transcript">README</a>. The images are synthetic (<code>registry.example.com</code>) and the CVE-2099 entry is invented.</p>
-{{key:main}}
-{{strips:main}}
+<p class="trim">Trimmed: namespace setup, Helm install output, the over-threshold enforce case and the metrics block removed; the rest is unedited. The images are synthetic (<code>registry.example.com</code>) and the CVE-2099 entries are invented.</p>
+<h3>The outage step</h3>
+<div class="prose"><p>The same workflow then runs <code>deploy/demo/outage.sh</code>. This excerpt from the README shows the part that matters (the exact reason after "failed calling webhook" depends on the Kubernetes version and kube-proxy):</p></div>
+<pre data-copy data-label="Outage transcript (README)"><code>== failurePolicy Fail: a Pod create is rejected by the API server
+Error from server (InternalError): error when creating "STDIN": Internal error occurred: failed calling webhook "validate.kevgate-admit.samiali38183.github.io": failed to call webhook: Post "https://kevgate-admit.kevgate-system.svc:443/validate?timeout=10s": dial tcp 10.96.183.14:443: connect: connection refused
+RESULT fail-policy-rejects: PASS
+RESULT fail-policy-no-pod: PASS
+
+== failurePolicy Fail: excluded namespaces still admit during the outage
+pod/excluded-kube-system created (server dry run)
+RESULT outage-excluded-kube-system: PASS
+
+== failurePolicy Ignore: the same outage admits the Pod, even one the policy would deny
+validatingwebhookconfiguration.admissionregistration.k8s.io/kevgate-admit patched
+pod/outage-ignore created
+RESULT ignore-policy-admits-tag-only-pod: PASS
+
+outage test finished: all checks passed</code></pre>
+<p class="trim">Trimmed to the Fail and Ignore cases; the baseline, restore and resume steps are in the <a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/README.md#end-to-end-transcript">README</a>. The run the README cites for this step is {{run:43042286763}}.</p>
 <div class="scroll wide"><table class="tbl">
 <caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests</th><td>72 top-level (308 with subtests and fuzz seed runs)</td><td>re-run for this page; <a href="https://github.com/samiali38183/kevgate-admit#verification-status">README</a></td></tr>
+<tr><th scope="row">Tests</th><td>93 top-level (482 with subtests and fuzz seed runs)</td><td>re-run for this page; <a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/README.md#verification-status">README</a></td></tr>
 <tr><th scope="row">Coverage</th><td>95.0% of statements across packages</td><td>re-run for this page (<code>go tool cover</code>)</td></tr>
-<tr><th scope="row">Score parity with Python</th><td>1000 generated vectors plus 12 hand-computed</td><td><a href="https://github.com/samiali38183/kevgate-admit/blob/main/scripts/gen_parity.py">scripts/gen_parity.py</a>; 1000 vectors counted in the committed file</td></tr>
-<tr><th scope="row">Fuzzing</th><td>2 targets (Trivy parser, AdmissionReview decoder), 25 s each locally, no findings</td><td>README (not re-run for this page)</td></tr>
-<tr><th scope="row">End-to-end</th><td>allow, deny (KEV, risk, unpinned tag) and audit-warn outcomes all pass on kind: 5 of 5</td><td>{{run:42958591906}} (e2e-kind)</td></tr>
+<tr><th scope="row">Score parity with Python</th><td>1000 generated vectors plus 12 hand-computed</td><td><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/scripts/gen_parity.py">scripts/gen_parity.py</a>; 1000 vectors counted in the committed file</td></tr>
+<tr><th scope="row">Fuzzing</th><td>3 targets, 60 s each, no findings</td><td>README (a 5 s run of each was repeated for this page)</td></tr>
+<tr><th scope="row">End-to-end</th><td>allow, deny (KEV, risk, unpinned tag) and audit-warn outcomes, then the outage step</td><td>{{run:43081479456}} (e2e-kind on main)</td></tr>
+<tr><th scope="row">Admission desk</th><td>24 recorded responses (15 decisions, 9 with signed evidence)</td><td>captured from the tagged binary; <code>scripts/capture_admission_bench.py --check</code></td></tr>
 </tbody>
 </table></div>
 
@@ -86,39 +128,50 @@ demo finished: all checks passed</code></pre>
 </div>
 <h3>What it does</h3>
 <div class="prose">
-<p>For CREATE and UPDATE of Pods, Deployments, StatefulSets, DaemonSets, Jobs and CronJobs, it extracts every container, init container and ephemeral container image, looks up a Trivy report for each image digest, scores each finding, and applies the namespace's policy. The answer is allow, allow with warnings, or deny with a message naming the rule and the top findings.</p>
-<p>Policy is per namespace: <code>denyKev</code>, <code>maxRisk</code>, <code>requireDigest</code>, <code>requireEvidence</code>, allowed registries, exceptions with an expiry date, and an audit mode that admits but warns. It does not scan images itself; it enforces over reports a scan pipeline already produced.<sup class="nref" aria-hidden="true"></sup></p>
+<p>For CREATE and UPDATE of Pods, Deployments, StatefulSets, DaemonSets, Jobs and CronJobs, it extracts every container, init container and ephemeral container image, parses each reference strictly, looks up a Trivy report for each image digest, optionally checks the report's signature, scores each finding, and applies the namespace's policy. The answer is allow, allow with warnings, or deny with a message naming the rule and the top findings.</p>
+<p>Policy is per namespace: <code>denyKev</code>, <code>maxRisk</code>, <code>requireDigest</code>, <code>requireEvidence</code>, <code>requireSignedEvidence</code>, allowed registries, exceptions with an expiry date, and an audit mode that admits but warns. It does not scan images itself; it enforces over reports a scan pipeline already produced.<sup class="nref" aria-hidden="true"></sup></p>
 </div>
 <aside class="note"><strong>An admission webhook</strong> is a service the Kubernetes API server asks to approve or reject an object before it is stored.</aside>
 {{diagram:kevgate-admit}}
-<h3>Three implementation points</h3>
+{{admitpath:path}}
+<h3>Four implementation points</h3>
 <div class="prose">
 <h4>The Go score must equal the Python score</h4>
 <p>Two services that rank the same finding differently would be a bug nobody notices until an argument about a denial. Go can differ from Python in the last bit: constant expressions are evaluated with arbitrary precision, and the compiler may fuse multiply-adds on some architectures. <code>internal/risk</code> keeps the weights in variables so the arithmetic runs in <code>float64</code> at run time, forces explicit conversions to prevent fusing, and rounds to one decimal through the decimal expansion of the value, which is what Python's <code>round(x, 1)</code> does. <code>scripts/gen_parity.py</code> calls kevgate's own <code>risk_score</code> to generate 1000 reference vectors (a grid plus a seeded random sample) and a test compares every one, next to 12 hand-computed cases.</p>
-<h4>Only a digest names an image</h4>
-<p><code>internal/imageref</code> never resolves a tag. A malformed digest is an error rather than "unpinned", so an image that cannot be pulled is not confused with one that merely lacks a pin. Evidence is keyed by <code>sha256-&lt;hex&gt;.json</code>, and a report whose own metadata names a different digest is rejected as an evidence error, so a file renamed to another image's digest cannot vouch for it. An unpinned image gets a <code>requireDigest</code> denial that says tags are mutable.</p>
+<h4>Only a well-formed digest names an image</h4>
+<p><code>internal/imageref</code> never resolves a tag, and it parses a reference under the OCI distribution grammar before anything else uses it: dot segments, upper-case repositories, bad hosts, bad ports and non-ASCII bytes are rejected as <code>imageRef</code>, and allow-list entries are validated with the same rules and match whole path components. A malformed digest is an error rather than "unpinned", so an image that cannot be pulled is not confused with one that merely lacks a pin. Evidence is keyed by <code>sha256-&lt;hex&gt;.json</code>, and a report whose own metadata names a different digest is rejected as an evidence error, so a file renamed to another image's digest cannot vouch for it.</p>
 <h4>Bounded work and last-good state</h4>
 <p>Admission sits on the critical path of every deploy, so the lookup is bounded. Each request has a time budget (8 s by default, to stay under the webhook timeout), each evidence lookup has its own (3 s), a semaphore caps concurrent lookups, a request may name at most 128 distinct images, and report files and HTTP bodies have size caps. If the evidence source fails, <code>--fail-mode closed</code> (the default) denies instead of waiting. Policy, KEV catalog, EPSS data and the TLS pair are hot reloaded by a generic <code>File[T]</code> that swaps a parsed copy atomically; a file that fails to parse never replaces the last good one, and a broken version is remembered by modification time and size so it is reported once per change, not on every tick.</p>
+<h4>A signature binds a report to its digest</h4>
+<p><code>internal/evsign</code> signs a domain-separation string, the image digest and the report bytes together, with Ed25519 or ECDSA P-256 from the standard library and a detached <code>.sig</code> file. Moving a signed report to another digest, or editing it, breaks verification. The directory provider reads the report once and uses the same bytes for the signature check and the parse, so what was verified is what is judged. A report that fails the check is not scored: it counts as missing, and <code>requireEvidence</code> decides.</p>
 </div>
 
 <!--@limits-->
 <ul class="prose">
+<li><strong>It does not verify image signatures at admission.</strong> The published image is signed, but the webhook checks nothing about the images it admits beyond their reports. Kyverno <code>verifyImages</code> or the Sigstore policy-controller already do that.</li>
+<li><strong>Report signatures authenticate the report store only.</strong> They show that someone holding the key signed the file; they say nothing about whether the scan was right or the image is what it claims.</li>
 <li><strong>It does not scan images.</strong> A digest with no report is "no evidence", handled by <code>requireEvidence</code>.</li>
-<li><strong>Evidence goes stale.</strong> <code>maxEvidenceAge</code> bounds it only when the report carries a timestamp.</li>
+<li><strong>Evidence goes stale.</strong> <code>maxEvidenceAge</code> bounds it when the report carries a timestamp: a signed one when the report has <code>CreatedAt</code>, otherwise the unsigned file modification time.</li>
 <li><strong>The cert-manager certificate path is not exercised in CI.</strong> It is only checked by <code>helm template</code> and <code>kubeconform</code>; the end-to-end run uses a certificate generated at install time.</li>
-<li><strong>The release workflow has never run.</strong> There is no release yet.</li>
-<li><strong>Exceptions are policy entries with an expiry, not signed attestations.</strong> Whoever can edit the policy can add one.</li>
-<li><strong>The demo uses synthetic evidence,</strong> and ConfigMap-hosted reports are limited to 1 MiB in total. The race detector was not run locally (it needs cgo); CI runs it.</li>
+<li><strong>In <code>tls.mode=helm</code> a <code>helm upgrade</code> may delete the generated Secret.</strong> The README documents this; it was not tested. Use cert-manager or an existing Secret outside demos.</li>
+<li><strong>The outage test is narrow.</strong> It does not cover <code>--fail-mode</code> (the webhook answering but unable to judge), slow responses and timeouts at the API server, node drains with the PodDisruptionBudget, or <code>helm upgrade</code>. The demo runs one replica.</li>
+<li><strong>The policy and the KEV catalog are unsigned ConfigMaps,</strong> and exceptions are policy entries with an expiry, not signed attestations. Whoever can edit them controls enforcement.</li>
+<li><strong>The demo uses synthetic evidence,</strong> and ConfigMap-hosted reports are limited to 1 MiB in total. The Admission desk shows responses from a locally run binary, not from a cluster. The race detector was not run locally (it needs cgo); CI runs it.</li>
 </ul>
 
 <!--@trace-->
 <h3>CI evidence</h3>
 <div class="scroll wide"><table class="tbl">
-<caption>Workflows on main at bfa62fe; what each covers is taken from the repository README</caption>
+<caption>Workflows on main at 0499200 (one README-only commit after the tag), and the release run; what each covers is read from the workflow files</caption>
 <thead><tr><th scope="col">Workflow</th><th scope="col">What it covers</th><th scope="col">Run</th></tr></thead>
 <tbody>
-<tr><th scope="row">ci</th><td>vet, lint, tests with the race detector and an 85% coverage floor, 30 s fuzz runs of two targets, Helm lint, kubeconform, shellcheck, actionlint</td><td>{{run:42958592023}}</td></tr>
-<tr><th scope="row">e2e-kind</th><td>kind cluster, chart install, allow, deny and warn outcomes with exact denial text</td><td>{{run:42958591906}}</td></tr>
-<tr><th scope="row">security</th><td>hadolint, gosec, govulncheck, Trivy filesystem and image scans, gitleaks (per the README)</td><td>{{run:42958591911}}</td></tr>
+<tr><th scope="row">ci</th><td>vet and lint, tests with the race detector and an 85% coverage floor, 30 s fuzz runs of three targets, Helm lint, kubeconform, shellcheck, actionlint</td><td>{{run:43081479537}}</td></tr>
+<tr><th scope="row">e2e-kind</th><td>kind cluster, chart install, allow, deny and warn outcomes with exact denial text, then the outage step</td><td>{{run:43081479456}}</td></tr>
+<tr><th scope="row">security</th><td>govulncheck, gosec, Trivy filesystem and image scans, hadolint, gitleaks</td><td>{{run:43081479552}}</td></tr>
+<tr><th scope="row">release (v0.1.0)</th><td>image build, Trivy scan failing on HIGH or CRITICAL, SBOM, push to GHCR, keyless cosign signature, SBOM attestation, verification</td><td>{{run:43080641309}}</td></tr>
 </tbody>
 </table></div>
+<h3>The published image</h3>
+<div class="prose">
+<p><code>ghcr.io/samiali38183/kevgate-admit@sha256:1023382754d9b6b7ca727d47701d9e3bfb5f245a6531e0debd1307ebf9e64195</code> (tag <code>0.1.0</code>, linux/amd64). Checked on 2026-11-11 with the registry API and an anonymous token: the manifest is served without credentials, its SHA-256 equals that digest, tag <code>0.1.0</code> resolves to the same digest, and two Sigstore bundles are attached to it (the release signed and attested the image). <code>cosign verify</code> was not run for this page; the release run did, as its last step.</p>
+</div>

@@ -1,0 +1,26 @@
+/* Admission desk and evidence lookup path (kevgate-admit sheet only). Uses the tokens from site.css and the radio
+   group styles (.sw-pick) from the sinkline bench. Verdicts are text stamps; nothing here depends on colour alone. */
+.ad-out{margin-top:var(--s-4)}
+.ad-req{margin:0 0 var(--s-3);font:400 var(--step--1)/1.45 var(--mono);color:var(--ink-2);max-width:60rem;overflow-wrap:anywhere}
+.ad-req code,.ad-w code,.ad-msg{overflow-wrap:anywhere}
+.ad-h{margin:var(--s-5) 0 var(--s-2);font-size:var(--step-1)}
+.ad-msg{display:block;white-space:pre-wrap;font-size:.8125rem;line-height:1.45}
+.ad-w{margin:0 0 var(--s-4);padding-left:1.2rem;font-size:var(--step--1);line-height:1.5}
+.ad-out .scroll{margin-bottom:var(--s-4)}
+.ad-tab{width:100%;min-width:34rem;border-collapse:collapse;font-size:var(--step--1);line-height:1.4;margin:0}
+.ad-tab caption{text-align:left;font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2);padding-bottom:var(--s-2);position:sticky;left:0}
+.ad-tab thead th{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);text-align:left;padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:2px solid var(--ink);vertical-align:bottom;white-space:nowrap}
+.ad-tab td,.ad-tab tbody th{padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:1px solid var(--rule);vertical-align:middle;text-align:left;font:400 .8125rem/1.4 var(--mono);white-space:nowrap}
+.ad-tab td.num{text-align:right;font-variant-numeric:tabular-nums slashed-zero}
+.ad-tab td:last-child{padding-right:0}
+.ad-out .alt{margin-top:var(--s-3)}
+.ad-out pre{margin:0 0 var(--s-3)}
+/* evidence lookup path */
+.ap{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(13.5rem,1fr));gap:var(--s-4)}
+.ap li{position:relative;display:flex;flex-direction:column;gap:var(--s-2);border:1.5px solid var(--edge);background:var(--paper);padding:var(--s-3) var(--s-3) var(--s-3) var(--s-4);min-width:0}
+.ap li:nth-child(4),.ap li:nth-child(5){border-color:var(--ink)}
+.ap-n{align-self:flex-start;display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--ink);color:var(--paper);font:600 .75rem/1 var(--mono)}
+.ap b{font:600 1rem/1.25 var(--serif)}
+.ap-d{font-size:var(--step--1);line-height:1.45;color:var(--ink-2)}
+.ap-c{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:auto}
+.ap-c code{font-size:.75rem;line-height:1.35;padding:0 .4ch;border:1px solid var(--edge);color:var(--ink);overflow-wrap:anywhere}

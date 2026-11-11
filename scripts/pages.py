@@ -42,7 +42,10 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
             return C.key(p["strip_sets"][arg])
         if kind == "bench":
             return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption,
-                    "kev-risk": B.kev_risk_static, "kev-risk-cap": B.kev_risk_caption}[arg]()
+                    "kev-risk": B.kev_risk_static, "kev-risk-cap": B.kev_risk_caption,
+                    "kevgate-admit": B.admit_static, "kevgate-admit-cap": B.admit_caption}[arg]()
+        if kind == "admitpath":
+            return B.admit_path()
         if kind == "snapshot":
             return {"figure": B.kev_snapshot_plate}[arg]()
         if kind == "kb":

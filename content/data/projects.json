@@ -677,22 +677,22 @@
    "slug": "kevgate-admit",
    "content": "kevgate-admit.html",
    "name": "kevgate-admit",
-   "version": "main",
+   "version": "v0.1.0",
    "sheet": 4,
    "kind": "Kubernetes security, Go",
    "title": "kevgate-admit: Kubernetes admission webhook | Sami Ali",
-   "desc": "kevgate-admit is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, kind end-to-end run in CI.",
-   "fact": "An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. 72 tests, 95% coverage, and a kind end-to-end run in CI. It does not scan images itself.",
+   "desc": "kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. Strict image-reference parsing, optional signed evidence, a signed published image, 93 tests and 95% coverage.",
+   "fact": "An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. v0.1.0: strict image-reference parsing, signed scan reports, an outage test on kind and a signed image on GHCR; 93 tests, 95% coverage. It does not scan images itself.",
    "labels": {
     "found": "Reference",
     "left": "Reading"
    },
-   "found_title": "What the webhook was checked against",
-   "left_title": "Five outcomes on kind, and coverage",
+   "found_title": "Five weaknesses in the reviewed version",
+   "left_title": "What v0.1.0 changed, and what it still does not do",
    "record": {
-    "instrument": "kevgate-admit, main at commit bfa62fe (no release yet)",
-    "reference": "kevgate's Python risk score on 1000 generated vectors, and synthetic Trivy reports applied to a kind cluster",
-    "measured": "2026-11-10, Go 1.27.4, fresh clone of main",
+    "instrument": "kevgate-admit v0.1.0, tag commit 161169a (released 2026-11-11)",
+    "reference": "kevgate's Python risk score on 1000 generated vectors; synthetic and one real Trivy report; a kind cluster in CI; distribution/reference for the image-reference grammar",
+    "measured": "2026-11-11, Go 1.27.4, fresh clone at tag v0.1.0",
     "reproduce": [
      "go test ./... -cover"
     ],
@@ -701,42 +701,53 @@
    "reading": {
     "num": "5",
     "den": "/5",
-    "unit": "end-to-end outcomes as expected",
-    "caption": "On a kind cluster with synthetic evidence, five demo workloads were allowed, denied or warned exactly as expected, with the expected message text. The Go score matches the Python score on 1000 reference vectors.",
+    "unit": "review findings closed",
+    "caption": "A review of the earlier version found five weaknesses: a malformed image reference accepted, an option that could drop a KEV finding, an untested outage, unauthenticated evidence and no published image. v0.1.0 closes all five, each with a test, a CI run or a recorded response. The limits it keeps are listed below.",
     "stamp": [
      "pass",
-     "5 of 5 as expected"
+     "As left: 5 of 5 closed"
     ],
-    "run": "42958591906"
+    "run": "43081479456"
    },
    "strip_sets": {
     "main": {
-     "unit": "end-to-end outcomes",
-     "total_label": "5 outcomes",
+     "unit": "review findings",
+     "total_label": "5 findings",
      "phr": {
-      "hit": "outcome matched the expected result"
+      "hit": "closed in v0.1.0",
+      "miss": "open in the reviewed version"
      },
      "rows": [
       {
-       "label": "Reading",
+       "label": "As found",
+       "runs": [
+        [
+         "miss",
+         5
+        ]
+       ],
+       "val": "<b>5</b> open in the reviewed version (commit bfa62fe)"
+      },
+      {
+       "label": "As left",
        "runs": [
         [
          "hit",
          5
         ]
        ],
-       "val": "<b>5</b> of 5 outcomes as expected"
+       "val": "<b>5</b> closed in v0.1.0"
       }
      ]
     }
    },
    "home": {
-    "against": "Python score on 1000 vectors; synthetic reports on kind",
-    "reading": "5 of 5 outcomes",
-    "run": "42958591906",
-    "found": "No earlier failure recorded",
-    "left": "72 tests, 95.0% statement coverage",
-    "tolerance": "Does not scan images; synthetic evidence in the demo"
+    "against": "Python score on 1000 vectors; synthetic and real Trivy reports; kind in CI",
+    "reading": "5 of 5 review findings closed",
+    "run": "43081479456",
+    "found": "Accepted org/../evil; ignoreUnfixed could drop a KEV finding; outage untested; unsigned evidence; no image",
+    "left": "v0.1.0: 93 tests, 95.0% coverage, signed image",
+    "tolerance": "Does not scan images or verify image signatures; synthetic evidence in the demo"
    },
    "links": [
     [
@@ -744,12 +755,16 @@
      "https://github.com/samiali38183/kevgate-admit"
     ],
     [
+     "Release v0.1.0",
+     "https://github.com/samiali38183/kevgate-admit/releases/tag/v0.1.0"
+    ],
+    [
      "Design notes",
-     "https://github.com/samiali38183/kevgate-admit/blob/main/docs/DESIGN.md"
+     "https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/DESIGN.md"
     ],
     [
      "Threat model",
-     "https://github.com/samiali38183/kevgate-admit/blob/main/docs/THREAT_MODEL.md"
+     "https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/THREAT_MODEL.md"
     ],
     [
      "CI runs",
@@ -758,34 +773,57 @@
    ],
    "trace": [
     [
-     "Unit tests and lint (ci)",
+     "Release, image build, scan and signature (release, v0.1.0)",
      "run",
-     "42958592023"
+     "43080641309"
     ],
     [
-     "Kind end to end (e2e-kind)",
+     "Unit tests and lint (ci, main)",
      "run",
-     "42958591906"
+     "43081479537"
     ],
     [
-     "Scans (security)",
+     "Kind end to end (e2e-kind, main)",
      "run",
-     "42958591911"
+     "43081479456"
+    ],
+    [
+     "Scans (security, main)",
+     "run",
+     "43081479552"
+    ],
+    [
+     "Outage test, first passing run (e2e-kind, pull request)",
+     "run",
+     "43042286763"
     ],
     [
      "Score parity script",
      "link",
-     "https://github.com/samiali38183/kevgate-admit/blob/main/scripts/gen_parity.py",
+     "https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/scripts/gen_parity.py",
      "scripts/gen_parity.py"
     ],
     [
      "End-to-end transcript",
      "link",
-     "https://github.com/samiali38183/kevgate-admit#end-to-end-transcript",
-     "README"
+     "https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/README.md#end-to-end-transcript",
+     "README at v0.1.0"
+    ],
+    [
+     "Admission desk capture script",
+     "link",
+     "https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/capture_admission_bench.py",
+     "scripts/capture_admission_bench.py"
+    ],
+    [
+     "Admission desk parity test",
+     "link",
+     "https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_admission.mjs",
+     "scripts/test_bench_admission.mjs"
     ]
    ],
-   "commit": "bfa62fe"
+   "commit": "161169a",
+   "bench": "kevgate-admit"
   },
   "fuzzdiff": {
    "slug": "fuzzdiff",
@@ -1187,6 +1225,19 @@
    "src": [
     "CHANGELOG 0.1.1",
     "https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md"
+   ]
+  },
+  {
+   "project": "kevgate-admit",
+   "text": "The image parser accepted ghcr.io/org/../evil, and ignoreUnfixed could let a KEV finding with no fix pass denyKev. Both are fixed in v0.1.0.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-found",
+   "src": [
+    "CHANGELOG 0.1.0, Hardening",
+    "https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/CHANGELOG.md"
    ]
   },
   {
