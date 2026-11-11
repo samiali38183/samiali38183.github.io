@@ -23,12 +23,13 @@ export function py2js(src) {
   return new RegExp(out, 'u');
 }
 
-const lit = (s) => new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu'); // Sigma contains: case-insensitive
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const lit = (s) => new RegExp(esc(s), 'iu'); // Sigma contains: case-insensitive
 
 export function compile(d) {
   return {
     root: d.stock.root.map(lit), perm: d.stock.perm.map(lit),
-    image: new RegExp(d.custom.image.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'iu'),
+    image: new RegExp('(?:' + d.custom.image.map(esc).join('|') + ')$', 'iu'), // Image|endswith with a list: any of them
     sym: py2js(d.custom.symbolic), oct: py2js(d.custom.octal), filt: py2js(d.custom.filter),
   };
 }
@@ -48,9 +49,9 @@ export function reasons(res) {
     : !root ? "Has the chmod text but no 'chown root'; the rule needs both."
     : "Has 'chown root' but not the literal ' chmod u+s' or ' chmod g+s'; the rule needs both.";
   const form = sy && oc ? 'symbolic and octal' : sy ? 'symbolic' : 'octal';
-  const custom = rv ? 'Image ends with /chmod and the mode sets setuid or setgid (' + form + ' form).'
-    : !im ? ((sy || oc) ? 'The mode would match, but Image does not end with /chmod, so this event is not the chmod itself.'
-      : 'Image does not end with /chmod and no setuid or setgid mode is present.')
+  const custom = rv ? 'Image ends with /chmod or /busybox and the mode sets setuid or setgid (' + form + ' form).'
+    : !im ? ((sy || oc) ? 'The mode would match, but Image does not end with /chmod or /busybox, so this event is not a chmod execution.'
+      : 'Image does not end with /chmod or /busybox and no setuid or setgid mode is present.')
     : !(sy || oc) ? 'No setuid or setgid mode: no symbolic s bit and no octal mode 2xxx to 7xxx.'
     : 'Excluded: every file operand is under /usr/share/doc/.';
   return { stock, custom };
@@ -62,12 +63,12 @@ const STOCK_CONDS = [
   ['selection_perm', "CommandLine contains ' chmod u+s' or ' chmod g+s'"],
 ];
 const CUSTOM_CONDS = [
-  ['selection_image', 'Image ends with /chmod'],
+  ['selection_image', 'Image ends with /chmod or /busybox'],
   ['selection_symbolic', 'symbolic mode with the s bit (u+s, ug+s, u+xs, a+s, g+w,u+s)'],
   ['selection_octal', 'octal mode 2xxx to 7xxx, optional leading zero'],
   ['filter_tmp_runner', 'every file operand is under /usr/share/doc/'],
 ];
-const IMAGES = ['/usr/bin/chmod', '/bin/chmod', '/usr/bin/sudo', '/usr/bin/dash'];
+const IMAGES = ['/usr/bin/chmod', '/bin/chmod', '/usr/bin/busybox', '/usr/bin/sudo', '/usr/bin/dash'];
 const REPO = 'https://github.com/samiali38183/tripline/blob/main/';
 
 function h(tag, attrs, ...kids) {

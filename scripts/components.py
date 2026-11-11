@@ -79,6 +79,8 @@ def strip_rows(sset: dict, mini: bool = False, vt: str | None = None, show_val: 
             f'<div class="srow"><span class="label" aria-hidden="true">{esc(r["label"])}</span>'
             f'{strip(drawn, r["label"], sset["unit"], sset["phr"], mini, runs, scaled=bool(per) and not mini)}{val}</div>')
     cls = "strips mini" if mini else "strips"
+    if sset.get("dense") and not mini:
+        cls += " dense"  # thinner ticks so about 110 fit on one line (one tick per item, no scaling)
     if vt:
         cls += " vt"
     style = f' style="--vt:{vt}"' if vt else ""

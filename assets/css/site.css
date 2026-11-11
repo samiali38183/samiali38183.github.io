@@ -149,6 +149,7 @@ main{display:block;padding-block:var(--s-7) var(--s-8)}
 .strip i[data-s=pend]{border-style:dotted;border-color:var(--ink-2)}
 .strip i[data-s=fp]{background:linear-gradient(to top,var(--ink) 50%,transparent 50%);border-color:var(--ink)}
 .strips:not(.mini) .strip{padding-bottom:16px}
+.strips.dense{--tick-w:5px;--tick-gap:2px}
 .strips.mini{--tick-w:5px;--tick-h:16px;--tick-gap:2px}
 .strips.mini .srow{grid-template-columns:4.5rem minmax(0,1fr);margin-bottom:var(--s-3)}
 .strips.mini .strip{row-gap:2px}
