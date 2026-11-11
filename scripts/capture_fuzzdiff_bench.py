@@ -91,13 +91,20 @@ def main() -> int:
         sys.exit("curated table not found in DIFFERENTIAL_HTTPARSE.md")
     table = m.group(1).strip() + "\n"
 
-    # the harness's own expected pattern for each curated input must be the one in the document
+    # the harness's own expected pattern for each curated input must be the one in the document; the document's
+    # "Stricter" column is copied into the data
+    rows = [[c.strip() for c in ln.strip().strip("|").split(" | ")] for ln in table.splitlines() if ln.startswith("| ") and "---" not in ln]
     for i in data["inputs"]:
         d = i["doc"]
-        if d and not re.search(r"\| " + re.escape(d["pattern"]) + r" \|", "".join(l for l in table.splitlines(True) if "(" + d["label"] + ")" in l)):
-            sys.exit(f"{i['id']}: pattern {d['pattern']} for '{d['label']}' not found in the document table")
-        if d and i["pattern"] != d["pattern"]:
-            sys.exit(f"{i['id']}: observed pattern {i['pattern']} differs from the harness expectation {d['pattern']}")
+        if not d:
+            continue
+        hit = [r for r in rows if r[0] == d["class"] and r[1].endswith("(" + d["label"] + ")")]
+        if len(hit) != 1:
+            sys.exit(f"{i['id']}: expected one row for '{d['label']}' in the document table, found {len(hit)}")
+        r = hit[0]
+        if r[5] != d["pattern"] or i["pattern"] != d["pattern"]:
+            sys.exit(f"{i['id']}: pattern in the document {r[5]}, harness expectation {d['pattern']}, observed {i['pattern']}")
+        d["stricter"] = r[6]
 
     text = json.dumps(data, ensure_ascii=False, indent=1) + "\n"
     if a.check:

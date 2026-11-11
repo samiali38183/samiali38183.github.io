@@ -451,6 +451,10 @@ fn class_title(id: &str) -> &'static str {
     CLASSES.iter().find(|c| c.0 == id).map(|c| c.1).expect("class")
 }
 
+fn class_rfc(id: &str) -> &'static str {
+    CLASSES.iter().find(|c| c.0 == id).map(|c| c.2).expect("class")
+}
+
 fn main() {
     let default_hook = std::panic::take_hook();
     std::panic::set_hook(Box::new(|info| {
@@ -481,6 +485,7 @@ fn main() {
                     op,
                     obj(vec![
                         ("class", s(class_title(class))),
+                        ("rfc", s(class_rfc(class))),
                         ("class_id", s(*class)),
                         ("label", s(e.label)),
                         ("pattern", s(e.expect)),

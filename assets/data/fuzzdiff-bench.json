@@ -75,9 +75,11 @@
    "explained_by": "agree",
    "doc": {
     "class": "Accepted by all three (context)",
+    "rfc": "RFC 9112 6.1, 6.2, 6.3",
     "class_id": "agree",
     "label": "baseline request",
-    "pattern": "CCC"
+    "pattern": "CCC",
+    "stricter": "same"
    },
    "mutant": null
   },
@@ -171,9 +173,11 @@
    "explained_by": "features: multi-space-start-line",
    "doc": {
     "class": "Number of SP between start-line elements",
+    "rfc": "RFC 9112 3, 4",
     "class_id": "sp-count",
     "label": "two SP after the method",
-    "pattern": "CCR"
+    "pattern": "CCR",
+    "stricter": "httparse"
    },
    "mutant": null
   },
@@ -219,9 +223,11 @@
    "explained_by": "features: version-digits",
    "doc": {
     "class": "HTTP version digits",
+    "rfc": "RFC 9112 2.3",
     "class_id": "version",
     "label": "HTTP/1.2 request",
-    "pattern": "CCR"
+    "pattern": "CCR",
+    "stricter": "httparse"
    },
    "mutant": null
   },
@@ -267,9 +273,11 @@
    "explained_by": "features: high-byte-start-line",
    "doc": {
     "class": "Octets 0x80-0xFF in the request-target",
+    "rfc": "RFC 9112 3.2, RFC 9110 4.1",
     "class_id": "hi-target",
     "label": "0x80 in the target",
-    "pattern": "CCR"
+    "pattern": "CCR",
+    "stricter": "httparse"
    },
    "mutant": null
   },
@@ -341,9 +349,11 @@
    "explained_by": "features: leading-empty-lines",
    "doc": {
     "class": "Empty lines before the start-line",
+    "rfc": "RFC 9112 2.2",
     "class_id": "lead-crlf",
     "label": "two empty lines before the request",
-    "pattern": "RRC"
+    "pattern": "RRC",
+    "stricter": "picohttpparser"
    },
    "mutant": null
   },
@@ -407,9 +417,11 @@
    "explained_by": "features: obs-fold",
    "doc": {
     "class": "Obsolete line folding",
+    "rfc": "RFC 9112 5.2",
     "class_id": "fold",
     "label": "request, SP continuation",
-    "pattern": "CCR"
+    "pattern": "CCR",
+    "stricter": "httparse"
    },
    "mutant": null
   },
@@ -460,9 +472,11 @@
    "explained_by": "features: obs-fold",
    "doc": {
     "class": "Obsolete line folding",
+    "rfc": "RFC 9112 5.2",
     "class_id": "fold",
     "label": "request, SP continuation",
-    "pattern": "CCR"
+    "pattern": "CCR",
+    "stricter": "httparse"
    },
    "mutant": null
   },
@@ -622,9 +636,11 @@
    "explained_by": "features: multi-space-start-line",
    "doc": {
     "class": "Number of SP between start-line elements",
+    "rfc": "RFC 9112 3, 4",
     "class_id": "sp-count",
     "label": "two SP after the status code",
-    "pattern": "CCC!"
+    "pattern": "CCC!",
+    "stricter": "same verdict, fields differ"
    },
    "mutant": null
   },
@@ -660,9 +676,11 @@
    "explained_by": null,
    "doc": {
     "class": "Chunk extensions",
+    "rfc": "RFC 9112 7.1.1",
     "class_id": "chunk-ext",
     "label": "bare LF inside an extension",
-    "pattern": "RRC"
+    "pattern": "RRC",
+    "stricter": "picohttpparser"
    },
    "mutant": null
   },
@@ -698,9 +716,11 @@
    "explained_by": null,
    "doc": {
     "class": "Chunk-size line shape",
+    "rfc": "RFC 9112 7.1",
     "class_id": "chunk-size",
     "label": "empty size",
-    "pattern": "RRC"
+    "pattern": "RRC",
+    "stricter": "picohttpparser"
    },
    "mutant": null
   },
@@ -735,9 +755,11 @@
    "explained_by": null,
    "doc": {
     "class": "Chunk-size line shape",
+    "rfc": "RFC 9112 7.1",
     "class_id": "chunk-size",
     "label": "17 hex digits (overflow of u64)",
-    "pattern": "RRR"
+    "pattern": "RRR",
+    "stricter": "same"
    },
    "mutant": null
   },
@@ -770,9 +792,11 @@
    "explained_by": "agree",
    "doc": {
     "class": "Partial input: when a parser gives up",
+    "rfc": "none (implementation behaviour)",
     "class_id": "timing",
     "label": "version cut after 'HTTP/1.'",
-    "pattern": "PPP"
+    "pattern": "PPP",
+    "stricter": "same"
    },
    "mutant": null
   },
@@ -907,7 +931,7 @@
   {
    "name": "HeaderLenOffByOne",
    "generator_inputs": 3,
-   "generator_seconds": "0.000039",
+   "generator_seconds": "0.000044",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Headers last_len=12 max_headers=8 strict=false trailer=false pieces=[151] data=\"Set-Cookie: /==\\n'+~a: ::cfjsyvawqdcgdufrvc\\nContent-Length: \\nHost: \\nAccept: a",
    "budget": 2000000,
@@ -917,7 +941,7 @@
   {
    "name": "MissingBoundsCheck",
    "generator_inputs": 286,
-   "generator_seconds": "0.001025",
+   "generator_seconds": "0.001004",
    "generator_how": "RustPanic",
    "first_failing_input": "Request last_len=0 max_headers=2 strict=false trailer=false pieces=[29] data=\"\\r\\nGET /q=0.9&;;q=0.9 HTTP/1.1\"",
    "budget": 2000000,
@@ -927,7 +951,7 @@
   {
    "name": "WrongStateAfterCrlf",
    "generator_inputs": 8,
-   "generator_seconds": "0.000061",
+   "generator_seconds": "0.000060",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Chunked last_len=0 max_headers=32 strict=false trailer=true pieces=[104] data=\"1;ext=val\\r\\n\\u{fffd}\\r\\n23\\r\\n3p\\u{f}Q\\u{fffd}7\\u{fffd}_G\\u{fffd}{\\u{fffd}\\u{b}\\u{fffd}+\\u{17}\\u{fffd}\\u{fffd}d\\u{fffd}\\u{fffd}R\\u{fffd}N\\u{fffd}oc\\u{fffd}\\u{fffd},\\u{fffd}\\u{15}.\\u{14}",
    "budget": 2000000,
@@ -937,7 +961,7 @@
   {
    "name": "OverheadRatio",
    "generator_inputs": null,
-   "generator_seconds": "6.081480",
+   "generator_seconds": "6.171207",
    "generator_how": null,
    "first_failing_input": null,
    "budget": 2000000,
@@ -947,7 +971,7 @@
   {
    "name": "StatusGuard",
    "generator_inputs": 10085,
-   "generator_seconds": "0.030410",
+   "generator_seconds": "0.030611",
    "generator_how": "ResultMismatch",
    "first_failing_input": "Response last_len=0 max_headers=16 strict=false trailer=false pieces=[12] data=\"HTTP/1.1 .1 \"",
    "budget": 2000000,
@@ -959,6 +983,6 @@
   "inputs": 500000,
   "targeted_cases": 9,
   "divergences": 0,
-  "seconds": "1.541157"
+  "seconds": "1.532242"
  }
 }
