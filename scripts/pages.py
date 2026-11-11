@@ -7,6 +7,7 @@ from pathlib import Path
 
 import bench_fuzzdiff_static as BF
 import bench_static as B
+import bench_vulnlab_static as BV
 import components as C
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -45,7 +46,8 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
             return {"sinkline": B.sinkline_static, "sinkline-cap": B.sinkline_caption,
                     "fuzzdiff": BF.parser_static, "fuzzdiff-cap": BF.parser_caption, "fuzzdiff-mutants": BF.mutants_panel, "fuzzdiff-sweep": BF.sweep_table,
                     "kev-risk": B.kev_risk_static, "kev-risk-cap": B.kev_risk_caption,
-                    "kevgate-admit": B.admit_static, "kevgate-admit-cap": B.admit_caption}[arg]()
+                    "kevgate-admit": B.admit_static, "kevgate-admit-cap": B.admit_caption,
+                    "vulnlab": BV.vulnlab_static, "vulnlab-cap": BV.vulnlab_caption}[arg]()
         if kind == "admitpath":
             return B.admit_path()
         if kind == "snapshot":
@@ -130,7 +132,7 @@ def home(ctx: dict) -> str:
             f'<td>{esc(p["home"]["against"])}</td><td>{minis}</td>'
             f'<td class="rd"><b>{esc(p["home"]["reading"])}</b></td><td>{run_chip(ctx, p["home"]["run"])}</td></tr>')
     ledger = (
-        '<table class="tbl wt ledger"><caption class="vh">Record of checks: six tools, what each was checked against and the reading</caption>'
+        f'<table class="tbl wt ledger"><caption class="vh">Record of checks: {len(d["order"])} projects, what each was checked against and the reading</caption>'
         '<thead><tr><th scope="col">Instrument</th><th scope="col">Checked against</th><th scope="col">As found, then as left</th>'
         '<th scope="col">Reading</th><th scope="col">Evidence</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>")
     ff = []
@@ -194,12 +196,13 @@ def home(ctx: dict) -> str:
 # ---------------------------------------------------------------------------------------------
 def projects_index(ctx: dict) -> str:
     d = ctx["projects"]
+    order = d["order"]
     cards, rows = [], []
     for slug in d["order"]:
         p = d["projects"][slug]
         sset = p["strip_sets"]["main"]
         cards.append(
-            f'<li><p class="tag label">Sheet {p["sheet"]} of 6 &middot; {esc(p["kind"])}</p>'
+            f'<li><p class="tag label">Sheet {p["sheet"]} of {len(order)} &middot; {esc(p["kind"])}</p>'
             f'<h2><a href="/projects/{slug}/">{esc(p["name"])}</a></h2>'
             f'<p class="rd">{esc(p["home"]["reading"])}</p>'
             f'{C.strip_rows(sset, mini=True, vt="strip-" + slug)}'
@@ -216,7 +219,7 @@ def projects_index(ctx: dict) -> str:
         '<th scope="col">Tolerance</th><th scope="col">Evidence</th><th scope="col" class="num">Version</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>")
     return f"""<h1>Projects</h1>
 <p class="dek">Each project is an instrument. This page lists what it was checked against and what the check found.</p>
-<ul class="multi" aria-label="Six projects">
+<ul class="multi" aria-label="{len(order)} projects">
 {"".join(cards)}
 </ul>
 <section aria-labelledby="ledger">
@@ -293,10 +296,10 @@ def sheets(ctx: dict, p: dict) -> str:
     prev = nxt = ""
     if i > 0:
         q = d["projects"][order[i - 1]]
-        prev = f'<a class="prev" href="/projects/{q["slug"]}/"><span class="label">Previous sheet, {q["sheet"]} of 6</span><span class="n">{esc(q["name"])}</span></a>'
+        prev = f'<a class="prev" href="/projects/{q["slug"]}/"><span class="label">Previous sheet, {q["sheet"]} of {len(order)}</span><span class="n">{esc(q["name"])}</span></a>'
     if i < len(order) - 1:
         q = d["projects"][order[i + 1]]
-        nxt = f'<a class="next" href="/projects/{q["slug"]}/"><span class="label">Next sheet, {q["sheet"]} of 6</span><span class="n">{esc(q["name"])}</span></a>'
+        nxt = f'<a class="next" href="/projects/{q["slug"]}/"><span class="label">Next sheet, {q["sheet"]} of {len(order)}</span><span class="n">{esc(q["name"])}</span></a>'
     return f'<nav class="sheets" aria-label="Sheets">{prev}{nxt}</nav>'
 
 

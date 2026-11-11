@@ -1,0 +1,554 @@
+{
+ "roles": {
+  "impact": "Impact demonstrated",
+  "inconsistency": "Update route already checks the owner",
+  "blocked": "Impact blocked",
+  "feature": "Feature still works",
+  "login": "Login required",
+  "detect": "Detection replay"
+ },
+ "provenance": {
+  "tool": "vulnlab",
+  "version": "0.1.0",
+  "tag": "v0.1.0",
+  "commit": "1fceaa8",
+  "commit_full": "1fceaa89625d60b0b858facf19f7d901a0d63a57",
+  "repo": "https://github.com/samiali38183/vulnlab",
+  "ci_run": "43087241629",
+  "captured": "2026-11-11",
+  "python": "3.12.2",
+  "pytest": "9.2.0",
+  "sinkline": "0.5.0",
+  "tripline": "0.2.1",
+  "pysigma": "2.1.0",
+  "os": "Windows 11",
+  "commands": {
+   "tests": "python -m pytest -v -p no:cacheprovider",
+   "sinkline": "sinkline scan VARIANT --no-color (run from the lab directory)",
+   "replay": "python -m vulnlab_common.replay RULE LOG"
+  },
+  "totals": {
+   "passed": 43,
+   "lab_tests": 17,
+   "safety_tests": 26
+  },
+  "repo_checks": {
+   "sinkline_check": "exit 0 (tools/sinkline_check.py)",
+   "sigma_check": "0 errors, 0 condition errors, 0 issues"
+  }
+ },
+ "labs": [
+  {
+   "id": "01-ssrf-redirect",
+   "n": "01",
+   "title": "SSRF through a redirect",
+   "cwe": "CWE-918",
+   "readme": "labs/01-ssrf-redirect/README.md",
+   "versions": [
+    {
+     "id": "vulnerable",
+     "label": "Vulnerable",
+     "summary": "The preview endpoint checks the host of the URL it was given once, then fetches it with a client that follows redirects on its own.",
+     "outcome": "The preview endpoint returned the internal service's marker, reached through a redirect on an allowed host.",
+     "file": "labs/01-ssrf-redirect/vulnerable/app.py",
+     "code": "from __future__ import annotations\n\nfrom urllib.parse import urlsplit\n\nimport requests\nfrom flask import Flask, jsonify, request\n\n\ndef create_app(settings: dict | None = None) -> Flask:\n    config = {\"allowed_hosts\": {\"127.0.0.1\"}, **(settings or {})}\n    app = Flask(__name__)\n\n    def host_allowed(url: str) -> bool:\n        parts = urlsplit(url)\n        return parts.scheme in (\"http\", \"https\") and parts.hostname in config[\"allowed_hosts\"]\n\n    @app.get(\"/preview\")\n    def preview():\n        url = request.args.get(\"url\", \"\")\n        if not host_allowed(url):\n            return jsonify(error=\"host not allowed\"), 403\n        try:\n            upstream = requests.get(url, timeout=3)\n        except requests.RequestException:\n            return jsonify(error=\"fetch failed\"), 502\n        return jsonify(status=upstream.status_code, excerpt=upstream.text[:300])\n\n    return app\n",
+     "marks": {
+      "bug": [
+       23
+      ],
+      "changed": []
+     },
+     "tests": [
+      {
+       "name": "test_vulnerable_service_returns_internal_marker_via_allowed_redirect",
+       "role": "impact",
+       "cases": 1,
+       "passed": 1
+      }
+     ],
+     "sinkline": {
+      "command": "sinkline scan vulnerable --no-color",
+      "status": 0,
+      "out": "[HIGH] SL-SSRF-001 A10:2021 CWE-918  app.py:23:24\n  SSRF: tainted URL fetched server-side\n  flask.request.args reaches requests.get without a sanitizer for CWE-918.\n  ┌ source     app.py:19  url = request.args.get(\"url\", \"\")  # flask.request.args\n  │ propagate  app.py:19  url = request.args.get(\"url\", \"\")  # .get()\n  └ sink       app.py:23  upstream = requests.get(url, timeout=3)  # requests.get\n  fix: Allow-list hosts/schemes, resolve DNS and reject private ranges, disable redirects.\n\n1 finding(s) in 1 file(s), 6 function(s) summarized\nby OWASP: A10:2021 Server-Side Request Forgery: 1\n",
+      "findings": [
+       {
+        "rule_id": "SL-SSRF-001",
+        "cwe": "CWE-918",
+        "severity": "high",
+        "file": "app.py",
+        "line": 23,
+        "flow": [
+         {
+          "kind": "source",
+          "line": 19
+         },
+         {
+          "kind": "propagate",
+          "line": 19
+         },
+         {
+          "kind": "sink",
+          "line": 23
+         }
+        ]
+       }
+      ],
+      "reading": "true positive",
+      "note": ""
+     }
+    },
+    {
+     "id": "fixed",
+     "label": "Fixed",
+     "summary": "The app follows redirects itself, at most three hops, and checks every hop's host and resolved address before connecting to that address.",
+     "outcome": "Both the direct and the redirected request were refused and the internal service was never contacted.",
+     "file": "labs/01-ssrf-redirect/fixed/app.py",
+     "code": "from __future__ import annotations\n\nimport socket\nfrom urllib.parse import urljoin, urlsplit\n\nimport requests\nfrom flask import Flask, jsonify, request\n\nMAX_HOPS = 3\n\n\nclass Blocked(Exception):\n    pass\n\n\ndef create_app(settings: dict | None = None) -> Flask:\n    config = {\"allowed_hosts\": {\"127.0.0.1\"}, \"allowed_addrs\": {\"127.0.0.1\"}, **(settings or {})}\n    app = Flask(__name__)\n\n    def resolve_allowed(url: str) -> tuple[str, str]:\n        parts = urlsplit(url)\n        if parts.scheme != \"http\" or parts.hostname not in config[\"allowed_hosts\"]:\n            raise Blocked(\"host not allowed\")\n        port = parts.port or 80\n        addr = socket.getaddrinfo(parts.hostname, port, type=socket.SOCK_STREAM)[0][4][0]\n        if addr not in config[\"allowed_addrs\"]:\n            raise Blocked(\"address not allowed\")\n        return parts.netloc, parts._replace(netloc=f\"{addr}:{port}\").geturl()\n\n    def fetch(url: str) -> requests.Response:\n        for _ in range(MAX_HOPS + 1):\n            host_header, pinned = resolve_allowed(url)\n            upstream = requests.get(pinned, headers={\"Host\": host_header}, allow_redirects=False, timeout=3)\n            if not upstream.is_redirect:\n                return upstream\n            url = urljoin(url, upstream.headers[\"Location\"])\n        raise Blocked(\"too many redirects\")\n\n    @app.get(\"/preview\")\n    def preview():\n        try:\n            upstream = fetch(request.args.get(\"url\", \"\"))\n        except Blocked as exc:\n            return jsonify(error=str(exc)), 403\n        except requests.RequestException:\n            return jsonify(error=\"fetch failed\"), 502\n        return jsonify(status=upstream.status_code, excerpt=upstream.text[:300])\n\n    return app\n",
+     "marks": {
+      "bug": [],
+      "changed": [
+       3,
+       4,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       17,
+       20,
+       22,
+       23,
+       24,
+       25,
+       26,
+       27,
+       28,
+       29,
+       30,
+       31,
+       32,
+       33,
+       34,
+       35,
+       36,
+       37,
+       42,
+       43,
+       44
+      ]
+     },
+     "tests": [
+      {
+       "name": "test_fixed_service_does_not_return_internal_marker",
+       "role": "blocked",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_fixed_service_still_previews_pages_and_follows_allowed_redirects",
+       "role": "feature",
+       "cases": 1,
+       "passed": 1
+      }
+     ],
+     "sinkline": {
+      "command": "sinkline scan fixed --no-color",
+      "status": 0,
+      "out": "[HIGH] SL-SSRF-001 A10:2021 CWE-918  app.py:42:24\n  SSRF: tainted URL fetched server-side\n  flask.request.args reaches requests.get (inside fetch, app.py:33) without a sanitizer for CWE-918.\n  ┌ source     app.py:42  upstream = fetch(request.args.get(\"url\", \"\"))  # flask.request.args\n  │ propagate  app.py:42  upstream = fetch(request.args.get(\"url\", \"\"))  # .get()\n  │ call       app.py:42  upstream = fetch(request.args.get(\"url\", \"\"))  # passed as `url` to fetch()\n  └ sink       app.py:33  upstream = requests.get(pinned, headers={\"Host\": host_header}, allow_redirects=False, timeout=3)  # requests.get inside fetch()\n  fix: Allow-list hosts/schemes, resolve DNS and reject private ranges, disable redirects.\n\n1 finding(s) in 1 file(s), 8 function(s) summarized\nby OWASP: A10:2021 Server-Side Request Forgery: 1\n",
+      "findings": [
+       {
+        "rule_id": "SL-SSRF-001",
+        "cwe": "CWE-918",
+        "severity": "high",
+        "file": "app.py",
+        "line": 42,
+        "flow": [
+         {
+          "kind": "source",
+          "line": 42
+         },
+         {
+          "kind": "propagate",
+          "line": 42
+         },
+         {
+          "kind": "call",
+          "line": 42
+         },
+         {
+          "kind": "sink",
+          "line": 33
+         }
+        ]
+       }
+      ],
+      "reading": "false positive",
+      "note": "False positive. sinkline does not recognize a custom allow-list or address pinning as a sanitizer."
+     }
+    }
+   ],
+   "detection": {
+    "rule": "labs/01-ssrf-redirect/detection/web_ssrf_preview_internal_address.yml",
+    "titles": [
+     "URL preview request names an internal or metadata address"
+    ],
+    "correlation": null,
+    "test": {
+     "name": "test_detection_rule_fires_on_recorded_attack_not_on_benign_traffic",
+     "role": "detect",
+     "cases": 1,
+     "passed": 1
+    },
+    "attack": {
+     "events": 2,
+     "alerts": 1,
+     "out": "sample_attack.ndjson: 2 events, 1 alert(s)\n  ALERT 'URL preview request names an internal or metadata address': 2 matching event(s)\n",
+     "matching": [
+      2
+     ],
+     "titles": [
+      "URL preview request names an internal or metadata address"
+     ],
+     "from": "vulnerable"
+    },
+    "benign": {
+     "events": 2,
+     "alerts": 0,
+     "out": "sample_benign.ndjson: 2 events, 0 alert(s)\n",
+     "matching": [],
+     "titles": [],
+     "from": "fixed"
+    },
+    "fixed_still_alerts": true
+   }
+  },
+  {
+   "id": "02-sqli-order-by",
+   "n": "02",
+   "title": "SQL injection in ORDER BY",
+   "cwe": "CWE-89",
+   "readme": "labs/02-sqli-order-by/README.md",
+   "versions": [
+    {
+     "id": "vulnerable",
+     "label": "Vulnerable",
+     "summary": "The search text is bound as a query parameter, but the sort column is pasted into the SQL string.",
+     "outcome": "A sort value made a second table decide the order of the rows that came back.",
+     "file": "labs/02-sqli-order-by/vulnerable/app.py",
+     "code": "from __future__ import annotations\n\nimport sqlite3\n\nfrom flask import Flask, jsonify, request\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n\n    @app.get(\"/api/products\")\n    def products():\n        sort = request.args.get(\"sort\", \"name\")\n        direction = \"DESC\" if request.args.get(\"order\") == \"desc\" else \"ASC\"\n        needle = f\"%{request.args.get('q', '')}%\"\n        query = f\"SELECT id, name, price FROM products WHERE name LIKE ? ORDER BY {sort} {direction}\"\n        with sqlite3.connect(settings[\"db_path\"]) as conn:\n            try:\n                rows = conn.execute(query, (needle,)).fetchall()\n            except sqlite3.Error:\n                return jsonify(error=\"bad query\"), 400\n        return jsonify([{\"id\": i, \"name\": n, \"price\": p} for i, n, p in rows])\n\n    return app\n",
+     "marks": {
+      "bug": [
+       16
+      ],
+      "changed": []
+     },
+     "tests": [
+      {
+       "name": "test_vulnerable_sort_parameter_lets_another_table_decide_the_order",
+       "role": "impact",
+       "cases": 1,
+       "passed": 1
+      }
+     ],
+     "sinkline": {
+      "command": "sinkline scan vulnerable --no-color",
+      "status": 0,
+      "out": "[CRITICAL] SL-SQLI-001 A03:2021 CWE-89  app.py:19:24\n  SQL built from tainted data\n  flask.request.args reaches sqlite3.Connection.execute without a sanitizer for CWE-89.\n  ┌ source     app.py:13  sort = request.args.get(\"sort\", \"name\")  # flask.request.args\n  │ propagate  app.py:13  sort = request.args.get(\"sort\", \"name\")  # .get()\n  │ propagate  app.py:16  query = f\"SELECT id, name, price FROM products WHERE name LIKE ? ORDER BY {sort} {direction}\"  # f-string\n  └ sink       app.py:19  rows = conn.execute(query, (needle,)).fetchall()  # sqlite3.Connection.execute\n  fix: Use parameterized queries: conn.execute('... WHERE id = ?', (user_id,))\n\n1 finding(s) in 1 file(s), 4 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+      "findings": [
+       {
+        "rule_id": "SL-SQLI-001",
+        "cwe": "CWE-89",
+        "severity": "critical",
+        "file": "app.py",
+        "line": 19,
+        "flow": [
+         {
+          "kind": "source",
+          "line": 13
+         },
+         {
+          "kind": "propagate",
+          "line": 13
+         },
+         {
+          "kind": "propagate",
+          "line": 16
+         },
+         {
+          "kind": "sink",
+          "line": 19
+         }
+        ]
+       }
+      ],
+      "reading": "true positive",
+      "note": ""
+     }
+    },
+    {
+     "id": "fixed",
+     "label": "Fixed",
+     "summary": "The sort value is looked up in a dictionary of columns the application owns; anything else is a 400.",
+     "outcome": "The same sort values got a 400 and nothing from the second table appeared in a response.",
+     "file": "labs/02-sqli-order-by/fixed/app.py",
+     "code": "from __future__ import annotations\n\nimport sqlite3\n\nfrom flask import Flask, jsonify, request\n\nSORT_COLUMNS = {\"id\": \"id\", \"name\": \"name\", \"price\": \"price\"}\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n\n    @app.get(\"/api/products\")\n    def products():\n        column = SORT_COLUMNS.get(request.args.get(\"sort\", \"name\"))\n        if column is None:\n            return jsonify(error=\"unsupported sort column\"), 400\n        direction = \"DESC\" if request.args.get(\"order\") == \"desc\" else \"ASC\"\n        needle = f\"%{request.args.get('q', '')}%\"\n        query = f\"SELECT id, name, price FROM products WHERE name LIKE ? ORDER BY {column} {direction}\"\n        with sqlite3.connect(settings[\"db_path\"]) as conn:\n            rows = conn.execute(query, (needle,)).fetchall()\n        return jsonify([{\"id\": i, \"name\": n, \"price\": p} for i, n, p in rows])\n\n    return app\n",
+     "marks": {
+      "bug": [],
+      "changed": [
+       6,
+       7,
+       15,
+       16,
+       17,
+       20,
+       22
+      ]
+     },
+     "tests": [
+      {
+       "name": "test_fixed_endpoint_rejects_non_column_sort_values",
+       "role": "blocked",
+       "cases": 3,
+       "passed": 3
+      },
+      {
+       "name": "test_fixed_endpoint_keeps_normal_sorting_and_filtering",
+       "role": "feature",
+       "cases": 1,
+       "passed": 1
+      }
+     ],
+     "sinkline": {
+      "command": "sinkline scan fixed --no-color",
+      "status": 0,
+      "out": "[CRITICAL] SL-SQLI-001 A03:2021 CWE-89  app.py:22:20\n  SQL built from tainted data\n  flask.request.args reaches sqlite3.Connection.execute without a sanitizer for CWE-89.\n  ┌ source     app.py:15  column = SORT_COLUMNS.get(request.args.get(\"sort\", \"name\"))  # flask.request.args\n  │ propagate  app.py:15  column = SORT_COLUMNS.get(request.args.get(\"sort\", \"name\"))  # .get()\n  │ call       app.py:15  column = SORT_COLUMNS.get(request.args.get(\"sort\", \"name\"))  # SORT_COLUMNS.get() (unknown; assumed passthrough)\n  │ propagate  app.py:15  column = SORT_COLUMNS.get(request.args.get(\"sort\", \"name\"))  # assigned to `column`\n  │ propagate  app.py:20  query = f\"SELECT id, name, price FROM products WHERE name LIKE ? ORDER BY {column} {direction}\"  # f-string\n  └ sink       app.py:22  rows = conn.execute(query, (needle,)).fetchall()  # sqlite3.Connection.execute\n  fix: Use parameterized queries: conn.execute('... WHERE id = ?', (user_id,))\n\n1 finding(s) in 1 file(s), 4 function(s) summarized\nby OWASP: A03:2021 Injection: 1\n",
+      "findings": [
+       {
+        "rule_id": "SL-SQLI-001",
+        "cwe": "CWE-89",
+        "severity": "critical",
+        "file": "app.py",
+        "line": 22,
+        "flow": [
+         {
+          "kind": "source",
+          "line": 15
+         },
+         {
+          "kind": "propagate",
+          "line": 15
+         },
+         {
+          "kind": "call",
+          "line": 15
+         },
+         {
+          "kind": "propagate",
+          "line": 15
+         },
+         {
+          "kind": "propagate",
+          "line": 20
+         },
+         {
+          "kind": "sink",
+          "line": 22
+         }
+        ]
+       }
+      ],
+      "reading": "false positive",
+      "note": "False positive. sinkline treats the allow-list dictionary lookup as an unknown call and assumes passthrough."
+     }
+    }
+   ],
+   "detection": {
+    "rule": "labs/02-sqli-order-by/detection/web_sqli_order_by_injection.yml",
+    "titles": [
+     "Product API sort parameter is not a plain column name"
+    ],
+    "correlation": null,
+    "test": {
+     "name": "test_detection_rule_fires_on_recorded_attack_not_on_benign_traffic",
+     "role": "detect",
+     "cases": 1,
+     "passed": 1
+    },
+    "attack": {
+     "events": 4,
+     "alerts": 1,
+     "out": "sample_attack.ndjson: 4 events, 1 alert(s)\n  ALERT 'Product API sort parameter is not a plain column name': 2 matching event(s)\n",
+     "matching": [
+      2
+     ],
+     "titles": [
+      "Product API sort parameter is not a plain column name"
+     ],
+     "from": "vulnerable"
+    },
+    "benign": {
+     "events": 4,
+     "alerts": 0,
+     "out": "sample_benign.ndjson: 4 events, 0 alert(s)\n",
+     "matching": [],
+     "titles": [],
+     "from": "fixed"
+    },
+    "fixed_still_alerts": true
+   }
+  },
+  {
+   "id": "03-idor-bola",
+   "n": "03",
+   "title": "IDOR / broken object-level authorization",
+   "cwe": "CWE-639",
+   "readme": "labs/03-idor-bola/README.md",
+   "versions": [
+    {
+     "id": "vulnerable",
+     "label": "Vulnerable",
+     "summary": "The read-by-id route checks that someone is logged in but not that the invoice is theirs; the list and update routes do check.",
+     "outcome": "A logged-in user received another user's invoice, including its memo, and every one of the eight ids answered 200.",
+     "file": "labs/03-idor-bola/vulnerable/app.py",
+     "code": "from __future__ import annotations\n\nimport secrets\n\nfrom flask import Flask, jsonify, request\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n    invoices = {item[\"id\"]: item for item in settings[\"invoices\"]}\n    sessions: dict[str, str] = {}\n\n    def current_user() -> str | None:\n        return sessions.get(request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \"))\n\n    @app.post(\"/api/login\")\n    def login():\n        body = request.get_json(silent=True) or {}\n        if settings[\"users\"].get(body.get(\"user\")) != body.get(\"password\"):\n            return jsonify(error=\"bad credentials\"), 401\n        token = secrets.token_hex(16)\n        sessions[token] = body[\"user\"]\n        return jsonify(token=token)\n\n    @app.get(\"/api/invoices\")\n    def list_invoices():\n        user = current_user()\n        if user is None:\n            return jsonify(error=\"login required\"), 401\n        return jsonify([i for i in invoices.values() if i[\"owner\"] == user])\n\n    @app.get(\"/api/invoices/<int:object_id>\")\n    def get_invoice(object_id: int):\n        if current_user() is None:\n            return jsonify(error=\"login required\"), 401\n        if object_id not in invoices:\n            return jsonify(error=\"not found\"), 404\n        return jsonify(invoices[object_id])\n\n    @app.patch(\"/api/invoices/<int:object_id>\")\n    def update_invoice(object_id: int):\n        user = current_user()\n        if user is None:\n            return jsonify(error=\"login required\"), 401\n        invoice = invoices.get(object_id)\n        if invoice is None or invoice[\"owner\"] != user:\n            return jsonify(error=\"not found\"), 404\n        invoice[\"memo\"] = (request.get_json(silent=True) or {}).get(\"memo\", invoice[\"memo\"])\n        return jsonify(invoice)\n\n    return app\n",
+     "marks": {
+      "bug": [
+       38
+      ],
+      "changed": []
+     },
+     "tests": [
+      {
+       "name": "test_vulnerable_api_returns_another_users_record",
+       "role": "impact",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_vulnerable_patch_route_already_checks_ownership",
+       "role": "inconsistency",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_requests_without_a_login_are_rejected[vulnerable]",
+       "role": "login",
+       "cases": 1,
+       "passed": 1
+      }
+     ],
+     "sinkline": {
+      "command": "sinkline scan vulnerable --no-color",
+      "status": 0,
+      "out": "0 finding(s) in 1 file(s), 12 function(s) summarized\nby OWASP: none\n",
+      "findings": [],
+      "reading": "missed",
+      "note": "Not reported, as the write-up expects: a missing authorization check is not a taint flow."
+     }
+    },
+    {
+     "id": "fixed",
+     "label": "Fixed",
+     "summary": "One helper checks ownership and every by-id route goes through it; a record that is not yours answers 404.",
+     "outcome": "Every record the user did not own answered 404 on read and on update, and the other user's memo never appeared.",
+     "file": "labs/03-idor-bola/fixed/app.py",
+     "code": "from __future__ import annotations\n\nimport secrets\n\nfrom flask import Flask, abort, jsonify, request\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n    invoices = {item[\"id\"]: item for item in settings[\"invoices\"]}\n    sessions: dict[str, str] = {}\n\n    def current_user() -> str:\n        user = sessions.get(request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \"))\n        if user is None:\n            abort(401)\n        return user\n\n    def owned_invoice(object_id: int) -> dict:\n        invoice = invoices.get(object_id)\n        if invoice is None or invoice[\"owner\"] != current_user():\n            abort(404)\n        return invoice\n\n    @app.errorhandler(401)\n    @app.errorhandler(404)\n    def error(exc):\n        return jsonify(error=exc.name.lower()), exc.code\n\n    @app.post(\"/api/login\")\n    def login():\n        body = request.get_json(silent=True) or {}\n        if settings[\"users\"].get(body.get(\"user\")) != body.get(\"password\"):\n            return jsonify(error=\"bad credentials\"), 401\n        token = secrets.token_hex(16)\n        sessions[token] = body[\"user\"]\n        return jsonify(token=token)\n\n    @app.get(\"/api/invoices\")\n    def list_invoices():\n        user = current_user()\n        return jsonify([i for i in invoices.values() if i[\"owner\"] == user])\n\n    @app.get(\"/api/invoices/<int:object_id>\")\n    def get_invoice(object_id: int):\n        return jsonify(owned_invoice(object_id))\n\n    @app.patch(\"/api/invoices/<int:object_id>\")\n    def update_invoice(object_id: int):\n        invoice = owned_invoice(object_id)\n        invoice[\"memo\"] = (request.get_json(silent=True) or {}).get(\"memo\", invoice[\"memo\"])\n        return jsonify(invoice)\n\n    return app\n",
+     "marks": {
+      "bug": [],
+      "changed": [
+       5,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20,
+       21,
+       22,
+       23,
+       24,
+       25,
+       26,
+       27,
+       28,
+       46,
+       50
+      ]
+     },
+     "tests": [
+      {
+       "name": "test_requests_without_a_login_are_rejected[fixed]",
+       "role": "login",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_fixed_api_hides_other_users_records_on_every_route",
+       "role": "blocked",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_fixed_api_still_serves_owners_their_own_records",
+       "role": "feature",
+       "cases": 1,
+       "passed": 1
+      }
+     ],
+     "sinkline": {
+      "command": "sinkline scan fixed --no-color",
+      "status": 0,
+      "out": "0 finding(s) in 1 file(s), 16 function(s) summarized\nby OWASP: none\n",
+      "findings": [],
+      "reading": "clean",
+      "note": ""
+     }
+    }
+   ],
+   "detection": {
+    "rule": "labs/03-idor-bola/detection/web_idor_object_id_enumeration.yml",
+    "titles": [
+     "Invoice read by id",
+     "One session reads many different invoice ids in a short time"
+    ],
+    "correlation": {
+     "type": "value_count",
+     "group_by": "session",
+     "timespan": "1m",
+     "gte": 5,
+     "field": "object_id"
+    },
+    "test": {
+     "name": "test_detection_rule_fires_on_recorded_enumeration_not_on_benign_traffic",
+     "role": "detect",
+     "cases": 1,
+     "passed": 1
+    },
+    "attack": {
+     "events": 11,
+     "alerts": 1,
+     "out": "sample_attack.ndjson: 11 events, 1 alert(s)\n  ALERT 'One session reads many different invoice ids in a short time': 6 matching event(s)\n",
+     "matching": [
+      6
+     ],
+     "titles": [
+      "One session reads many different invoice ids in a short time"
+     ],
+     "from": "vulnerable"
+    },
+    "benign": {
+     "events": 4,
+     "alerts": 0,
+     "out": "sample_benign.ndjson: 4 events, 0 alert(s)\n",
+     "matching": [],
+     "titles": [],
+     "from": "fixed"
+    },
+    "fixed_still_alerts": true
+   }
+  }
+ ]
+}

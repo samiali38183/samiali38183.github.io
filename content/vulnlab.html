@@ -1,0 +1,115 @@
+<!--@dek-->
+A localhost-only training lab: three small Flask services, each with one textbook web bug (SSRF through a redirect, SQL injection in ORDER BY, a missing object-level authorization check). Every lab has a fixed version, tests that show the impact on the vulnerable service and then the same checks failing against the fix, a Sigma rule replayed on recorded logs, and a record of what <a href="/projects/sinkline/">sinkline</a> does and does not report. It is a training lab, not vulnerability research.
+
+<!--@bench-->
+{{bench:vulnlab}}
+
+<!--@bench-cap-->
+{{bench:vulnlab-cap}}
+
+<!--@as-found-->
+<div class="prose">
+<p>Each vulnerable service is under 60 lines, has no comment pointing at its bug, and does the intended job. What goes wrong is one missing check, and each test first confirms that the intended protection works for the direct case, then shows the impact. Everything the tests touch is data the test created: a marker string, a temporary SQLite file, seeded records.</p>
+</div>
+{{key:main}}
+{{strips:main}}
+<div class="scroll wide"><table class="tbl">
+<caption>What each vulnerable service does wrong, the line, and the impact its test observes</caption>
+<thead><tr><th scope="col">Lab</th><th scope="col">What it does wrong</th><th scope="col">Root cause (vulnerable line)</th><th scope="col">What the test observes</th></tr></thead>
+<tbody>
+<tr class="row-fail"><th scope="row">01 SSRF through a redirect<br>CWE-918</th><td>A link-preview endpoint checks the host of the URL it was given once, then fetches it with a client that follows redirects on its own.</td><td>The allow-list never sees the second URL, so an allowed host that redirects anywhere is a pass to anywhere.<pre tabindex="0" data-label="01 vulnerable/app.py, lines 20 and 23"><code>if not host_allowed(url):
+    ...
+upstream = requests.get(url, timeout=3)</code></pre></td><td>The direct request to the internal address got 403. The request through the allowed host's redirect got 200, and the preview contained the internal service's marker; the internal service logged one request it should never have received.</td></tr>
+<tr class="row-fail"><th scope="row">02 SQL injection in ORDER BY<br>CWE-89</th><td>A product list binds the search text as a query parameter, so the query looks safe, but the sort column is pasted into the SQL string.</td><td>Placeholders cannot stand in for identifiers, so the placeholder protects one position and the f-string opens another.<pre tabindex="0" data-label="02 vulnerable/app.py, line 16"><code>query = f"... ORDER BY {sort} {direction}"</code></pre></td><td>Ordinary sort values behaved. A sort value that depends on a second table changed the order of the rows that came back: data from a table the endpoint never returns decided what it returned. The test stops there and does not recover the marker.</td></tr>
+<tr class="row-fail"><th scope="row">03 IDOR (broken object-level authorization)<br>CWE-639</th><td>An invoice API checks that the caller is logged in on the read-by-id route but not that the invoice is theirs. The list and update routes do check.<sup class="nref" aria-hidden="true"></sup></td><td>Each route re-implements the rule by hand and one forgot.<pre tabindex="0" data-label="03 vulnerable/app.py, lines 34 and 38"><code>if current_user() is None:
+    ...
+return jsonify(invoices[object_id])</code></pre></td><td>A logged-in user's own list contained only their invoices. Asking for another user's invoice returned 200 with that user's memo, and all eight ids answered 200. On the same record the update route already answered 404, so the inconsistency is part of the evidence.</td></tr>
+</tbody>
+</table></div>
+<aside class="note"><strong>IDOR and BOLA</strong> name the same flaw: the server trusts an object id from the client without checking that the caller may use that object (OWASP API1:2023, CWE-639). Sequential ids make other records easy to find but are not the bug; random ids would only make a missing check harder to exploit.</aside>
+
+<!--@as-left-->
+<div class="prose">
+<p>Each fix is small and each lab's tests show it from two sides: the impact check that passed on the vulnerable service fails on the fix, and a second test shows the fixed service still does its job, so a fix that breaks the feature is not accepted. The three labs' own tests (17) and the tests of the loopback guard and the harness (26) all pass: 43 in all.</p>
+</div>
+<div class="scroll wide"><table class="tbl">
+<caption>The three fixes, the tests that check them and what changed</caption>
+<thead><tr><th scope="col">Lab</th><th scope="col">The fix</th><th scope="col">Impact check on the fix</th><th scope="col">Feature check on the fix</th></tr></thead>
+<tbody>
+<tr><th scope="row">01 SSRF through a redirect</th><td>The client no longer follows redirects. The app follows them itself, at most three hops, and checks every hop's host and its resolved address, then connects to that checked address. Only <code>http</code> is accepted.</td><td>Both the direct and the redirected request got 403, the marker was absent and the internal service was never contacted.</td><td>A page on the partner site, directly and through an allowed redirect, still previews.</td></tr>
+<tr><th scope="row">02 SQL injection in ORDER BY</th><td>The sort value is looked up in a dictionary of the three columns the application owns; the text interpolated into the SQL is the dictionary's value, never the caller's. Anything else is a 400.</td><td>Three different non-column sort values each got 400 and nothing from the second table appeared.</td><td>Sorting by each allowed column in both directions and filtering by search text still work.</td></tr>
+<tr><th scope="row">03 IDOR</th><td>One helper decides whether an invoice is the caller's, and every by-id route goes through it. A record that is not yours answers 404, the same answer as "does not exist", so responses do not confirm which ids are in use.</td><td>Every record the user did not own answered 404 on read and on update, and the other user's memo never appeared.</td><td>An owner can still read and update their own invoices and list them; requests without a login get 401.</td></tr>
+</tbody>
+</table></div>
+<h3>The other checks, side by side</h3>
+<div class="prose">
+<p>The tests are the reference. The other two checks are scored against what each lab is known to contain, and they agree with it less.</p>
+</div>
+<div class="scroll wide"><table class="tbl">
+<caption>Recorded results of the three checks on the six services</caption>
+<thead><tr><th scope="col">Check</th><th scope="col">Vulnerable versions</th><th scope="col">Fixed versions</th><th scope="col">Verdict</th></tr></thead>
+<tbody>
+<tr><th scope="row">The lab's own tests</th><td>Impact demonstrated in 3 of 3</td><td>Impact blocked in 3 of 3, features intact</td><td>{{stamp:pass:As left: 3 of 3 fixes verified}}</td></tr>
+<tr class="row-fail"><th scope="row">sinkline 0.5.0</th><td>Reports labs 01 and 02, correctly. Reports nothing on lab 03.</td><td>Still reports labs 01 and 02, which are false positives. Nothing on lab 03.</td><td>{{stamp:limit:2 of 3 found, 2 false positives}}</td></tr>
+<tr><th scope="row">Sigma rules, replayed on recorded logs</th><td>1 alert on each lab's attack log</td><td>No alert on each benign log; the attempt against the fixed service still alerts, because the rules see attempts, not outcomes</td><td>{{stamp:limit:Fires on attempts}}</td></tr>
+</tbody>
+</table></div>
+{{key:sinkline}}
+{{strips:sinkline}}
+<div class="prose">
+<p>The write-ups say why. sinkline reports a tainted value reaching a dangerous call; it does not recognize a custom allow-list or address check as a sanitizer, and treats a dictionary lookup against constant column names as a pass-through, so it cannot tell the fixes from the bugs in labs 01 and 02. On lab 01 it also does not say that the bug is the redirect: "tainted URL reaches <code>requests.get</code>" would be just as true of an app with no allow-list at all. Lab 03 has no tainted value reaching a sink: the id is used only as a dictionary key, and whether the caller may see the record is a rule of the application that a source-to-sink analyzer has no model of. Finding that class takes authorization tests, a policy layer that fails closed, or review against an access matrix.</p>
+<p>The lab was not changed to hide any of this.</p>
+</div>
+
+<!--@method-->
+<h3>Shape of a lab</h3>
+<div class="prose">
+<p>Each lab is a directory with a <code>vulnerable/app.py</code> and a <code>fixed/app.py</code> (a Flask app with a <code>create_app(settings)</code> function), a <code>lab.py</code> that starts the services for one variant on free loopback ports, <code>test_lab.py</code>, a write-up, the captured sinkline output and a <code>detection/</code> directory with a Sigma rule and two recorded access logs. The two app files differ only where the fix is.</p>
+</div>
+<h3>Four statements per lab, each a test</h3>
+<div class="prose">
+<ol>
+<li>Proof on the vulnerable service: a control first (the intended protection works for the direct case), then the observable impact.</li>
+<li>The same request against the fixed service does not produce the impact.</li>
+<li>The fixed service still does its job.</li>
+<li>The detection rule fires on the recorded attack log and not on the recorded benign log, and the attempt against the fixed service is still visible to the rule.</li>
+</ol>
+</div>
+<h3>Access log and detection</h3>
+<div class="prose">
+<p>The harness appends one JSON object per request to a log file: timestamp, client address, method, path, raw query string, status, a short hash of the Authorization header as <code>session</code> and the route's <code>object_id</code>. Field names follow W3C-style web-server logs, so the rules read like web-server rules. Single-event rules are compiled by <a href="/projects/tripline/">tripline</a>'s engine (pySigma parses, tripline walks the condition tree), with its logsource router bypassed because that router knows only Windows, Linux auditd and CloudTrail. Lab 03's rule is a correlation (an event count of distinct <code>object_id</code> values per session within a minute) that tripline does not implement, so the lab's own windowing code in <code>vulnlab_common/replay.py</code> evaluates it.</p>
+</div>
+<h3>One real run</h3>
+<div class="prose"><p>Run on 2026-11-11 from a fresh clone at tag v0.1.0 (Windows 11, Python 3.12.2) as <code>bash tools/demo.sh</code>, which runs lab 01 end to end. Trimmed: the pytest header and timings are removed, and the two sinkline reports are on Plate 1.</p></div>
+<pre data-copy data-label="$ bash tools/demo.sh (lab 01, trimmed)"><code>=== 1. vulnerable service: the preview endpoint returns the internal service's canary via an allowed redirect ===
+labs/01-ssrf-redirect/test_lab.py::test_vulnerable_service_returns_internal_marker_via_allowed_redirect PASSED
+=== 2. what sinkline reports on the vulnerable version ===
+[HIGH] SL-SSRF-001 ... CWE-918  app.py:23:24   (full output on Plate 1)
+=== 3. fixed service: the same request is refused and the internal service is never contacted ===
+labs/01-ssrf-redirect/test_lab.py::test_fixed_service_does_not_return_internal_marker PASSED
+labs/01-ssrf-redirect/test_lab.py::test_fixed_service_still_previews_pages_and_follows_allowed_redirects PASSED
+=== 4. what sinkline reports on the fixed version (a documented false positive) ===
+[HIGH] SL-SSRF-001 ... CWE-918  app.py:42:24   (full output on Plate 1)
+=== 5. replay the Sigma rule over the recorded logs ===
+sample_attack.ndjson: 2 events, 1 alert(s)
+  ALERT 'URL preview request names an internal or metadata address': 2 matching event(s)
+sample_benign.ndjson: 2 events, 0 alert(s)</code></pre>
+<h3>Safety scope</h3>
+<div class="prose">
+<p>Everything binds to loopback. The harness refuses to start a service on any other host, and every request the tests make goes through a client that checks the URL first and accepts only <code>localhost</code> or a literal loopback address, with no DNS lookup. The stand-in "internal" address in lab 01 is 127.0.0.2, which is still loopback. 26 tests under <code>tests/</code> assert the guard, including look-alike names and private and link-local addresses, and that no lab test names a non-loopback URL. There is no shell, persistence, evasion or scanning code in the repository.</p>
+</div>
+
+<!--@limits-->
+<ul class="prose">
+<li><strong>It is a training lab, and the bugs are simpler than real ones.</strong> Each is a textbook class written small enough to fit on one screen: one file, one bug, in-memory or temporary data, no framework configuration, no concurrency and no real identity provider. Finding such a bug in real code is the hard part, and these labs do not exercise it.</li>
+<li><strong>No CVEs, no disclosures, no findings against real software.</strong> None are claimed, and no real product or vendor is reproduced.</li>
+<li><strong>Scope is loopback only.</strong> The services run on 127.0.0.1 and start on random ports; the repository's own guard refuses anything else. It is not a scanner, an exploitation toolkit or a target for anything else, and the vulnerable apps must not be deployed or exposed on a network.</li>
+<li><strong>sinkline reports both fixed injection-style services,</strong> because it does not recognize a custom allow-list, address check or constant-column lookup as a sanitizer. Those two findings are false positives. It reports <strong>nothing on the missing-authorization lab,</strong> vulnerable or fixed, because that bug is not a taint flow: the blind spot of static taint analysis, not a defect of the scan.</li>
+<li><strong>The detection rules see attempts, not impact.</strong> They fire on the fixed services too. Lab 01's rule matches literal internal and metadata addresses and misses an internal target named by hostname or written in another address form; lab 02's matches anything in the sort value other than letters, digits and underscore, so a client that legitimately sends a multi-column sort would be a false positive.</li>
+<li><strong>The IDOR rule is a correlation with an untuned threshold.</strong> Five or more distinct invoice ids per session in a minute is evaluated by the lab's own windowing code, since tripline has no correlation support. A single targeted read of one other user's invoice produces no alert at all, which is the real gap: this class has no request-level signature.</li>
+<li><strong>The fixes are checked by the tests listed, not proven.</strong> Lab 01's fix accepts only <code>http</code>: pinning an address for <code>https</code> needs a custom adapter that keeps SNI and certificate checks on the original hostname, and that is not done here. Nothing was tested against real traffic.</li>
+<li><strong>The page shows recorded results.</strong> It evaluates nothing, runs no service and sends no request. Request strings and logs are not reproduced here; the observable results are described in prose and the labs' own tests are linked below.</li>
+</ul>
+
+<!--@trace-->
+<p class="prose muted">The sinkline text files recorded in the repository (<code>labs/*/sinkline/*.txt</code>) show the path glyphs as garbled characters, a character-encoding slip when they were written on Windows. The capture script for this page undoes the slip, checks that the text then equals a fresh run of sinkline 0.5.0, and shows the glyphs the tool prints. Findings, lines and exit status are identical.</p>

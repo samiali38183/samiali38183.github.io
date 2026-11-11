@@ -34,11 +34,11 @@ PAGES = [
      "Sami Ali, George Mason University class of 2028. Detection, application-security and vulnerability-management tools, each checked against a reference, with the readings and CI runs.",
      "home", None),
     ("/projects/", "projects", "Projects | Sami Ali",
-     "Six security tools, each checked against a reference: tripline, sinkline, kevgate, kevgate-admit, fuzzdiff and kev-risk-prioritization, with readings, limits and CI evidence.",
+     "Seven projects, each checked against a reference: tripline, sinkline, kevgate, kevgate-admit, vulnlab, fuzzdiff and kev-risk-prioritization, with readings, limits and CI evidence.",
      "projects", None),
 ] + [
     (f"/projects/{slug}/", "projects", None, None, "project", slug)
-    for slug in ["tripline", "sinkline", "kevgate", "kevgate-admit", "fuzzdiff", "kev-risk-prioritization"]
+    for slug in ["tripline", "sinkline", "kevgate", "kevgate-admit", "vulnlab", "fuzzdiff", "kev-risk-prioritization"]
 ] + [
     ("/experience/", "experience", "Experience | Sami Ali",
      "DHS HS-POWER intern on CBP's Vulnerability Assessment Team, May to August 2026. Education and certifications.",
@@ -170,7 +170,7 @@ def render(ctx: dict, kind: str, arg: str | None, path: str) -> tuple[str, str, 
     elif kind == "project":
         p = ctx["projects"]["projects"][arg]
         body = P.project_page(ctx, arg)
-        sheetline = (f'<p class="wrap sheetline"><b>Sheet {p["sheet"]} of 6</b> &middot; {html.escape(p["name"])}'
+        sheetline = (f'<p class="wrap sheetline"><b>Sheet {p["sheet"]} of {len(ctx["projects"]["order"])}</b> &middot; {html.escape(p["name"])}'
                      f' &middot; {html.escape(p["version"] if p["version"].startswith("v") else "main")}</p>')
         bn = p.get("bench", arg)
         if (ROOT / "assets/js" / f"bench-{bn}.js").exists():
