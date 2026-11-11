@@ -9,9 +9,9 @@
 .bl-prov{margin:var(--s-5) 0 0;text-transform:none;letter-spacing:0}
 .wb-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-3) var(--s-6);margin:0 0 var(--s-4)}
 .wb-s{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 var(--s-3);min-width:0}
-.wb-s label{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
-.wb-s output{font:600 var(--step-0)/1 var(--mono);font-variant-numeric:tabular-nums}
-.wb-s input{grid-column:1/-1;width:100%;min-height:2.75rem;margin:0;accent-color:var(--ink)}
+.wb-s label{grid-row:1;grid-column:1;font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.wb-s output{grid-row:1;grid-column:2;font:600 var(--step-0)/1 var(--mono);font-variant-numeric:tabular-nums}
+.wb-s input{grid-row:2;grid-column:1/-1;width:100%;min-height:2.75rem;margin:0;accent-color:var(--ink)}
 .wb-fl{margin:0 0 var(--s-5);font-size:var(--step--1)}
 .wb-f{display:inline-block;max-width:100%}
 .wb-h{margin:var(--s-5) 0 var(--s-2);font-size:var(--step-1)}
@@ -21,7 +21,7 @@
 .wb-t{width:100%;min-width:44rem;border-collapse:collapse;font-size:var(--step--1);line-height:1.4;margin:0}
 .wb-t caption{text-align:left;font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2);padding-bottom:var(--s-2);position:sticky;left:0}
 .wb-t thead th{font:400 var(--step--1)/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);text-align:left;padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:2px solid var(--ink);vertical-align:bottom}
-.wb-t td,.wb-t tbody th{padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:1px solid var(--rule);vertical-align:middle;text-align:left;font-family:var(--mono);font-weight:400;font-size:.8125rem}
+.wb-t td,.wb-t tbody th{white-space:nowrap;padding:var(--s-2) var(--s-3) var(--s-2) 0;border-bottom:1px solid var(--rule);vertical-align:middle;text-align:left;font-family:var(--mono);font-weight:400;font-size:.8125rem}
 .wb-t .num{text-align:right;font-variant-numeric:tabular-nums slashed-zero}
 .wb-t tr.cut>*{border-top:2px solid var(--ink)}
 .wb-t td:last-child{padding-right:0}

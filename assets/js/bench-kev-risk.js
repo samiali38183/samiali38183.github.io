@@ -122,7 +122,7 @@ async function init() {
   sliders.forEach((s) => s.inp.addEventListener('input', () => render(false)));
 
   const head = ['Rank', 'CVE', 'Asset', 'KEV', 'CVSS', 'EPSS', 'ACR', 'Days open', 'Risk score', 'Against default'];
-  const table = h('table', { class: 'tbl wb-t' },
+  const table = h('table', { class: 'wb-t' },
     h('caption', { text: 'The 20 synthetic findings in the order the chosen weights give. A line marks the end of the top ' + TOP + '.' }),
     h('thead', null, h('tr', null, ...head.map((t, i) => h('th', { scope: 'col', class: i > 3 && i < 9 ? 'num' : '', text: t })))), tbody);
   const keyEl = h('ul', { class: 'key', 'aria-label': 'How to read the strips' },

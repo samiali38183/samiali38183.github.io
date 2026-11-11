@@ -164,12 +164,12 @@ def kev_snapshot_plate() -> str:
     for t in ("0.1", "0.5", "0.9"):
         x = xp(float(t))
         k = th[t]
-        left = t == "0.1"
+        side = {"0.1": (-8, 20, "end"), "0.5": (8, -8, "start"), "0.9": (-8, 4, "end")}[t]
         marks.append(f'<line class="thr" x1="{x:.1f}" x2="{x:.1f}" y1="{T - 6}" y2="{T + ph}"/>'
                      f'<text class="t b" x="{x:.1f}" y="{T - 10}" text-anchor="middle">{t}</text>'
                      f'<rect class="pt" x="{x - 4:.1f}" y="{yp(k["kev_pct"] / 100) - 4:.1f}" width="8" height="8"/>'
-                     f'<text class="t b" x="{x + (-8 if left else 8):.1f}" y="{yp(k["kev_pct"] / 100) - 8:.1f}" '
-                     f'text-anchor="{"end" if left else "start"}">{k["kev_pct"]}%</text>')
+                     f'<text class="t b" x="{x + side[0]:.1f}" y="{yp(k["kev_pct"] / 100) + side[1]:.1f}" '
+                     f'text-anchor="{side[2]}">{k["kev_pct"]}%</text>')
     svg = (f'<svg viewBox="0 0 {W} {H}" role="img" aria-labelledby="ksn-t ksn-d">'
            '<title id="ksn-t">Share of CVEs at or above each EPSS value, KEV against sampled non-KEV</title>'
            f'<desc id="ksn-d">Two falling curves on a log scale from 0.001 to 1. KEV curve: {th["0.1"]["kev_pct"]}% of KEV CVEs have EPSS 0.1 or higher, '
@@ -177,14 +177,14 @@ def kev_snapshot_plate() -> str:
            f'{th["0.5"]["sample_pct"]}% and {th["0.9"]["sample_pct"]}% at the same thresholds. The table below gives the same numbers.</desc>'
            + "".join(g) + f'<polyline class="c2" points="{pts(s["non_kev"])}"/><polyline class="c1" points="{pts(s["kev"])}"/>'
            + "".join(marks)
-           + f'<text class="t b" x="{xp(0.0015):.1f}" y="{yp(.9):.1f}">KEV, {_n(m["kev_rows"])} CVEs</text>'
+           + f'<text class="t b" x="{xp(0.005):.1f}" y="{yp(.85):.1f}">KEV, {_n(m["kev_rows"])} CVEs</text>'
            f'<text class="t b" x="{xp(0.0015):.1f}" y="{yp(.3):.1f}">Sampled non-KEV,</text>'
            f'<text class="t b" x="{xp(0.0015):.1f}" y="{yp(.3) + 16:.1f}">{_n(m["non_kev_rows"])} CVEs</text>'
            f'<text class="t" x="{L + pw / 2:.1f}" y="{H - 6}" text-anchor="middle">EPSS value (log scale)</text></svg>')
     rows = []
     for t in ("0.1", "0.5", "0.9"):
         k = th[t]
-        rows.append(f'<tr><th scope="row" class="num">{t}</th><td class="num">{_n(k["kev"])} ({k["kev_pct"]}%)</td>'
+        rows.append(f'<tr><th scope="row" class="num">at or above {t}</th><td class="num">{_n(k["kev"])} ({k["kev_pct"]}%)</td>'
                     f'<td class="num">{_n(k["sample"])} ({k["sample_pct"]}%)</td><td class="num">{_n(k["pop_non_kev"])}</td>'
                     f'<td class="num">{k["precision_pct"]}%</td></tr>')
     table = (f'<div class="scroll"><table class="tbl"><caption>Text equivalent of the figure: CVEs at or above each EPSS value</caption><thead><tr>'
