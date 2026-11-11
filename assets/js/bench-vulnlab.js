@@ -5,7 +5,7 @@
 const READING = {
   'true positive': 'Correct: the finding is the bug.',
   'false positive': 'False positive: this version is fixed.',
-  missed: 'Not reported. The write-up expects this: a missing check is not a taint flow.',
+  missed: 'Not reported.',
   clean: 'Nothing to report on the fixed version.',
 };
 
