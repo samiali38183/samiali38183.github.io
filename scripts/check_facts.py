@@ -66,7 +66,7 @@ def main() -> int:
     ap.add_argument("--clones", required=True)
     ap.add_argument("--venv", action="append", default=[])
     ap.add_argument("--go", default="go")
-    ap.add_argument("--only", choices=["sinkline"], help="run only the sinkline checks (when the other toolchains are not installed)")
+    ap.add_argument("--only", choices=["sinkline", "tripline"], help="run only one project's checks (when the other toolchains are not installed)")
     a = ap.parse_args()
     clones = Path(a.clones)
     venvs = dict(v.split("=", 1) for v in a.venv)
@@ -81,7 +81,7 @@ def main() -> int:
         expect(f"{repo} latest release on home", tag, "index.html")
 
     # tripline
-    if not a.only:
+    if a.only in (None, "tripline"):
         t = clones / "tripline"
         sc = json.loads((t / "docs" / "scorecard.json").read_text(encoding="utf-8"))["totals"]
         expect("tripline gate", f"{sc['passed']} passed, {sc['failed']} failed, {sc['pending']} pending", "projects/tripline/index.html")
@@ -129,6 +129,14 @@ def main() -> int:
         ev = bd["events"]
         results.append((len(ev) == 36 and sum(e["s"] for e in ev) == 0 and sum(e["r"] for e in ev) == 2, "bench events: 36, stock 0, replacement 2"))
         expect("bench parity cases", str(bd["meta"]["parity_cases"]), "projects/tripline/index.html", f"on {bd['meta']['parity_cases']} command lines")
+
+    if a.only == "tripline":
+        all_html = "".join(p.read_text(encoding="utf-8") for p in SITE.rglob("*.html") if "content" not in p.parts)
+        for repo, rid in sorted(set(re.findall(r"github\.com/samiali38183/(tripline)/actions/runs/(\d+)", all_html))):
+            r = gh(f"repos/samiali38183/{repo}/actions/runs/{rid}")
+            red = rid in {"41838714456", "42917025570"}  # recording runs, red by design
+            results.append((r.get("conclusion") == ("failure" if red else "success"), f"CI run {repo}/{rid}: conclusion={r.get('conclusion')}{' (expected red)' if red else ''}"))
+        return report()
 
     # sinkline (the clone must be at the v0.5.0 tag or main at that commit)
     s = clones / "sinkline"
