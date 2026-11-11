@@ -152,12 +152,66 @@ def kev_risk_checks(clones: Path, venvs: dict[str, str]) -> None:
         results.append((r.get("conclusion") == "success", f"CI run {repo}/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
 
 
+def admit_checks(clones: Path, env_go: str) -> None:
+    """kevgate-admit sheet: tests, coverage, parity vectors, release, image, Admission desk data."""
+    page = "projects/kevgate-admit/index.html"
+    ka = clones / "kevgate-admit"
+    tag = gh("repos/samiali38183/kevgate-admit/releases/latest")["tag_name"]
+    expect("kevgate-admit latest release", tag, page)
+    expect("kevgate-admit latest release on home", tag, "index.html")
+    tagsha = run(["git", "rev-list", "-n1", tag], ka).strip()
+    head = run(["git", "rev-parse", "HEAD"], ka).strip()
+    results.append((head == tagsha, f"kevgate-admit clone HEAD {head[:7]} is the {tag} commit {tagsha[:7]}"))
+    expect("kevgate-admit tag commit", tagsha[:7], page)
+    pj = run([env_go, "test", "./...", "-json", "-count=1"], ka)
+    top, allt = set(), set()
+    for line in pj.splitlines():
+        try:
+            e = json.loads(line)
+        except ValueError:
+            continue
+        if e.get("Action") == "pass" and e.get("Test"):
+            allt.add((e["Package"], e["Test"]))
+            if "/" not in e["Test"]:
+                top.add((e["Package"], e["Test"]))
+    expect("kevgate-admit top-level tests", str(len(top)), page, f"{len(top)} top-level")
+    expect("kevgate-admit all tests", str(len(allt)), page, f"{len(allt)} with subtests")
+    expect("kevgate-admit tests in the projects ledger", str(len(top)), "projects/index.html", f"{len(top)} tests")
+    run([env_go, "test", "./...", "-coverprofile=c.out", "-count=1"], ka)
+    cov = run([env_go, "tool", "cover", "-func=c.out"], ka).strip().splitlines()[-1]
+    m = re.search(r"([\d.]+)%", cov)
+    expect("kevgate-admit coverage", m.group(1) + "%", page)
+    expect("kevgate-admit coverage in the projects ledger", m.group(1) + "%", "projects/index.html")
+    vec = json.loads((ka / "internal" / "risk" / "testdata" / "parity_vectors.json").read_text(encoding="utf-8"))
+    expect("kevgate-admit parity vectors", str(len(vec)), page, f"{len(vec)} generated vectors")
+    try:
+        (ka / "c.out").unlink()
+    except OSError:
+        pass
+    img = "sha256:1023382754d9b6b7ca727d47701d9e3bfb5f245a6531e0debd1307ebf9e64195"
+    expect("kevgate-admit image digest", img, page)
+    bench = json.loads((SITE / "assets/data/admission-bench.json").read_text(encoding="utf-8"))
+    results.append((bench["provenance"]["commit"] == tagsha, f"Admission desk data captured at the {tag} commit {bench['provenance']['commit'][:7]}"))
+    n1, n2 = len(bench["results"]), len(bench["signed"]["results"])
+    expect("Admission desk response counts", f"{n1}+{n2}", page, f"{n1 + n2} recorded responses ({n1} decisions, {n2} with signed evidence)")
+    expect("Admission desk scanner entries", str(bench["scanner"]["raw_entries"]), page, f"{bench['scanner']['raw_entries']} entries, 10 findings")
+    nodes = run(["node", str(SITE / "scripts" / "test_bench_admission.mjs")], SITE).strip().splitlines()[-1]
+    results.append(("checks passed" in nodes, f"node scripts/test_bench_admission.mjs: {nodes}"))
+    gen = run([sys.executable, str(SITE / "scripts" / "capture_admission_bench.py"), "--go", env_go, "--check"], SITE)
+    gen = next((ln for ln in gen.splitlines() if ln.startswith("checked")), gen.strip()[-200:])
+    results.append((gen.endswith("OK"), f"capture_admission_bench.py --check: {gen}"))
+    all_html = "".join(p.read_text(encoding="utf-8") for p in SITE.rglob("*.html") if "content" not in p.parts)
+    for repo, rid in sorted(set(re.findall(r"github\.com/samiali38183/(kevgate-admit)/actions/runs/(\d+)", all_html))):
+        r = gh(f"repos/samiali38183/{repo}/actions/runs/{rid}")
+        results.append((r.get("conclusion") == "success", f"CI run {repo}/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--clones", required=True)
     ap.add_argument("--venv", action="append", default=[])
     ap.add_argument("--go", default="go")
-    ap.add_argument("--only", choices=["sinkline", "tripline", "kev"], help="run only one project's checks (when the other toolchains are not installed)")
+    ap.add_argument("--only", choices=["sinkline", "tripline", "kev", "admit"], help="run only one project's checks (when the other toolchains are not installed)")
     a = ap.parse_args()
     clones = Path(a.clones)
     venvs = dict(v.split("=", 1) for v in a.venv)
@@ -173,6 +227,9 @@ def main() -> int:
 
     if a.only == "kev":
         kev_risk_checks(clones, venvs)
+        return report()
+    if a.only == "admit":
+        admit_checks(clones, a.go)
         return report()
 
     # tripline
@@ -352,31 +409,7 @@ def main() -> int:
     kev_risk_checks(clones, venvs)
 
     # kevgate-admit (Go)
-    ka = clones / "kevgate-admit"
-    env_go = a.go
-    pj = run([env_go, "test", "./...", "-json"], ka)
-    top, allt = set(), set()
-    for line in pj.splitlines():
-        try:
-            e = json.loads(line)
-        except ValueError:
-            continue
-        if e.get("Action") == "pass" and e.get("Test"):
-            allt.add((e["Package"], e["Test"]))
-            if "/" not in e["Test"]:
-                top.add((e["Package"], e["Test"]))
-    expect("kevgate-admit top-level tests", str(len(top)), "projects/kevgate-admit/index.html", f"{len(top)} top-level")
-    expect("kevgate-admit all tests", str(len(allt)), "projects/kevgate-admit/index.html", f"{len(allt)} with subtests")
-    run([env_go, "test", "./...", "-coverprofile=c.out"], ka)
-    cov = run([env_go, "tool", "cover", "-func=c.out"], ka).strip().splitlines()[-1]
-    m = re.search(r"([\d.]+)%", cov)
-    expect("kevgate-admit coverage", m.group(1) + "%", "projects/kevgate-admit/index.html")
-    vec = json.loads((ka / "internal" / "risk" / "testdata" / "parity_vectors.json").read_text(encoding="utf-8"))
-    expect("kevgate-admit parity vectors", str(len(vec)), "projects/kevgate-admit/index.html", f"{len(vec)} reference vectors")
-    try:
-        (ka / "c.out").unlink()
-    except OSError:
-        pass
+    admit_checks(clones, a.go)
 
     # fuzzdiff (Rust). Needs cargo and cargo-llvm-cov on PATH.
     fz = clones / "fuzzdiff"

@@ -684,8 +684,8 @@
    "desc": "kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. Strict image-reference parsing, optional signed evidence, a signed published image, 93 tests and 95% coverage.",
    "fact": "An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. v0.1.0: strict image-reference parsing, signed scan reports, an outage test on kind and a signed image on GHCR; 93 tests, 95% coverage. It does not scan images itself.",
    "labels": {
-    "found": "Reference",
-    "left": "Reading"
+    "found": "As found",
+    "left": "As left"
    },
    "found_title": "Five weaknesses in the reviewed version",
    "left_title": "What v0.1.0 changed, and what it still does not do",
