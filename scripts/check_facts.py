@@ -61,12 +61,103 @@ def collected(py: str, repo: Path) -> int:
     return sum(int(x) for x in re.findall(r": (\d+)$", out, re.M))
 
 
+def kev_risk_checks(clones: Path, venvs: dict[str, str]) -> None:
+    """kev-risk-prioritization sheet: tool output, release, snapshot numbers, BOD 26-04 notes, Weight bench data."""
+    page = "projects/kev-risk-prioritization/index.html"
+    kr = clones / "kev-risk-prioritization"
+    py = pybin(venvs, "kev", "python")
+    tag = gh("repos/samiali38183/kev-risk-prioritization/releases/latest")["tag_name"]
+    expect("kev-risk latest release", tag, page)
+    expect("kev-risk latest release on home", tag, "index.html")
+    head = run(["git", "rev-parse", "HEAD"], kr).strip()
+    tagsha = run(["git", "rev-list", "-n1", tag], kr).strip()
+    results.append((head == tagsha, f"kev-risk clone HEAD {head[:7]} is the {tag} commit {tagsha[:7]}"))
+    expect("kev-risk commit", tagsha[:7], page)
+    # tool output on the synthetic demo
+    out = run([py, "kev_prioritize.py", "data/sample_findings.csv", "--kev", "data/sample_kev.json", "--format", "json"], kr)
+    ranked = json.loads(out)["ranked"]
+    kev_n = sum(1 for x in ranked if x["kev"])
+    rows = list(csv.DictReader((kr / "data" / "sample_findings.csv").open(encoding="utf-8")))
+    kevset = {x["cve"] for x in ranked if x["kev"]}
+    cvss_top = sorted(rows, key=lambda x: -float(x["cvss"]))[:12]
+    nk = sum(1 for x in cvss_top if x["cve"].upper() in kevset)
+    top12 = sum(1 for x in ranked[:12] if x["kev"])
+    expect("kev-risk sample (KEV of total)", f"{kev_n} of {len(ranked)}", page, f"n={kev_n}")
+    expect("kev-risk CVSS-only top 12 KEV count", str(nk), page, f"{nk} KEV findings in its top 12")
+    expect("kev-risk risk-score top 12 KEV count", str(top12), page, f"all {top12} KEV findings in its top 12")
+    expect("kev-risk top risk score", str(ranked[0]["risk_score"]), page)
+    expect("kev-risk lowest KEV score", str(min(x["risk_score"] for x in ranked if x["kev"])), page, "lowest-scoring KEV finding scores 85.0")
+    expect("kev-risk highest non-KEV score", str(max(x["risk_score"] for x in ranked if not x["kev"])), page, "highest-scoring non-KEV finding 38.5")
+    n = collected(py, kr)
+    expect("kev-risk tests", str(n), page, f"{n} tests pass")
+    results.append((True, "kev-risk unittest run (info): " + run([py, "-m", "unittest", "discover", "tests"], kr).strip().splitlines()[-1]))
+    # weights in the code
+    src = (kr / "kev_prioritize.py").read_text(encoding="utf-8")
+    results.append(('DEFAULT_WEIGHTS = {"kev": 0.40, "acr": 0.25, "epss": 0.20, "cvss": 0.20}' in src, "kev-risk default weights 0.40 / 0.25 / 0.20 / 0.20 in kev_prioritize.py"))
+    expect("kev-risk weights on page", "0.40 0.25 0.20 0.20", page, "0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10")
+    # real snapshot: generated analysis must be current, and the page must carry its numbers
+    chk = run([py, "scripts/analyze_snapshot.py", "--check"], kr).strip()
+    results.append(("up to date" in chk, f"kev-risk analyze_snapshot.py --check: {chk}"))
+    doc = (kr / "docs" / "real_data_analysis.md").read_text(encoding="utf-8")
+    m = re.search(r"AUC of EPSS for separating KEV from sampled non-KEV: (\d\.\d+)\*\* \(95% bootstrap interval (\d\.\d+) to (\d\.\d+)", doc)
+    results.append((bool(m), "kev-risk analysis doc AUC line found"))
+    snap = json.loads((SITE / "assets/data/kev-snapshot.json").read_text(encoding="utf-8"))
+    if m:
+        results.append(((float(m.group(1)), float(m.group(2)), float(m.group(3))) == (snap["auc"], snap["auc_lo"], snap["auc_hi"]),
+                        f"kev-risk AUC in kev-snapshot.json equals the doc ({m.group(1)}, {m.group(2)} to {m.group(3)})"))
+        expect("kev-risk AUC on page", m.group(1), page, f"AUC of {m.group(1)} (95% bootstrap interval {m.group(2)} to {m.group(3)})")
+    for t in ("0.1", "0.5", "0.9"):
+        tm = re.search(r"\| " + re.escape(t) + r" \| (\d+) \| ([\d.]+)% \| (\d+) \(([\d.]+)%\) \| ([\d.]+)% \| (\d+) \(([\d.]+)%\) \|", doc)
+        if not tm:
+            results.append((False, f"kev-risk analysis doc threshold row {t} not found"))
+            continue
+        k, kp, npop, _, prec, ns, nsp = tm.groups()
+        th = snap["thresholds"][t]
+        same = (th["kev"], th["kev_pct"], th["pop_non_kev"], th["precision_pct"], th["sample"], th["sample_pct"]) == (int(k), float(kp), int(npop), float(prec), int(ns), float(nsp))
+        results.append((same, f"kev-risk threshold {t}: kev-snapshot.json equals the doc (KEV {k}, {kp}%, non-KEV population {npop}, precision {prec}%, sample {ns})"))
+        expect(f"kev-risk threshold {t} on page", f"{int(k):,}", page, f"{int(k):,} ({kp}%)")
+    sj = json.loads((kr / "data" / "snapshot" / "SNAPSHOT.json").read_text(encoding="utf-8"))
+    expect("kev-risk KEV catalogVersion", sj["kev"]["catalogVersion"], page)
+    expect("kev-risk KEV entries", f"{sj['kev']['count']:,}", page, f"{sj['kev']['count']:,} entries")
+    expect("kev-risk EPSS model", sj["epss"]["model_version"], page)
+    expect("kev-risk EPSS date", sj["epss"]["score_date"][:10], page)
+    expect("kev-risk EPSS CVEs scored", f"{sj['epss']['rows_total']:,}", page, f"{sj['epss']['rows_total']:,} CVEs")
+    expect("kev-risk subset rows", f"{sj['subset']['rows']:,}", page, f"{sj['subset']['rows']:,} rows")
+    mix = re.search(r"\| Risk score \(tool\) \| (\d+) \| (\d+) \|", doc)
+    eps = re.search(r"\| EPSS only \| (\d+) \| (\d+) \|", doc)
+    if mix and eps:
+        expect("kev-risk mixed list: tool KEV in top 100", mix.group(2), page, f"puts all {mix.group(2)} KEV findings in its top 100")
+        expect("kev-risk mixed list: EPSS-only KEV in top 100", eps.group(2), page, f"EPSS alone puts {eps.group(2)} there")
+    else:
+        results.append((False, "kev-risk mixed list rows not found in the analysis doc"))
+    # BOD 26-04 notes: the four variables and the scope sentences the page relies on
+    bod = (kr / "docs" / "bod-26-04.md").read_text(encoding="utf-8")
+    for needle in ("Publicly Exposed", "In the KEV", "Automatable by Adversary", "Technical Impact", "BOD 19-02 and BOD 22-01", "Federal Civilian Executive Branch"):
+        results.append((needle in bod, f"kev-risk docs/bod-26-04.md contains {needle!r}"))
+    for needle in ("revokes BOD 19-02 and BOD 22-01", "Publicly exposed", "Automatable by adversary", "In the KEV", "Table 1 was transcribed by eye"):
+        expect("kev-risk BOD statement on page", needle, page, needle)
+    # Weight bench data: regenerated from the tool must equal what is committed, and the JS must match
+    gen = run([py, str(SITE / "scripts" / "gen_bench_kev.py"), "--repo", str(kr), "--check"], SITE)
+    results.append((gen.count("DIFFERENT") == 0 and gen.count("same ") == 3, "gen_bench_kev.py --check: " + " ".join(l.split()[-1] for l in gen.splitlines() if l.startswith(("same", "DIFFERENT")))))
+    bd = json.loads((SITE / "assets/data/bench-kev-risk.json").read_text(encoding="utf-8"))
+    cp = json.loads((SITE / "assets/data/kev-bench-parity.json").read_text(encoding="utf-8"))
+    results.append((bd["meta"]["kev_in_top"] == {"default": 12, "cvss": nk, "epss": 12, "acr": 10}, f"bench KEV-in-top-12 per preset {bd['meta']['kev_in_top']}"))
+    expect("bench parity cases on page", str(cp["meta"]["parity_cases"]), page, f"{cp['meta']['parity_cases']} weight vectors")
+    expect("bench random vectors on page", str(cp["meta"]["random_cases"]), page, f"{cp['meta']['random_cases']} random weight vectors")
+    nodes = run(["node", str(SITE / "scripts" / "test_bench_kev.mjs")], SITE).strip().splitlines()[-1]
+    results.append((nodes.startswith("OK"), f"node scripts/test_bench_kev.mjs: {nodes}"))
+    all_html = "".join(p.read_text(encoding="utf-8") for p in SITE.rglob("*.html") if "content" not in p.parts)
+    for repo, rid in sorted(set(re.findall(r"github\.com/samiali38183/(kev-risk-prioritization)/actions/runs/(\d+)", all_html))):
+        r = gh(f"repos/samiali38183/{repo}/actions/runs/{rid}")
+        results.append((r.get("conclusion") == "success", f"CI run {repo}/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--clones", required=True)
     ap.add_argument("--venv", action="append", default=[])
     ap.add_argument("--go", default="go")
-    ap.add_argument("--only", choices=["sinkline", "tripline"], help="run only one project's checks (when the other toolchains are not installed)")
+    ap.add_argument("--only", choices=["sinkline", "tripline", "kev"], help="run only one project's checks (when the other toolchains are not installed)")
     a = ap.parse_args()
     clones = Path(a.clones)
     venvs = dict(v.split("=", 1) for v in a.venv)
@@ -79,6 +170,10 @@ def main() -> int:
         tag = gh(f"repos/samiali38183/{repo}/releases/latest")["tag_name"]
         expect(f"{repo} latest release", tag, page)
         expect(f"{repo} latest release on home", tag, "index.html")
+
+    if a.only == "kev":
+        kev_risk_checks(clones, venvs)
+        return report()
 
     # tripline
     if a.only in (None, "tripline"):
@@ -254,22 +349,7 @@ def main() -> int:
                         f"CI run {repo}/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')}{' (expected red, linked as the recording source)' if expected_red else ''} sha={r.get('head_sha', '')[:7]}"))
 
     # kev-risk-prioritization
-    kr = clones / "kev-risk-prioritization"
-    out = run([pybin(venvs, "kev", "python"), "kev_prioritize.py", "data/sample_findings.csv", "--kev", "data/sample_kev.json", "--format", "json"], kr)
-    data = json.loads(out)
-    ranked = data["ranked"]
-    kev_n = sum(1 for x in ranked if x["kev"])
-    top12_cvss = sorted(ranked, key=lambda x: -x["cvss"])[:12]
-    # the repo's CVSS-only sort breaks ties by input order; this uses the same stable sort
-    rows = list(csv.DictReader((kr / "data" / "sample_findings.csv").open(encoding="utf-8")))
-    kevset = {x["cve"] for x in ranked if x["kev"]}
-    cvss_top = sorted(rows, key=lambda x: -float(x["cvss"]))[:12]
-    nk = sum(1 for x in cvss_top if x["cve"].upper() in kevset)
-    expect("kev-risk sample (KEV of total)", f"{kev_n} of {len(ranked)}", "projects/kev-risk-prioritization/index.html", f"n={kev_n}")
-    expect("kev-risk CVSS-only top 12 KEV count", str(nk), "projects/kev-risk-prioritization/index.html", f"{nk} KEV findings in its top 12")
-    expect("kev-risk top risk score", str(ranked[0]["risk_score"]), "projects/kev-risk-prioritization/index.html")
-    n = collected(pybin(venvs, "kev", "python"), kr)
-    expect("kev-risk tests", str(n), "projects/kev-risk-prioritization/index.html", f"{n} tests pass")
+    kev_risk_checks(clones, venvs)
 
     # kevgate-admit (Go)
     ka = clones / "kevgate-admit"
