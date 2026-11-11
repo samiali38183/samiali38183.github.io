@@ -176,6 +176,7 @@ def render(ctx: dict, kind: str, arg: str | None, path: str) -> tuple[str, str, 
             extra = f'<script type="module" src="/assets/js/bench-{arg}.js"></script>\n'
     else:
         body = P.expand(ctx, (ROOT / "content" / arg).read_text(encoding="utf-8").strip())
+    body = body.replace('<aside class="note">', '<div class="note" role="note">').replace('</aside>', '</div>')
     body = C.label_tables(number_plates(body))
     title = desc = ""
     return title, desc, body, sheetline, extra

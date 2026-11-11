@@ -62,7 +62,7 @@ def home(ctx: dict) -> str:
             f'<td>{esc(p["home"]["against"])}</td><td>{minis}</td>'
             f'<td class="rd"><b>{esc(p["home"]["reading"])}</b></td><td>{run_chip(ctx, p["home"]["run"])}</td></tr>')
     ledger = (
-        '<table class="tbl ledger"><caption class="vh">Record of checks: six tools, what each was checked against and the reading</caption>'
+        '<table class="tbl wt ledger"><caption class="vh">Record of checks: six tools, what each was checked against and the reading</caption>'
         '<thead><tr><th scope="col">Instrument</th><th scope="col">Checked against</th><th scope="col">As found, then as left</th>'
         '<th scope="col">Reading</th><th scope="col">Evidence</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>")
     ff = []
@@ -73,7 +73,7 @@ def home(ctx: dict) -> str:
             f'<td>{esc(item["text"])}</td><td>{C.stamp(*item["state"])}</td>'
             f'<td><a href="{item["src"][1]}">{esc(item["src"][0])}</a></td></tr>')
     failed = (
-        '<table class="tbl"><caption class="vh">What failed first, with the source of each item</caption>'
+        '<table class="tbl wt"><caption class="vh">What failed first, with the source of each item</caption>'
         '<thead><tr><th scope="col">Instrument</th><th scope="col">What the check found</th><th scope="col">State</th><th scope="col">Source</th></tr></thead>'
         "<tbody>" + "".join(ff) + "</tbody></table>")
     rd = t["reading"]
@@ -132,7 +132,7 @@ def projects_index(ctx: dict) -> str:
         sset = p["strip_sets"]["main"]
         cards.append(
             f'<li><p class="tag label">Sheet {p["sheet"]} of 6 &middot; {esc(p["kind"])}</p>'
-            f'<h3><a href="/projects/{slug}/">{esc(p["name"])}</a></h3>'
+            f'<h2><a href="/projects/{slug}/">{esc(p["name"])}</a></h2>'
             f'<p class="rd">{esc(p["home"]["reading"])}</p>'
             f'{C.strip_rows(sset, mini=True, vt="strip-" + slug)}'
             f'<p class="fact">{esc(p["fact"])}</p></li>')
@@ -143,7 +143,7 @@ def projects_index(ctx: dict) -> str:
             f'<td>{esc(p["home"]["tolerance"])}</td><td>{run_chip(ctx, p["home"]["run"])}</td>'
             f'<td class="num">{esc(p["version"] if p["version"].startswith("v") else "commit " + p["commit"])}</td></tr>')
     table = (
-        '<table class="tbl"><caption class="vh">Full ledger: reference standard, reading as found and as left, limits, evidence and version for each project</caption>'
+        '<table class="tbl wt"><caption class="vh">Full ledger: reference standard, reading as found and as left, limits, evidence and version for each project</caption>'
         '<thead><tr><th scope="col">Instrument</th><th scope="col">Reference standard</th><th scope="col">As found</th><th scope="col">As left</th>'
         '<th scope="col">Tolerance</th><th scope="col">Evidence</th><th scope="col" class="num">Version</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>")
     return f"""<h1>Projects</h1>
