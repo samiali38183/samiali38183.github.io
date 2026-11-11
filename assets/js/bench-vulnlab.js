@@ -72,7 +72,7 @@ export function mount(doc, root, data) {
   const status = t('p', { class: 'vh', role: 'status' });
   const stamp = (s) => t('span', { class: 'stamp' + (s[0] === 'plain' ? '' : ' ' + s[0]), text: s[1] });
   const pre = (cls, label, body) => t('pre', { class: cls, 'data-label': label, tabindex: '0' }, [t('code', { text: body })]);
-  const head = (text) => t('h3', { class: 'vl-h', text });
+  const head = (text) => t('h2', { class: 'vl-h', text });
   const row = (cells, th) => t('tr', {}, cells.map((c, i) => t(i === 0 && th ? 'th' : 'td', th && i === 0 ? { scope: 'row' } : {}, [typeof c === 'string' ? doc.createTextNode(c) : c])));
   const table = (cls, cap, cols, rows) => t('table', { class: 'vl-tab ' + cls }, [
     t('caption', { text: cap }),
@@ -153,9 +153,10 @@ if (typeof document !== 'undefined') {
     fetch('/assets/data/vulnlab-bench.json')
       .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then((data) => {
-        mount(document, live, data);
+        const app = mount(document, live, data);
         live.hidden = false;
         stat.hidden = true;
+        app.show(); // again, now that the pane is laid out: scrolls the marked line into view
       })
       .catch(() => { live.textContent = ''; live.hidden = true; stat.hidden = false; });
   }

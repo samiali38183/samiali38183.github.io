@@ -57,7 +57,7 @@ def summary_table(d: dict) -> str:
             skind, stext = ("plain", "Finding") if s["findings"] else ("off", "No finding")
             rows.append(
                 f'<tr><th scope="row"><span class="label">Lab {lab["n"]}</span><br>{esc(lab["title"])} ({esc(lab["cwe"])})<br><b>{esc(v["label"])}</b></th>'
-                f'<td>{C.stamp(kind, text)}<p>{p} of {c} tests passed</p></td>'
+                f'<td>{C.stamp(kind, text)}<p>{p} of {c} {'test' if c == 1 else 'tests'} passed</p></td>'
                 f'<td>{C.stamp(skind, stext)}<p>{esc(READING[s["reading"]])}</p></td>'
                 f'<td><p>Attack sample: {det["attack"]["events"]} events, {_plural(det["attack"]["alerts"], "alert")}.</p>'
                 f'<p>Benign sample: {det["benign"]["events"]} events, {_plural(det["benign"]["alerts"], "alert")}.</p></td></tr>')
@@ -86,8 +86,8 @@ def version_block(d: dict, lab: dict, v: dict) -> str:
         f'<td>{C.stamp("pass" if t["passed"] == t["cases"] else "fail", ("Pass" if t["passed"] == t["cases"] else "Fail") + (f" ({t["passed"]} of {t["cases"]} cases)" if t["cases"] > 1 else ""))}</td></tr>'
         for t in v["tests"])
     return (
-        f'<section class="vl-sv" data-lab="{esc(lab["id"])}" data-ver="{esc(v["id"])}" aria-labelledby="vls-{esc(lab["id"])}-{v["id"]}">'
-        f'<h4 class="vl-vh" id="vls-{esc(lab["id"])}-{v["id"]}">{esc(v["label"])}</h4>'
+        f'<section class="vl-sv" data-lab="{esc(lab["id"])}" data-ver="{esc(v["id"])}">'
+        f'<h2 class="vl-vh">Lab {lab["n"]}, {esc(v["label"])}</h2>'
         f'<p class="sw-vh">{C.stamp(kind, text)} <span class="vl-say">{esc(v["outcome"])}</span></p>'
         f'<p class="sw-note">{esc(v["summary"])}</p>'
         f'<p class="sw-note">{" ".join(esc(x) for x in marks + flow)}</p>'
@@ -115,8 +115,8 @@ def detection_block(lab: dict) -> str:
                     f'<td>{r["events"]} events, {_plural(r["alerts"], "alert")}</td><td>{C.stamp(rk, rt)}</td></tr>')
     test = det["test"]
     return (
-        f'<section class="vl-sv" data-lab="{esc(lab["id"])}" data-ver="detection" aria-labelledby="vls-{esc(lab["id"])}-det">'
-        f'<h4 class="vl-vh" id="vls-{esc(lab["id"])}-det">Detection replay</h4>'
+        f'<section class="vl-sv" data-lab="{esc(lab["id"])}" data-ver="detection">'
+        f'<h2 class="vl-vh">Lab {lab["n"]}, detection replay</h2>'
         f'<p class="sw-note">Rule: {esc(rule)}. {esc(test["name"])}: {"Pass" if test["passed"] == test["cases"] else "Fail"}.</p>'
         '<div class="scroll wide"><table class="tbl bt"><caption>The rule replayed over two recorded access logs</caption>'
         '<thead><tr><th scope="col">Sample</th><th scope="col">Events and alerts</th><th scope="col">Result</th></tr></thead>'
