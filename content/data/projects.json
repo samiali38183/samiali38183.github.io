@@ -476,7 +476,17 @@
     ]
    ],
    "commit": "a0d6622",
-   "tier": "featured"
+   "tier": "featured",
+   "lede": "When a detection rule changes, this replays recorded attacks through it and fails the build if the rule stays quiet.",
+   "plain": {
+    "what": "It replays recorded attack activity through detection rules every time the rules change, and fails the build if a rule that should fire does not.",
+    "why": "A rule that never fires looks the same as a rule that works, right up until the attack.",
+    "found": "A public SigmaHQ rule for setuid abuse flagged 0 of the 2 attack events in a recording of 36 events. The replacement rule in the repository flags both."
+   },
+   "try": {
+    "kind": "Try it",
+    "text": "Pick a command line and see whether the stock rule and the replacement flag it."
+   }
   },
   "sinkline": {
    "slug": "sinkline",
@@ -809,7 +819,17 @@
     ]
    ],
    "commit": "f879e88",
-   "tier": "featured"
+   "tier": "featured",
+   "lede": "Reads Python web code and flags places where request data reaches a dangerous call, such as a SQL query, without being cleaned first.",
+   "plain": {
+    "what": "It follows data from a web request through functions and files. It reports a finding only if the data reaches a dangerous call without the right clean-up for that kind of bug.",
+    "why": "Escaping HTML does nothing for a SQL query, so a tool has to know which clean-up fits which bug.",
+    "found": "On ten categories of OWASP BenchmarkPython (score = true-positive rate minus false-positive rate), 0.4.1 scored +0.21 and Bandit +0.07. Version 0.5.1 scores +0.52, but those fixes were chosen by reading 0.4.1's failures, so it is not a held-out score. Across all 14 categories Bandit still leads."
+   },
+   "try": {
+    "kind": "Try it",
+    "text": "Switch one small Flask app between unsafe, right sanitizer and wrong sanitizer, and read the real scanner output."
+   }
   },
   "kevgate": {
    "slug": "kevgate",
@@ -963,7 +983,17 @@
     ]
    ],
    "commit": "973c8c1",
-   "tier": "featured"
+   "tier": "featured",
+   "lede": "Takes vulnerability scanner output and returns a fix-first list, with bugs attackers are already exploiting at the top.",
+   "plain": {
+    "what": "A small service that ranks scanner findings by CISA KEV listing, EPSS, CVSS and how critical the asset is. It ships with a container, a Helm chart, Terraform and a CI pipeline.",
+    "why": "The point is to show what shipping a small service carefully looks like: authentication, rate limits, hardened containers, and CI that tests those controls.",
+    "found": "Six defects had survived the 227 tests. Tests were added until each one fails when the defect is put back. The suite is now 277 tests."
+   },
+   "try": {
+    "kind": "See it",
+    "text": "Click a control to see the code and the CI checks behind it."
+   }
   },
   "kevgate-admit": {
    "slug": "kevgate-admit",
@@ -1116,7 +1146,17 @@
    ],
    "commit": "161169a",
    "bench": "kevgate-admit",
-   "tier": "also"
+   "tier": "also",
+   "lede": "A gatekeeper for Kubernetes that refuses, or warns about, workloads whose container images carry known-exploited vulnerabilities.",
+   "plain": {
+    "what": "It checks each container image against existing scan reports when a workload is created. Depending on the namespace policy, it denies, warns or allows.",
+    "why": "The decision happens where the workload gets created. It does not scan images itself.",
+    "found": "A review of the earlier version found five weaknesses, such as a malformed image name that was accepted. Version 0.1.0 closes all five, each with a test, a CI run or a recorded response."
+   },
+   "try": {
+    "kind": "Try it",
+    "text": "Pick an image and a namespace policy and read the response the real webhook returned."
+   }
   },
   "fuzzdiff": {
    "slug": "fuzzdiff",
@@ -1269,7 +1309,17 @@
     ]
    ],
    "commit": "6ec1e6e",
-   "tier": "also"
+   "tier": "also",
+   "lede": "A web-request parser rewritten from C into memory-safe Rust, checked by feeding both versions the same bytes and listing every difference.",
+   "plain": {
+    "what": "picohttpparser is an HTTP parser written in C. It was ported to safe Rust, then the C original, the port and a third parser (httparse) were run on the same input.",
+    "why": "A rewrite can change behavior without anyone noticing. Running the original next to the copy shows where.",
+    "found": "5 bugs were planted to see whether the checks would notice. The 0.1.0 tests missed 2; 0.2.0 catches all 5. Against the C original there were 0 differences in 2,000,000 inputs. No vulnerability was found."
+   },
+   "try": {
+    "kind": "See it",
+    "text": "Pick an input and compare what the C parser, the Rust port and httparse each return."
+   }
   },
   "kev-risk-prioritization": {
    "slug": "kev-risk-prioritization",
@@ -1477,7 +1527,17 @@
    ],
    "commit": "3859ff6",
    "bench": "kev-risk",
-   "tier": "also"
+   "tier": "also",
+   "lede": "A short Python script that ranks scan findings so the known-exploited ones come first.",
+   "plain": {
+    "what": "It scores each finding from KEV listing, asset criticality, EPSS and CVSS, using weights chosen by hand, and sorts by that score. It is not an implementation of CISA BOD 26-04.",
+    "why": "Sorting by severity alone can bury the vulnerabilities attackers are already using.",
+    "found": "On 20 synthetic findings, a CVSS-only sort puts 9 of the 12 known-exploited ones in its top 12, and the risk score puts all 12 there. That shows how the formula orders findings, not that it speeds up fixing. The weights are not validated."
+   },
+   "try": {
+    "kind": "Try it",
+    "text": "Move the four weights and watch the ranking reorder."
+   }
   },
   "vulnlab": {
    "slug": "vulnlab",
@@ -1689,7 +1749,17 @@
    ],
    "commit": "dd2665d",
    "bench": "vulnlab",
-   "tier": "featured"
+   "tier": "featured",
+   "lede": "Three small web apps with one planted bug each, a fix for each, and tests that show the damage and then show the fix stopping it. It runs only on your own machine.",
+   "plain": {
+    "what": "Three small Flask apps, each with one classic web bug: SSRF through a redirect, SQL injection in ORDER BY, and a missing permission check. Each has a fix and tests.",
+    "why": "The attack that works on the vulnerable app is blocked on the fixed one, and the tests show both.",
+    "found": "All 3 fixes verified. sinkline flagged 2 of the 3 bugs and also flagged both fixed versions of those two, which are false alarms. It reports nothing on the permission check, because that is not a data-flow bug."
+   },
+   "try": {
+    "kind": "See it",
+    "text": "Pick a lab and a version, vulnerable or fixed, and read the code, the tests and the scanner output side by side."
+   }
   }
  },
  "failed_first": [

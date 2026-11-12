@@ -49,20 +49,18 @@
 <div class="sheet">
 <header class="title">
 <h1>fuzzdiff</h1>
-<p class="dek">picohttpparser, an HTTP/1.x parser written in C, ported to safe Rust and checked by running the C original, the Rust port and a second parser (httparse) on the same input and reporting every difference.</p>
+<dl class="plain">
+<div><dt>What it does</dt><dd>picohttpparser is an HTTP parser written in C. It was ported to safe Rust, then the C original, the port and a third parser (httparse) were run on the same input.</dd></div>
+<div><dt>Why it matters</dt><dd>A rewrite can change behavior without anyone noticing. Running the original next to the copy shows where.</dd></div>
+<div class="pf"><dt>What was found</dt><dd>5 bugs were planted to see whether the checks would notice. The 0.1.0 tests missed 2; 0.2.0 catches all 5. Against the C original there were 0 differences in 2,000,000 inputs. No vulnerability was found.</dd></div>
+</dl>
+<p class="row cta"><a class="btn" href="#try">See it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/fuzzdiff">Repository</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0">Release v0.2.0</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/tree/main/docs">Docs</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">httparse comparison</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 </header>
-<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>The C original and httparse, same bytes</dd></div>
-<div><dt>Found, then left</dt><dd><span class="gl">As found</span> 2 of 5 seeded bugs not noticed by the 0.1.0 tests; harness accepted any folded-header error as expected (PR #2)<br><span class="gl">As left</span> 5 of 5 detected; 0 differences from C in 2,000,000 inputs; 609,278 disagree with httparse, all in documented classes</dd></div>
-<div><dt>Limits</dt><dd>Smoke fuzzing (120 s per leg); Miri on the pure-Rust crate only; no vulnerability found <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>
 <section class="reading-band" aria-label="The reading">
 <div class="hero-read">
-<p class="reading sm" role="img" aria-label="Reading: 5/5 seeded bugs detected"><span aria-hidden="true">5</span><span class="den" aria-hidden="true">/5</span></p>
+<p class="reading sm k-pass" role="img" aria-label="Reading: 5/5 seeded bugs detected"><span aria-hidden="true">5</span><span class="den" aria-hidden="true">/5</span></p>
 <div>
 <p class="why">The harness detected all five deliberately seeded bugs. Two of them (added in 0.2.0 after a mutation sweep) were missed by the 0.1.0 tests, and one of the five is caught only by a hand-built case, not by the random generator.</p>
 <p class="chips"><span class="stamp pass">5 of 5 detected</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037960324"><span class="st" aria-hidden="true"></span><span>run 43037960324</span> <span class="d">passed 2026-11-11</span></a></p>
@@ -71,17 +69,8 @@
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>detected</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>not detected by the 0.1.0 tests</li></ul>
 <div class="strips vt" style="--vt:strip-fuzzdiff"><div class="srow"><span class="label" aria-hidden="true">As found (0.1.0)</span><div class="strip" role="img" aria-label="As found (0.1.0), 5 seeded bugs: 3 detected, 2 not detected by the 0.1.0 tests"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> of 5 detected; <b>2</b> survived the 0.1.0 tests</p></div><div class="srow"><span class="label" aria-hidden="true">As left (0.2.0)</span><div class="strip" role="img" aria-label="As left (0.2.0), 5 seeded bugs: 5 detected"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>5</b> of 5 detected; 4 by the generator, 1 only by a targeted case</p></div></div>
 </section>
-<details class="fold fold-rec"><summary>Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)</summary><section class="record-head" aria-label="Verification record">
-<dl>
-<div><dt>Instrument</dt><dd>fuzzdiff v0.2.0 (tag, commit 6ec1e6e, released 2026-11-11)</dd></div>
-<div><dt>Reference standard</dt><dd>the C original, picohttpparser commit dd573d8, run on the same bytes; httparse 1.10.1 as a second parser for the head-parsing comparison</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-11, Windows, rustc 1.99.1; Miri, sanitizers and libFuzzer runs in CI on Linux</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ cargo test"><code>cargo test --all
-cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --nocapture</code></pre></dd></div>
-</dl>
-</section></details>
-<section class="bench" data-bench="fuzzdiff" aria-label="Recorded readings">
+<div class="try-head"><h2>See it</h2><p>Pick an input and compare what the C parser, the Rust port and httparse each return.</p></div>
+<section class="bench" id="try" data-bench="fuzzdiff" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
 <div class="bench-static">
@@ -92,6 +81,24 @@ cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --
 <figcaption><b>With default settings picohttpparser and fuzzdiff return the same result on every input here, except the two seeded-bug rows and the strict-mode row (documented deviation D1); httparse, a different parser, differs from both in a fixed set of documented classes.</b> Recorded, not live: every result was returned by the parser named, on the bytes shown (fuzzdiff 0.2.0, tag v0.2.0, commit 6ec1e6e; picohttpparser dd573d8; httparse 1.10.1 (default configuration); 64 header slots for all three; Windows, release build, MSVC build of the C code), run 2026-11-11 with <code>scripts/capture_fuzzdiff_bench.py</code>. The page runs no parser. The httparse column covers head parsing and, for chunked bodies, only the first chunk-size line. The two seeded-bug rows run the Rust parser with a test-only bug switched on; the shipped parser has none.</figcaption>
 </figure>
 </section>
+<section class="glance" aria-label="At a glance">
+<dl>
+<div><dt>Checked against</dt><dd>The C original and httparse, same bytes</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> 2 of 5 seeded bugs not noticed by the 0.1.0 tests; harness accepted any folded-header error as expected (PR #2)<br><span class="gl">As left</span> 5 of 5 detected; 0 differences from C in 2,000,000 inputs; 609,278 disagree with httparse, all in documented classes</dd></div>
+<div><dt>Limits</dt><dd>Smoke fuzzing (120 s per leg); Miri on the pure-Rust crate only; no vulnerability found <a href="#limits">Full limits</a></dd></div>
+</dl>
+</section>
+<details class="fold fold-rec"><summary>Technical description and verification record: instrument, reference standard, date, how to reproduce (self-issued, not accredited)</summary><p class="dek tech">picohttpparser, an HTTP/1.x parser written in C, ported to safe Rust and checked by running the C original, the Rust port and a second parser (httparse) on the same input and reporting every difference.</p>
+<section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>fuzzdiff v0.2.0 (tag, commit 6ec1e6e, released 2026-11-11)</dd></div>
+<div><dt>Reference standard</dt><dd>the C original, picohttpparser commit dd573d8, run on the same bytes; httparse 1.10.1 as a second parser for the head-parsing comparison</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-11, Windows, rustc 1.99.1; Miri, sanitizers and libFuzzer runs in CI on Linux</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ cargo test"><code>cargo test --all
+cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --nocapture</code></pre></dd></div>
+</dl>
+</section></details>
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
 <h2 id="found-h"><span class="label sec-label">As found</span>Two seeded bugs no test noticed, and a harness exception that would have hidden one</h2>
@@ -158,7 +165,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 </div>
 <h3>Miri and libFuzzer, from CI</h3>
 <div class="prose"><p>Miri ran on the pure-Rust crate only: 13 tests (10 known-answer, 1 pseudo-random invariant, 2 doc tests), no undefined behaviour reported, in the <code>ci</code> run <a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037960324"><span class="st" aria-hidden="true"></span><span>run 43037960324</span> <span class="d">passed 2026-11-11</span></a>. The fuzz workflow ran five legs for 120 s each on nightly, seeded from the corpus (612 seed files per leg, cold cache), including the C SIMD path (<code>-msse4.2</code>). Counts are libFuzzer's own &ldquo;Done N runs&rdquo; lines in the log of <a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43035685955"><span class="st" aria-hidden="true"></span><span>run 43035685955</span> <span class="d">passed 2026-11-11</span></a>.</p></div>
-<div class="scroll wide"><table class="tbl">
+<details class="fold fold-tbl"><summary>Table, 5 rows: libFuzzer results</summary><div class="scroll wide"><table class="tbl">
 <caption>libFuzzer results</caption>
 <thead><tr><th scope="col">Leg</th><th scope="col">What it runs</th><th scope="col" class="num">Executions</th><th scope="col">Result</th></tr></thead>
 <tbody>
@@ -168,7 +175,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <tr><th scope="row"><code>c_only</code></th><td data-label="What it runs">C only, ASan and UBSan, portable path</td><td class="num" data-label="Executions">5,731,452</td><td data-label="Result">no crash, no sanitizer report</td></tr>
 <tr><th scope="row"><code>c_only-sse42</code></th><td data-label="What it runs">the same with <code>-msse4.2</code></td><td class="num" data-label="Executions">5,856,004</td><td data-label="Result">no crash, no sanitizer report</td></tr>
 </tbody>
-</table></div>
+</table></div></details>
 <details class="fold fold-tbl"><summary>Table, 8 rows: Results</summary><div class="scroll wide"><table class="tbl">
 <caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
@@ -185,7 +192,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 </table></div></details>
 </section>
 <section class="section fold-sec" id="method" aria-labelledby="method-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Technical details</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
 <div class="fold-body">
 <h3>The problem</h3>
 <div class="prose">
@@ -226,7 +233,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">8 links</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">8 links</span></summary>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace"><div><dt>Tests, sanitizers, Miri, coverage (ci on main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037960324"><span class="st" aria-hidden="true"></span><span>run 43037960324</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Fuzz run with the counts below (pull request 3)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43035685955"><span class="st" aria-hidden="true"></span><span>run 43035685955</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Last fuzz run of pull request 3</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037421227"><span class="st" aria-hidden="true"></span><span>run 43037421227</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0">v0.2.0</a></dd></div><div><dt>Harness fix</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/pull/2">pull request #2</a></dd></div><div><dt>Three-way comparison</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">docs/DIFFERENTIAL_HTTPARSE.md</a></dd></div><div><dt>Deviations</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DEVIATIONS.md">docs/DEVIATIONS.md</a></dd></div><div><dt>Findings</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/FINDINGS.md">docs/FINDINGS.md</a></dd></div></dl>
 <h3>CI evidence</h3>

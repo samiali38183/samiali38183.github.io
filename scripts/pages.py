@@ -13,8 +13,7 @@ import components as C
 
 ROOT = Path(__file__).resolve().parent.parent
 GH = "https://github.com/samiali38183"
-FAILED_SHOWN = 4  # "What failed first" rows shown on the home page; the rest sit in a details element
-FOLD_ROWS = 7  # tables with at least this many body rows, and code blocks with FOLD_LINES lines, are folded on project pages
+FOLD_ROWS = 5  # tables with at least this many body rows, and code blocks with FOLD_LINES lines, are folded on project pages
 FOLD_LINES = 12
 
 
@@ -133,21 +132,18 @@ def tier(d: dict, name: str) -> list[dict]:
     return [d["projects"][s] for s in d["order"] if d["projects"][s]["tier"] == name]
 
 
-def card(ctx: dict, p: dict, n: int, h: str = "h3") -> str:
-    sset = p["strip_sets"]["main"]
-    return (f'<li><p class="tag label">Sheet {p["sheet"]} of {n} &middot; {esc(p["kind"])}</p>'
-            f'<{h}><a href="/projects/{p["slug"]}/">{esc(p["name"])}</a></{h}>'
-            f'<p class="rd">{esc(p["home"]["reading"])}</p>'
-            f'{C.strip_rows(sset, mini=True, vt="strip-" + p["slug"])}'
-            f'<p class="fact">{esc(p["fact"])}</p></li>')
-
-
-def short_list(p_list: list[dict], n: int) -> str:
-    """One line per project: sheet, link, version, the single best reading."""
-    items = "".join(
-        f'<li><span class="label">Sheet {p["sheet"]} of {n}</span> <a class="nm" href="/projects/{p["slug"]}/">{esc(p["name"])}</a> '
-        f'<span class="ver">{esc(ver_of(p))}</span> <span class="rd">{esc(p["home"]["reading"])}</span></li>' for p in p_list)
-    return f'<ul class="plist">{items}</ul>'
+def work_list(plist: list[dict], cls: str = "") -> str:
+    """The project list: number, name, one plain sentence, the reading, and the as found / as left strips."""
+    items = []
+    for p in plist:
+        items.append(
+            f'<li><span class="no" aria-hidden="true">{p["sheet"]:02d}</span>'
+            f'<div class="w-main"><h3><a href="/projects/{p["slug"]}/">{esc(p["name"])}</a> <span class="ver">{esc(ver_of(p))}</span></h3>'
+            f'<p class="w-kind">{esc(p["kind"])}</p>'
+            f'<p class="w-lede">{esc(p["lede"])}</p>'
+            f'<p class="w-res"><span class="w-rl">Reading</span> {esc(p["home"]["reading"])}</p></div>'
+            f'<div class="w-viz">{C.strip_rows(p["strip_sets"]["main"], mini=True, vt="strip-" + p["slug"])}</div></li>')
+    return f'<ol class="work {cls}">{"".join(items)}</ol>'
 
 
 def reading_chips(ctx: dict, rd: dict) -> str:
@@ -185,22 +181,19 @@ def home(ctx: dict) -> str:
             f'<td>{esc(item["text"])}</td><td>{C.stamp(*item["state"])}</td>'
             f'<td><a href="{item["src"][1]}">{esc(item["src"][0])}</a></td></tr>')
     head = ('<thead><tr><th scope="col">Instrument</th><th scope="col">What the check found</th><th scope="col">State</th><th scope="col">Source</th></tr></thead>')
-    first, rest = ff[:FAILED_SHOWN], ff[FAILED_SHOWN:]
     failed = ('<table class="tbl wt"><caption class="vh">What failed first, with the source of each item</caption>' + head +
-              "<tbody>" + "".join(first) + "</tbody></table>")
-    if rest:
-        failed += (f'<details class="fold"><summary>{len(rest)} more items</summary>'
-                   '<table class="tbl wt"><caption class="vh">What failed first, remaining items</caption>' + head +
-                   "<tbody>" + "".join(rest) + "</tbody></table></details>")
+              "<tbody>" + "".join(ff) + "</tbody></table>")
     rd = t["reading"]
     den = f'<span class="den" aria-hidden="true">{esc(rd["den"])}</span>'
     aria = f'Reading: {rd["num"]}{rd["den"]} {rd["unit"]}'
     return f"""<section class="hero" aria-labelledby="top">
-<h1 id="top">Security tools, checked against what they claim.</h1>
-<p class="dek">Detection engineering, application security and vulnerability management. George Mason University, class of 2028.</p>
+<h1 id="top">Security tools, checked against what they <span class="hl">claim</span>.</h1>
+<p class="dek">I'm Sami Ali, a student at George Mason University (class of 2028). I write detection rules, code analyzers and vulnerability-ranking tools, then test them against something other than my own opinion.</p>
+<p class="row cta"><a class="btn" href="#work">See the work</a> <a class="btn alt" href="/resume/">Resume</a></p>
 <div class="hero-read">
-<p class="reading" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
+<p class="reading k-{rd["stamp"][0]}" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
 <div>
+<p class="say">A public SigmaHQ rule is meant to notice a program being set to run with its owner's privileges. I replayed a real recording of that attack, 36 events with 2 attack steps in it, and the rule caught neither. The rule I wrote catches both.</p>
 <p class="why">{esc(rd["caption"])}</p>
 {reading_chips(ctx, rd)}
 </div>
@@ -213,25 +206,11 @@ def home(ctx: dict) -> str:
 </section>
 
 <section class="section" aria-labelledby="work">
-<div class="sec-head"><h2 id="work">Featured work</h2></div>
-<ul class="multi" aria-label="Featured projects">
-{"".join(card(ctx, p, n) for p in tier(d, "featured"))}
-</ul>
-<h3 class="also-h" id="also">Also</h3>
-{short_list(tier(d, "also"), n)}
+<div class="sec-head"><h2 id="work">The work</h2><p class="sec-aside">The strips are the check: top row as found, bottom row as left.</p></div>
+{work_list(tier(d, "featured"))}
+<h3 class="also-h" id="also">Smaller, and still checked</h3>
+{work_list(tier(d, "also"), "compact")}
 <p><a class="arrow-link" href="/projects/">All {n} projects</a></p>
-</section>
-
-<section class="section" aria-labelledby="rec">
-<div class="sec-head"><h2 id="rec">Record of checks</h2></div>
-<p class="ledger-note">Each tool was checked against a reference and the reading is on its sheet. The strips show the same units as the sheet, reduced to at most 24 ticks: top row as found, bottom row as left. Where a project has only one row, it is the reading.</p>
-{ledger}
-</section>
-
-<section class="section" aria-labelledby="ff">
-<div class="sec-head"><h2 id="ff">What failed first</h2></div>
-<p class="ledger-note">Each item is copied from the repository text it links to.</p>
-{failed}
 </section>
 
 <section class="section prose" aria-labelledby="exp">
@@ -246,21 +225,31 @@ def home(ctx: dict) -> str:
 <li>CompTIA Security+ and AWS Certified Cloud Practitioner</li>
 <li>In progress: OSCP and AWS Certified Security - Specialty</li>
 </ul>
+</section>
+
+<section class="section" aria-labelledby="ev">
+<div class="sec-head"><h2 id="ev">The evidence</h2></div>
+<p class="ledger-note">The numbers above come from these two tables and the CI runs they link to. Both are complete; they are closed so the page stays readable.</p>
+<details class="fold fold-main fold-ev"><summary><span class="label sec-label">Record of checks</span><span class="fold-t" id="rec">What each of the {n} projects was checked against</span><span class="fold-hint">The strips show the same units as the project's own page, reduced to at most 24 ticks: top row as found, bottom row as left.</span></summary>
+{ledger}
+</details>
+<details class="fold fold-main fold-ev"><summary><span class="label sec-label">What failed first</span><span class="fold-t" id="ff">{len(ff)} problems found first, each copied from the repository text it links to</span><span class="fold-hint">What was broken or missing before the fix.</span></summary>
+{failed}
+</details>
 </section>"""
 
 
 def projects_index(ctx: dict) -> str:
     d = ctx["projects"]
-    n = len(d["order"])
     return f"""<h1>Projects</h1>
-<p class="dek">Each project is an instrument. This page lists them with the version and the reading; the full record of checks is on the <a href="/#rec">home page</a>.</p>
+<p class="dek">Seven projects. Each was checked against something other than my own opinion, and the result is on its row. The table with every reference and CI run is on the <a href="/#rec">home page</a>.</p>
 <section aria-labelledby="featured">
 <h2 id="featured">Featured</h2>
-{short_list(tier(d, "featured"), n)}
+{work_list(tier(d, "featured"))}
 </section>
 <section class="section" aria-labelledby="also">
 <h2 id="also">Also</h2>
-{short_list(tier(d, "also"), n)}
+{work_list(tier(d, "also"), "compact")}
 </section>
 <section class="section prose" aria-labelledby="other">
 <h2 id="other">Other repositories</h2>
@@ -328,10 +317,11 @@ def glance(p: dict) -> str:
 </section>"""
 
 
-def record_head(p: dict) -> str:
+def record_head(p: dict, dek: str) -> str:
     r = p["record"]
     repro = "\n".join(r["reproduce"])
-    inner = f"""<section class="record-head" aria-label="Verification record">
+    inner = f"""<p class="dek tech">{dek}</p>
+<section class="record-head" aria-label="Verification record">
 <dl>
 <div><dt>Instrument</dt><dd>{esc(r["instrument"])}</dd></div>
 <div><dt>Reference standard</dt><dd>{esc(r["reference"])}</dd></div>
@@ -340,7 +330,7 @@ def record_head(p: dict) -> str:
 <div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="{esc(r["reproduce_label"])}"><code>{esc(repro)}</code></pre></dd></div>
 </dl>
 </section>"""
-    return fold("Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)", inner, "fold-rec")
+    return fold("Technical description and verification record: instrument, reference standard, date, how to reproduce (self-issued, not accredited)", inner, "fold-rec")
 
 
 def reading_band(ctx: dict, p: dict) -> str:
@@ -350,7 +340,7 @@ def reading_band(ctx: dict, p: dict) -> str:
     aria = f'Reading: {rd["num"]}{rd["den"]} {rd["unit"]}'
     return f"""<section class="reading-band" aria-label="The reading">
 <div class="hero-read">
-<p class="reading sm" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
+<p class="reading sm k-{rd["stamp"][0]}" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
 <div>
 <p class="why">{esc(rd["caption"])}</p>
 {reading_chips(ctx, rd)}
@@ -373,7 +363,7 @@ def trace(ctx: dict, p: dict, extra: str) -> str:
 <dl class="trace">{"".join(items)}</dl>
 {extra}"""
     return f"""<section class="section fold-sec" id="trace" aria-labelledby="trace-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">{len(items)} links</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">{len(items)} links</span></summary>
 {body}
 </details>
 </section>"""
@@ -413,17 +403,29 @@ def project_page(ctx: dict, slug: str) -> str:
 {after}<figcaption>{ex(f["bench-cap"])}</figcaption>
 </figure>
 </section>"""
+    pl = p["plain"]
+    tr = p["try"]
+    has_bench = "bench" in f
+    try_btn = f'<a class="btn" href="#try">{esc(tr["kind"])}</a> ' if has_bench else ""
+    if has_bench:
+        bench = bench.replace('<section class="bench"', f'<section class="bench" id="try"', 1)
+        bench = (f'<div class="try-head"><h2>{esc(tr["kind"])}</h2><p>{esc(tr["text"])}</p></div>\n' + bench)
     return f"""<div class="sheet">
 <header class="title">
 <h1>{esc(p["name"])}</h1>
-<p class="dek">{ex(f["dek"])}</p>
+<dl class="plain">
+<div><dt>What it does</dt><dd>{esc(pl["what"])}</dd></div>
+<div><dt>Why it matters</dt><dd>{esc(pl["why"])}</dd></div>
+<div class="pf"><dt>What was found</dt><dd>{esc(pl["found"])}</dd></div>
+</dl>
+<p class="row cta">{try_btn}<a class="btn alt" href="#limits">Read the limits</a></p>
 <ul class="linkrow">{links}</ul>
 {note}
 </header>
-{glance(p)}
 {reading_band(ctx, p)}
-{record_head(p)}
 {bench}
+{glance(p)}
+{record_head(p, ex(f["dek"]))}
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
 <h2 id="found-h"><span class="label sec-label">{esc(labels["found"])}</span>{esc(p["found_title"])}</h2>
@@ -434,7 +436,7 @@ def project_page(ctx: dict, slug: str) -> str:
 {fold_long(ex(f["as-left"]))}
 </section>
 <section class="section fold-sec" id="method" aria-labelledby="method-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Technical details</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
 <div class="fold-body">
 {ex(f["method"])}
 </div>
