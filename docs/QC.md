@@ -214,3 +214,10 @@ Page, home, record table, resume page and data now describe sinkline v0.5.1 (tag
 - Sanitizer switch: `capture_sinkline_bench.py --check` against 0.5.1 passes; the ten captures are byte-identical, only the provenance (version, commit, capture date) changed.
 - vulnlab's recorded sinkline run is still labeled 0.5.0 on purpose: it records the version those labs were scored with and was not re-run.
 - `check_facts.py --only sinkline`: 33 passed, 0 failed (CI runs 43136290658 ci and 43136290530 report on f879e88). Second `build.py` produces no diff. All Node bench tests pass (sinkline 181). `qc_strips.mjs`: 488 strips, 0 failures.
+
+## 2026-11-12: live QA fixes (tap targets, sinkline evidence label)
+
+- **Tap targets.** On `/projects/tripline/` the two rule-ID links in the JS-rendered bench panels (`c21c4eaa` and `tripline_lnx_chmod_setuid_setgid_any_form`) measured 17-18 px tall. `.bl-t a` in `assets/css/bench-tripline.css` now has `min-height:24px` with 3 px block padding (WCAG 2.2 SC 2.5.8). Not re-measured in a browser after the change; only the CSS rule was verified.
+- **sinkline evidence label.** The repository has only `bench/external/results/v0.5.0` (no v0.5.1 folder). The links that pointed there now read "results/v0.5.0 (0.5.1 rows are identical)" (sinkline page, twice; the home/projects limit item). The identity is the one already stated and checked: the 0.5.1 per-test table equals the committed 0.5.0 result (TP 175, FN 65, FP 93, TN 344).
+- **Checks.** `build.py` run twice, no diff between runs. All seven Node bench tests pass (tripline 355 cases, sinkline 181). `qc_strips.mjs`: 488 strips, 0 failures. `check_facts.py --only tripline`: 42 passed, 0 failed. `--only sinkline`: 33 passed, 0 failed (needed sinkline 0.5.1 and bandit 1.9.4 installed; an older 0.4.1 venv gave 2 false failures).
+- **Not changed.** The tripline repo wording fix (0 of 2 / 2 of 2) is a separate PR in the tripline repository.
