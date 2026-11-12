@@ -1483,29 +1483,29 @@
    "slug": "vulnlab",
    "content": "vulnlab.html",
    "name": "vulnlab",
-   "version": "v0.1.0",
+   "version": "v0.1.1",
    "sheet": 3,
    "kind": "Web security training lab, Python",
    "title": "vulnlab: localhost-only web vulnerability lab | Sami Ali",
-   "desc": "vulnlab v0.1.0 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 43 tests, loopback only.",
+   "desc": "vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.",
    "fact": "A localhost-only lab of three small vulnerable Flask services: SSRF through a redirect, SQL injection in ORDER BY and IDOR. Each has a fix checked by the tests that show the impact, a sinkline record and a Sigma rule. 3 of 3 fixes verified; sinkline reports two of the three bugs and both fixes of those two. Training lab, loopback only, no CVEs.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
    "found_title": "Three vulnerable services, one missing check each",
-   "left_title": "Three fixes, checked by the tests that showed the impact",
+   "left_title": "Three fixes, checked by the tests that showed the impact, and four defects of the first release fixed",
    "record": {
-    "instrument": "vulnlab v0.1.0, tag commit 1fceaa8 (released 2026-11-11)",
+    "instrument": "vulnlab v0.1.1, tag commit dd2665d (released 2026-11-11)",
     "reference": "each lab's fixed service and its tests: the same checks that show the impact on the vulnerable service must fail against the fix; sinkline 0.5.0 and a Sigma rule per lab are the other two checks",
-    "measured": "2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.0; CI (Linux) run 43087241629",
+    "measured": "2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.1; CI (Linux) run 43134837698",
     "reproduce": [
      "pip install -r requirements.lock",
      "pytest -q",
      "python tools/sinkline_check.py",
      "sigma check labs/*/detection/*.yml"
     ],
-    "reproduce_label": "$ vulnlab, from a clone at v0.1.0"
+    "reproduce_label": "$ vulnlab, from a clone at v0.1.1"
    },
    "reading": {
     "num": "3",
@@ -1516,7 +1516,7 @@
      "pass",
      "As left: 3 of 3 fixes verified"
     ],
-    "run": "43087241629"
+    "run": "43134837698"
    },
    "strip_sets": {
     "main": {
@@ -1593,9 +1593,9 @@
    "home": {
     "against": "Each lab's fixed service and its tests; sinkline 0.5.0; Sigma rules replayed on recorded logs",
     "reading": "3 of 3 fixes verified; sinkline 2 of 3 detected (2 false positives on fixes)",
-    "run": "43087241629",
+    "run": "43134837698",
     "found": "3 vulnerable services (SSRF, SQL injection, IDOR) show impact in their tests",
-    "left": "3 fixes block it; 43 tests pass; loopback only",
+    "left": "3 fixes block it; 137 tests pass; loopback only",
     "tolerance": "Training lab; bugs simpler than real ones; no CVEs; detection fires on attempts, not impact"
    },
    "links": [
@@ -1604,16 +1604,16 @@
      "https://github.com/samiali38183/vulnlab"
     ],
     [
-     "Release v0.1.0",
-     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0"
+     "Release v0.1.1",
+     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.1"
     ],
     [
      "Method",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/METHOD.md"
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/docs/METHOD.md"
     ],
     [
      "Safety scope",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/SAFETY.md"
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/docs/SAFETY.md"
     ],
     [
      "CI runs",
@@ -1622,50 +1622,56 @@
    ],
    "trace": [
     [
-     "CI on main, tag commit (ci, v0.1.0)",
+     "CI on main, tag commit (ci, v0.1.1)",
      "run",
-     "43087241629"
+     "43134837698"
     ],
     [
      "Release",
      "link",
-     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0",
-     "v0.1.0"
+     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.1",
+     "v0.1.1"
+    ],
+    [
+     "Changelog 0.1.1",
+     "link",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/CHANGELOG.md",
+     "CHANGELOG.md"
     ],
     [
      "Lab 01 write-up",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/01-ssrf-redirect/README.md",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/labs/01-ssrf-redirect/README.md",
      "labs/01-ssrf-redirect/README.md"
     ],
     [
      "Lab 02 write-up",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/02-sqli-order-by/README.md",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/labs/02-sqli-order-by/README.md",
      "labs/02-sqli-order-by/README.md"
     ],
     [
      "Lab 03 write-up",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/03-idor-bola/README.md",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/labs/03-idor-bola/README.md",
      "labs/03-idor-bola/README.md"
     ],
     [
      "Harness and replay code",
      "link",
-     "https://github.com/samiali38183/vulnlab/tree/v0.1.0/vulnlab_common",
+     "https://github.com/samiali38183/vulnlab/tree/v0.1.1/vulnlab_common",
      "vulnlab_common/"
     ],
     [
      "Safety tests",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/tests/test_safety.py",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/tests/test_safety.py",
      "tests/test_safety.py"
     ],
     [
      "sinkline capture and check",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/tools/sinkline_check.py",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/tools/sinkline_check.py",
      "tools/sinkline_check.py"
     ],
     [
@@ -1681,7 +1687,7 @@
      "scripts/test_bench_vulnlab.mjs"
     ]
    ],
-   "commit": "1fceaa8",
+   "commit": "dd2665d",
    "bench": "vulnlab",
    "tier": "featured"
   }
@@ -1827,7 +1833,20 @@
    "anchor": "limits",
    "src": [
     "README, labs and results",
-    "https://github.com/samiali38183/vulnlab/blob/v0.1.0/README.md"
+    "https://github.com/samiali38183/vulnlab/blob/v0.1.1/README.md"
+   ]
+  },
+  {
+   "project": "vulnlab",
+   "text": "A review of 0.1.0 found that the fixed SSRF service answered 500 to malformed URLs, that both IDOR variants issued a login token for an unknown user with a null password, and that no test failed if the fixed SSRF service's address check was removed. All three are fixed in 0.1.1 and each has a test.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-left",
+   "src": [
+    "CHANGELOG 0.1.1",
+    "https://github.com/samiali38183/vulnlab/blob/v0.1.1/CHANGELOG.md"
    ]
   },
   {

@@ -5,16 +5,22 @@
   "blocked": "Impact blocked",
   "feature": "Feature still works",
   "login": "Login required",
-  "detect": "Detection replay"
+  "detect": "Detection replay",
+  "malformed": "Malformed input answered with 400",
+  "forbidden": "Well-formed request for another host still refused",
+  "pinning": "Address check enforced (test fails if it is removed)",
+  "stricter": "Fixed version stricter on odd sort values, by design",
+  "anon": "Same answer for existing and missing ids",
+  "badlogin": "Unknown users and malformed logins rejected"
  },
  "provenance": {
   "tool": "vulnlab",
-  "version": "0.1.0",
-  "tag": "v0.1.0",
-  "commit": "1fceaa8",
-  "commit_full": "1fceaa89625d60b0b858facf19f7d901a0d63a57",
+  "version": "0.1.1",
+  "tag": "v0.1.1",
+  "commit": "dd2665d",
+  "commit_full": "dd2665d7cdf0ef300846014a5c4a775e3e1dd6d4",
   "repo": "https://github.com/samiali38183/vulnlab",
-  "ci_run": "43087241629",
+  "ci_run": "43134837698",
   "captured": "2026-11-11",
   "python": "3.12.2",
   "pytest": "9.2.0",
@@ -28,9 +34,9 @@
    "replay": "python -m vulnlab_common.replay RULE LOG"
   },
   "totals": {
-   "passed": 43,
-   "lab_tests": 17,
-   "safety_tests": 26
+   "passed": 137,
+   "lab_tests": 72,
+   "safety_tests": 65
   },
   "repo_checks": {
    "sinkline_check": "exit 0 (tools/sinkline_check.py)",
@@ -103,7 +109,7 @@
      "summary": "The app follows redirects itself, at most three hops, and checks every hop's host and resolved address before connecting to that address.",
      "outcome": "Both the direct and the redirected request were refused and the internal service was never contacted.",
      "file": "labs/01-ssrf-redirect/fixed/app.py",
-     "code": "from __future__ import annotations\n\nimport socket\nfrom urllib.parse import urljoin, urlsplit\n\nimport requests\nfrom flask import Flask, jsonify, request\n\nMAX_HOPS = 3\n\n\nclass Blocked(Exception):\n    pass\n\n\ndef create_app(settings: dict | None = None) -> Flask:\n    config = {\"allowed_hosts\": {\"127.0.0.1\"}, \"allowed_addrs\": {\"127.0.0.1\"}, **(settings or {})}\n    app = Flask(__name__)\n\n    def resolve_allowed(url: str) -> tuple[str, str]:\n        parts = urlsplit(url)\n        if parts.scheme != \"http\" or parts.hostname not in config[\"allowed_hosts\"]:\n            raise Blocked(\"host not allowed\")\n        port = parts.port or 80\n        addr = socket.getaddrinfo(parts.hostname, port, type=socket.SOCK_STREAM)[0][4][0]\n        if addr not in config[\"allowed_addrs\"]:\n            raise Blocked(\"address not allowed\")\n        return parts.netloc, parts._replace(netloc=f\"{addr}:{port}\").geturl()\n\n    def fetch(url: str) -> requests.Response:\n        for _ in range(MAX_HOPS + 1):\n            host_header, pinned = resolve_allowed(url)\n            upstream = requests.get(pinned, headers={\"Host\": host_header}, allow_redirects=False, timeout=3)\n            if not upstream.is_redirect:\n                return upstream\n            url = urljoin(url, upstream.headers[\"Location\"])\n        raise Blocked(\"too many redirects\")\n\n    @app.get(\"/preview\")\n    def preview():\n        try:\n            upstream = fetch(request.args.get(\"url\", \"\"))\n        except Blocked as exc:\n            return jsonify(error=str(exc)), 403\n        except requests.RequestException:\n            return jsonify(error=\"fetch failed\"), 502\n        return jsonify(status=upstream.status_code, excerpt=upstream.text[:300])\n\n    return app\n",
+     "code": "from __future__ import annotations\n\nimport socket\nfrom urllib.parse import urljoin, urlsplit\n\nimport requests\nfrom flask import Flask, jsonify, request\n\nMAX_HOPS = 3\nMAX_URL_LENGTH = 2048\n\n\nclass Blocked(Exception):\n    \"\"\"A well-formed URL that policy refuses (403).\"\"\"\n\n\nclass InvalidUrl(Exception):\n    \"\"\"Input that is not a usable http URL at all (400).\"\"\"\n\n\ndef create_app(settings: dict | None = None) -> Flask:\n    config = {\"allowed_hosts\": {\"127.0.0.1\"}, \"allowed_addrs\": {\"127.0.0.1\"}, **(settings or {})}\n    app = Flask(__name__)\n\n    def resolve_allowed(url: str) -> tuple[str, str]:\n        if len(url) > MAX_URL_LENGTH:\n            raise InvalidUrl(\"too long\")\n        try:\n            parts = urlsplit(url)\n            hostname = parts.hostname\n            port = parts.port\n        except ValueError:  # unterminated IPv6 literal, non-numeric or out-of-range port\n            raise InvalidUrl(\"unparseable\") from None\n        if parts.scheme != \"http\":\n            raise InvalidUrl(\"only http is supported\")\n        if not hostname:\n            raise InvalidUrl(\"missing host\")\n        if \"@\" in parts.netloc:\n            raise InvalidUrl(\"credentials in the URL are not accepted\")\n        if port == 0:\n            raise InvalidUrl(\"invalid port\")\n        if hostname not in config[\"allowed_hosts\"]:\n            raise Blocked(\"host not allowed\")\n        port = port or 80\n        addr = socket.getaddrinfo(hostname, port, type=socket.SOCK_STREAM)[0][4][0]\n        if addr not in config[\"allowed_addrs\"]:\n            raise Blocked(\"address not allowed\")\n        return parts.netloc, parts._replace(netloc=f\"{addr}:{port}\").geturl()\n\n    def fetch(url: str) -> requests.Response:\n        for _ in range(MAX_HOPS + 1):\n            host_header, pinned = resolve_allowed(url)\n            upstream = requests.get(pinned, headers={\"Host\": host_header}, allow_redirects=False, timeout=3)\n            if not upstream.is_redirect:\n                return upstream\n            url = urljoin(url, upstream.headers[\"Location\"])\n        raise Blocked(\"too many redirects\")\n\n    @app.get(\"/preview\")\n    def preview():\n        try:\n            upstream = fetch(request.args.get(\"url\", \"\"))\n        except InvalidUrl:\n            return jsonify(error=\"invalid url\"), 400\n        except Blocked as exc:\n            return jsonify(error=str(exc)), 403\n        except requests.RequestException:\n            return jsonify(error=\"fetch failed\"), 502\n        return jsonify(status=upstream.status_code, excerpt=upstream.text[:300])\n\n    return app\n",
      "marks": {
       "bug": [],
       "changed": [
@@ -115,11 +121,12 @@
        12,
        13,
        14,
+       15,
+       16,
        17,
-       20,
+       18,
+       19,
        22,
-       23,
-       24,
        25,
        26,
        27,
@@ -133,9 +140,31 @@
        35,
        36,
        37,
+       38,
+       39,
+       40,
+       41,
        42,
        43,
-       44
+       44,
+       45,
+       46,
+       47,
+       48,
+       49,
+       50,
+       51,
+       52,
+       53,
+       54,
+       55,
+       56,
+       57,
+       62,
+       63,
+       64,
+       65,
+       66
       ]
      },
      "tests": [
@@ -150,35 +179,59 @@
        "role": "feature",
        "cases": 1,
        "passed": 1
+      },
+      {
+       "name": "test_fixed_service_answers_400_to_every_malformed_url",
+       "role": "malformed",
+       "cases": 18,
+       "passed": 18
+      },
+      {
+       "name": "test_fixed_service_answers_400_to_a_malformed_redirect_target",
+       "role": "malformed",
+       "cases": 2,
+       "passed": 2
+      },
+      {
+       "name": "test_fixed_service_keeps_403_for_well_formed_urls_on_other_hosts",
+       "role": "forbidden",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_address_pinning_refuses_a_host_whose_address_is_not_approved",
+       "role": "pinning",
+       "cases": 1,
+       "passed": 1
       }
      ],
      "sinkline": {
       "command": "sinkline scan fixed --no-color",
       "status": 0,
-      "out": "[HIGH] SL-SSRF-001 A10:2021 CWE-918  app.py:42:24\n  SSRF: tainted URL fetched server-side\n  flask.request.args reaches requests.get (inside fetch, app.py:33) without a sanitizer for CWE-918.\n  ┌ source     app.py:42  upstream = fetch(request.args.get(\"url\", \"\"))  # flask.request.args\n  │ propagate  app.py:42  upstream = fetch(request.args.get(\"url\", \"\"))  # .get()\n  │ call       app.py:42  upstream = fetch(request.args.get(\"url\", \"\"))  # passed as `url` to fetch()\n  └ sink       app.py:33  upstream = requests.get(pinned, headers={\"Host\": host_header}, allow_redirects=False, timeout=3)  # requests.get inside fetch()\n  fix: Allow-list hosts/schemes, resolve DNS and reject private ranges, disable redirects.\n\n1 finding(s) in 1 file(s), 8 function(s) summarized\nby OWASP: A10:2021 Server-Side Request Forgery: 1\n",
+      "out": "[HIGH] SL-SSRF-001 A10:2021 CWE-918  app.py:62:24\n  SSRF: tainted URL fetched server-side\n  flask.request.args reaches requests.get (inside fetch, app.py:53) without a sanitizer for CWE-918.\n  ┌ source     app.py:62  upstream = fetch(request.args.get(\"url\", \"\"))  # flask.request.args\n  │ propagate  app.py:62  upstream = fetch(request.args.get(\"url\", \"\"))  # .get()\n  │ call       app.py:62  upstream = fetch(request.args.get(\"url\", \"\"))  # passed as `url` to fetch()\n  └ sink       app.py:53  upstream = requests.get(pinned, headers={\"Host\": host_header}, allow_redirects=False, timeout=3)  # requests.get inside fetch()\n  fix: Allow-list hosts/schemes, resolve DNS and reject private ranges, disable redirects.\n\n1 finding(s) in 1 file(s), 8 function(s) summarized\nby OWASP: A10:2021 Server-Side Request Forgery: 1\n",
       "findings": [
        {
         "rule_id": "SL-SSRF-001",
         "cwe": "CWE-918",
         "severity": "high",
         "file": "app.py",
-        "line": 42,
+        "line": 62,
         "flow": [
          {
           "kind": "source",
-          "line": 42
+          "line": 62
          },
          {
           "kind": "propagate",
-          "line": 42
+          "line": 62
          },
          {
           "kind": "call",
-          "line": 42
+          "line": 62
          },
          {
           "kind": "sink",
-          "line": 33
+          "line": 53
          }
         ]
        }
@@ -313,6 +366,12 @@
        "passed": 3
       },
       {
+       "name": "test_fixed_endpoint_is_stricter_than_the_vulnerable_one_on_legitimate_looking_values",
+       "role": "stricter",
+       "cases": 3,
+       "passed": 3
+      },
+      {
        "name": "test_fixed_endpoint_keeps_normal_sorting_and_filtering",
        "role": "feature",
        "cases": 1,
@@ -411,10 +470,10 @@
      "summary": "The read-by-id route checks that someone is logged in but not that the invoice is theirs; the list and update routes do check.",
      "outcome": "A logged-in user received another user's invoice, including its memo, and every one of the eight ids answered 200.",
      "file": "labs/03-idor-bola/vulnerable/app.py",
-     "code": "from __future__ import annotations\n\nimport secrets\n\nfrom flask import Flask, jsonify, request\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n    invoices = {item[\"id\"]: item for item in settings[\"invoices\"]}\n    sessions: dict[str, str] = {}\n\n    def current_user() -> str | None:\n        return sessions.get(request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \"))\n\n    @app.post(\"/api/login\")\n    def login():\n        body = request.get_json(silent=True) or {}\n        if settings[\"users\"].get(body.get(\"user\")) != body.get(\"password\"):\n            return jsonify(error=\"bad credentials\"), 401\n        token = secrets.token_hex(16)\n        sessions[token] = body[\"user\"]\n        return jsonify(token=token)\n\n    @app.get(\"/api/invoices\")\n    def list_invoices():\n        user = current_user()\n        if user is None:\n            return jsonify(error=\"login required\"), 401\n        return jsonify([i for i in invoices.values() if i[\"owner\"] == user])\n\n    @app.get(\"/api/invoices/<int:object_id>\")\n    def get_invoice(object_id: int):\n        if current_user() is None:\n            return jsonify(error=\"login required\"), 401\n        if object_id not in invoices:\n            return jsonify(error=\"not found\"), 404\n        return jsonify(invoices[object_id])\n\n    @app.patch(\"/api/invoices/<int:object_id>\")\n    def update_invoice(object_id: int):\n        user = current_user()\n        if user is None:\n            return jsonify(error=\"login required\"), 401\n        invoice = invoices.get(object_id)\n        if invoice is None or invoice[\"owner\"] != user:\n            return jsonify(error=\"not found\"), 404\n        invoice[\"memo\"] = (request.get_json(silent=True) or {}).get(\"memo\", invoice[\"memo\"])\n        return jsonify(invoice)\n\n    return app\n",
+     "code": "from __future__ import annotations\n\nimport secrets\n\nfrom flask import Flask, jsonify, request\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n    invoices = {item[\"id\"]: item for item in settings[\"invoices\"]}\n    sessions: dict[str, str] = {}\n\n    def current_user() -> str | None:\n        return sessions.get(request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \"))\n\n    @app.post(\"/api/login\")\n    def login():\n        body = request.get_json(silent=True)\n        body = body if isinstance(body, dict) else {}\n        user, password = body.get(\"user\"), body.get(\"password\")\n        expected = settings[\"users\"].get(user) if isinstance(user, str) else None\n        if expected is None or not isinstance(password, str) or password != expected:\n            return jsonify(error=\"bad credentials\"), 401\n        token = secrets.token_hex(16)\n        sessions[token] = user\n        return jsonify(token=token)\n\n    @app.get(\"/api/invoices\")\n    def list_invoices():\n        user = current_user()\n        if user is None:\n            return jsonify(error=\"login required\"), 401\n        return jsonify([i for i in invoices.values() if i[\"owner\"] == user])\n\n    @app.get(\"/api/invoices/<int:object_id>\")\n    def get_invoice(object_id: int):\n        if current_user() is None:\n            return jsonify(error=\"login required\"), 401\n        if object_id not in invoices:\n            return jsonify(error=\"not found\"), 404\n        return jsonify(invoices[object_id])\n\n    @app.patch(\"/api/invoices/<int:object_id>\")\n    def update_invoice(object_id: int):\n        user = current_user()\n        if user is None:\n            return jsonify(error=\"login required\"), 401\n        invoice = invoices.get(object_id)\n        if invoice is None or invoice[\"owner\"] != user:\n            return jsonify(error=\"not found\"), 404\n        invoice[\"memo\"] = (request.get_json(silent=True) or {}).get(\"memo\", invoice[\"memo\"])\n        return jsonify(invoice)\n\n    return app\n",
      "marks": {
       "bug": [
-       38
+       41
       ],
       "changed": []
      },
@@ -436,6 +495,24 @@
        "role": "login",
        "cases": 1,
        "passed": 1
+      },
+      {
+       "name": "test_anonymous_callers_cannot_tell_existing_ids_from_missing_ones[vulnerable]",
+       "role": "anon",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_login_rejects_unknown_users_and_malformed_bodies",
+       "role": "badlogin",
+       "cases": 9,
+       "passed": 9
+      },
+      {
+       "name": "test_login_rejects_known_user_with_missing_or_non_string_password",
+       "role": "badlogin",
+       "cases": 5,
+       "passed": 5
       }
      ],
      "sinkline": {
@@ -453,7 +530,7 @@
      "summary": "One helper checks ownership and every by-id route goes through it; a record that is not yours answers 404.",
      "outcome": "Every record the user did not own answered 404 on read and on update, and the other user's memo never appeared.",
      "file": "labs/03-idor-bola/fixed/app.py",
-     "code": "from __future__ import annotations\n\nimport secrets\n\nfrom flask import Flask, abort, jsonify, request\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n    invoices = {item[\"id\"]: item for item in settings[\"invoices\"]}\n    sessions: dict[str, str] = {}\n\n    def current_user() -> str:\n        user = sessions.get(request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \"))\n        if user is None:\n            abort(401)\n        return user\n\n    def owned_invoice(object_id: int) -> dict:\n        invoice = invoices.get(object_id)\n        if invoice is None or invoice[\"owner\"] != current_user():\n            abort(404)\n        return invoice\n\n    @app.errorhandler(401)\n    @app.errorhandler(404)\n    def error(exc):\n        return jsonify(error=exc.name.lower()), exc.code\n\n    @app.post(\"/api/login\")\n    def login():\n        body = request.get_json(silent=True) or {}\n        if settings[\"users\"].get(body.get(\"user\")) != body.get(\"password\"):\n            return jsonify(error=\"bad credentials\"), 401\n        token = secrets.token_hex(16)\n        sessions[token] = body[\"user\"]\n        return jsonify(token=token)\n\n    @app.get(\"/api/invoices\")\n    def list_invoices():\n        user = current_user()\n        return jsonify([i for i in invoices.values() if i[\"owner\"] == user])\n\n    @app.get(\"/api/invoices/<int:object_id>\")\n    def get_invoice(object_id: int):\n        return jsonify(owned_invoice(object_id))\n\n    @app.patch(\"/api/invoices/<int:object_id>\")\n    def update_invoice(object_id: int):\n        invoice = owned_invoice(object_id)\n        invoice[\"memo\"] = (request.get_json(silent=True) or {}).get(\"memo\", invoice[\"memo\"])\n        return jsonify(invoice)\n\n    return app\n",
+     "code": "from __future__ import annotations\n\nimport secrets\n\nfrom flask import Flask, abort, jsonify, request\n\n\ndef create_app(settings: dict) -> Flask:\n    app = Flask(__name__)\n    invoices = {item[\"id\"]: item for item in settings[\"invoices\"]}\n    sessions: dict[str, str] = {}\n\n    def current_user() -> str:\n        user = sessions.get(request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \"))\n        if user is None:\n            abort(401)\n        return user\n\n    def owned_invoice(object_id: int) -> dict:\n        user = current_user()  # authenticate before any lookup, so a missing id cannot be told apart\n        invoice = invoices.get(object_id)\n        if invoice is None or invoice[\"owner\"] != user:\n            abort(404)\n        return invoice\n\n    @app.errorhandler(401)\n    @app.errorhandler(404)\n    def error(exc):\n        return jsonify(error=exc.name.lower()), exc.code\n\n    @app.post(\"/api/login\")\n    def login():\n        body = request.get_json(silent=True)\n        body = body if isinstance(body, dict) else {}\n        user, password = body.get(\"user\"), body.get(\"password\")\n        expected = settings[\"users\"].get(user) if isinstance(user, str) else None\n        if expected is None or not isinstance(password, str) or password != expected:\n            return jsonify(error=\"bad credentials\"), 401\n        token = secrets.token_hex(16)\n        sessions[token] = user\n        return jsonify(token=token)\n\n    @app.get(\"/api/invoices\")\n    def list_invoices():\n        user = current_user()\n        return jsonify([i for i in invoices.values() if i[\"owner\"] == user])\n\n    @app.get(\"/api/invoices/<int:object_id>\")\n    def get_invoice(object_id: int):\n        return jsonify(owned_invoice(object_id))\n\n    @app.patch(\"/api/invoices/<int:object_id>\")\n    def update_invoice(object_id: int):\n        invoice = owned_invoice(object_id)\n        invoice[\"memo\"] = (request.get_json(silent=True) or {}).get(\"memo\", invoice[\"memo\"])\n        return jsonify(invoice)\n\n    return app\n",
      "marks": {
       "bug": [],
       "changed": [
@@ -474,8 +551,9 @@
        26,
        27,
        28,
-       46,
-       50
+       29,
+       50,
+       54
       ]
      },
      "tests": [
@@ -484,6 +562,24 @@
        "role": "login",
        "cases": 1,
        "passed": 1
+      },
+      {
+       "name": "test_anonymous_callers_cannot_tell_existing_ids_from_missing_ones[fixed]",
+       "role": "anon",
+       "cases": 1,
+       "passed": 1
+      },
+      {
+       "name": "test_login_rejects_unknown_users_and_malformed_bodies",
+       "role": "badlogin",
+       "cases": 9,
+       "passed": 9
+      },
+      {
+       "name": "test_login_rejects_known_user_with_missing_or_non_string_password",
+       "role": "badlogin",
+       "cases": 5,
+       "passed": 5
       },
       {
        "name": "test_fixed_api_hides_other_users_records_on_every_route",

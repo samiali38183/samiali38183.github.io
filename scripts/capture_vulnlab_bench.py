@@ -6,7 +6,7 @@
   python scripts/capture_vulnlab_bench.py --clone DIR --venv DIR [--check]   # reuse a clone at the tag and a venv
 
 What it does (needs git, network access to GitHub and Python 3.12):
-  1. Clones https://github.com/samiali38183/vulnlab into a scratch directory, checks out the tag v0.1.0 and refuses to
+  1. Clones https://github.com/samiali38183/vulnlab into a scratch directory, checks out the tag v0.1.1 and refuses to
      continue if the commit is not the one recorded below. The public repository is never modified.
   2. Creates a virtual environment and installs requirements.lock (the exact versions CI uses, including sinkline and
      tripline at pinned commits) and the project itself. No Docker; the labs are plain Python processes on loopback.
@@ -42,10 +42,10 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "data" / "vulnlab-bench.json"
 
 REPO_URL = "https://github.com/samiali38183/vulnlab"
-TAG = "v0.1.0"
-COMMIT = "1fceaa89625d60b0b858facf19f7d901a0d63a57"
+TAG = "v0.1.1"
+COMMIT = "dd2665d7cdf0ef300846014a5c4a775e3e1dd6d4"
 CAPTURED = "2026-11-11"
-CI_RUN = "43087241629"
+CI_RUN = "43134837698"
 
 # Display labels. `bug` is the line the lab's README names as the vulnerable line; it is checked against the README and the
 # source text below. `note` explains a sinkline result that is not a plain finding.
@@ -70,7 +70,7 @@ LABS = [
     },
     {
         "id": "03-idor-bola", "n": "03", "title": "IDOR / broken object-level authorization", "cwe": "CWE-639",
-        "bug": 38, "bug_text": "jsonify(invoices[object_id])", "bug_readme": "line 38",
+        "bug": 41, "bug_text": "jsonify(invoices[object_id])", "bug_readme": "jsonify(invoices[object_id])  # line",  # the README still says "line 38" (v0.1.1); the line is 41
         "vulnerable": "The read-by-id route checks that someone is logged in but not that the invoice is theirs; the list and update routes do check.",
         "fixed": "One helper checks ownership and every by-id route goes through it; a record that is not yours answers 404.",
         "impact": "A logged-in user received another user's invoice, including its memo, and every one of the eight ids answered 200.",
@@ -89,25 +89,51 @@ ROLES = {
     "feature": "Feature still works",
     "login": "Login required",
     "detect": "Detection replay",
+    "malformed": "Malformed input answered with 400",
+    "forbidden": "Well-formed request for another host still refused",
+    "pinning": "Address check enforced (test fails if it is removed)",
+    "stricter": "Fixed version stricter on odd sort values, by design",
+    "anon": "Same answer for existing and missing ids",
+    "badlogin": "Unknown users and malformed logins rejected",
 }
 TESTS = {
     ("01-ssrf-redirect", "test_vulnerable_service_returns_internal_marker_via_allowed_redirect", ""): ("vulnerable", "impact"),
     ("01-ssrf-redirect", "test_fixed_service_does_not_return_internal_marker", ""): ("fixed", "blocked"),
     ("01-ssrf-redirect", "test_fixed_service_still_previews_pages_and_follows_allowed_redirects", ""): ("fixed", "feature"),
+    ("01-ssrf-redirect", "test_fixed_service_answers_400_to_every_malformed_url", "*"): ("fixed", "malformed"),
+    ("01-ssrf-redirect", "test_fixed_service_answers_400_to_a_malformed_redirect_target", "*"): ("fixed", "malformed"),
+    ("01-ssrf-redirect", "test_fixed_service_keeps_403_for_well_formed_urls_on_other_hosts", ""): ("fixed", "forbidden"),
+    ("01-ssrf-redirect", "test_address_pinning_refuses_a_host_whose_address_is_not_approved", ""): ("fixed", "pinning"),
     ("01-ssrf-redirect", "test_detection_rule_fires_on_recorded_attack_not_on_benign_traffic", ""): (None, "detect"),
     ("02-sqli-order-by", "test_vulnerable_sort_parameter_lets_another_table_decide_the_order", ""): ("vulnerable", "impact"),
     ("02-sqli-order-by", "test_fixed_endpoint_rejects_non_column_sort_values", "*"): ("fixed", "blocked"),
+    ("02-sqli-order-by", "test_fixed_endpoint_is_stricter_than_the_vulnerable_one_on_legitimate_looking_values", "*"): ("fixed", "stricter"),
     ("02-sqli-order-by", "test_fixed_endpoint_keeps_normal_sorting_and_filtering", ""): ("fixed", "feature"),
     ("02-sqli-order-by", "test_detection_rule_fires_on_recorded_attack_not_on_benign_traffic", ""): (None, "detect"),
     ("03-idor-bola", "test_vulnerable_api_returns_another_users_record", ""): ("vulnerable", "impact"),
     ("03-idor-bola", "test_vulnerable_patch_route_already_checks_ownership", ""): ("vulnerable", "inconsistency"),
     ("03-idor-bola", "test_requests_without_a_login_are_rejected", "vulnerable"): ("vulnerable", "login"),
     ("03-idor-bola", "test_requests_without_a_login_are_rejected", "fixed"): ("fixed", "login"),
+    ("03-idor-bola", "test_anonymous_callers_cannot_tell_existing_ids_from_missing_ones", "vulnerable"): ("vulnerable", "anon"),
+    ("03-idor-bola", "test_anonymous_callers_cannot_tell_existing_ids_from_missing_ones", "fixed"): ("fixed", "anon"),
+    ("03-idor-bola", "test_login_rejects_unknown_users_and_malformed_bodies", "*-vulnerable"): ("vulnerable", "badlogin"),
+    ("03-idor-bola", "test_login_rejects_unknown_users_and_malformed_bodies", "*-fixed"): ("fixed", "badlogin"),
+    ("03-idor-bola", "test_login_rejects_known_user_with_missing_or_non_string_password", "*-vulnerable"): ("vulnerable", "badlogin"),
+    ("03-idor-bola", "test_login_rejects_known_user_with_missing_or_non_string_password", "*-fixed"): ("fixed", "badlogin"),
     ("03-idor-bola", "test_fixed_api_hides_other_users_records_on_every_route", ""): ("fixed", "blocked"),
     ("03-idor-bola", "test_fixed_api_still_serves_owners_their_own_records", ""): ("fixed", "feature"),
     ("03-idor-bola", "test_detection_rule_fires_on_recorded_enumeration_not_on_benign_traffic", ""): (None, "detect"),
 }
 STILL_VISIBLE = "is still visible in the log"   # assertion in the fixed-service tests: the rule still fires there
+
+
+def param_matches(pattern: str, param: str) -> bool:
+    """TESTS keys: "" no parameter, an exact parameter, "*" any, or "*-vulnerable" / "*-fixed" (parameter ends with that)."""
+    if pattern == "*":
+        return True
+    if pattern.startswith("*-"):
+        return param.endswith(pattern[1:])
+    return param == pattern
 
 
 def sh(cmd: list[str], cwd: Path | None = None, env: dict | None = None, ok: tuple[int, ...] = (0,)) -> tuple[str, int]:
@@ -149,7 +175,7 @@ def parse_pytest(out: str) -> tuple[list[dict], int, int]:
             safety += state == "PASSED"
         else:
             rows.append({"lab": path.split("/")[1], "name": name, "param": param or "", "state": state})
-    summary = re.search(r"=+ (\d+) passed in [\d.]+s =+", out)
+    summary = re.search(r"=+ (\d+) passed in [\d.]+s(?: \([\d:]+\))? =+", out)
     if not summary:
         raise SystemExit("pytest did not finish with 'N passed':\n" + out[-600:])
     return rows, safety, int(summary.group(1))
@@ -206,18 +232,20 @@ def build(clone: Path, venv: Path) -> dict:
         detect = None
         seen_keys = set()
         for r in rows:
-            key = (meta["id"], r["name"], r["param"]) if (meta["id"], r["name"], r["param"]) in TESTS else (meta["id"], r["name"], "*" if r["param"] else "")
-            if key not in TESTS:
-                raise SystemExit(f"test {r['name']}[{r['param']}] in {meta['id']} is not listed in TESTS")
-            seen_keys.add(key)
+            keys = [k for k in TESTS if k[0] == meta["id"] and k[1] == r["name"] and param_matches(k[2], r["param"]) and (k[2] != "*" or r["param"] != "")]
+            keys += [k for k in TESTS if k[0] == meta["id"] and k[1] == r["name"] and k[2] == "" and r["param"] == ""]
+            keys = list(dict.fromkeys(keys))
+            if len(keys) != 1:
+                raise SystemExit(f"test {r['name']}[{r['param']}] in {meta['id']} matches {len(keys)} entries of TESTS (need exactly one)")
+            seen_keys.add(keys[0])
         for key in TESTS:
             if key[0] == meta["id"] and key not in seen_keys:
                 raise SystemExit(f"listed test {key} did not run")
         for key, (version, role) in TESTS.items():
             if key[0] != meta["id"]:
                 continue
-            cases = [r for r in rows if r["name"] == key[1] and (key[2] == "*" or r["param"] == key[2])]
-            entry = {"name": key[1] + (f"[{key[2]}]" if key[2] not in ("", "*") else ""), "role": role, "cases": len(cases),
+            cases = [r for r in rows if r["name"] == key[1] and param_matches(key[2], r["param"]) and (key[2] != "" or r["param"] == "")]
+            entry = {"name": key[1] + (f"[{key[2]}]" if key[2] != "" and not key[2].startswith("*") else ""), "role": role, "cases": len(cases),
                      "passed": sum(c["state"] == "PASSED" for c in cases)}
             if role == "detect":
                 detect = entry
