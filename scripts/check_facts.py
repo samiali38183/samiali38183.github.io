@@ -43,7 +43,20 @@ def run(cmd: list[str], cwd: Path | None = None) -> str:
 
 
 def gh(path: str) -> dict | list:
-    return json.loads(run(["gh", "api", path]))
+    """`gh api`, retried: GitHub's API fails transiently (outages print warnings that would corrupt the JSON)."""
+    import time
+    last = ""
+    for attempt in range(4):
+        p = subprocess.run(["gh", "api", path], capture_output=True, text=True, encoding="utf-8", errors="replace")
+        last = p.stdout
+        try:
+            data = json.loads(p.stdout)
+            if not (isinstance(data, dict) and "message" in data and "documentation_url" in data):  # API error body
+                return data
+        except json.JSONDecodeError:
+            pass
+        time.sleep(3 * (attempt + 1))
+    raise RuntimeError(f"gh api {path} failed after retries: {last[:200]!r}")
 
 
 def pybin(venvs: dict[str, str], name: str, exe: str) -> str:
@@ -453,18 +466,77 @@ def main() -> int:
     # tripline
     if a.only in (None, "tripline"):
         t = clones / "tripline"
-        sc = json.loads((t / "docs" / "scorecard.json").read_text(encoding="utf-8"))["totals"]
+        sc_all = json.loads((t / "docs" / "scorecard.json").read_text(encoding="utf-8"))
+        sc = sc_all["totals"]
+        scn = sc_all["scenarios"]
         expect("tripline gate", f"{sc['passed']} passed, {sc['failed']} failed, {sc['pending']} pending", "projects/tripline/index.html")
         expect("tripline scenarios", str(sc["scenarios"]), "projects/tripline/index.html", f"{sc['scenarios']} scenarios")
         pct = round(sc["weighted_coverage"] * 100)
         expect("tripline weighted coverage", f"{pct}%", "projects/tripline/index.html")
+        # The 98% must never appear without the split (52% on unmodified SigmaHQ rules alone).
+        pts = sum(r["weight"] for r in scn)
+        got = round(sc["weighted_coverage"] * pts)
+        vend = round(sc["weighted_coverage_vendored"] * pts)
+        expect("tripline weighted points", f"{got} of {pts}", "projects/tripline/index.html", f"{got} of {pts}")
+        expect("tripline vendored-only split", f"{round(sc['weighted_coverage_vendored'] * 100)}% ({vend} of {pts}, {sc['passed_vendored_only']} scenarios)",
+               "projects/tripline/index.html", f"{round(sc['weighted_coverage_vendored'] * 100)}% ({vend} of {pts}, {sc['passed_vendored_only']} scenarios)")
+        authored = sum(r["weight"] for r in scn if r["status"] == "passed" and r["needs_authored_rule"])
+        expect("tripline authored-rule points", f"{authored} of {pts}", "projects/tripline/index.html", f"({authored} of {pts} weight points)")
+        for pg in ("projects/tripline/index.html", "projects/index.html", "index.html"):
+            html_text = text_of(pg)
+            for m in re.finditer(r"(?<![0-9])98%", html_text):
+                near = html_text[max(0, m.start() - 160): m.end() + 260]
+                results.append(("52%" in near, f"98% shown with the 52% split within 400 characters in {pg} (at offset {m.start()})"))
+        # weights: points that follow the published ranking (docs/weights.md)
+        ranked = set(re.findall(r"^\d+\. (T[\d.]+)", (t / "docs" / "weights.md").read_text(encoding="utf-8"), re.M))
+        follow = sum(r["weight"] for r in scn if r["technique"] in ranked)
+        expect("tripline weight points following the ranking", f"{follow} of {pts}", "projects/tripline/index.html", f"{follow} of {pts} points follow")
+        ben = sc_all["benign"]
+        nb = ben["events"]
+        ev_rules = [r for r in ben["rules"] if r["applicable"]]
+        fp = sum(r["matched"] for r in ben["rules"])
+        fp_rules = sum(1 for r in ben["rules"] if r["matched"])
+        expect("tripline benign corpus", f"{fp} matches from {fp_rules} of {len(ev_rules)} evaluated rules, {nb} events", "projects/tripline/index.html",
+               f"{fp} matches from {fp_rules} of {len(ev_rules)} evaluated rules on {nb} events")
+        expect("tripline benign not evaluated", f"{len(ben['rules']) - len(ev_rules)} of {len(ben['rules'])}", "projects/tripline/index.html",
+               f"{len(ben['rules']) - len(ev_rules)} of {len(ben['rules'])} rules not evaluated")
+        # evasion sweep: the page's strip data must equal the variants in docs/robustness.json (sweep re-run: tripline robustness)
+        rob = json.loads((t / "docs" / "robustness.json").read_text(encoding="utf-8"))
+        page_sets = json.loads((SITE / "content/data/projects.json").read_text(encoding="utf-8"))["projects"]["tripline"]["strip_sets"]
+        want = {}
+        for scn_r in rob["scenarios"]:
+            exp_ids = {r["rule_id"] for r in scn_r["rules"] if r["expected"]}
+            for cmd in (True, False):
+                vs = [v for v in scn_r["variants"] if (v["kind"] == "cmdline") == cmd]
+                if not vs:
+                    continue
+                runs: list[list] = []
+                for v in vs:
+                    st = "hit" if any(v["caught"].get(i) for i in exp_ids) else "miss"
+                    if runs and runs[-1][0] == st:
+                        runs[-1][1] += 1
+                    else:
+                        runs.append([st, 1])
+                want[(scn_r["technique"], cmd)] = runs
+        rows = {r["label"]: r["runs"] for r in page_sets["evasion"]["rows"]}
+        got_rows = [rows["Cron"], rows["History"], rows["Setuid"], rows["Setuid, other tools"]]
+        want_rows = [want[("T1053.003", True)], want[("T1070.003", True)], want[("T1548.001", True)], want[("T1548.001", False)]]
+        results.append((got_rows == want_rows, "evasion strips equal the variants in docs/robustness.json (per scenario, in order)"))
+        n_cmd = sum(n for rr in got_rows[:3] for _, n in rr)
+        n_hit = sum(n for rr in got_rows[:3] for st, n in rr if st == "hit")
+        expect("tripline evasion sweep", f"{n_hit} of {n_cmd}", "projects/tripline/index.html", f"{n_hit} of {n_cmd} command-line variants")
+        bsum = sum(n for _, n in page_sets["benign"]["rows"][0]["runs"])
+        results.append((bsum == nb and sum(n for st, n in page_sets["benign"]["rows"][0]["runs"] if st == "fp") == fp, f"benign strip: {bsum} events, {fp} matches"))
         out = run([pybin(venvs, "tripline", "tripline"), "replay", "--all"], t)
         ps = len(re.findall(r"^\[\s+PASS\]", out, re.M))
         pe = len(re.findall(r"^\[PENDING\]", out, re.M))
         results.append((ps == sc["passed"] and pe == sc["pending"] and "gate passed" in out,
                         f"tripline replay --all output: {ps} PASS, {pe} PENDING, gate passed={'gate passed' in out}"))
         n = collected(pybin(venvs, "tripline", "python"), t)
-        expect("tripline tests (pytest collection)", str(n), "projects/tripline/index.html", f"{n} (89%")
+        expect("tripline tests (pytest collection)", str(n), "projects/tripline/index.html", f"{n} (91% line+branch")
+        cov = run([pybin(venvs, "tripline", "python"), "-m", "pytest", "-q", "-p", "no:cacheprovider", "--cov=tripline", "--cov-branch"], t)
+        mcov = re.search(r"^TOTAL\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)%", cov, re.M)
+        results.append((bool(mcov) and mcov.group(1) == "91", f"tripline coverage (line+branch) {mcov.group(1) + '%' if mcov else 'not measured'}, page says 91%"))
         expect("tripline 0 of 36 on home", "0 of 36", "index.html")
         expect("tripline tests on resume page", str(n), "resume/index.html", f"{n} tests")
         code = (
@@ -491,9 +563,10 @@ def main() -> int:
         bd = json.loads((SITE / "assets/data/bench-tripline.json").read_text(encoding="utf-8"))
         ys = yaml.safe_load((t / bd["meta"]["stock"]["file"]).read_text(encoding="utf-8"))["detection"]
         yc = yaml.safe_load((t / bd["meta"]["custom"]["file"]).read_text(encoding="utf-8"))["detection"]
+        img_sel = yc["selection_image"]["Image|endswith"]
         same = (bd["stock"]["perm"] == ys["selection_perm"]["CommandLine|contains"]
                 and bd["stock"]["root"] == [ys["selection_root"]["CommandLine|contains"]]
-                and bd["custom"] == {"image": yc["selection_image"]["Image|endswith"], "symbolic": yc["selection_symbolic"]["CommandLine|re"],
+                and bd["custom"] == {"image": [img_sel] if isinstance(img_sel, str) else list(img_sel), "symbolic": yc["selection_symbolic"]["CommandLine|re"],
                                      "octal": yc["selection_octal"]["CommandLine|re"], "filter": yc["filter_tmp_runner"]["CommandLine|re"]})
         results.append((same, "bench rule patterns equal the YAML in the tripline clone"))
         ev = bd["events"]
@@ -504,7 +577,7 @@ def main() -> int:
         all_html = "".join(p.read_text(encoding="utf-8") for p in SITE.rglob("*.html") if "content" not in p.parts)
         for repo, rid in sorted(set(re.findall(r"github\.com/samiali38183/(tripline)/actions/runs/(\d+)", all_html))):
             r = gh(f"repos/samiali38183/{repo}/actions/runs/{rid}")
-            red = rid in {"41838714456", "42917025570"}  # recording runs, red by design
+            red = rid in {"41838714456", "42917025570", "43090565998"}  # recording runs, red by design
             results.append((r.get("conclusion") == ("failure" if red else "success"), f"CI run {repo}/{rid}: conclusion={r.get('conclusion')}{' (expected red)' if red else ''}"))
         return report()
 
@@ -619,7 +692,7 @@ def main() -> int:
     for repo, rid in sorted(set(re.findall(r"github\.com/samiali38183/([\w.-]+)/actions/runs/(\d+)", all_html))):
         r = gh(f"repos/samiali38183/{repo}/actions/runs/{rid}")
         # The two tripline emulation runs are red by design: their last step asserts that expected rules fire.
-        expected_red = rid in {"41838714456", "42917025570"}
+        expected_red = rid in {"41838714456", "42917025570", "43090565998"}
         results.append((r.get("conclusion") == ("failure" if expected_red else "success"),
                         f"CI run {repo}/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')}{' (expected red, linked as the recording source)' if expected_red else ''} sha={r.get('head_sha', '')[:7]}"))
 

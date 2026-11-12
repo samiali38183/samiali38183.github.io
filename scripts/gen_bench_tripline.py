@@ -57,6 +57,12 @@ PRESETS = [
     ("Doc path appended", "/usr/bin/chmod", "chmod 4755 /tmp/x /usr/share/doc/x"),
     ("Only under /usr/share/doc/", "/usr/bin/chmod", "chmod u+s /usr/share/doc/pkg/helper"),
     ("Benign 644", "/usr/bin/chmod", "chmod 644 /tmp/x"),
+    # Variants from the evasion sweep (docs/robustness.md at tripline v0.3.0, seed 20261111); each is checked against the compiler below
+    ("Sweep: busybox multicall", "/usr/bin/busybox", "busybox chmod u+s f"),
+    ("Sweep: clustered flags -vR", "/usr/bin/chmod", "chmod -vR 4755 /tmp/evilBinary"),
+    ("Sweep: flag after mode", "/usr/bin/chmod", "chmod u+s -v /tmp/evilBinary"),
+    ("Sweep: install -m 4755 (missed)", "/usr/bin/install", "install -m 4755 /tmp/src /tmp/dst"),
+    ("Sweep: renamed copy (missed)", "/tmp/.c", "/tmp/.c u+s f"),
 ]
 
 
@@ -65,7 +71,7 @@ def conditions(stock: dict, custom: dict, image: str, cmd: str) -> tuple[list[in
     contains = lambda needle: re.search(re.escape(needle), cmd, re.I | re.S) is not None  # noqa: E731
     root = contains(stock["root"][0])
     perm = any(contains(n) for n in stock["perm"])
-    img = re.fullmatch(".*" + re.escape(custom["image"]), image, re.I | re.S) is not None
+    img = any(re.fullmatch(".*" + re.escape(x), image, re.I | re.S) for x in custom["image"])
     sym = re.search(custom["symbolic"], cmd) is not None
     octal = re.search(custom["octal"], cmd) is not None
     filt = re.search(custom["filter"], cmd) is not None
@@ -87,10 +93,10 @@ def reasons(sc: list[int], cc: list[int]) -> list[str]:
         stock = "Has 'chown root' but not the literal ' chmod u+s' or ' chmod g+s'; the rule needs both."
     if rv:
         form = "symbolic and octal" if sy and oc else "symbolic" if sy else "octal"
-        custom = f"Image ends with /chmod and the mode sets setuid or setgid ({form} form)."
+        custom = f"Image ends with /chmod or /busybox and the mode sets setuid or setgid ({form} form)."
     elif not im:
-        custom = ("The mode would match, but Image does not end with /chmod, so this event is not the chmod itself."
-                  if sy or oc else "Image does not end with /chmod and no setuid or setgid mode is present.")
+        custom = ("The mode would match, but Image does not end with /chmod or /busybox, so this event is not a chmod execution."
+                  if sy or oc else "Image does not end with /chmod or /busybox and no setuid or setgid mode is present.")
     elif not (sy or oc):
         custom = "No setuid or setgid mode: no symbolic s bit and no octal mode 2xxx to 7xxx."
     else:
@@ -100,7 +106,8 @@ def reasons(sc: list[int], cc: list[int]) -> list[str]:
 
 def random_cases(rng: random.Random, n: int) -> list[tuple[str, str]]:
     images = ["/usr/bin/chmod", "/usr/bin/chmod", "/bin/chmod", "/usr/bin/sudo", "/usr/bin/dash", "/usr/bin/CHMOD",
-              "/opt/chmod", "/chmod", "chmod", "/usr/bin/chmod ", "/usr/bin/chmodx", "/usr/bin/chmod\n", ""]
+              "/opt/chmod", "/chmod", "chmod", "/usr/bin/chmod ", "/usr/bin/chmodx", "/usr/bin/chmod\n", "",
+              "/usr/bin/busybox", "/bin/BusyBox", "/busybox", "/usr/bin/busyboxx"]
     prefixes = ["", "", "", "sudo ", "/usr/bin/", "sh -c ", "sudo /bin/", "chown root x; ", "x chmod ", "xchmod ", "./", "  ",
                 "env X=1 ", "\tsudo "]
     opts = ["", "", "-R ", "-f ", "--recursive ", "-Rf ", "-- ", "--reference=x ", "-1 ", "-v -c "]
@@ -170,7 +177,8 @@ def main() -> None:
     ys = yaml.safe_load((repo / STOCK_FILE).read_text(encoding="utf-8"))["detection"]
     yc = yaml.safe_load((repo / CUSTOM_FILE).read_text(encoding="utf-8"))["detection"]
     stock = {"root": [ys["selection_root"]["CommandLine|contains"]], "perm": ys["selection_perm"]["CommandLine|contains"]}
-    custom = {"image": yc["selection_image"]["Image|endswith"], "symbolic": yc["selection_symbolic"]["CommandLine|re"],
+    image_sel = yc["selection_image"]["Image|endswith"]
+    custom = {"image": [image_sel] if isinstance(image_sel, str) else list(image_sel), "symbolic": yc["selection_symbolic"]["CommandLine|re"],
               "octal": yc["selection_octal"]["CommandLine|re"], "filter": yc["filter_tmp_runner"]["CommandLine|re"]}
     assert ys["condition"] == "all of selection_*", ys["condition"]
     assert yc["condition"] == "selection_image and (selection_symbolic or selection_octal) and not filter_tmp_runner"
