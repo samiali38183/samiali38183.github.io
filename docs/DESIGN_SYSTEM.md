@@ -58,11 +58,16 @@ All are plain HTML with classes; none needs JS.
 - **Result table** (`table.tbl`): header cells `th scope="col"`, row headers `th scope="row"`. The build adds `data-label` to each `td`, and below 48 rem (below 64 rem with `.wt`) the table collapses to cards. Numbers use `.num` (tabular, right-aligned). `b.best` marks the best value with a filled square. `tr.row-fail` tints a failed row.
 - **Code or output block**: `<pre data-copy data-label="..."><code>`; the label bar is CSS, the copy button is added by `site.js`.
 - **Limits box** (`.limits`): placed right after the method, never in a footer.
-- **Sheets nav** (`.sheets`): previous and next sheet.
+- **Sheets nav** (`.sheets`): previous and next sheet. Sheets are numbered in the order of `order` in `projects.json`: the four featured projects first (sheets 1 to 4), then the three "also" projects.
+- **Single-row strips.** A `.strip` never wraps: ticks are `flex: 0 1 var(--tick-w)` with a 2 px minimum, so they shrink in a narrow container, and a mini strip in a table cell has a minimum width for its 24 ticks. Strips with more than 40 ticks (`components.LONG_STRIP`) get class `long` and wrap onto further ruler rows by design (the 255-tick evasion sweep, the 109-tick gate strip). `scripts/qc_strips.mjs` fails if any non-`long` strip has ticks on two rows, at 360, 768, 1280 and 1600 px.
+- **Summary box** (`.glance`): three rows (Checked against, Found then left, Limits) built from the project's `home` data, directly under the title block, so the first screen holds the verdict without the detail.
+- **Folded section** (`details.fold`, closed by default; `.fold-main` for section-size ones): the method (`#method`), the traceability list (`#trace`), the verification record (`.fold-rec`), and long evidence tables and code blocks (`pages.fold_long()`: tables with 7 or more body rows, code blocks of 12 or more lines; `FOLD_ROWS` and `FOLD_LINES`). Content files may also hold their own `<details class="fold">`. Only `#as-found`, `#as-left` and `#limits` are open by default. Everything stays in the HTML, so it is reachable without JavaScript and by crawlers; browsers open a folded section when its anchor is the target.
+- **Project list** (`.plist`): one line per project (sheet, link, version, reading) used for the "Also" group on the home page and for both groups on the projects index. The home page shows the featured four as cards (`.multi`, two columns) and keeps the full record-of-checks table; the projects index repeats no table.
+- **Reading chips** (`pages.reading_chips()`): when a reading has `run_ok` and `run_note` in `projects.json`, the verdict stamp is followed by the recording run (which may be red by design), a green main-branch run, and a plain-words note saying why the first one failed.
 
 ## Project page template
 
-`pages.project_page()` assembles, in order: title block, record head, reading band (numeral, caption, stamp, chip, legend, strip pair with the view-transition name), bench slot, `#as-found`, `#as-left`, `#method`, `#limits`, `#trace`, sheets nav. Prose comes from `content/<project>.html`, split into named chunks:
+`pages.project_page()` assembles, in order: title block, summary box, reading band (numeral, caption, stamp, chips, legend, strip pair with the view-transition name), folded record head, bench slot, `#as-found`, `#as-left`, folded `#method`, `#limits`, folded `#trace`, sheets nav. Prose comes from `content/<project>.html`, split into named chunks:
 
 `<!--@dek-->` one-sentence description, `<!--@bench-->` and `<!--@bench-cap-->` static state and caption for Plate 1, `<!--@as-found-->`, `<!--@as-left-->`, `<!--@method-->`, `<!--@limits-->` (a `ul`), optional `<!--@trace-->` (extra tables after the generated traceability list).
 

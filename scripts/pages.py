@@ -13,9 +13,9 @@ import components as C
 
 ROOT = Path(__file__).resolve().parent.parent
 GH = "https://github.com/samiali38183"
-FAILED_SHOWN = 6  # "What failed first" rows shown on the home page; the rest sit in a details element
-FOLD_ROWS = 9  # tables with at least this many body rows, and code blocks with FOLD_LINES lines, are folded on project pages
-FOLD_LINES = 16
+FAILED_SHOWN = 4  # "What failed first" rows shown on the home page; the rest sit in a details element
+FOLD_ROWS = 7  # tables with at least this many body rows, and code blocks with FOLD_LINES lines, are folded on project pages
+FOLD_LINES = 12
 
 
 # ---------------------------------------------------------------------------------------------

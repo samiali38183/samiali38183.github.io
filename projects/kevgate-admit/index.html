@@ -152,7 +152,7 @@ kevgate-admit audit: would deny [maxRisk] registry.example.com/demo/kev-vulnerab
 </table></div>
 <h3>Tests, re-run locally</h3>
 <div class="prose"><p>Run on 2026-11-11 from a fresh clone at tag v0.1.0 (commit 161169a), Go 1.27.4, on Windows.</p></div>
-<pre data-copy data-label="$ go test ./... -cover"><code>$ go test ./... -cover
+<details class="fold fold-tbl"><summary>Output, 12 lines: $ go test ./... -cover</summary><pre data-copy data-label="$ go test ./... -cover"><code>$ go test ./... -cover
 ok   .../internal/admission   coverage: 98.0% of statements
 ok   .../internal/app         coverage: 96.4% of statements
 ok   .../internal/evidence    coverage: 92.8% of statements
@@ -163,7 +163,7 @@ ok   .../internal/risk        coverage: 87.5% of statements
 ok   .../internal/trivy       coverage: 98.9% of statements
 ...
 $ go test ./... -coverprofile=c.out; go tool cover -func=c.out | tail -1
-total:    (statements)    95.0%</code></pre>
+total:    (statements)    95.0%</code></pre></details>
 <p class="trim">Trimmed: 8 of 15 packages shown and the elapsed times removed. Counting passes in <code>go test -json</code> gave 93 top-level tests and 482 including subtests and fuzz seed runs, none failing.</p>
 <h3>A real scanner report</h3>
 <div class="prose">
@@ -203,7 +203,7 @@ demo finished: all checks passed</code></pre></details>
 <p class="trim">Trimmed: namespace setup, Helm install output, the over-threshold enforce case and the metrics block removed; the rest is unedited. The images are synthetic (<code>registry.example.com</code>) and the CVE-2099 entries are invented.</p>
 <h3>The outage step</h3>
 <div class="prose"><p>The same workflow then runs <code>deploy/demo/outage.sh</code>. This excerpt from the README shows the part that matters (the exact reason after "failed calling webhook" depends on the Kubernetes version and kube-proxy):</p></div>
-<pre data-copy data-label="Outage transcript (README)"><code>== failurePolicy Fail: a Pod create is rejected by the API server
+<details class="fold fold-tbl"><summary>Output, 15 lines: Outage transcript (README)</summary><pre data-copy data-label="Outage transcript (README)"><code>== failurePolicy Fail: a Pod create is rejected by the API server
 Error from server (InternalError): error when creating "STDIN": Internal error occurred: failed calling webhook "validate.kevgate-admit.samiali38183.github.io": failed to call webhook: Post "https://kevgate-admit.kevgate-system.svc:443/validate?timeout=10s": dial tcp 10.96.183.14:443: connect: connection refused
 RESULT fail-policy-rejects: PASS
 RESULT fail-policy-no-pod: PASS
@@ -217,7 +217,7 @@ validatingwebhookconfiguration.admissionregistration.k8s.io/kevgate-admit patche
 pod/outage-ignore created
 RESULT ignore-policy-admits-tag-only-pod: PASS
 
-outage test finished: all checks passed</code></pre>
+outage test finished: all checks passed</code></pre></details>
 <p class="trim">Trimmed to the Fail and Ignore cases; the baseline, restore and resume steps are in the <a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/README.md#end-to-end-transcript">README</a>. The run the README cites for this step is <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43042286763"><span class="st" aria-hidden="true"></span><span>run 43042286763</span> <span class="d">passed 2026-11-11</span></a>.</p>
 <div class="scroll wide"><table class="tbl">
 <caption>Results</caption>

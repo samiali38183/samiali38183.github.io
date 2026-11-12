@@ -63,6 +63,7 @@ KEV vs non-KEV population
   kev      n=12  avg CVSS 9.53  avg EPSS 0.935  avg days open 94.2
   non_kev  n=8   avg CVSS 8.34  avg EPSS 0.029  avg days open 101.5</code></pre>
 <p class="trim">Trimmed: rows 4 to 10 (including the swapped ranks 8 and 9 described above) and the KEV concentration line removed. The group averages are properties of the invented inputs.</p>
+<details class="fold"><summary>The pinned real snapshot: what it contains, what it shows, two strips and the EPSS plot</summary>
 <div class="prose">
 <h3>The pinned real snapshot</h3>
 <p>The repository now carries real public data, pinned so the numbers can be reproduced: the CISA KEV catalog (<code>catalogVersion</code> 2026.11.10, 1,779 entries) and the FIRST EPSS file scored 2026-11-11 (model v2026.06.15, 404,864 CVEs), kept as a subset of 6,779 rows: every KEV CVE plus 5,000 non-KEV CVEs chosen by a seeded hash. Asset fields are still invented and CVSS is not used with the real data.</p>
@@ -72,6 +73,7 @@ KEV vs non-KEV population
 {{key:snapshot}}
 {{strips:snapshot}}
 {{snapshot:figure}}
+</details>
 <div class="prose">
 <p>What none of this shows: that the ranking improves remediation outcomes. KEV is an incomplete label (a CVE missing from it is not known to be safe), the snapshot is one point in time with no forecasting test, and the EPSS-against-KEV result is partly circular.</p>
 </div>

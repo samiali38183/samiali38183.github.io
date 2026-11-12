@@ -107,7 +107,7 @@ Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</
 <p>The first is the vendored upstream rule, unchanged. The second is the replacement described below. Write-up: <a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">docs/findings.md, F-001</a>.</p>
 <p>The gate itself, as of <a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1</a>, also had gaps that the setuid finding did not show. The rows below are what a check of that version found.</p>
 </div>
-<div class="scroll wide"><table class="tbl">
+<details class="fold fold-tbl"><summary>Table, 7 rows: Reading ledger, as found (v0.2.1)</summary><div class="scroll wide"><table class="tbl">
 <caption>Reading ledger, as found (v0.2.1)</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
@@ -119,7 +119,7 @@ Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</
 <tr><th scope="row">Workflow supply chain</th><td data-label="Expected">Third-party actions pinned to a commit</td><td data-label="Observed">18 action references pinned to version tags only; zizmor 1.32.0 (auditor persona) reports 42 findings, 19 of them high</td><td data-label="Verdict"><span class="stamp limit">As found: unpinned</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/tripline/blob/main/CHANGELOG.md">CHANGELOG 0.3.0, Pipeline hygiene</a></td></tr>
 <tr><th scope="row">Windows scenarios</th><td data-label="Expected">Recorded telemetry for all 7</td><td data-label="Observed">3 recorded, 4 pending (T1059.001, T1059.003, T1027, T1053.005); 10 of 14 scenarios passing, 68% weighted coverage</td><td data-label="Verdict"><span class="stamp pend">As found: 4 pending</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/tripline/releases/tag/v0.2.1">v0.2.1 scorecard</a></td></tr>
 </tbody>
-</table></div>
+</table></div></details>
 </section>
 <section class="section" id="as-left" aria-labelledby="left-h">
 <h2 id="left-h"><span class="label sec-label">As left</span>A replacement rule matches the two chmod runs, and the gaps are now measured</h2>

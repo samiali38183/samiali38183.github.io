@@ -456,6 +456,7 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <div class="prose">
 <p>The first release passed its own tests and still had four defects that the tests did not catch. The labs' own tests now cover each one; the fixes change the services' behavior on bad input and add no attack content.</p>
 </div>
+<details class="fold fold-tbl"><summary>Table, 4 rows: what the review of v0.1.0 found, what v0.1.1 does instead, and the test</summary>
 <div class="scroll wide"><table class="tbl">
 <caption>What the review of v0.1.0 found, what v0.1.1 does instead, and the test</caption>
 <thead><tr><th scope="col">Where</th><th scope="col">As found (v0.1.0)</th><th scope="col">As left (v0.1.1)</th><th scope="col">Test</th></tr></thead>
@@ -466,9 +467,11 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <tr class="row-fail"><th scope="row">Lab 01 tests: address check</th><td data-label="As found (v0.1.0)">Removing the check of the resolved address left every test green.</td><td data-label="As left (v0.1.1)">A test fails if the address check is removed.</td><td data-label="Test">1 case</td></tr>
 </tbody>
 </table></div>
+</details>
 <div class="prose">
 <p>The same review found that the replay code counted a missing field as a distinct value (now a unit-tested case), that <code>tools/sinkline_check.py</code> could run a different sinkline from the one the repository pins (it now runs the active interpreter's sinkline and exits 2 on a version mismatch), and that the README said 43 tests pass when the run reported more. The recorded sinkline output of lab 01 changed line numbers because the fixed service grew; its findings did not change.</p>
 </div>
+<details class="fold"><summary>The other checks, side by side: sinkline and the Sigma rules (table, strips and notes)</summary>
 <h3>The other checks, side by side</h3>
 <div class="prose">
 <p>The tests are the reference. The other two checks are scored against what each lab is known to contain, and they agree with it less.</p>
@@ -488,6 +491,7 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <p>The write-ups say why. sinkline reports a tainted value reaching a dangerous call; it does not recognize a custom allow-list or address check as a sanitizer, and treats a dictionary lookup against constant column names as a pass-through, so it cannot tell the fixes from the bugs in labs 01 and 02. On lab 01 it also does not say that the bug is the redirect: "tainted URL reaches <code>requests.get</code>" would be just as true of an app with no allow-list at all. Lab 03 has no tainted value reaching a sink: the id is used only as a dictionary key, and whether the caller may see the record is a rule of the application that a source-to-sink analyzer has no model of. Finding that class takes authorization tests, a policy layer that fails closed, or review against an access matrix.</p>
 <p>The lab was not changed to hide any of this.</p>
 </div>
+</details>
 </section>
 <section class="section fold-sec" id="method" aria-labelledby="method-h">
 <details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
