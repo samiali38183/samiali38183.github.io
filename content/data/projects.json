@@ -1275,22 +1275,22 @@
    "slug": "kev-risk-prioritization",
    "content": "kev-risk.html",
    "name": "kev-risk-prioritization",
-   "version": "v0.2.0",
+   "version": "v0.3.0",
    "sheet": 7,
    "kind": "Vulnerability management",
    "title": "kev-risk-prioritization | Sami Ali",
-   "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
-   "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. 27 tests.",
+   "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. v0.3.0 refuses lists that mix rows with and without CVSS and sorts in a total order. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
+   "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. Mixed CVSS lists are refused unless --allow-mixed. 63 tests.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
    "found_title": "The first version claimed more than it showed",
-   "left_title": "A pinned real snapshot, and what it does and does not show",
+   "left_title": "Defects from a review fixed in 0.3.0, and a pinned real snapshot with its limits",
    "record": {
-    "instrument": "kev-risk-prioritization v0.2.0, commit d85495f",
+    "instrument": "kev-risk-prioritization v0.3.0, commit 3859ff6",
     "reference": "a CVSS-only sort of 20 synthetic findings, and a pinned real snapshot: CISA KEV 2026.11.10 and FIRST EPSS scored 2026-11-11",
-    "measured": "2026-11-11, fresh clone of tag v0.2.0, 27 tests pass",
+    "measured": "2026-11-11, fresh clone of tag v0.3.0, 63 tests pass",
     "reproduce": [
      "python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json"
     ],
@@ -1305,7 +1305,7 @@
      "limit",
      "Synthetic data"
     ],
-    "run": "43040235145"
+    "run": "43134445948"
    },
    "strip_sets": {
     "main": {
@@ -1399,9 +1399,9 @@
    "home": {
     "against": "CVSS-only sort of 20 synthetic findings; pinned real KEV and EPSS snapshot",
     "reading": "12 vs 9 KEV in the top 12 (synthetic demo)",
-    "run": "43040235145",
+    "run": "43134445948",
     "found": "Earlier text called it KEV-first in the spirit of BOD 26-04 and showed measurements on invented values",
-    "left": "Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515",
+    "left": "Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515. v0.3.0: mixed CVSS lists refused, total sort order, 63 tests",
     "tolerance": "Weights not validated; EPSS and KEV are related signals; synthetic assets"
    },
    "links": [
@@ -1410,8 +1410,8 @@
      "https://github.com/samiali38183/kev-risk-prioritization"
     ],
     [
-     "Release v0.2.0",
-     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0"
+     "Release v0.3.0",
+     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.3.0"
     ],
     [
      "Methodology",
@@ -1423,20 +1423,26 @@
     ],
     [
      "CI run (main)",
-     "https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43040235145"
+     "https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43134445948"
     ]
    ],
    "trace": [
     [
      "CI run on main",
      "run",
-     "43040235145"
+     "43134445948"
     ],
     [
      "Release",
      "link",
-     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0",
-     "v0.2.0"
+     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.3.0",
+     "v0.3.0"
+    ],
+    [
+     "Changelog 0.3.0",
+     "link",
+     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md",
+     "CHANGELOG.md"
     ],
     [
      "Real-data analysis",
@@ -1469,7 +1475,7 @@
      "scripts/test_bench_kev.mjs"
     ]
    ],
-   "commit": "d85495f",
+   "commit": "3859ff6",
    "bench": "kev-risk",
    "tier": "also"
   },
@@ -1860,6 +1866,19 @@
    "anchor": "as-found",
    "src": [
     "CHANGELOG 0.2.0, Corrections",
+    "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md"
+   ]
+  },
+  {
+   "project": "kev-risk-prioritization",
+   "text": "In 0.2.0 a finding without CVSS was scored on a different scale from one with it (the same KEV finding scored 73.5 without CVSS and 59.5 with CVSS 0.0), so a mixed list was ranked with incomparable scores. 0.3.0 refuses such a list unless --allow-mixed, which scores every row without CVSS.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-left",
+   "src": [
+    "CHANGELOG 0.3.0",
     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md"
    ]
   }

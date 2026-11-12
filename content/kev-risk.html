@@ -35,10 +35,19 @@ A standard-library Python script that ranks scan findings with a simple weighted
 
 <!--@as-left-->
 <div class="prose">
-<p>Run on 2026-11-11 from a fresh clone of tag v0.2.0 (commit d85495f, Python 3.12.2): 27 tests pass. On the synthetic sample the risk score puts all 12 KEV findings in its top 12, and a CVSS-only sort puts 9 KEV findings in its top 12. The lowest-scoring KEV finding scores 85.0 and the highest-scoring non-KEV finding 38.5.</p>
+<p>Run on 2026-11-11 from a fresh clone of tag v0.3.0 (commit 3859ff6, Python 3.12.2): 63 tests pass (27 in 0.2.0). On the synthetic sample the risk score puts all 12 KEV findings in its top 12, and a CVSS-only sort puts 9 KEV findings in its top 12. The lowest-scoring KEV finding scores 85.0 and the highest-scoring non-KEV finding 38.5.</p>
 </div>
 {{key:main}}
 {{strips:main}}
+<div class="prose">
+<p>Version 0.3.0 fixes defects found in a review of 0.2.0. Four changes alter behavior:</p>
+<ul>
+<li><strong>Mixed lists are refused.</strong> In 0.2.0 the same KEV finding (ACR 4, EPSS 0.5) scored 73.5 without a CVSS value and 59.5 with CVSS 0.0, so a list mixing both kinds was ranked with scores on different scales. Now such a list is an error (exit code 2) unless <code>--allow-mixed</code> is given; then every row is scored without its CVSS term, a warning is printed and each output row carries a <code>score_basis</code> field. Lists where every row, or no row, has CVSS score as before.</li>
+<li><strong>The sort is a total order:</strong> score, KEV, EPSS, CVSS, ACR and days open (all descending), then CVE id, asset, system group, vendor and exposure, so input order never matters. On the demo this swaps ranks 8 and 9: CVE-2018-13379 on vpn-old-01 (300 days open) now ranks above CVE-2022-22965 on app-srv-07 (75 days), both scoring 93.1. On the 2,000-row real-data list 139 tied rows changed position; the row set and every score are unchanged.</li>
+<li><strong>Input is validated, not clamped.</strong> Out-of-range values that 0.2.0 clamped silently are errors that name the row, and bad input (missing columns, empty files, malformed KEV JSON, missing files and similar) ends in one line on stderr and a non-zero exit code instead of a traceback.</li>
+<li><strong>CI runs ruff and mypy</strong> at pinned versions, and a script regenerates or checks the generated analysis and the golden files.</li>
+</ul>
+</div>
 <pre data-copy data-label="$ python kev_prioritize.py ... --top 14"><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14
   #  risk  KEV CVE              CVSS  EPSS ACR days  asset
   1  99.4  yes CVE-2021-44228   10.0 0.970   8   42  web-portal-01
@@ -53,7 +62,7 @@ A standard-library Python script that ranks scan findings with a simple weighted
 KEV vs non-KEV population
   kev      n=12  avg CVSS 9.53  avg EPSS 0.935  avg days open 94.2
   non_kev  n=8   avg CVSS 8.34  avg EPSS 0.029  avg days open 101.5</code></pre>
-<p class="trim">Trimmed: rows 4 to 10 and the KEV concentration line removed. The group averages are properties of the invented inputs.</p>
+<p class="trim">Trimmed: rows 4 to 10 (including the swapped ranks 8 and 9 described above) and the KEV concentration line removed. The group averages are properties of the invented inputs.</p>
 <div class="prose">
 <h3>The pinned real snapshot</h3>
 <p>The repository now carries real public data, pinned so the numbers can be reproduced: the CISA KEV catalog (<code>catalogVersion</code> 2026.11.10, 1,779 entries) and the FIRST EPSS file scored 2026-11-11 (model v2026.06.15, 404,864 CVEs), kept as a subset of 6,779 rows: every KEV CVE plus 5,000 non-KEV CVEs chosen by a seeded hash. Asset fields are still invented and CVSS is not used with the real data.</p>
@@ -69,7 +78,7 @@ KEV vs non-KEV population
 
 <!--@method-->
 <div class="prose">
-<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it: <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>. Dividing by the weight total keeps the scale at 0 to 100 for any weights, so ordering does not depend on it. Ties break on EPSS, then CVSS. If a finding has no CVSS value, that term and its weight are dropped and the rest is renormalized, which is how the real snapshot is scored. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison. The <a href="/projects/kevgate/">kevgate</a> sheet documents the same weights.</p>
+<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it: <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>. Dividing by the weight total keeps the scale at 0 to 100 for any weights, so ordering does not depend on it. Ties break on KEV, EPSS, CVSS, ACR, days open, then CVE id and asset. If no finding in the list has a CVSS value, that term and its weight are dropped for every row and the rest is renormalized, which is how the real snapshot is scored; a list that mixes the two is refused unless <code>--allow-mixed</code> is given. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison. The <a href="/projects/kevgate/">kevgate</a> sheet documents the same weights.</p>
 <p>Plate 1 re-implements that formula in the browser and checks it against the tool: <code>scripts/gen_bench_kev.py</code> calls the tool's own <code>score_all</code> with custom weights for the four presets and 300 random weight vectors, and <code>scripts/test_bench_kev.mjs</code> requires the same order and the same scores to one decimal. Plate 2 is drawn at build time from the committed subset.</p>
 </div>
 
@@ -80,6 +89,7 @@ KEV vs non-KEV population
 <li>The demo data is synthetic, so 12 of 12 shows how the formula orders findings, not what a real environment looks like.</li>
 <li>EPSS and KEV are related signals, so the AUC of 0.9515 is not independent validation of either, and it says nothing about the risk score.</li>
 <li>KEV is incomplete, the snapshot is one date, and CVSS was not available for the real data.</li>
+<li><code>--allow-mixed</code> makes a mixed list rankable by dropping CVSS for every row, which discards information on the rows that had it.</li>
 <li>It uses the CVSS and EPSS values you supply and does not query NVD or the EPSS API. Live mode fetches only the KEV catalog.</li>
 <li>A weighted sum cannot express a hard rule such as "KEV and internet-exposed always first".</li>
 </ul>

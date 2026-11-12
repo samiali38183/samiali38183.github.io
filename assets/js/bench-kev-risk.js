@@ -1,7 +1,9 @@
 /* Weight bench for the kev-risk-prioritization sheet. Re-implements the documented score of kev_prioritize.py
-   (v0.2.0) on its 20 synthetic sample findings so a visitor can move the four weights and watch the order change:
+   (v0.3.0) on its 20 synthetic sample findings so a visitor can move the four weights and watch the order change:
      risk = round(100 * (w_kev*kev + w_acr*acr/8 + w_epss*epss + w_cvss*cvss/10) / sum(weights), 1)
-   sorted by risk, then EPSS, then CVSS (descending; ties keep input order). The tool itself is the source of truth:
+   sorted by the tool's total order: risk, then KEV, EPSS, CVSS, ACR and days open (all descending), then CVE id and
+   asset (the tool's last three keys, group, vendor and exposure, are never reached: CVE and asset are unique in the
+   sample, which scripts/gen_bench_kev.py asserts). The tool itself is the source of truth:
    scripts/test_bench_kev.mjs checks this file against its output (assets/data/kev-bench-parity.json).
    The page is complete without this script. Findings are read from /assets/data/bench-kev-risk.json. */
 
@@ -28,8 +30,10 @@ export function round1(x) {
 export function rank(f, w) {
   const zero = w[0] + w[1] + w[2] + w[3] === 0;
   const sc = f.map((r) => (zero ? null : riskScore(r[6], r[2], r[4], r[3], w)));
+  const cmp = (x, y) => (x < y ? -1 : x > y ? 1 : 0); // ASCII only, so code units equal code points
   const o = f.map((_, i) => i).sort((a, b) =>
-    (zero ? 0 : sc[b] - sc[a]) || f[b][4] - f[a][4] || f[b][3] - f[a][3]);
+    (zero ? 0 : sc[b] - sc[a]) || f[b][6] - f[a][6] || f[b][4] - f[a][4] || f[b][3] - f[a][3] || f[b][2] - f[a][2]
+    || f[b][5] - f[a][5] || cmp(f[a][0], f[b][0]) || cmp(f[a][1], f[b][1]));
   return { o, s: o.map((i) => sc[i]) };
 }
 
