@@ -1,7 +1,7 @@
 // QC check: ruler strips must not wrap. Usage:
 //   PUPPETEER_DIR=path/to/node_modules CHROME="path/to/chrome" node scripts/qc_strips.mjs http://127.0.0.1:8000
 // Loads every page at 360, 768, 1280 and 1600 px in headless Chrome, opens every details element, and checks that all ticks of each
-// `.strip` share one offsetTop (one row). Strips with class `long` (more than 40 ticks: the 255-tick evasion sweep, the 109-tick
+// `.strip` share one bottom edge (one row; they are bottom-aligned because every tenth tick is taller). Strips with class `long` (more than 40 ticks: the 255-tick evasion sweep, the 109-tick
 // gate strip and similar) are multi-row rulers by design and are reported, not failed. Also fails on horizontal page overflow and on
 // a mini strip narrower than its ticks need. Exit code 1 on any failure.
 import { createRequire } from 'node:module';
@@ -32,7 +32,8 @@ for (const scheme of ['light', 'dark']) {
           if (ticks.length < 2 || s.getBoundingClientRect().width === 0) continue;
           if (s.classList.contains('long')) { out.long++; continue; }
           out.strips++;
-          const tops = new Set(ticks.map((t) => Math.round(t.getBoundingClientRect().top)));
+          // ticks are bottom-aligned (every tenth is taller), so one row means one shared bottom edge
+          const tops = new Set(ticks.map((t) => Math.round(t.getBoundingClientRect().bottom)));
           const right = Math.max(...ticks.map((t) => t.getBoundingClientRect().right));
           const box = s.getBoundingClientRect();
           if (tops.size > 1 || right > box.right + 1) out.wrapped.push({ ticks: ticks.length, rows: tops.size, label: (s.getAttribute('aria-label') || s.className || '').slice(0, 60) });

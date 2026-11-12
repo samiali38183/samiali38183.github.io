@@ -400,7 +400,7 @@ ol.rules h3{margin:0 0 var(--s-2);font-size:var(--step-1)}
 .fold-tbl{margin:var(--s-4) 0}
 .chip-note{max-width:34rem;margin:var(--s-2) 0 0;font-size:var(--step--1);line-height:1.45;color:var(--ink-2)}
 .plist{list-style:none;padding:0;margin:0 0 var(--s-5)}
-.plist li{display:grid;grid-template-columns:7rem 11rem 5rem minmax(0,1fr);gap:var(--s-1) var(--s-4);align-items:baseline;margin:0;padding:var(--s-3) 0;border-top:1px solid var(--rule)}
+.plist li{display:grid;grid-template-columns:7rem 15rem 5rem minmax(0,1fr);gap:var(--s-1) var(--s-4);align-items:baseline;margin:0;padding:var(--s-3) 0;border-top:1px solid var(--rule)}
 .plist li:last-child{border-bottom:1px solid var(--rule)}
 .plist .nm{font-weight:600;font-size:1.125rem;color:var(--ink);text-decoration-color:var(--edge)}
 .plist .ver,.plist .rd{font:400 var(--step--1)/1.4 var(--mono);color:var(--ink-2)}

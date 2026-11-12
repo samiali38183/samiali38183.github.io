@@ -23,6 +23,15 @@
     });
   }
 
+  /* A link to a section that is folded (#method, #trace) opens it. Without this script the fold stays closed and the heading is still shown. */
+  function openFold() {
+    var el = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+    var d = el && (el.closest('details') || el.querySelector('details.fold'));
+    if (d) { d.open = true; el.scrollIntoView(); }
+  }
+  openFold();
+  addEventListener('hashchange', openFold);
+
   if (navigator.clipboard) {
     Array.prototype.forEach.call(document.querySelectorAll('pre[data-copy]'), function (pre) {
       var b = document.createElement('button');
