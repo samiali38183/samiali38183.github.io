@@ -26,7 +26,7 @@ import pages as P  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "https://samiali38183.github.io"
 OG_IMAGE = BASE + "/assets/og.png"
-OG_ALT = "A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left."
+OG_ALT = "A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left."
 
 # (url path, nav key, title, description, kind, argument)
 PAGES = [
@@ -38,7 +38,7 @@ PAGES = [
      "projects", None),
 ] + [
     (f"/projects/{slug}/", "projects", None, None, "project", slug)
-    for slug in ["tripline", "sinkline", "kevgate", "kevgate-admit", "vulnlab", "fuzzdiff", "kev-risk-prioritization"]
+    for slug in ["tripline", "sinkline", "vulnlab", "kevgate", "kevgate-admit", "fuzzdiff", "kev-risk-prioritization"]
 ] + [
     ("/experience/", "experience", "Experience | Sami Ali",
      "DHS HS-POWER intern on CBP's Vulnerability Assessment Team, May to August 2026. Education and certifications.",

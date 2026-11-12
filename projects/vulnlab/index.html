@@ -17,12 +17,12 @@
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta property="og:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="vulnlab: localhost-only web vulnerability lab | Sami Ali">
 <meta name="twitter:description" content="vulnlab v0.1.0 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 43 tests, loopback only.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-vulnlab.css">
@@ -43,7 +43,7 @@
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Sheet 5 of 7</b> &middot; vulnlab &middot; v0.1.0</p>
+<p class="wrap sheetline"><b>Sheet 3 of 7</b> &middot; vulnlab &middot; v0.1.0</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
@@ -53,16 +53,11 @@
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/vulnlab">Repository</a></li><li><a href="https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0">Release v0.1.0</a></li><li><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/METHOD.md">Method</a></li><li><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/SAFETY.md">Safety scope</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 </header>
-<section class="record-head" aria-label="Verification record">
+<section class="glance" aria-label="At a glance">
 <dl>
-<div><dt>Instrument</dt><dd>vulnlab v0.1.0, tag commit 1fceaa8 (released 2026-11-11)</dd></div>
-<div><dt>Reference standard</dt><dd>each lab&#x27;s fixed service and its tests: the same checks that show the impact on the vulnerable service must fail against the fix; sinkline 0.5.0 and a Sigma rule per lab are the other two checks</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.0; CI (Linux) run 43087241629</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ vulnlab, from a clone at v0.1.0"><code>pip install -r requirements.lock
-pytest -q
-python tools/sinkline_check.py
-sigma check labs/*/detection/*.yml</code></pre></dd></div>
+<div><dt>Checked against</dt><dd>Each lab&#x27;s fixed service and its tests; sinkline 0.5.0; Sigma rules replayed on recorded logs</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> 3 vulnerable services (SSRF, SQL injection, IDOR) show impact in their tests<br><span class="gl">As left</span> 3 fixes block it; 43 tests pass; loopback only</dd></div>
+<div><dt>Limits</dt><dd>Training lab; bugs simpler than real ones; no CVEs; detection fires on attempts, not impact <a href="#limits">Full limits</a></dd></div>
 </dl>
 </section>
 <section class="reading-band" aria-label="The reading">
@@ -76,6 +71,18 @@ sigma check labs/*/detection/*.yml</code></pre></dd></div>
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable service shows the impact</li><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>fixed service blocks the impact</li></ul>
 <div class="strips vt" style="--vt:strip-vulnlab"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 3 labs: 3 vulnerable service shows the impact"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> vulnerable services show their impact in a test</p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 3 labs: 3 fixed service blocks the impact"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>3</b> fixed services block it, checked by the same tests</p></div></div>
 </section>
+<details class="fold fold-rec"><summary>Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)</summary><section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>vulnlab v0.1.0, tag commit 1fceaa8 (released 2026-11-11)</dd></div>
+<div><dt>Reference standard</dt><dd>each lab&#x27;s fixed service and its tests: the same checks that show the impact on the vulnerable service must fail against the fix; sinkline 0.5.0 and a Sigma rule per lab are the other two checks</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.0; CI (Linux) run 43087241629</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ vulnlab, from a clone at v0.1.0"><code>pip install -r requirements.lock
+pytest -q
+python tools/sinkline_check.py
+sigma check labs/*/detection/*.yml</code></pre></dd></div>
+</dl>
+</section></details>
 <section class="bench" data-bench="vulnlab" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
@@ -436,8 +443,9 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <p>The lab was not changed to hide any of this.</p>
 </div>
 </section>
-<section class="section" id="method" aria-labelledby="method-h">
-<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<section class="section fold-sec" id="method" aria-labelledby="method-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<div class="fold-body">
 <h3>Shape of a lab</h3>
 <div class="prose">
 <p>Each lab is a directory with a <code>vulnerable/app.py</code> and a <code>fixed/app.py</code> (a Flask app with a <code>create_app(settings)</code> function), a <code>lab.py</code> that starts the services for one variant on free loopback ports, <code>test_lab.py</code>, a write-up, the captured sinkline output and a <code>detection/</code> directory with a Sigma rule and two recorded access logs. The two app files differ only where the fix is.</p>
@@ -474,6 +482,8 @@ sample_benign.ndjson: 2 events, 0 alert(s)</code></pre>
 <div class="prose">
 <p>Everything binds to loopback. The harness refuses to start a service on any other host, and every request the tests make goes through a client that checks the URL first and accepts only <code>localhost</code> or a literal loopback address, with no DNS lookup. The stand-in "internal" address in lab 01 is 127.0.0.2, which is still loopback. 26 tests under <code>tests/</code> assert the guard, including look-alike names and private and link-local addresses, and that no lab test names a non-loopback URL. There is no shell, persistence, evasion or scanning code in the repository.</p>
 </div>
+</div>
+</details>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
@@ -489,13 +499,14 @@ sample_benign.ndjson: 2 events, 0 alert(s)</code></pre>
 <li><strong>The page shows recorded results.</strong> It evaluates nothing, runs no service and sends no request. Request strings and logs are not reproduced here; the observable results are described in prose and the labs' own tests are linked below.</li>
 </ul>
 </section>
-<section class="section" id="trace" aria-labelledby="trace-h">
-<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<section class="section fold-sec" id="trace" aria-labelledby="trace-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">10 links</span></summary>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace"><div><dt>CI on main, tag commit (ci, v0.1.0)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/vulnlab/actions/runs/43087241629"><span class="st" aria-hidden="true"></span><span>run 43087241629</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0">v0.1.0</a></dd></div><div><dt>Lab 01 write-up</dt><dd><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/01-ssrf-redirect/README.md">labs/01-ssrf-redirect/README.md</a></dd></div><div><dt>Lab 02 write-up</dt><dd><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/02-sqli-order-by/README.md">labs/02-sqli-order-by/README.md</a></dd></div><div><dt>Lab 03 write-up</dt><dd><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/03-idor-bola/README.md">labs/03-idor-bola/README.md</a></dd></div><div><dt>Harness and replay code</dt><dd><a href="https://github.com/samiali38183/vulnlab/tree/v0.1.0/vulnlab_common">vulnlab_common/</a></dd></div><div><dt>Safety tests</dt><dd><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.0/tests/test_safety.py">tests/test_safety.py</a></dd></div><div><dt>sinkline capture and check</dt><dd><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.0/tools/sinkline_check.py">tools/sinkline_check.py</a></dd></div><div><dt>Lab explorer capture script</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/capture_vulnlab_bench.py">scripts/capture_vulnlab_bench.py</a></dd></div><div><dt>Lab explorer consistency test</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_vulnlab.mjs">scripts/test_bench_vulnlab.mjs</a></dd></div></dl>
 <p class="prose muted">The sinkline text files recorded in the repository (<code>labs/*/sinkline/*.txt</code>) show the path glyphs as garbled characters, a character-encoding slip when they were written on Windows. The capture script for this page undoes the slip, checks that the text then equals a fresh run of sinkline 0.5.0, and shows the glyphs the tool prints. Findings, lines and exit status are identical.</p>
+</details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/kevgate-admit/"><span class="label">Previous sheet, 4 of 7</span><span class="n">kevgate-admit</span></a><a class="next" href="/projects/fuzzdiff/"><span class="label">Next sheet, 6 of 7</span><span class="n">fuzzdiff</span></a></nav>
+<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/sinkline/"><span class="label">Previous sheet, 2 of 7</span><span class="n">sinkline</span></a><a class="next" href="/projects/kevgate/"><span class="label">Next sheet, 4 of 7</span><span class="n">kevgate</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">

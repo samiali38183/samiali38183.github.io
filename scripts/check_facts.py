@@ -537,25 +537,36 @@ def main() -> int:
         cov = run([pybin(venvs, "tripline", "python"), "-m", "pytest", "-q", "-p", "no:cacheprovider", "--cov=tripline", "--cov-branch"], t)
         mcov = re.search(r"^TOTAL\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)%", cov, re.M)
         results.append((bool(mcov) and mcov.group(1) == "91", f"tripline coverage (line+branch) {mcov.group(1) + '%' if mcov else 'not measured'}, page says 91%"))
-        expect("tripline 0 of 36 on home", "0 of 36", "index.html")
         expect("tripline tests on resume page", str(n), "resume/index.html", f"{n} tests")
         code = (
             "from pathlib import Path\n"
             "from tripline.engine.rules import load_rules, evaluate\n"
             "from tripline.replay import load_fixture_events\n"
             "from tripline.scenarios import load_scenarios\n"
+            "from tripline.logsource import normalize\n"
             "root=Path('.')\n"
             "sc={s.id:s for s in load_scenarios(root/'scenarios')}['t1548-001-setuid-setgid']\n"
             "ev=load_fixture_events(sc,root)\n"
             "rs={r.id:r for r in load_rules(root/'rules'/'sigma').rules}\n"
             "for rid in ('c21c4eaa-ba2e-419a-92b2-8371703cbe21','7f3c2b1a-6d4e-4a9b-9c8d-1e2f3a4b5c6d'):\n"
             "    res=[evaluate(rs[rid],e) for e in ev]\n"
-            "    print(sum(x is not None for x in res), sum(x is True for x in res))\n"
+            "    ne=[normalize(e) for e in ev]\n"
+            "    ok=[(x is not None) for x in res]\n"
+            "    atk=[x for x,n,k in zip(res,ne,ok) if k and n['Image'].endswith('/chmod')]\n"
+            "    wrap=sum(1 for n,k in zip(ne,ok) if k and not n['Image'].endswith('/chmod') and 'chmod' in n['CommandLine'])\n"
+            "    print(sum(x is not None for x in res), sum(x is True for x in res), len(atk), sum(x is True for x in atk), wrap)\n"
         )
         o = run([pybin(venvs, "tripline", "python"), "-c", code], t).split()
-        if len(o) == 4:
-            expect("tripline stock rule hits", f"{o[1]} of {o[0]}", "projects/tripline/index.html")
-            expect("tripline replacement rule hits", f"{o[3]} of {o[2]}", "projects/tripline/index.html")
+        if len(o) == 10:
+            # per rule: applicable events, flagged events, attack events (chmod executions), flagged attack events, wrapper events
+            (tot, s_all, n_atk, s_atk, n_wrap), (tot2, r_all, n_atk2, r_atk, n_wrap2) = list(map(int, o[:5])), list(map(int, o[5:]))
+            results.append((tot == tot2 == 36 and n_atk == n_atk2 == 2 and n_wrap == n_wrap2 == 4 and (s_atk, r_atk) == (0, 2) and (s_all, r_all) == (0, 2),
+                            f"F-001 counts from the fixture: {tot} events, {n_atk} attack events, {n_wrap} wrapper lines; stock flagged {s_atk}, replacement flagged {r_atk}"))
+            expect("tripline stock rule on the attack events", f"{s_atk} of the {n_atk} attack events", "projects/tripline/index.html")
+            expect("tripline replacement rule on the attack events", f"{r_atk} of {n_atk}", "projects/tripline/index.html")
+            expect("tripline hero reading on the home page", f"flagged {s_atk} of those {n_atk}", "index.html")
+            expect("tripline resume text", f"flagged {s_atk} of the {n_atk} attack events among {tot} recorded events", "resume/index.html")
+            expect("tripline about text", f"flagged {s_atk} of the {n_atk} attack events among {tot} recorded events", "about/index.html")
         else:
             results.append((False, f"tripline F-001 derivation failed: {o}"))
         # tripline Rule bench: data file against the clone's rule YAML and the page text

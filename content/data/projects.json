@@ -2,9 +2,9 @@
  "order": [
   "tripline",
   "sinkline",
+  "vulnlab",
   "kevgate",
   "kevgate-admit",
-  "vulnlab",
   "fuzzdiff",
   "kev-risk-prioritization"
  ],
@@ -17,7 +17,7 @@
    "sheet": 1,
    "kind": "Detection engineering",
    "title": "tripline: a CI gate for detection rules | Sami Ali",
-   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule matched 0 of 36 events; a replacement matches 2.",
+   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule flagged 0 of the 2 attack events among 36 recorded events; a replacement flags both.",
    "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 13 passing, 1 pending (Windows); 98% weighted coverage, 52% on unmodified SigmaHQ rules alone; 212 tests.",
    "labels": {
     "found": "As found",
@@ -39,14 +39,18 @@
    },
    "reading": {
     "num": "0",
-    "den": "/36",
-    "unit": "events matched by the stock rule",
-    "caption": "The stock SigmaHQ Setuid and Setgid rule matched 0 of 36 events in telemetry recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner. The replacement rule matches 2.",
+    "den": "/2",
+    "unit": "attack events flagged by the stock rule",
+    "caption": "Among 36 events recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner, 2 are the attack itself (the two chmod executions). SigmaHQ's stock Setuid and Setgid rule flagged 0 of those 2; the replacement rule flags both. The other 34 events are not attack events.",
     "stamp": [
      "fail",
      "As found: fail"
     ],
-    "run": "41838714456"
+    "run": "41838714456",
+    "run_label": "recording run",
+    "run_ok": "43100952362",
+    "run_ok_label": "main CI run",
+    "run_note": "The recording run's gate failed because the stock rule missed the attack: that failure is the finding. The second run is the latest passing CI run on main, which replays the committed recording with the replacement rule."
    },
    "strip_sets": {
     "main": {
@@ -82,7 +86,7 @@
          4
         ]
        ],
-       "val": "<b>0</b> matched of 36 events"
+       "val": "<b>0</b> of 2 attack events flagged, among 36 recorded events"
       },
       {
        "label": "As left",
@@ -108,7 +112,7 @@
          4
         ]
        ],
-       "val": "<b>2</b> matched of 36 events"
+       "val": "<b>2</b> of 2 attack events flagged, among 36 recorded events"
       }
      ]
     },
@@ -373,11 +377,11 @@
     }
    },
    "home": {
-    "against": "SigmaHQ stock rule, 36 recorded events",
-    "reading": "0 to 2 of 36",
-    "run": "41838714456",
-    "found": "0 of 36 events matched by the stock rule",
-    "left": "Replacement rule: 2 of 36. Gate: 13 of 14 scenarios, 98% weighted, 52% on unmodified SigmaHQ rules alone",
+    "against": "SigmaHQ stock rule; 2 attack events among 36 recorded events",
+    "reading": "0 to 2 of 2 attack events",
+    "run": "43100952362",
+    "found": "Stock rule flagged 0 of the 2 attack events (36 events recorded)",
+    "left": "Replacement rule flags 2 of 2. Gate: 13 of 14 scenarios, 98% weighted, 52% on unmodified SigmaHQ rules alone",
     "tolerance": "One recording per scenario; 675-event benign corpus, Linux only; 1 Windows scenario pending"
    },
    "links": [
@@ -471,7 +475,8 @@
      "CHANGELOG.md"
     ]
    ],
-   "commit": "a0d6622"
+   "commit": "a0d6622",
+   "tier": "featured"
   },
   "sinkline": {
    "slug": "sinkline",
@@ -803,14 +808,15 @@
      "tests/test_action.py"
     ]
    ],
-   "commit": "9c58efd"
+   "commit": "9c58efd",
+   "tier": "featured"
   },
   "kevgate": {
    "slug": "kevgate",
    "content": "kevgate.html",
    "name": "kevgate",
    "version": "v0.1.1",
-   "sheet": 3,
+   "sheet": 4,
    "kind": "Vulnerability management and DevSecOps",
    "title": "kevgate: KEV-ranked vulnerability intake | Sami Ali",
    "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.",
@@ -956,14 +962,15 @@
      "assets/data/kevgate-bench.json"
     ]
    ],
-   "commit": "973c8c1"
+   "commit": "973c8c1",
+   "tier": "featured"
   },
   "kevgate-admit": {
    "slug": "kevgate-admit",
    "content": "kevgate-admit.html",
    "name": "kevgate-admit",
    "version": "v0.1.0",
-   "sheet": 4,
+   "sheet": 5,
    "kind": "Kubernetes security, Go",
    "title": "kevgate-admit: Kubernetes admission webhook | Sami Ali",
    "desc": "kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. Strict image-reference parsing, optional signed evidence, a signed published image, 93 tests and 95% coverage.",
@@ -1108,7 +1115,8 @@
     ]
    ],
    "commit": "161169a",
-   "bench": "kevgate-admit"
+   "bench": "kevgate-admit",
+   "tier": "also"
   },
   "fuzzdiff": {
    "slug": "fuzzdiff",
@@ -1260,7 +1268,8 @@
      "docs/FINDINGS.md"
     ]
    ],
-   "commit": "6ec1e6e"
+   "commit": "6ec1e6e",
+   "tier": "also"
   },
   "kev-risk-prioritization": {
    "slug": "kev-risk-prioritization",
@@ -1461,14 +1470,15 @@
     ]
    ],
    "commit": "d85495f",
-   "bench": "kev-risk"
+   "bench": "kev-risk",
+   "tier": "also"
   },
   "vulnlab": {
    "slug": "vulnlab",
    "content": "vulnlab.html",
    "name": "vulnlab",
    "version": "v0.1.0",
-   "sheet": 5,
+   "sheet": 3,
    "kind": "Web security training lab, Python",
    "title": "vulnlab: localhost-only web vulnerability lab | Sami Ali",
    "desc": "vulnlab v0.1.0 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 43 tests, loopback only.",
@@ -1666,13 +1676,14 @@
     ]
    ],
    "commit": "1fceaa8",
-   "bench": "vulnlab"
+   "bench": "vulnlab",
+   "tier": "featured"
   }
  },
  "failed_first": [
   {
    "project": "tripline",
-   "text": "The stock SigmaHQ Setuid and Setgid rule matched 0 of 36 recorded events. A replacement rule matches the 2 chmod executions.",
+   "text": "The stock SigmaHQ Setuid and Setgid rule flagged 0 of the 2 attack events (the two chmod executions) among 36 recorded events. A replacement rule flags both.",
    "state": [
     "pass",
     "Fixed"

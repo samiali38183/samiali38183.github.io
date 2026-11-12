@@ -17,12 +17,12 @@
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta property="og:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kevgate-admit: Kubernetes admission webhook | Sami Ali">
 <meta name="twitter:description" content="kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. Strict image-reference parsing, optional signed evidence, a signed published image, 93 tests and 95% coverage.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-kevgate-admit.css">
@@ -43,7 +43,7 @@
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Sheet 4 of 7</b> &middot; kevgate-admit &middot; v0.1.0</p>
+<p class="wrap sheetline"><b>Sheet 5 of 7</b> &middot; kevgate-admit &middot; v0.1.0</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
@@ -53,13 +53,11 @@
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/kevgate-admit">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/releases/tag/v0.1.0">Release v0.1.0</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/DESIGN.md">Design notes</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/THREAT_MODEL.md">Threat model</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 </header>
-<section class="record-head" aria-label="Verification record">
+<section class="glance" aria-label="At a glance">
 <dl>
-<div><dt>Instrument</dt><dd>kevgate-admit v0.1.0, tag commit 161169a (released 2026-11-11)</dd></div>
-<div><dt>Reference standard</dt><dd>kevgate&#x27;s Python risk score on 1000 generated vectors; synthetic and one real Trivy report; a kind cluster in CI; distribution/reference for the image-reference grammar</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-11, Go 1.27.4, fresh clone at tag v0.1.0</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ go test"><code>go test ./... -cover</code></pre></dd></div>
+<div><dt>Checked against</dt><dd>Python score on 1000 vectors; synthetic and real Trivy reports; kind in CI</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> Accepted org/../evil; ignoreUnfixed could drop a KEV finding; outage untested; unsigned evidence; no image<br><span class="gl">As left</span> v0.1.0: 93 tests, 95.0% coverage, signed image</dd></div>
+<div><dt>Limits</dt><dd>Does not scan images or verify image signatures; synthetic evidence in the demo <a href="#limits">Full limits</a></dd></div>
 </dl>
 </section>
 <section class="reading-band" aria-label="The reading">
@@ -73,6 +71,15 @@
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>open in the reviewed version</li><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>closed in v0.1.0</li></ul>
 <div class="strips vt" style="--vt:strip-kevgate-admit"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 5 review findings: 5 open in the reviewed version"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>5</b> open in the reviewed version (commit bfa62fe)</p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 5 review findings: 5 closed in v0.1.0"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>5</b> closed in v0.1.0</p></div></div>
 </section>
+<details class="fold fold-rec"><summary>Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)</summary><section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>kevgate-admit v0.1.0, tag commit 161169a (released 2026-11-11)</dd></div>
+<div><dt>Reference standard</dt><dd>kevgate&#x27;s Python risk score on 1000 generated vectors; synthetic and one real Trivy report; a kind cluster in CI; distribution/reference for the image-reference grammar</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-11, Go 1.27.4, fresh clone at tag v0.1.0</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ go test"><code>go test ./... -cover</code></pre></dd></div>
+</dl>
+</section></details>
 <section class="bench" data-bench="kevgate-admit" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
@@ -170,7 +177,7 @@ total:    (statements)    95.0%</code></pre>
 <div class="prose">
 <p>The <code>e2e-kind</code> workflow builds the image, creates a kind cluster, installs the Helm chart and applies demo workloads against synthetic evidence. It fails the job unless every outcome and denial text matches. This is the transcript from the repository README (the output of a passing CI run; the runner's file paths are shortened with <code>...</code>):</p>
 </div>
-<pre data-copy data-label="End-to-end transcript (README)"><code>== clean in demo-enforce (expect: allowed)
+<details class="fold fold-tbl"><summary>Output, 23 lines: End-to-end transcript (README)</summary><pre data-copy data-label="End-to-end transcript (README)"><code>== clean in demo-enforce (expect: allowed)
 deployment.apps/clean created
 RESULT clean: PASS
 
@@ -192,7 +199,7 @@ Error from server (Forbidden): ... denied the request: kevgate-admit: request de
 - [requireDigest] registry.example.com/demo/clean:latest: image is not pinned by digest; tags are mutable
 RESULT tag-only: PASS
 
-demo finished: all checks passed</code></pre>
+demo finished: all checks passed</code></pre></details>
 <p class="trim">Trimmed: namespace setup, Helm install output, the over-threshold enforce case and the metrics block removed; the rest is unedited. The images are synthetic (<code>registry.example.com</code>) and the CVE-2099 entries are invented.</p>
 <h3>The outage step</h3>
 <div class="prose"><p>The same workflow then runs <code>deploy/demo/outage.sh</code>. This excerpt from the README shows the part that matters (the exact reason after "failed calling webhook" depends on the Kubernetes version and kube-proxy):</p></div>
@@ -225,8 +232,9 @@ outage test finished: all checks passed</code></pre>
 </tbody>
 </table></div>
 </section>
-<section class="section" id="method" aria-labelledby="method-h">
-<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<section class="section fold-sec" id="method" aria-labelledby="method-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<div class="fold-body">
 <h3>The problem</h3>
 <div class="prose">
 <p>Vulnerability scans usually run in a pipeline, and nothing stops a workload with a known-exploited vulnerability from reaching the cluster anyway. A tag is also not evidence: <code>nginx:1.25</code> can point at different bytes tomorrow, so a report about a tag says little about what a node will pull.</p>
@@ -250,6 +258,8 @@ outage test finished: all checks passed</code></pre>
 <h4>A signature binds a report to its digest</h4>
 <p><code>internal/evsign</code> signs a domain-separation string, the image digest and the report bytes together, with Ed25519 or ECDSA P-256 from the standard library and a detached <code>.sig</code> file. Moving a signed report to another digest, or editing it, breaks verification. The directory provider reads the report once and uses the same bytes for the signature check and the parse, so what was verified is what is judged. A report that fails the check is not scored: it counts as missing, and <code>requireEvidence</code> decides.</p>
 </div>
+</div>
+</details>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
@@ -266,8 +276,8 @@ outage test finished: all checks passed</code></pre>
 <li><strong>The demo uses synthetic evidence,</strong> and ConfigMap-hosted reports are limited to 1 MiB in total. The Admission desk shows responses from a locally run binary, not from a cluster. The race detector was not run locally (it needs cgo); CI runs it.</li>
 </ul>
 </section>
-<section class="section" id="trace" aria-labelledby="trace-h">
-<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<section class="section fold-sec" id="trace" aria-labelledby="trace-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">9 links</span></summary>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace"><div><dt>Release, image build, scan and signature (release, v0.1.0)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43080641309"><span class="st" aria-hidden="true"></span><span>run 43080641309</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Unit tests and lint (ci, main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43081479537"><span class="st" aria-hidden="true"></span><span>run 43081479537</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Kind end to end (e2e-kind, main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43081479456"><span class="st" aria-hidden="true"></span><span>run 43081479456</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Scans (security, main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43081479552"><span class="st" aria-hidden="true"></span><span>run 43081479552</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Outage test, first passing run (e2e-kind, pull request)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43042286763"><span class="st" aria-hidden="true"></span><span>run 43042286763</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Score parity script</dt><dd><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/scripts/gen_parity.py">scripts/gen_parity.py</a></dd></div><div><dt>End-to-end transcript</dt><dd><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/README.md#end-to-end-transcript">README at v0.1.0</a></dd></div><div><dt>Admission desk capture script</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/capture_admission_bench.py">scripts/capture_admission_bench.py</a></dd></div><div><dt>Admission desk parity test</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_admission.mjs">scripts/test_bench_admission.mjs</a></dd></div></dl>
 <h3>CI evidence</h3>
@@ -285,8 +295,9 @@ outage test finished: all checks passed</code></pre>
 <div class="prose">
 <p><code>ghcr.io/samiali38183/kevgate-admit@sha256:1023382754d9b6b7ca727d47701d9e3bfb5f245a6531e0debd1307ebf9e64195</code> (tag <code>0.1.0</code>, linux/amd64). Checked on 2026-11-11 with the registry API and an anonymous token: the manifest is served without credentials, its SHA-256 equals that digest, tag <code>0.1.0</code> resolves to the same digest, and two Sigstore bundles are attached to it (the release signed and attested the image). <code>cosign verify</code> was not run for this page; the release run did, as its last step.</p>
 </div>
+</details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/kevgate/"><span class="label">Previous sheet, 3 of 7</span><span class="n">kevgate</span></a><a class="next" href="/projects/vulnlab/"><span class="label">Next sheet, 5 of 7</span><span class="n">vulnlab</span></a></nav>
+<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/kevgate/"><span class="label">Previous sheet, 4 of 7</span><span class="n">kevgate</span></a><a class="next" href="/projects/fuzzdiff/"><span class="label">Next sheet, 6 of 7</span><span class="n">fuzzdiff</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">

@@ -13,6 +13,9 @@ import components as C
 
 ROOT = Path(__file__).resolve().parent.parent
 GH = "https://github.com/samiali38183"
+FAILED_SHOWN = 6  # "What failed first" rows shown on the home page; the rest sit in a details element
+FOLD_ROWS = 9  # tables with at least this many body rows, and code blocks with FOLD_LINES lines, are folded on project pages
+FOLD_LINES = 16
 
 
 # ---------------------------------------------------------------------------------------------
@@ -120,12 +123,47 @@ def bench_events(name: str) -> str:
 
 
 # ---------------------------------------------------------------------------------------------
-# Home
+# Home and projects index
 # ---------------------------------------------------------------------------------------------
+def ver_of(p: dict) -> str:
+    return p["version"] if p["version"].startswith("v") else "main"
+
+
+def tier(d: dict, name: str) -> list[dict]:
+    return [d["projects"][s] for s in d["order"] if d["projects"][s]["tier"] == name]
+
+
+def card(ctx: dict, p: dict, n: int, h: str = "h3") -> str:
+    sset = p["strip_sets"]["main"]
+    return (f'<li><p class="tag label">Sheet {p["sheet"]} of {n} &middot; {esc(p["kind"])}</p>'
+            f'<{h}><a href="/projects/{p["slug"]}/">{esc(p["name"])}</a></{h}>'
+            f'<p class="rd">{esc(p["home"]["reading"])}</p>'
+            f'{C.strip_rows(sset, mini=True, vt="strip-" + p["slug"])}'
+            f'<p class="fact">{esc(p["fact"])}</p></li>')
+
+
+def short_list(p_list: list[dict], n: int) -> str:
+    """One line per project: sheet, link, version, the single best reading."""
+    items = "".join(
+        f'<li><span class="label">Sheet {p["sheet"]} of {n}</span> <a class="nm" href="/projects/{p["slug"]}/">{esc(p["name"])}</a> '
+        f'<span class="ver">{esc(ver_of(p))}</span> <span class="rd">{esc(p["home"]["reading"])}</span></li>' for p in p_list)
+    return f'<ul class="plist">{items}</ul>'
+
+
+def reading_chips(ctx: dict, rd: dict) -> str:
+    """Verdict stamp and run chips. A recording run that is red by design gets its reason in plain words and a green main-branch run beside it."""
+    chips = [C.chip(rd["run"], ctx["runs"], rd.get("run_label"))]
+    if rd.get("run_ok"):
+        chips.append(C.chip(rd["run_ok"], ctx["runs"], rd.get("run_ok_label")))
+    note = f'<p class="chip-note">{esc(rd["run_note"])}</p>' if rd.get("run_note") else ""
+    return f'<p class="chips">{C.stamp(*rd["stamp"])} {" ".join(chips)}</p>{note}'
+
+
 def home(ctx: dict) -> str:
     d = ctx["projects"]
     t = d["projects"]["tripline"]
     main = t["strip_sets"]["main"]
+    n = len(d["order"])
     rows = []
     for slug in d["order"]:
         p = d["projects"][slug]
@@ -136,7 +174,7 @@ def home(ctx: dict) -> str:
             f'<td>{esc(p["home"]["against"])}</td><td>{minis}</td>'
             f'<td class="rd"><b>{esc(p["home"]["reading"])}</b></td><td>{run_chip(ctx, p["home"]["run"])}</td></tr>')
     ledger = (
-        f'<table class="tbl wt ledger"><caption class="vh">Record of checks: {len(d["order"])} projects, what each was checked against and the reading</caption>'
+        f'<table class="tbl wt ledger"><caption class="vh">Record of checks: {n} projects, what each was checked against and the reading</caption>'
         '<thead><tr><th scope="col">Instrument</th><th scope="col">Checked against</th><th scope="col">As found, then as left</th>'
         '<th scope="col">Reading</th><th scope="col">Evidence</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>")
     ff = []
@@ -146,19 +184,25 @@ def home(ctx: dict) -> str:
             f'<tr><th scope="row" class="name"><a href="/projects/{item["project"]}/#{item["anchor"]}">{esc(p["name"])}</a></th>'
             f'<td>{esc(item["text"])}</td><td>{C.stamp(*item["state"])}</td>'
             f'<td><a href="{item["src"][1]}">{esc(item["src"][0])}</a></td></tr>')
-    failed = (
-        '<table class="tbl wt"><caption class="vh">What failed first, with the source of each item</caption>'
-        '<thead><tr><th scope="col">Instrument</th><th scope="col">What the check found</th><th scope="col">State</th><th scope="col">Source</th></tr></thead>'
-        "<tbody>" + "".join(ff) + "</tbody></table>")
+    head = ('<thead><tr><th scope="col">Instrument</th><th scope="col">What the check found</th><th scope="col">State</th><th scope="col">Source</th></tr></thead>')
+    first, rest = ff[:FAILED_SHOWN], ff[FAILED_SHOWN:]
+    failed = ('<table class="tbl wt"><caption class="vh">What failed first, with the source of each item</caption>' + head +
+              "<tbody>" + "".join(first) + "</tbody></table>")
+    if rest:
+        failed += (f'<details class="fold"><summary>{len(rest)} more items</summary>'
+                   '<table class="tbl wt"><caption class="vh">What failed first, remaining items</caption>' + head +
+                   "<tbody>" + "".join(rest) + "</tbody></table></details>")
     rd = t["reading"]
+    den = f'<span class="den" aria-hidden="true">{esc(rd["den"])}</span>'
+    aria = f'Reading: {rd["num"]}{rd["den"]} {rd["unit"]}'
     return f"""<section class="hero" aria-labelledby="top">
 <h1 id="top">Security tools, checked against what they claim.</h1>
 <p class="dek">Detection engineering, application security and vulnerability management. George Mason University, class of 2028.</p>
 <div class="hero-read">
-<p class="reading" role="img" aria-label="Reading: 0 of 36 events matched"><span aria-hidden="true">0</span><span class="den" aria-hidden="true">/36</span></p>
+<p class="reading" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
 <div>
-<p class="why">SigmaHQ's stock Setuid and Setgid rule matched 0 of 36 events in telemetry recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner. The replacement rule matches 2.</p>
-<p class="chips">{C.stamp("fail", "As found: fail")} {run_chip(ctx, rd["run"])}</p>
+<p class="why">{esc(rd["caption"])}</p>
+{reading_chips(ctx, rd)}
 </div>
 </div>
 <div class="hero-strips">
@@ -166,6 +210,16 @@ def home(ctx: dict) -> str:
 {C.strip_rows(main)}
 </div>
 <p><a class="arrow-link" href="/projects/tripline/#as-found">Read the record</a></p>
+</section>
+
+<section class="section" aria-labelledby="work">
+<div class="sec-head"><h2 id="work">Featured work</h2></div>
+<ul class="multi" aria-label="Featured projects">
+{"".join(card(ctx, p, n) for p in tier(d, "featured"))}
+</ul>
+<h3 class="also-h" id="also">Also</h3>
+{short_list(tier(d, "also"), n)}
+<p><a class="arrow-link" href="/projects/">All {n} projects</a></p>
 </section>
 
 <section class="section" aria-labelledby="rec">
@@ -195,41 +249,18 @@ def home(ctx: dict) -> str:
 </section>"""
 
 
-# ---------------------------------------------------------------------------------------------
-# Projects index
-# ---------------------------------------------------------------------------------------------
 def projects_index(ctx: dict) -> str:
     d = ctx["projects"]
-    order = d["order"]
-    cards, rows = [], []
-    for slug in d["order"]:
-        p = d["projects"][slug]
-        sset = p["strip_sets"]["main"]
-        cards.append(
-            f'<li><p class="tag label">Sheet {p["sheet"]} of {len(order)} &middot; {esc(p["kind"])}</p>'
-            f'<h2><a href="/projects/{slug}/">{esc(p["name"])}</a></h2>'
-            f'<p class="rd">{esc(p["home"]["reading"])}</p>'
-            f'{C.strip_rows(sset, mini=True, vt="strip-" + slug)}'
-            f'<p class="fact">{esc(p["fact"])}</p></li>')
-        rows.append(
-            f'<tr><th scope="row" class="name"><a href="/projects/{slug}/">{esc(p["name"])}</a></th>'
-            f'<td>{esc(p["record"]["reference"][0].upper() + p["record"]["reference"][1:])}</td>'
-            f'<td>{esc(p["home"]["found"])}</td><td>{esc(p["home"]["left"])}</td>'
-            f'<td>{esc(p["home"]["tolerance"])}</td><td>{run_chip(ctx, p["home"]["run"])}</td>'
-            f'<td class="num">{esc(p["version"] if p["version"].startswith("v") else "commit " + p["commit"])}</td></tr>')
-    table = (
-        '<table class="tbl wt"><caption class="vh">Full ledger: reference standard, reading as found and as left, limits, evidence and version for each project</caption>'
-        '<thead><tr><th scope="col">Instrument</th><th scope="col">Reference standard</th><th scope="col">As found</th><th scope="col">As left</th>'
-        '<th scope="col">Tolerance</th><th scope="col">Evidence</th><th scope="col" class="num">Version</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>")
+    n = len(d["order"])
     return f"""<h1>Projects</h1>
-<p class="dek">Each project is an instrument. This page lists what it was checked against and what the check found.</p>
-<ul class="multi" aria-label="{len(order)} projects">
-{"".join(cards)}
-</ul>
-<section aria-labelledby="ledger">
-<h2 id="ledger">Full ledger</h2>
-<p class="ledger-note">Where a project has no earlier failure on record, the columns read Reference and Reading instead, and the sheet says so. Small strips are reduced to at most 24 ticks; every sheet shows the real counts.</p>
-{table}
+<p class="dek">Each project is an instrument. This page lists them with the version and the reading; the full record of checks is on the <a href="/#rec">home page</a>.</p>
+<section aria-labelledby="featured">
+<h2 id="featured">Featured</h2>
+{short_list(tier(d, "featured"), n)}
+</section>
+<section class="section" aria-labelledby="also">
+<h2 id="also">Also</h2>
+{short_list(tier(d, "also"), n)}
 </section>
 <section class="section prose" aria-labelledby="other">
 <h2 id="other">Other repositories</h2>
@@ -245,10 +276,62 @@ def projects_index(ctx: dict) -> str:
 # ---------------------------------------------------------------------------------------------
 # Project page (6.3)
 # ---------------------------------------------------------------------------------------------
+def fold(summary: str, body: str, cls: str = "") -> str:
+    """A closed native details element. Everything inside stays in the page for crawlers and for readers without JavaScript."""
+    c = "fold" + (f" {cls}" if cls else "")
+    return f'<details class="{c}"><summary>{summary}</summary>{body}</details>'
+
+
+_TABLE_BOX = re.compile(r'<div class="scroll wide">\s*<table\b[^>]*>(?:(?!</table>).)*?</table>\s*</div>', re.S)
+_PRE = re.compile(r'<pre\b[^>]*>.*?</pre>', re.S)
+
+
+def fold_long(html: str) -> str:
+    """Wrap long evidence tables and long code blocks in a details element (closed). Short ones stay in the flow."""
+    def tbl(m: re.Match) -> str:
+        box = m.group(0)
+        rows = len(re.findall(r"<tr\b", re.search(r"<tbody>.*</tbody>", box, re.S).group(0))) if "<tbody>" in box else 0
+        if rows < FOLD_ROWS:
+            return box
+        cap = re.search(r"<caption>(.*?)</caption>", box, re.S)
+        name = re.sub(r"<[^>]+>", "", cap.group(1)).strip() if cap else "Table"
+        return fold(f"Table, {rows} rows: {name}", box, "fold-tbl")
+
+    def pre(m: re.Match) -> str:
+        block = m.group(0)
+        lines = block.count("\n") + 1
+        if lines < FOLD_LINES:
+            return block
+        lab = re.search(r'data-label="([^"]*)"', block)
+        name = lab.group(1) if lab else "Code"
+        return fold(f"Output, {lines} lines: {name}", block, "fold-tbl")
+
+    # Do not fold inside an element that is already a details element.
+    parts = re.split(r"(<details\b.*?</details>)", html, flags=re.S)
+    out = []
+    for part in parts:
+        if part.startswith("<details"):
+            out.append(part)
+        else:
+            out.append(_PRE.sub(pre, _TABLE_BOX.sub(tbl, part)))
+    return "".join(out)
+
+
+def glance(p: dict) -> str:
+    h = p["home"]
+    return f"""<section class="glance" aria-label="At a glance">
+<dl>
+<div><dt>Checked against</dt><dd>{esc(h["against"])}</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> {esc(h["found"])}<br><span class="gl">As left</span> {esc(h["left"])}</dd></div>
+<div><dt>Limits</dt><dd>{esc(h["tolerance"])} <a href="#limits">Full limits</a></dd></div>
+</dl>
+</section>"""
+
+
 def record_head(p: dict) -> str:
     r = p["record"]
     repro = "\n".join(r["reproduce"])
-    return f"""<section class="record-head" aria-label="Verification record">
+    inner = f"""<section class="record-head" aria-label="Verification record">
 <dl>
 <div><dt>Instrument</dt><dd>{esc(r["instrument"])}</dd></div>
 <div><dt>Reference standard</dt><dd>{esc(r["reference"])}</dd></div>
@@ -257,6 +340,7 @@ def record_head(p: dict) -> str:
 <div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="{esc(r["reproduce_label"])}"><code>{esc(repro)}</code></pre></dd></div>
 </dl>
 </section>"""
+    return fold("Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)", inner, "fold-rec")
 
 
 def reading_band(ctx: dict, p: dict) -> str:
@@ -269,7 +353,7 @@ def reading_band(ctx: dict, p: dict) -> str:
 <p class="reading sm" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
 <div>
 <p class="why">{esc(rd["caption"])}</p>
-<p class="chips">{C.stamp(*rd["stamp"])} {run_chip(ctx, rd["run"])}</p>
+{reading_chips(ctx, rd)}
 </div>
 </div>
 {C.key(main)}
@@ -285,11 +369,13 @@ def trace(ctx: dict, p: dict, extra: str) -> str:
         else:
             val = f'<a href="{t[2]}">{esc(t[3])}</a>'
         items.append(f'<div><dt>{esc(t[0])}</dt><dd>{val}</dd></div>')
-    return f"""<section class="section" id="trace" aria-labelledby="trace-h">
-<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
-<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+    body = f"""<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace">{"".join(items)}</dl>
-{extra}
+{extra}"""
+    return f"""<section class="section fold-sec" id="trace" aria-labelledby="trace-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">{len(items)} links</span></summary>
+{body}
+</details>
 </section>"""
 
 
@@ -334,21 +420,25 @@ def project_page(ctx: dict, slug: str) -> str:
 <ul class="linkrow">{links}</ul>
 {note}
 </header>
-{record_head(p)}
+{glance(p)}
 {reading_band(ctx, p)}
+{record_head(p)}
 {bench}
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
 <h2 id="found-h"><span class="label sec-label">{esc(labels["found"])}</span>{esc(p["found_title"])}</h2>
-{ex(f["as-found"])}
+{fold_long(ex(f["as-found"]))}
 </section>
 <section class="section" id="as-left" aria-labelledby="left-h">
 <h2 id="left-h"><span class="label sec-label">{esc(labels["left"])}</span>{esc(p["left_title"])}</h2>
-{ex(f["as-left"])}
+{fold_long(ex(f["as-left"]))}
 </section>
-<section class="section" id="method" aria-labelledby="method-h">
-<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<section class="section fold-sec" id="method" aria-labelledby="method-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<div class="fold-body">
 {ex(f["method"])}
+</div>
+</details>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">

@@ -17,12 +17,12 @@
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta property="og:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kev-risk-prioritization | Sami Ali">
 <meta name="twitter:description" content="A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-kev-risk.css">
@@ -53,13 +53,11 @@
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/kev-risk-prioritization">Repository</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0">Release v0.2.0</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">Methodology</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/bod-26-04.md">BOD 26-04 notes</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43040235145">CI run (main)</a></li></ul>
 
 </header>
-<section class="record-head" aria-label="Verification record">
+<section class="glance" aria-label="At a glance">
 <dl>
-<div><dt>Instrument</dt><dd>kev-risk-prioritization v0.2.0, commit d85495f</dd></div>
-<div><dt>Reference standard</dt><dd>a CVSS-only sort of 20 synthetic findings, and a pinned real snapshot: CISA KEV 2026.11.10 and FIRST EPSS scored 2026-11-11</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-11, fresh clone of tag v0.2.0, 27 tests pass</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ python"><code>python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json</code></pre></dd></div>
+<div><dt>Checked against</dt><dd>CVSS-only sort of 20 synthetic findings; pinned real KEV and EPSS snapshot</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> Earlier text called it KEV-first in the spirit of BOD 26-04 and showed measurements on invented values<br><span class="gl">As left</span> Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515</dd></div>
+<div><dt>Limits</dt><dd>Weights not validated; EPSS and KEV are related signals; synthetic assets <a href="#limits">Full limits</a></dd></div>
 </dl>
 </section>
 <section class="reading-band" aria-label="The reading">
@@ -73,6 +71,15 @@
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>KEV finding</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>non-KEV finding</li></ul>
 <div class="strips vt" style="--vt:strip-kev-risk-prioritization"><div class="srow"><span class="label" aria-hidden="true">CVSS only</span><div class="strip" role="img" aria-label="CVSS only, 12 top-12 slots: 9 KEV finding, 3 non-KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss" class="m" data-n="10"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>9</b> KEV findings in the top 12</p></div><div class="srow"><span class="label" aria-hidden="true">Risk score</span><div class="strip" role="img" aria-label="Risk score, 12 top-12 slots: 12 KEV finding"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit" class="m" data-n="10"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>12</b> KEV findings in the top 12</p></div></div>
 </section>
+<details class="fold fold-rec"><summary>Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)</summary><section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>kev-risk-prioritization v0.2.0, commit d85495f</dd></div>
+<div><dt>Reference standard</dt><dd>a CVSS-only sort of 20 synthetic findings, and a pinned real snapshot: CISA KEV 2026.11.10 and FIRST EPSS scored 2026-11-11</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-11, fresh clone of tag v0.2.0, 27 tests pass</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ python"><code>python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json</code></pre></dd></div>
+</dl>
+</section></details>
 <section class="bench" data-bench="kev-risk" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
@@ -146,12 +153,15 @@ KEV vs non-KEV population
 <p>What none of this shows: that the ranking improves remediation outcomes. KEV is an incomplete label (a CVE missing from it is not known to be safe), the snapshot is one point in time with no forecasting test, and the EPSS-against-KEV result is partly circular.</p>
 </div>
 </section>
-<section class="section" id="method" aria-labelledby="method-h">
-<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<section class="section fold-sec" id="method" aria-labelledby="method-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<div class="fold-body">
 <div class="prose">
 <p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it: <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>. Dividing by the weight total keeps the scale at 0 to 100 for any weights, so ordering does not depend on it. Ties break on EPSS, then CVSS. If a finding has no CVSS value, that term and its weight are dropped and the rest is renormalized, which is how the real snapshot is scored. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison. The <a href="/projects/kevgate/">kevgate</a> sheet documents the same weights.</p>
 <p>Plate 1 re-implements that formula in the browser and checks it against the tool: <code>scripts/gen_bench_kev.py</code> calls the tool's own <code>score_all</code> with custom weights for the four presets and 300 random weight vectors, and <code>scripts/test_bench_kev.mjs</code> requires the same order and the same scores to one decimal. Plate 2 is drawn at build time from the committed subset.</p>
 </div>
+</div>
+</details>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
@@ -166,11 +176,12 @@ KEV vs non-KEV population
 <li>A weighted sum cannot express a hard rule such as "KEV and internet-exposed always first".</li>
 </ul>
 </section>
-<section class="section" id="trace" aria-labelledby="trace-h">
-<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<section class="section fold-sec" id="trace" aria-labelledby="trace-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">7 links</span></summary>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace"><div><dt>CI run on main</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43040235145"><span class="st" aria-hidden="true"></span><span>run 43040235145</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0">v0.2.0</a></dd></div><div><dt>Real-data analysis</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/real_data_analysis.md">docs/real_data_analysis.md</a></dd></div><div><dt>BOD 26-04 notes</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/bod-26-04.md">docs/bod-26-04.md</a></dd></div><div><dt>Snapshot</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/tree/main/data/snapshot">data/snapshot/</a></dd></div><div><dt>Sample data</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/tree/main/data">data/</a></dd></div><div><dt>Bench parity test</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_kev.mjs">scripts/test_bench_kev.mjs</a></dd></div></dl>
 
+</details>
 </section>
 <nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/fuzzdiff/"><span class="label">Previous sheet, 6 of 7</span><span class="n">fuzzdiff</span></a></nav>
 </div>
