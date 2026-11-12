@@ -49,20 +49,18 @@
 <div class="sheet">
 <header class="title">
 <h1>kevgate</h1>
-<p class="dek">A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls. This sheet is the v0.1.1 record, with a matrix that maps each control to the code and the checks that cite it.</p>
+<dl class="plain">
+<div><dt>What it does</dt><dd>A small service that ranks scanner findings by CISA KEV listing, EPSS, CVSS and how critical the asset is. It ships with a container, a Helm chart, Terraform and a CI pipeline.</dd></div>
+<div><dt>Why it matters</dt><dd>The point is to show what shipping a small service carefully looks like: authentication, rate limits, hardened containers, and CI that tests those controls.</dd></div>
+<div class="pf"><dt>What was found</dt><dd>Six defects had survived the 227 tests. Tests were added until each one fails when the defect is put back. The suite is now 277 tests.</dd></div>
+</dl>
+<p class="row cta"><a class="btn" href="#try">See it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/kevgate">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">Release v0.1.1</a></li><li><a href="https://github.com/samiali38183/kevgate/pull/2">Hardening PR #2</a></li><li><a href="https://github.com/samiali38183/kevgate/tree/v0.1.1/docs">Docs</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 </header>
-<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>Its own six surviving mutants and 16 controls; kind cluster in CI</dd></div>
-<div><dt>Found, then left</dt><dd><span class="gl">As found</span> Six mutants survived 227 tests<br><span class="gl">As left</span> Six killed; 277 tests</dd></div>
-<div><dt>Limits</dt><dd>Demonstration scope: one replica, SQLite, LocalStack only <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>
 <section class="reading-band" aria-label="The reading">
 <div class="hero-read">
-<p class="reading sm" role="img" aria-label="Reading: 6/6 surviving mutants killed"><span aria-hidden="true">6</span><span class="den" aria-hidden="true">/6</span></p>
+<p class="reading sm k-pass" role="img" aria-label="Reading: 6/6 surviving mutants killed"><span aria-hidden="true">6</span><span class="den" aria-hidden="true">/6</span></p>
 <div>
 <p class="why">Six defects had survived the test suite; tests added in 0.1.1 now fail when each one is reintroduced. The suite went from 227 to 277 tests.</p>
 <p class="chips"><span class="stamp pass">As left: pass</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808156"><span class="st" aria-hidden="true"></span><span>run 42960808156</span> <span class="d">passed 2026-11-11</span></a></p>
@@ -71,18 +69,8 @@
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>survived the suite</li><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>killed by a test</li></ul>
 <div class="strips vt" style="--vt:strip-kevgate"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 6 mutants: 6 survived the suite"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>6</b> survived 227 tests</p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 6 mutants: 6 killed by a test"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>6</b> killed by 277 tests</p></div></div>
 </section>
-<details class="fold fold-rec"><summary>Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)</summary><section class="record-head" aria-label="Verification record">
-<dl>
-<div><dt>Instrument</dt><dd>kevgate v0.1.1, commit 973c8c1 (annotated tag)</dd></div>
-<div><dt>Reference standard</dt><dd>its own six surviving mutants and sixteen security controls, each cited to a test or a CI step (a kind cluster in CI for the cluster controls)</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-11, Python 3.12.2, fresh clone at tag v0.1.1; CI runs 2026-11-11</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ kevgate v0.1.1"><code>git clone https://github.com/samiali38183/kevgate &amp;&amp; cd kevgate &amp;&amp; git checkout v0.1.1
-pip install -e &quot;.[dev]&quot;
-pytest --cov</code></pre></dd></div>
-</dl>
-</section></details>
-<section class="bench" data-bench="kevgate" aria-label="Recorded readings">
+<div class="try-head"><h2>See it</h2><p>Click a control to see the code and the CI checks behind it.</p></div>
+<section class="bench" id="try" data-bench="kevgate" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
 <div class="bench-static">
@@ -93,6 +81,25 @@ pytest --cov</code></pre></dd></div>
 <figcaption><b>Every one of 16 controls cites at least one test or CI step; none of the cited tests or steps is evidence that the control is sufficient.</b> Recorded, not live: every line number, test name, CI job and step comes from <code>kevgate</code> v0.1.1 (commit 973c8c1) and from real GitHub Actions runs, captured on 2026-11-11 with Python 3.12.2 and pytest 9.2.0: 34 cited tests (84 cases, all passed on a rerun) of 277 collected, and 24 CI step citations. The page evaluates nothing. Regenerate with <code>python scripts/capture_kevgate_bench.py</code>; <code>python scripts/capture_kevgate_bench.py --check</code> compares the stored data with a fresh capture and <code>node scripts/test_bench_kevgate.mjs</code> checks that the page shows exactly the stored data.</figcaption>
 </figure>
 </section>
+<section class="glance" aria-label="At a glance">
+<dl>
+<div><dt>Checked against</dt><dd>Its own six surviving mutants and 16 controls; kind cluster in CI</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> Six mutants survived 227 tests<br><span class="gl">As left</span> Six killed; 277 tests</dd></div>
+<div><dt>Limits</dt><dd>Demonstration scope: one replica, SQLite, LocalStack only <a href="#limits">Full limits</a></dd></div>
+</dl>
+</section>
+<details class="fold fold-rec"><summary>Technical description and verification record: instrument, reference standard, date, how to reproduce (self-issued, not accredited)</summary><p class="dek tech">A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls. This sheet is the v0.1.1 record, with a matrix that maps each control to the code and the checks that cite it.</p>
+<section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>kevgate v0.1.1, commit 973c8c1 (annotated tag)</dd></div>
+<div><dt>Reference standard</dt><dd>its own six surviving mutants and sixteen security controls, each cited to a test or a CI step (a kind cluster in CI for the cluster controls)</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-11, Python 3.12.2, fresh clone at tag v0.1.1; CI runs 2026-11-11</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ kevgate v0.1.1"><code>git clone https://github.com/samiali38183/kevgate &amp;&amp; cd kevgate &amp;&amp; git checkout v0.1.1
+pip install -e &quot;.[dev]&quot;
+pytest --cov</code></pre></dd></div>
+</dl>
+</section></details>
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
 <h2 id="found-h"><span class="label sec-label">As found</span>The 0.1.0 tests would not have noticed six defects, and five gaps remained</h2>
@@ -101,7 +108,7 @@ pytest --cov</code></pre></dd></div>
 <p>The first finding is about the tests, not the code. v0.1.0 already compared keys with <code>hmac.compare_digest</code> and no early exit; the 227 tests would still have passed if someone had replaced it with <code>==</code>. Each of the six findings below was checked again on 2026-11-11 against the v0.1.0 tag.</p>
 </div>
 <div class="note" role="note"><strong>A mutant</strong> is a copy of the code with one deliberate defect. A test suite kills it if at least one test fails; a mutant that survives shows a check nobody was making.</div>
-<div class="scroll wide"><table class="tbl">
+<details class="fold fold-tbl"><summary>Table, 6 rows: Reading ledger: what the review found in v0.1.0</summary><div class="scroll wide"><table class="tbl">
 <caption>Reading ledger: what the review found in v0.1.0</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed at v0.1.0</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
@@ -112,8 +119,8 @@ pytest --cov</code></pre></dd></div>
 <tr class="row-fail"><th scope="row">Dependency lock</th><td data-label="Expected">A committed lock with hashes, installed with <code>--require-hashes</code> by CI</td><td data-label="Observed at v0.1.0"><code>requirements.lock</code> was not in the repository. The security workflow generated it on each run with <code>deploy/scripts/lock.sh</code>, and <code>ci</code> installed with <code>pip install -e ".[dev]"</code>, without hashes</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/kevgate/blob/v0.1.0/.github/workflows/ci.yml#L36-L37">ci.yml at v0.1.0</a></td></tr>
 <tr class="row-fail"><th scope="row">OIDC trust policy</th><td data-label="Expected">Weakening the policy fails a check</td><td data-label="Observed at v0.1.0">No test pinned it. The repository's own text says validate, tflint, checkov and Trivy accept a trust policy weakened to <code>StringLike</code> with a wildcard, so none of them would have caught it</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/DEPLOYMENT.md#oidc-trust-regression-check">DEPLOYMENT.md</a></td></tr>
 </tbody>
-</table></div>
-<div class="scroll wide"><table class="tbl">
+</table></div></details>
+<details class="fold fold-tbl"><summary>Table, 6 rows: The six mutants, re-run on 2026-11-11 against both tags (one change at a time to the source, full suite, stop at the first failure)</summary><div class="scroll wide"><table class="tbl">
 <caption>The six mutants, re-run on 2026-11-11 against both tags (one change at a time to the source, full suite, stop at the first failure)</caption>
 <thead><tr><th scope="col">Mutant (a deliberate defect)</th><th scope="col">v0.1.0, 227 tests</th><th scope="col">v0.1.1, 277 tests</th></tr></thead>
 <tbody>
@@ -124,14 +131,14 @@ pytest --cov</code></pre></dd></div>
 <tr><th scope="row">CSV merge taking the minimum CVSS</th><td data-label="v0.1.0, 227 tests">Survived</td><td data-label="v0.1.1, 277 tests">Killed</td></tr>
 <tr><th scope="row">Upsert skipping EPSS</th><td data-label="v0.1.0, 227 tests">Survived</td><td data-label="v0.1.1, 277 tests">Killed</td></tr>
 </tbody>
-</table></div>
+</table></div></details>
 </section>
 <section class="section" id="as-left" aria-labelledby="left-h">
 <h2 id="left-h"><span class="label sec-label">As left</span>Six mutants killed, five gaps closed, controls cited to tests and CI</h2>
 <div class="prose">
 <p>Release 0.1.1 adds the tests that kill the six mutants (<code>tests/test_mutation_kills.py</code>, 227 tests become 277) and closes the other five findings. Each change below is in the repository's CHANGELOG and is cited by a test or a CI step in the matrix above.</p>
 </div>
-<div class="scroll wide"><table class="tbl">
+<details class="fold fold-tbl"><summary>Table, 6 rows: Reading ledger: what 0.1.1 changed</summary><div class="scroll wide"><table class="tbl">
 <caption>Reading ledger: what 0.1.1 changed</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed at v0.1.1</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
@@ -142,7 +149,7 @@ pytest --cov</code></pre></dd></div>
 <tr><th scope="row">Dependency lock</th><td data-label="Expected">A committed lock with hashes, installed with <code>--require-hashes</code></td><td data-label="Observed at v0.1.1"><code>requirements.lock</code> is committed; <code>ci</code>, the image build and <code>pip-audit</code> use it. Dependabot is configured for pip, Actions and Docker</td><td data-label="Verdict"><span class="stamp pass">As left: pass</span></td><td data-label="Evidence"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808156"><span class="st" aria-hidden="true"></span><span>run 42960808156</span> <span class="d">passed 2026-11-11</span></a> (ci), <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808037"><span class="st" aria-hidden="true"></span><span>run 42960808037</span> <span class="d">passed 2026-11-11</span></a> (security)</td></tr>
 <tr><th scope="row">OIDC trust policy</th><td data-label="Expected">Weakening the policy fails a check</td><td data-label="Observed at v0.1.1">A <code>terraform test</code> pins one <code>Allow</code>, two <code>StringEquals</code> conditions, <code>aud</code> and one exact <code>sub</code> for the repository and branch, with no wildcard. 4 test runs pass</td><td data-label="Verdict"><span class="stamp pass">As left: pass</span></td><td data-label="Evidence"><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666367"><span class="st" aria-hidden="true"></span><span>run 42956666367</span> <span class="d">passed 2026-11-11</span></a> (terraform)</td></tr>
 </tbody>
-</table></div>
+</table></div></details>
 <div class="prose">
 <p>Run on 2026-11-11 from a fresh clone at tag <code>v0.1.1</code> (commit 973c8c1), Python 3.12.2, on Windows 11, on localhost (port 8765, shown as 8000 below). Production mode with a generated key file, the rate limit set to 6 per minute per key and the failed-authentication limit set to 5 per minute (the default is 20). The data is synthetic (real CVE IDs, invented assets and scores) and the KEV catalog is the 5-entry sample bundled with the repo. Keys are shown as placeholders; they were throwaway keys for this run, and a search of the server log for all three found none.</p>
 </div>
@@ -226,7 +233,7 @@ kevgate_auth_throttled_total 3.0</code></pre></details>
 </div>
 </section>
 <section class="section fold-sec" id="method" aria-labelledby="method-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Technical details</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
 <div class="fold-body">
 <h3>The problem</h3>
 <div class="prose">
@@ -270,7 +277,7 @@ kevgate_auth_throttled_total 3.0</code></pre></details>
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">9 links</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">9 links</span></summary>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace"><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">v0.1.1 (973c8c1)</a></dd></div><div><dt>Tests run (ci)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808156"><span class="st" aria-hidden="true"></span><span>run 42960808156</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Security scans (security)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808037"><span class="st" aria-hidden="true"></span><span>run 42960808037</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Kind cluster controls (deploy-kind)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960807983"><span class="st" aria-hidden="true"></span><span>run 42960807983</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Terraform (terraform, last run on main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666367"><span class="st" aria-hidden="true"></span><span>run 42956666367</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release run, v0.1.1</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960813836"><span class="st" aria-hidden="true"></span><span>run 42960813836</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Mutation tests</dt><dd><a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/tests/test_mutation_kills.py">tests/test_mutation_kills.py</a></dd></div><div><dt>Changelog</dt><dd><a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/CHANGELOG.md">CHANGELOG 0.1.1</a></dd></div><div><dt>Matrix data</dt><dd><a href="/assets/data/kevgate-bench.json">assets/data/kevgate-bench.json</a></dd></div></dl>
 <h3>CI evidence</h3>

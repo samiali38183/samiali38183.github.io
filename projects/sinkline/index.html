@@ -48,20 +48,18 @@
 <div class="sheet">
 <header class="title">
 <h1>sinkline</h1>
-<p class="dek">A static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class.</p>
+<dl class="plain">
+<div><dt>What it does</dt><dd>It follows data from a web request through functions and files. It reports a finding only if the data reaches a dangerous call without the right clean-up for that kind of bug.</dd></div>
+<div><dt>Why it matters</dt><dd>Escaping HTML does nothing for a SQL query, so a tool has to know which clean-up fits which bug.</dd></div>
+<div class="pf"><dt>What was found</dt><dd>On ten categories of OWASP BenchmarkPython (score = true-positive rate minus false-positive rate), 0.4.1 scored +0.21 and Bandit +0.07. Version 0.5.1 scores +0.52, but those fixes were chosen by reading 0.4.1&#x27;s failures, so it is not a held-out score. Across all 14 categories Bandit still leads.</dd></div>
+</dl>
+<p class="row cta"><a class="btn" href="#try">Try it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/sinkline">Repository</a></li><li><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.5.1">Release v0.5.1</a></li><li><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">External benchmark</a></li><li><a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md">Design doc</a></li><li><a href="https://github.com/samiali38183/sinkline/actions/runs/43136290658">CI run (main)</a></li><li><a href="https://samiali38183.github.io/sinkline/">Sample HTML report</a></li></ul>
 
 </header>
-<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>OWASP BenchmarkPython v0.1, 10 taint categories; Bandit +0.07</dd></div>
-<div><dt>Found, then left</dt><dd><span class="gl">As found</span> 0.4.1: TPR 0.41, FPR 0.20, score +0.21<br><span class="gl">As left</span> 0.5.1: TPR 0.73, FPR 0.21, score +0.52</dd></div>
-<div><dt>Limits</dt><dd>Fixes chosen from the 0.4.1 failures; Bandit leads over all 14 categories <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>
 <section class="reading-band" aria-label="The reading">
 <div class="hero-read">
-<p class="reading sm" role="img" aria-label="Reading: +0.52 TPR minus FPR on the 10 taint categories (0.4.1: +0.21; Bandit +0.07)"><span aria-hidden="true">+0.52</span></p>
+<p class="reading sm k-limit" role="img" aria-label="Reading: +0.52 TPR minus FPR on the 10 taint categories (0.4.1: +0.21; Bandit +0.07)"><span aria-hidden="true">+0.52</span></p>
 <div>
 <p class="why">On OWASP BenchmarkPython v0.1, ten taint categories, sinkline 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20). 0.5.1 scores +0.52 (0.73, 0.21), but its fixes were chosen by reading the failures of 0.4.1, so that is not a held-out score. Bandit 1.9.4 scores +0.07. Over all 14 categories Bandit leads, +0.36 to +0.27.</p>
 <p class="chips"><span class="stamp limit">Not held out</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43136290658"><span class="st" aria-hidden="true"></span><span>run 43136290658</span> <span class="d">passed 2026-11-12</span></a></p>
@@ -70,17 +68,8 @@
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>vulnerable cases reported</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable cases missed</li><li><span class="strip" aria-hidden="true"><i data-s="fp"></i></span>safe cases flagged</li><li><span class="strip" aria-hidden="true"><i data-s="neg"></i></span>safe cases left alone</li><li>Each tick is about 10 test cases; the counts are in the labels.</li></ul>
 <div class="strips vt" style="--vt:strip-sinkline"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip long" role="img" aria-label="As found, 677 test cases: 99 vulnerable cases reported, 141 vulnerable cases missed, 89 safe cases flagged, 348 safe cases left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">sinkline 0.4.1: TP 99, FN 141, FP 89, TN 348. Score <b>+0.21</b></p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip long" role="img" aria-label="As left, 677 test cases: 175 vulnerable cases reported, 65 vulnerable cases missed, 93 safe cases flagged, 344 safe cases left alone"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="fp"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i><i data-s="neg"></i></div><p class="val">sinkline 0.5.1: TP 175, FN 65, FP 93, TN 344. Score <b>+0.52</b></p></div></div>
 </section>
-<details class="fold fold-rec"><summary>Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)</summary><section class="record-head" aria-label="Verification record">
-<dl>
-<div><dt>Instrument</dt><dd>sinkline v0.5.1, commit f879e88 (0.4.1, commit 9a36ba2, is the as-found reading)</dd></div>
-<div><dt>Reference standard</dt><dd>OWASP BenchmarkPython v0.1, commit f129148: 1,230 labeled Flask test cases; Bandit 1.9.4 and Semgrep OSS 1.185.0 on the same files</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-12, Python 3.12.2; sinkline 0.5.1 re-run on the suite for this page, per-test table identical to the committed 0.5.0 result, other results from the repository (scored with its own script, not the official scorer)</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ sinkline repo"><code>bench/external/run.sh WORKDIR v0.5.0 sinkline bandit semgrep
-python bench/score.py</code></pre></dd></div>
-</dl>
-</section></details>
-<section class="bench" data-bench="sinkline" aria-label="Recorded readings">
+<div class="try-head"><h2>Try it</h2><p>Switch one small Flask app between unsafe, right sanitizer and wrong sanitizer, and read the real scanner output.</p></div>
+<section class="bench" id="try" data-bench="sinkline" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
 <div class="bench-static">
@@ -288,6 +277,24 @@ by OWASP: A03:2021 Injection: 1
 <figcaption><b>A sanitizer clears a finding only for its own bug class: <code>shlex.quote</code> clears command injection and leaves SQL injection and XSS reported, and <code>html.escape</code> leaves command injection reported.</b> Recorded, not live: every output is the unedited output of <code>sinkline scan --no-color --fail-on low FILE</code> (sinkline 0.5.1, tag v0.5.1, commit f879e88) on the file shown, run 2026-11-12. The page runs no analysis; the switch only chooses which recorded output to show. Files, outputs and the capture script: <a href="https://github.com/samiali38183/samiali38183.github.io/tree/main/assets/data/sinkline-bench">assets/data/sinkline-bench</a>, <code>scripts/capture_sinkline_bench.py</code>. Two unsafe files were missed by older versions, checked by running them: 0.4.0 reports nothing on the try/except file (join fix in 0.4.1) and 0.4.1 reports nothing on the XSS file, which returns a call result (fix in 0.5.0).</figcaption>
 </figure>
 </section>
+<section class="glance" aria-label="At a glance">
+<dl>
+<div><dt>Checked against</dt><dd>OWASP BenchmarkPython v0.1, 10 taint categories; Bandit +0.07</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> 0.4.1: TPR 0.41, FPR 0.20, score +0.21<br><span class="gl">As left</span> 0.5.1: TPR 0.73, FPR 0.21, score +0.52</dd></div>
+<div><dt>Limits</dt><dd>Fixes chosen from the 0.4.1 failures; Bandit leads over all 14 categories <a href="#limits">Full limits</a></dd></div>
+</dl>
+</section>
+<details class="fold fold-rec"><summary>Technical description and verification record: instrument, reference standard, date, how to reproduce (self-issued, not accredited)</summary><p class="dek tech">A static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class.</p>
+<section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>sinkline v0.5.1, commit f879e88 (0.4.1, commit 9a36ba2, is the as-found reading)</dd></div>
+<div><dt>Reference standard</dt><dd>OWASP BenchmarkPython v0.1, commit f129148: 1,230 labeled Flask test cases; Bandit 1.9.4 and Semgrep OSS 1.185.0 on the same files</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-12, Python 3.12.2; sinkline 0.5.1 re-run on the suite for this page, per-test table identical to the committed 0.5.0 result, other results from the repository (scored with its own script, not the official scorer)</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ sinkline repo"><code>bench/external/run.sh WORKDIR v0.5.0 sinkline bandit semgrep
+python bench/score.py</code></pre></dd></div>
+</dl>
+</section></details>
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
 <h2 id="found-h"><span class="label sec-label">As found</span>On an independent benchmark 0.4.1 scored +0.21, and Bandit leads over all 14 categories</h2>
@@ -308,7 +315,7 @@ by OWASP: A03:2021 Injection: 1
 <div class="prose">
 <p>One more analysis bug is in the changelog: a <code>try</code>/<code>except</code> lost taint, so <code>host = request.args["h"]</code> followed by <code>except: host = "localhost"</code> reported nothing (fixed in 0.4.1; the command-injection example on Plate 1 has that shape).</p>
 </div>
-<div class="scroll wide"><table class="tbl wt">
+<details class="fold fold-tbl"><summary>Table, 6 rows: Reading ledger</summary><div class="scroll wide"><table class="tbl wt">
 <caption>Reading ledger</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
@@ -319,7 +326,7 @@ by OWASP: A03:2021 Injection: 1
 <tr class="row-fail"><th scope="row">GitHub Action input handling, before 0.4.1</th><td data-label="Expected">Inputs reach the shell only as quoted data</td><td data-label="Observed">Inputs interpolated into a shell line</td><td data-label="Verdict"><span class="stamp fail">As found: fail</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1, Security</a></td></tr>
 <tr><th scope="row">The same Action, 0.4.1</th><td data-label="Expected">Hostile values stay data</td><td data-label="Observed">Tested with hostile values</td><td data-label="Verdict"><span class="stamp pass">As left: pass</span></td><td data-label="Evidence"><a href="https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py">tests/test_action.py</a></td></tr>
 </tbody>
-</table></div>
+</table></div></details>
 </section>
 <section class="section" id="as-left" aria-labelledby="left-h">
 <h2 id="left-h"><span class="label sec-label">As left</span>0.5.1 scores +0.52 on the taint categories; the fixes were chosen from the failures</h2>
@@ -399,7 +406,7 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 </table></div></details>
 </section>
 <section class="section fold-sec" id="method" aria-labelledby="method-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Technical details</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
 <div class="fold-body">
 <h3>The problem</h3>
 <div class="prose">
@@ -441,7 +448,7 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
-<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">11 links</span></summary>
+<details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">11 links</span></summary>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace"><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.5.1">v0.5.1</a></dd></div><div><dt>CI run on main (v0.5.1)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43136290658"><span class="st" aria-hidden="true"></span><span>run 43136290658</span> <span class="d">passed 2026-11-12</span></a></dd></div><div><dt>Report workflow on main</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43136290530"><span class="st" aria-hidden="true"></span><span>run 43136290530</span> <span class="d">passed 2026-11-12</span></a></dd></div><div><dt>External benchmark, method and results</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">bench/external/README.md</a></dd></div><div><dt>Per-category results, 0.4.1 and 0.5.0 (0.5.1 is identical to 0.5.0)</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/bench/external/results">bench/external/results</a></dd></div><div><dt>Changelog 0.5.1</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG.md</a></dd></div><div><dt>Security fix for the Action</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md">CHANGELOG 0.4.1, Security</a></dd></div><div><dt>Regression-gate scripts</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/bench">bench/</a></dd></div><div><dt>Public-project scans</dt><dd><a href="https://github.com/samiali38183/sinkline/tree/main/docs/examples">docs/examples</a></dd></div><div><dt>Sanitizer switch captures</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/tree/main/assets/data/sinkline-bench">assets/data/sinkline-bench</a></dd></div><div><dt>Action test</dt><dd><a href="https://github.com/samiali38183/sinkline/blob/main/tests/test_action.py">tests/test_action.py</a></dd></div></dl>
 
