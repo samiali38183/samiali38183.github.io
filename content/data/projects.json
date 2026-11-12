@@ -813,22 +813,24 @@
    "sheet": 3,
    "kind": "Vulnerability management and DevSecOps",
    "title": "kevgate: KEV-ranked vulnerability intake | Sami Ali",
-   "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and CI that tests NetworkPolicy and Pod Security on kind.",
-   "fact": "A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests on main.",
+   "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.",
+   "fact": "A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests at v0.1.1.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
-   "found_title": "Six defects survived the test suite",
-   "left_title": "Six mutants killed, and controls tested in CI",
+   "found_title": "The 0.1.0 tests would not have noticed six defects, and five gaps remained",
+   "left_title": "Six mutants killed, five gaps closed, controls cited to tests and CI",
    "record": {
-    "instrument": "kevgate v0.1.1, commit 973c8c1 (evidence run on b08a920)",
-    "reference": "its own controls (authentication, rate limits, NetworkPolicy, Pod Security) and a list of six mutants, tested in a kind cluster in CI",
-    "measured": "2026-11-10, Python 3.12.2, fresh clone of main; CI runs 2026-11-11",
+    "instrument": "kevgate v0.1.1, commit 973c8c1 (annotated tag)",
+    "reference": "its own six surviving mutants and sixteen security controls, each cited to a test or a CI step (a kind cluster in CI for the cluster controls)",
+    "measured": "2026-11-11, Python 3.12.2, fresh clone at tag v0.1.1; CI runs 2026-11-11",
     "reproduce": [
-     "pytest --cov=kevgate"
+     "git clone https://github.com/samiali38183/kevgate && cd kevgate && git checkout v0.1.1",
+     "pip install -e \".[dev]\"",
+     "pytest --cov"
     ],
-    "reproduce_label": "$ kevgate"
+    "reproduce_label": "$ kevgate v0.1.1"
    },
    "reading": {
     "num": "6",
@@ -839,7 +841,7 @@
      "pass",
      "As left: pass"
     ],
-    "run": "42956666365"
+    "run": "42960808156"
    },
    "strip_sets": {
     "main": {
@@ -874,9 +876,9 @@
     }
    },
    "home": {
-    "against": "Its own six surviving mutants; kind cluster in CI",
+    "against": "Its own six surviving mutants and 16 controls; kind cluster in CI",
     "reading": "6 of 6 mutants killed",
-    "run": "42956666365",
+    "run": "42960808156",
     "found": "Six mutants survived 227 tests",
     "left": "Six killed; 277 tests",
     "tolerance": "Demonstration scope: one replica, SQLite, LocalStack only"
@@ -896,7 +898,7 @@
     ],
     [
      "Docs",
-     "https://github.com/samiali38183/kevgate/tree/main/docs"
+     "https://github.com/samiali38183/kevgate/tree/v0.1.1/docs"
     ],
     [
      "CI runs",
@@ -913,12 +915,22 @@
     [
      "Tests run (ci)",
      "run",
-     "42956666365"
+     "42960808156"
+    ],
+    [
+     "Security scans (security)",
+     "run",
+     "42960808037"
     ],
     [
      "Kind cluster controls (deploy-kind)",
      "run",
-     "42956666404"
+     "42960807983"
+    ],
+    [
+     "Terraform (terraform, last run on main)",
+     "run",
+     "42956666367"
     ],
     [
      "Release run, v0.1.1",
@@ -928,14 +940,20 @@
     [
      "Mutation tests",
      "link",
-     "https://github.com/samiali38183/kevgate/blob/main/tests/test_mutation_kills.py",
+     "https://github.com/samiali38183/kevgate/blob/v0.1.1/tests/test_mutation_kills.py",
      "tests/test_mutation_kills.py"
     ],
     [
      "Changelog",
      "link",
-     "https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md",
+     "https://github.com/samiali38183/kevgate/blob/v0.1.1/CHANGELOG.md",
      "CHANGELOG 0.1.1"
+    ],
+    [
+     "Matrix data",
+     "link",
+     "/assets/data/kevgate-bench.json",
+     "assets/data/kevgate-bench.json"
     ]
    ],
    "commit": "973c8c1"
@@ -1758,7 +1776,7 @@
   },
   {
    "project": "kevgate",
-   "text": "Six defects survived 227 tests, including a non-constant-time key comparison. 0.1.1 adds tests that kill all six.",
+   "text": "Six deliberate defects survived 227 tests, including swapping the constant-time key comparison for ==. The code was correct, but no test would have failed. 0.1.1 adds tests that kill all six.",
    "state": [
     "pass",
     "Fixed"
@@ -1766,7 +1784,7 @@
    "anchor": "as-found",
    "src": [
     "CHANGELOG 0.1.1",
-    "https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md"
+    "https://github.com/samiali38183/kevgate/blob/v0.1.1/CHANGELOG.md"
    ]
   },
   {

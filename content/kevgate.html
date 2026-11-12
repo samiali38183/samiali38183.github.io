@@ -1,10 +1,36 @@
 <!--@dek-->
-A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls.
+A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls. This sheet is the v0.1.1 record, with a matrix that maps each control to the code and the checks that cite it.
 
 <!--@bench-->
-<div class="scroll"><table class="tbl">
-<caption>The six mutants that survived the 227-test suite, and what 0.1.1 did about each</caption>
-<thead><tr><th scope="col">Mutant (a deliberate defect)</th><th scope="col">Before 0.1.1</th><th scope="col">0.1.1</th></tr></thead>
+{{bench:kevgate}}
+
+<!--@bench-after-->
+{{bench:kevgate-what}}
+
+<!--@bench-cap-->
+{{bench:kevgate-cap}}
+
+<!--@as-found-->
+<div class="prose">
+<p>Coverage numbers do not show whether a test would notice a defect being introduced.<sup class="nref" aria-hidden="true"></sup> The review round after the first release (v0.1.0) asked of each control what would fail if it broke, and found six places where nothing would, plus five gaps in how the controls were observed or built.</p>
+<p>The first finding is about the tests, not the code. v0.1.0 already compared keys with <code>hmac.compare_digest</code> and no early exit; the 227 tests would still have passed if someone had replaced it with <code>==</code>. Each of the six findings below was checked again on 2026-11-11 against the v0.1.0 tag.</p>
+</div>
+<aside class="note"><strong>A mutant</strong> is a copy of the code with one deliberate defect. A test suite kills it if at least one test fails; a mutant that survives shows a check nobody was making.</aside>
+<div class="scroll wide"><table class="tbl">
+<caption>Reading ledger: what the review found in v0.1.0</caption>
+<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed at v0.1.0</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
+<tbody>
+<tr class="row-fail"><th scope="row">Six mutants against the suite</th><td>A failing test for each</td><td>All 227 tests passed with each mutant applied, including mutants of the key comparison (an early exit, and <code>==</code> in place of <code>compare_digest</code>; the shipped code used <code>compare_digest</code>) and a body-size limit that counted only the last chunk</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/rerun_kevgate_mutants.py">rerun script</a> (below)</td></tr>
+<tr class="row-fail"><th scope="row">Alert after a restart</th><td>The first authentication failure after a restart is counted</td><td>The labelled <code>kevgate_auth_failures_total</code> series only came into existence on the first failure. The repository's comment added in 0.1.1 says Prometheus' <code>increase()</code> then has no earlier sample, so the first event would never alert</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/kevgate/blob/v0.1.0/src/kevgate/metrics.py#L43-L49">metrics.py at v0.1.0</a></td></tr>
+<tr class="row-fail"><th scope="row">Readiness</th><td>Not ready when storage cannot take a write</td><td><code>/readyz</code> ran <code>SELECT 1</code> and checked that the KEV catalog loaded. It did not look at free space, a failing write or database integrity</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/kevgate/blob/v0.1.0/src/kevgate/app.py#L232-L236">app.py at v0.1.0</a></td></tr>
+<tr class="row-fail"><th scope="row">Failed authentication</th><td>Repeated bad keys from one source are throttled</td><td>A bad or missing key was counted and refused with 401, with no limit per source address. The per-key bucket applied only after a key authenticated</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/kevgate/blob/v0.1.0/src/kevgate/app.py#L91-L131">require() at v0.1.0</a></td></tr>
+<tr class="row-fail"><th scope="row">Dependency lock</th><td>A committed lock with hashes, installed with <code>--require-hashes</code> by CI</td><td><code>requirements.lock</code> was not in the repository. The security workflow generated it on each run with <code>deploy/scripts/lock.sh</code>, and <code>ci</code> installed with <code>pip install -e ".[dev]"</code>, without hashes</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/kevgate/blob/v0.1.0/.github/workflows/ci.yml#L36-L37">ci.yml at v0.1.0</a></td></tr>
+<tr class="row-fail"><th scope="row">OIDC trust policy</th><td>Weakening the policy fails a check</td><td>No test pinned it. The repository's own text says validate, tflint, checkov and Trivy accept a trust policy weakened to <code>StringLike</code> with a wildcard, so none of them would have caught it</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/DEPLOYMENT.md#oidc-trust-regression-check">DEPLOYMENT.md</a></td></tr>
+</tbody>
+</table></div>
+<div class="scroll wide"><table class="tbl">
+<caption>The six mutants, re-run on 2026-11-11 against both tags (one change at a time to the source, full suite, stop at the first failure)</caption>
+<thead><tr><th scope="col">Mutant (a deliberate defect)</th><th scope="col">v0.1.0, 227 tests</th><th scope="col">v0.1.1, 277 tests</th></tr></thead>
 <tbody>
 <tr><th scope="row">Early-exit key comparison</th><td>Survived</td><td>Killed</td></tr>
 <tr><th scope="row"><code>==</code> in place of <code>hmac.compare_digest</code></th><td>Survived</td><td>Killed</td></tr>
@@ -15,27 +41,35 @@ A small vulnerability intake service. Scanner findings go in; a remediation queu
 </tbody>
 </table></div>
 
-<!--@bench-cap-->
-<b>Coverage did not show whether a test would notice each defect, so each one is now pinned by a test.</b> List from the repository's CHANGELOG 0.1.1; the tests are in <code>tests/test_mutation_kills.py</code>.
-
-<!--@as-found-->
-<div class="prose">
-<p>Coverage numbers do not show whether a test would notice a defect being introduced.<sup class="nref" aria-hidden="true"></sup> The review round after the first release found six deliberate defects (mutants) that the 227-test suite did not catch.</p>
-<p>They included an early-exit key comparison and <code>==</code> in place of <code>compare_digest</code> in the authentication check, both of which would leak timing, and a body-size limit that counted only the last chunk. Release 0.1.1 adds the tests that kill all six and brings the suite to 277.</p>
-</div>
-<aside class="note"><strong>A mutant</strong> is a copy of the code with one deliberate defect. A test suite kills it if at least one test fails; a mutant that survives shows a check nobody was making.</aside>
-<div class="scroll wide"><table class="tbl">
-<caption>Reading ledger</caption>
-<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
-<tbody>
-<tr class="row-fail"><th scope="row">Six mutants against the suite before 0.1.1</th><td>A failing test for each</td><td>All 227 tests passed with each one in place</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/kevgate/blob/main/CHANGELOG.md">CHANGELOG 0.1.1</a></td></tr>
-</tbody>
-</table></div>
-
 <!--@as-left-->
 <div class="prose">
-<p>The six mutants are now killed by tests pinned in <code>tests/test_mutation_kills.py</code>, and the controls the README promises are tested in CI rather than described. Run on 2026-11-10 from a fresh clone of <code>main</code> (commit b08a920), Python 3.12.2, on localhost (port 8765, shown as 8000 below). Production mode with a generated key file and the rate limit set to 6 per minute. The data is synthetic (real CVE IDs, invented assets and scores) and the KEV catalog is the 5-entry sample bundled with the repo. Keys shown as placeholders; they were throwaway keys for this run.</p>
+<p>Release 0.1.1 adds the tests that kill the six mutants (<code>tests/test_mutation_kills.py</code>, 227 tests become 277) and closes the other five findings. Each change below is in the repository's CHANGELOG and is cited by a test or a CI step in the matrix above.</p>
 </div>
+<div class="scroll wide"><table class="tbl">
+<caption>Reading ledger: what 0.1.1 changed</caption>
+<thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed at v0.1.1</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
+<tbody>
+<tr><th scope="row">Six mutants against the suite</th><td>A failing test for each</td><td>Each mutant makes at least one of the 277 tests fail</td><td>{{stamp:pass:As left: pass}}</td><td>the table above; {{run:42960808156}}</td></tr>
+<tr><th scope="row">Alert after a restart</th><td>The first failure is counted</td><td>All three labelled series exist at 0 from startup (shown below)</td><td>{{stamp:pass:As left: pass}}</td><td><code>test_labelled_counters_exist_at_zero_on_startup</code></td></tr>
+<tr><th scope="row">Readiness</th><td>Not ready when storage cannot take a write</td><td><code>/readyz</code> also checks free space (1 MiB), a write taken inside a transaction that is rolled back, and a cached <code>quick_check</code> that is time-boxed</td><td>{{stamp:pass:As left: pass}}</td><td><code>tests/test_readiness.py</code></td></tr>
+<tr><th scope="row">Failed authentication</th><td>Repeated bad keys from one source are throttled</td><td>A per-source failure limiter is checked before any key is compared. <code>X-Forwarded-For</code> is read only for peers in <code>KEVGATE_TRUSTED_PROXIES</code> (shown below)</td><td>{{stamp:pass:As left: pass}}</td><td><code>tests/test_auth_failures.py</code></td></tr>
+<tr><th scope="row">Dependency lock</th><td>A committed lock with hashes, installed with <code>--require-hashes</code></td><td><code>requirements.lock</code> is committed; <code>ci</code>, the image build and <code>pip-audit</code> use it. Dependabot is configured for pip, Actions and Docker</td><td>{{stamp:pass:As left: pass}}</td><td>{{run:42960808156}} (ci), {{run:42960808037}} (security)</td></tr>
+<tr><th scope="row">OIDC trust policy</th><td>Weakening the policy fails a check</td><td>A <code>terraform test</code> pins one <code>Allow</code>, two <code>StringEquals</code> conditions, <code>aud</code> and one exact <code>sub</code> for the repository and branch, with no wildcard. 4 test runs pass</td><td>{{stamp:pass:As left: pass}}</td><td>{{run:42956666367}} (terraform)</td></tr>
+</tbody>
+</table></div>
+<div class="prose">
+<p>Run on 2026-11-11 from a fresh clone at tag <code>v0.1.1</code> (commit 973c8c1), Python 3.12.2, on Windows 11, on localhost (port 8765, shown as 8000 below). Production mode with a generated key file, the rate limit set to 6 per minute per key and the failed-authentication limit set to 5 per minute (the default is 20). The data is synthetic (real CVE IDs, invented assets and scores) and the KEV catalog is the 5-entry sample bundled with the repo. Keys are shown as placeholders; they were throwaway keys for this run, and a search of the server log for all three found none.</p>
+</div>
+<pre data-copy data-label="Startup: readiness and the counters that now exist at zero"><code>$ curl -s localhost:8000/readyz
+{"status":"ready","checks":{"db":"ok","storage":"ok","kev":"ok"}}
+
+$ curl -s localhost:8000/metrics | grep -E "^kevgate_(auth|rate|kev)" | grep -v created
+kevgate_auth_failures_total{reason="missing"} 0.0
+kevgate_auth_failures_total{reason="invalid"} 0.0
+kevgate_auth_failures_total{reason="forbidden"} 0.0
+kevgate_rate_limited_total 0.0
+kevgate_auth_throttled_total 0.0
+kevgate_kev_entries 5.0</code></pre>
 <pre data-copy data-label="curl against a local kevgate: auth, scopes, ingest"><code>$ curl -si localhost:8000/queue            # no key
 HTTP/1.1 401 Unauthorized
 www-authenticate: Bearer realm="kevgate"
@@ -60,7 +94,7 @@ risk  kev    cve              asset       acr  cvss  epss
 91.8  true   CVE-2023-4966    vpn-02        6   9.4  0.94
 37.1  false  CVE-2023-38545   build-03      3   9.8  0.50
 34.4  false  CVE-2022-42889   app-07        4   9.8  0.20</code></pre>
-<pre data-copy data-label="Rate limit and metrics"><code>$ (8 requests) curl -s -o /dev/null -w "%{http_code}" localhost:8000/stats -H "Authorization: Bearer $BURST_KEY"
+<pre data-copy data-label="Rate limit, failed-authentication limit and metrics"><code>$ (8 requests) curl -s -o /dev/null -w "%{http_code}" localhost:8000/stats -H "Authorization: Bearer $BURST_KEY"
 request 1 -> 200  ...  request 6 -> 200
 request 7 -> 429
 request 8 -> 429
@@ -70,30 +104,40 @@ HTTP/1.1 429 Too Many Requests
 retry-after: 8
 {"detail":"rate limit exceeded"}
 
-$ curl -s localhost:8000/metrics | grep -E "^kevgate_(http_requests_total|findings|auth|rate|kev)"
-kevgate_http_requests_total{method="GET",route="/queue",status="401"} 1.0
-kevgate_http_requests_total{method="GET",route="/queue",status="403"} 1.0
-kevgate_http_requests_total{method="POST",route="/findings",status="201"} 1.0
-kevgate_http_requests_total{method="GET",route="/queue",status="200"} 1.0
-kevgate_http_requests_total{method="GET",route="/stats",status="200"} 6.0
-kevgate_http_requests_total{method="GET",route="/stats",status="429"} 3.0
-kevgate_findings_ingested_total{source="json"} 6.0
+$ (6 requests) curl -s -o /dev/null -w "%{http_code}" localhost:8000/queue -H "Authorization: Bearer kvg_wrong"
+bad key 1 -> 401  ...  bad key 5 -> 401
+bad key 6 -> 429
+
+$ curl -si localhost:8000/queue -H "Authorization: Bearer $ANALYST_KEY"   # a valid key, same source
+HTTP/1.1 429 Too Many Requests
+retry-after: 11
+{"detail":"too many failed authentication attempts"}
+
+$ curl -s localhost:8000/metrics | grep -E "^kevgate_(auth|rate)" | grep -v created
 kevgate_auth_failures_total{reason="missing"} 1.0
+kevgate_auth_failures_total{reason="invalid"} 5.0
 kevgate_auth_failures_total{reason="forbidden"} 1.0
 kevgate_rate_limited_total 3.0
-kevgate_kev_entries 5.0</code></pre>
-<p class="trim">Trimmed: JSON bodies reflowed into a table; response headers other than the status line, <code>www-authenticate</code> and <code>retry-after</code> removed; the <code>/metrics</code> command is a simplified filter, and the full output also has duration histograms and <code>_created</code> series. The eight stats requests were a shell loop, written in short form here.</p>
+kevgate_auth_throttled_total 3.0</code></pre>
+<p class="trim">Trimmed: JSON bodies reflowed into a table; response headers other than the status line, <code>www-authenticate</code> and <code>retry-after</code> removed; the <code>/metrics</code> commands are simplified filters; the eight stats requests and the six bad-key requests were shell loops, written in short form here, and the bad-key run waited a minute after the earlier requests so the failure bucket was full. The valid-key request being refused is the documented trade-off of throttling by source address: a source that has spent its failure budget is refused before any key is compared.</p>
 <div class="scroll wide"><table class="tbl">
 <caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><th scope="row">Tests on main</th><td>277 collected and passing; 99.92% coverage with branches (1092 statements, 0 missed)</td><td>{{run:42956666365}} (ci); <a href="https://github.com/samiali38183/kevgate#tests-and-quality">README</a></td></tr>
-<tr><th scope="row">Release</th><td>v0.1.1 (<code>973c8c1</code>) includes the hardening round (277 tests). v0.1.0 was the first release.</td><td><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">GitHub release</a></td></tr>
-<tr><th scope="row">Image</th><td>Signed with cosign (keyless), with SBOM (104 components) and provenance attestations</td><td>{{run:42960813836}} (v0.1.1; v0.1.0: {{run:42922880036}})</td></tr>
-<tr><th scope="row">ZAP baseline</th><td>67 rules pass, 0 warnings, 0 failures</td><td>{{run:42956666404}} (deploy-kind); <a href="https://github.com/samiali38183/kevgate/blob/main/docs/PIPELINE.md">PIPELINE.md</a></td></tr>
-<tr><th scope="row">Terraform</th><td>20 resources applied to LocalStack, no drift on a second plan; checkov 0 failed</td><td>{{run:42956666367}} (terraform); <a href="https://github.com/samiali38183/kevgate/blob/main/docs/DEPLOYMENT.md">DEPLOYMENT.md</a></td></tr>
+<tr><th scope="row">Tests at the tag</th><td>277 collected and 277 passed (pytest 9.2.0); 99.92% coverage with branches (1092 statements, 0 missed; 202 branches, 1 partly covered)</td><td><code>pytest --cov</code> from the fresh clone; {{run:42960808156}} (ci, on both Python 3.11 and 3.12)</td></tr>
+<tr><th scope="row">Lint and types</th><td><code>ruff check</code> and <code>ruff format --check</code> clean (ruff 0.17.4); <code>mypy --strict src</code> reports no issues in 16 source files (mypy 2.4.1)</td><td>the same clone; {{run:42960808156}}</td></tr>
+<tr><th scope="row">Mutants</th><td>6 survive the 227 tests at v0.1.0; 6 are killed by the 277 tests at v0.1.1</td><td><code>scripts/rerun_kevgate_mutants.py</code> in this site's repository</td></tr>
+<tr><th scope="row">CI on main</th><td>ci, security and deploy-kind green on the tag commit; terraform green on the commit before it (the workflow only runs when <code>infra/</code> changes, and nothing there changed since)</td><td>{{run:42960808156}}, {{run:42960808037}}, {{run:42960807983}}, {{run:42956666367}}</td></tr>
+<tr><th scope="row">Kind cluster</th><td>12 smoke checks; labelled client allowed and unlabelled pod blocked; no outbound HTTPS from the pod; privileged pod rejected; 3 of the 4 Sigma-targeted audit events found in the API server log</td><td>{{run:42960807983}} (deploy-kind)</td></tr>
+<tr><th scope="row">ZAP baseline</th><td>67 rules pass, 0 warnings, 0 failures, 1 rule ignored (listed with a reason in <code>deploy/zap/rules.tsv</code>)</td><td>{{run:42960807983}}; <a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/PIPELINE.md">PIPELINE.md</a></td></tr>
+<tr><th scope="row">Terraform</th><td>20 resources applied to LocalStack, empty second plan, 20 destroyed; 4 <code>terraform test</code> runs pass; checkov 0 failed (13 skipped, each justified inline)</td><td>{{run:42956666367}}; <a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/DEPLOYMENT.md">DEPLOYMENT.md</a></td></tr>
+<tr><th scope="row">Release</th><td>v0.1.1 (<code>973c8c1</code>, annotated tag, published 2026-11-11). v0.1.0 was the first release.</td><td><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">GitHub release</a></td></tr>
+<tr><th scope="row">Image</th><td><code>ghcr.io/samiali38183/kevgate:0.1.1</code> is <code>sha256:526cae18&hellip;</code>. Signed with cosign (keyless) by the release job, which verified the signature before finishing. SBOM attestation lists 104 components; the SBOM and provenance statements name that digest as their subject. The package can be read without credentials: an anonymous token and manifest request both succeeded on 2026-11-11 (the same manifest request without a token gets 401, as a registry does). The tag has no <code>v</code> prefix on GHCR.</td><td>{{run:42960813836}} (release; v0.1.0: {{run:42922880036}})</td></tr>
 </tbody>
 </table></div>
+<div class="prose">
+<p>What was not done: the signature was verified by the release job, not again here (no <code>cosign</code> was available), and nothing in the cluster enforces it.</p>
+</div>
 
 <!--@method-->
 <h3>The problem</h3>
@@ -109,38 +153,41 @@ kevgate_kev_entries 5.0</code></pre>
 <div class="prose">
 <p>The API takes JSON findings or a Nessus/Tenable CSV export, upserts on (CVE, asset), and serves a ranked <code>/queue</code>, per-CVE views and stats. Scopes are <code>findings:write</code>, <code>queue:read</code> and <code>admin</code>. There are health, readiness and Prometheus endpoints, and a separate CLI command refreshes the KEV file from CISA so the API process never makes outbound calls.</p>
 </div>
-{{diagram:kevgate}}
+{{kgarch:deploy}}
 <h3>Three implementation points</h3>
 <div class="prose">
 <h4>Key checks that do not leak timing</h4>
-<p>Keys are 256-bit random values and the server stores only their SHA-256. <code>KeyStore.authenticate</code> hashes the presented token and compares it against every stored digest with <code>hmac.compare_digest</code>, never exiting early, so response time does not reveal whether a key matched or how many bytes were right. A fast hash is deliberate: slow password hashes exist to protect low-entropy passwords, and running one on every request would hand an attacker a CPU lever.</p>
+<p>Keys are 256-bit random values and the server stores only their SHA-256. <code>KeyStore.authenticate</code> hashes the presented token and compares it against every stored digest with <code>hmac.compare_digest</code>, never exiting early, so response time does not reveal whether a key matched or how many bytes were right. A fast hash is deliberate: slow password hashes exist to protect low-entropy passwords, and running one on every request would hand an attacker a CPU lever. Until 0.1.1 no test would have noticed if that loop were changed; the two tests that now do are in the matrix.</p>
 <h4>Limiters in the right order</h4>
-<p>A token bucket per API key returns 429 with <code>Retry-After</code>. A second limiter counts failed authentications per source address and is checked before any key is looked at, so a brute-force attempt is throttled instead of getting free guesses. The failure limiter uses <code>peek</code> and <code>charge</code> so that checking does not itself spend a token. Both are in memory, which is a stated limitation: they are per replica and reset on restart.</p>
+<p>A token bucket per API key returns 429 with <code>Retry-After</code>. A second limiter counts failed authentications per source address and is checked before any key is looked at, so a brute-force attempt is throttled instead of getting free guesses. The failure limiter uses <code>peek</code> and <code>charge</code> so that checking does not itself spend a token. Both are in memory, which is a stated limitation: they are per replica and reset on restart. Clients behind one NAT or proxy share a budget, so an attacker there can lock legitimate clients out until the bucket refills.</p>
 <h4>Controls proven by tests, and a hash-locked build</h4>
-<p>The kind job does not just render the Helm chart. <code>deploy/scripts/netpol-test.sh</code> starts a labeled pod that must reach the service, an unlabeled pod in the same namespace that must time out, checks that the kevgate pod cannot open an outbound HTTPS connection, and submits a privileged pod that Pod Security <code>restricted</code> must reject. A second script then confirms the three audit events that the repository's Sigma rules target are in the API server audit log. Dependencies are pinned in <code>requirements.lock</code> with hashes; CI and the Docker build install it with <code>--require-hashes</code>, <code>pip-audit</code> scans that exact file, and a weekly workflow fails if a fresh compile would change it.</p>
+<p>The kind job does not just render the Helm chart. <code>deploy/scripts/netpol-test.sh</code> starts a labeled pod that must reach the service, an unlabeled pod in the same namespace that must time out, checks that the kevgate pod cannot open an outbound HTTPS connection, and submits a privileged pod that Pod Security <code>restricted</code> must reject. A second script then confirms that three of the four audit events the repository's Sigma rules target are in the API server audit log. Dependencies are pinned in <code>requirements.lock</code> with hashes; CI and the Docker build install it with <code>--require-hashes</code> and <code>pip-audit</code> scans that exact file. A weekly <code>lock-freshness</code> workflow is meant to fail when a fresh compile would change the lock; it had no run on record when this page was checked.</p>
 </div>
 
 <!--@limits-->
 <ul class="prose">
-<li><strong>Nothing is deployed to a real AWS account.</strong> The Terraform (ECR, reports bucket, KMS key, workload and CI roles) was applied only to LocalStack, and the service does not call AWS. Releases go to GHCR.</li>
-<li><strong>One replica, SQLite on one volume, <code>Recreate</code> rollouts.</strong> That is a demonstration scope; <a href="https://github.com/samiali38183/kevgate/blob/main/docs/DEPLOYMENT.md#what-would-change-for-production">DEPLOYMENT.md</a> lists what production would change. The rate limiter is per process.</li>
-<li><strong>The scoring weights are a design choice,</strong> not evaluated against remediation outcomes.</li>
-<li><strong>The detection rules shipped with it have not been run against a real SIEM.</strong> They convert with <code>sigma</code> and are validated, no more.</li>
-<li><strong>Coarse access control.</strong> Three scopes, no per-asset authorization, and no key expiry or rotation workflow.</li>
+<li><strong>Nothing is deployed to a real AWS account.</strong> The Terraform (ECR, reports bucket, KMS key, workload and CI roles) was applied only to LocalStack, which has no ECR in its Community edition, so the ECR repository and the GitHub OIDC role are checked statically and by the <code>terraform test</code>. Nothing uses those resources: the service has no AWS SDK code and releases go to GHCR.</li>
+<li><strong>One replica, SQLite on one volume, <code>Recreate</code> rollouts.</strong> That is a demonstration scope; <a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/DEPLOYMENT.md#what-would-change-for-production">DEPLOYMENT.md</a> lists what production would change (Postgres, replicas, tested backup and restore, key lifecycle). The rate limiter and the failure limiter are per process, per source address, and reset on restart.</li>
+<li><strong><code>/metrics</code> is unauthenticated.</strong> It carries counts, not findings, and is protected only by the NetworkPolicy.</li>
+<li><strong>No branch protection on <code>main</code>.</strong> The OIDC trust policy is pinned to <code>refs/heads/main</code>, so whoever can push to <code>main</code> controls what may assume that role. The role has no consumer today. The GitHub API returned "Branch not protected" for the repository on 2026-11-11.</li>
+<li><strong>The detection rules have not been run against a real SIEM or a live Prometheus.</strong> The Sigma rules convert with <code>sigma</code> and are validated; three of four are checked by a <code>jq</code> translation against a real kind audit log. The alert rules are checked with <code>promtool</code> unit tests only.</li>
+<li><strong>No image signature enforcement.</strong> The release is signed and verified by its own job, but nothing at admission checks the signature, and there is no admission policy engine beyond Pod Security Admission.</li>
+<li><strong>The matrix maps claims to evidence; it does not show sufficiency.</strong> A cited test passing shows that the behavior it asserts held on the tag, not that the control covers the threat. The repository's threat model lists the residual risks, and the matrix quotes them.</li>
+<li><strong>The scoring weights are a design choice,</strong> not evaluated against remediation outcomes. Access control is coarse: three scopes, no per-asset authorization, no key expiry or rotation workflow, and revocation needs a restart.</li>
 <li><strong>Bundled KEV file is a 5-entry sample.</strong> <code>kevgate kev-refresh</code> downloads the real catalog; the demo above used the sample.</li>
 </ul>
 
 <!--@trace-->
 <h3>CI evidence</h3>
-<div class="prose"><p>Four workflows ran green on the merge commit of PR #2 (<code>b08a920</code>), and the release workflow ran on the tag. The results column is from the repository's own docs, which summarize those runs.</p></div>
+<div class="prose"><p>The latest runs on <code>main</code> are the evidence for the controls and the matrix. Three workflows ran green on the tag commit (<code>973c8c1</code>); <code>terraform</code> has a path filter and last ran on the commit before it (<code>b08a920</code>), which has the same <code>infra/</code> and workflow files. The release workflow ran on the tag. The results column is from the repository's own docs, which summarize those runs, and from the run logs.</p></div>
 <div class="scroll wide"><table class="tbl">
 <caption>Workflows and what each checks</caption>
 <thead><tr><th scope="col">Workflow</th><th scope="col">What it checks</th><th scope="col">Run</th></tr></thead>
 <tbody>
-<tr><th scope="row">ci</th><td>ruff, mypy, pytest with coverage, on Python 3.11 and 3.12; dependencies from the hashed lock</td><td>{{run:42956666365}}</td></tr>
-<tr><th scope="row">security</th><td>Semgrep (160 rules, 0 findings), Bandit, pip-audit on the lock, gitleaks, checkov, Trivy on the image (0 fixable HIGH/CRITICAL), container smoke test</td><td>{{run:42956666346}}</td></tr>
-<tr><th scope="row">deploy-kind</th><td>kind with Calico: 12 smoke checks, NetworkPolicy ingress and egress, Pod Security restricted rejects a privileged pod, Sigma-targeted audit events present, ZAP baseline (67 rules pass, 0 failures)</td><td>{{run:42956666404}}</td></tr>
-<tr><th scope="row">terraform</th><td>validate, checkov, <code>terraform test</code> on the OIDC trust policy, apply and destroy against LocalStack</td><td>{{run:42956666367}}</td></tr>
+<tr><th scope="row">ci</th><td>ruff, mypy, pytest with coverage, on Python 3.11 and 3.12; dependencies from the hashed lock</td><td>{{run:42960808156}}</td></tr>
+<tr><th scope="row">security</th><td>Semgrep and Bandit (no findings), pip-audit on the lock, gitleaks, checkov (0 failed), Trivy on the image (no fixable HIGH or CRITICAL), Sigma and promtool checks, container smoke test</td><td>{{run:42960808037}}</td></tr>
+<tr><th scope="row">deploy-kind</th><td>kind with Calico: 12 smoke checks, NetworkPolicy ingress and egress, Pod Security restricted rejects a privileged pod, Sigma-targeted audit events present, restricted profile on the live pod, ZAP baseline</td><td>{{run:42960807983}}</td></tr>
+<tr><th scope="row">terraform</th><td>validate, tflint, checkov, <code>terraform test</code> on the OIDC trust policy, apply and destroy against LocalStack</td><td>{{run:42956666367}}</td></tr>
 <tr><th scope="row">release</th><td>Build, scan, push to GHCR, cosign keyless signature, SBOM and provenance attestations, signature verified in the same run</td><td>{{run:42960813836}}</td></tr>
 </tbody>
 </table></div>
