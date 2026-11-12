@@ -30,9 +30,9 @@ ROOT = Path(__file__).resolve().parent.parent
 DIR = ROOT / "assets" / "data" / "sinkline-bench"
 OUT = ROOT / "assets" / "data" / "bench-sinkline.json"
 
-TOOL_VERSION = "0.5.0"
-TOOL_COMMIT = "9c58efd"          # tag v0.5.0
-CAPTURED = "2026-11-11"
+TOOL_VERSION = "0.5.1"
+TOOL_COMMIT = "f879e88"          # tag v0.5.1
+CAPTURED = "2026-11-12"
 
 # Variants of one example share a route and differ by one line (or, for the wrong-class XSS case, two).
 EXAMPLES = [

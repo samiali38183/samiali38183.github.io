@@ -1,9 +1,9 @@
 {
  "provenance": {
   "tool": "sinkline",
-  "version": "0.5.0",
-  "commit": "9c58efd",
-  "captured": "2026-11-11",
+  "version": "0.5.1",
+  "commit": "f879e88",
+  "captured": "2026-11-12",
   "command": "sinkline scan --no-color --fail-on low FILE",
   "cwd": "assets/data/sinkline-bench",
   "python": "3.12"

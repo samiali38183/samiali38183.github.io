@@ -39,7 +39,7 @@ for (const { v } of all) {
   ok(`${v.file} no run errors`, v.errors.length === 0);
 }
 eq('no unlisted files', readdirSync(dir).filter((f) => !listed.has(f)).join(','), '');
-eq('provenance tool', data.provenance.tool + ' ' + data.provenance.version, 'sinkline 0.5.0');
+eq('provenance tool', data.provenance.tool + ' ' + data.provenance.version, 'sinkline 0.5.1');
 
 // ---- 4. findings agree with the text; wrong-class variants
 for (const { ex, v } of all) {

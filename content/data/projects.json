@@ -482,22 +482,22 @@
    "slug": "sinkline",
    "content": "sinkline.html",
    "name": "sinkline",
-   "version": "v0.5.0",
+   "version": "v0.5.1",
    "sheet": 2,
    "kind": "Application security",
    "title": "sinkline: taint analysis for Python web apps | Sami Ali",
    "desc": "sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.",
-   "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 138 tests; scored on OWASP BenchmarkPython v0.1.",
+   "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 184 tests; scored on OWASP BenchmarkPython v0.1.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
    "found_title": "On an independent benchmark 0.4.1 scored +0.21, and Bandit leads over all 14 categories",
-   "left_title": "0.5.0 scores +0.52 on the taint categories; the fixes were chosen from the failures",
+   "left_title": "0.5.1 scores +0.52 on the taint categories; the fixes were chosen from the failures",
    "record": {
-    "instrument": "sinkline v0.5.0, commit 9c58efd (0.4.1, commit 9a36ba2, is the as-found reading)",
+    "instrument": "sinkline v0.5.1, commit f879e88 (0.4.1, commit 9a36ba2, is the as-found reading)",
     "reference": "OWASP BenchmarkPython v0.1, commit f129148: 1,230 labeled Flask test cases; Bandit 1.9.4 and Semgrep OSS 1.185.0 on the same files",
-    "measured": "2026-11-11, Python 3.12.2; sinkline 0.5.0 re-run on the suite for this page, other results from the repository (scored with its own script, not the official scorer)",
+    "measured": "2026-11-12, Python 3.12.2; sinkline 0.5.1 re-run on the suite for this page, per-test table identical to the committed 0.5.0 result, other results from the repository (scored with its own script, not the official scorer)",
     "reproduce": [
      "bench/external/run.sh WORKDIR v0.5.0 sinkline bandit semgrep",
      "python bench/score.py"
@@ -508,12 +508,12 @@
     "num": "+0.52",
     "den": "",
     "unit": "TPR minus FPR on the 10 taint categories (0.4.1: +0.21; Bandit +0.07)",
-    "caption": "On OWASP BenchmarkPython v0.1, ten taint categories, sinkline 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20). 0.5.0 scores +0.52 (0.73, 0.21), but its fixes were chosen by reading the failures of 0.4.1, so that is not a held-out score. Bandit 1.9.4 scores +0.07. Over all 14 categories Bandit leads, +0.36 to +0.27.",
+    "caption": "On OWASP BenchmarkPython v0.1, ten taint categories, sinkline 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20). 0.5.1 scores +0.52 (0.73, 0.21), but its fixes were chosen by reading the failures of 0.4.1, so that is not a held-out score. Bandit 1.9.4 scores +0.07. Over all 14 categories Bandit leads, +0.36 to +0.27.",
     "stamp": [
      "limit",
      "Not held out"
     ],
-    "run": "43033758810"
+    "run": "43136290658"
    },
    "strip_sets": {
     "main": {
@@ -570,7 +570,7 @@
          344
         ]
        ],
-       "val": "sinkline 0.5.0: TP 175, FN 65, FP 93, TN 344. Score <b>+0.52</b>"
+       "val": "sinkline 0.5.1: TP 175, FN 65, FP 93, TN 344. Score <b>+0.52</b>"
       }
      ]
     },
@@ -666,7 +666,7 @@
      },
      "rows": [
       {
-       "label": "sinkline 0.5.0",
+       "label": "sinkline 0.5.1",
        "runs": [
         [
          "hit",
@@ -711,9 +711,9 @@
    "home": {
     "against": "OWASP BenchmarkPython v0.1, 10 taint categories; Bandit +0.07",
     "reading": "+0.21 to +0.52 (not held out)",
-    "run": "43033758810",
+    "run": "43136290658",
     "found": "0.4.1: TPR 0.41, FPR 0.20, score +0.21",
-    "left": "0.5.0: TPR 0.73, FPR 0.21, score +0.52",
+    "left": "0.5.1: TPR 0.73, FPR 0.21, score +0.52",
     "tolerance": "Fixes chosen from the 0.4.1 failures; Bandit leads over all 14 categories"
    },
    "links": [
@@ -722,8 +722,8 @@
      "https://github.com/samiali38183/sinkline"
     ],
     [
-     "Release v0.5.0",
-     "https://github.com/samiali38183/sinkline/releases/tag/v0.5.0"
+     "Release v0.5.1",
+     "https://github.com/samiali38183/sinkline/releases/tag/v0.5.1"
     ],
     [
      "External benchmark",
@@ -735,7 +735,7 @@
     ],
     [
      "CI run (main)",
-     "https://github.com/samiali38183/sinkline/actions/runs/43033758810"
+     "https://github.com/samiali38183/sinkline/actions/runs/43136290658"
     ],
     [
      "Sample HTML report",
@@ -746,18 +746,18 @@
     [
      "Release",
      "link",
-     "https://github.com/samiali38183/sinkline/releases/tag/v0.5.0",
-     "v0.5.0"
+     "https://github.com/samiali38183/sinkline/releases/tag/v0.5.1",
+     "v0.5.1"
     ],
     [
-     "CI run on main (v0.5.0)",
+     "CI run on main (v0.5.1)",
      "run",
-     "43033758810"
+     "43136290658"
     ],
     [
      "Report workflow on main",
      "run",
-     "43033758686"
+     "43136290530"
     ],
     [
      "External benchmark, method and results",
@@ -766,13 +766,13 @@
      "bench/external/README.md"
     ],
     [
-     "Per-category results, 0.4.1 and 0.5.0",
+     "Per-category results, 0.4.1 and 0.5.0 (0.5.1 is identical to 0.5.0)",
      "link",
      "https://github.com/samiali38183/sinkline/tree/main/bench/external/results",
      "bench/external/results"
     ],
     [
-     "Changelog 0.5.0",
+     "Changelog 0.5.1",
      "link",
      "https://github.com/samiali38183/sinkline/blob/main/CHANGELOG.md",
      "CHANGELOG.md"
@@ -808,7 +808,7 @@
      "tests/test_action.py"
     ]
    ],
-   "commit": "9c58efd",
+   "commit": "f879e88",
    "tier": "featured"
   },
   "kevgate": {
@@ -1760,7 +1760,7 @@
   },
   {
    "project": "sinkline",
-   "text": "On the independent OWASP BenchmarkPython suite, 0.4.1 scored +0.21 on the 10 taint categories, with 0 of 16 LDAP and 5 of 51 XPath cases reported. 0.5.0 scores +0.52, but the fixes were chosen from those failures, so it is not a held-out score.",
+   "text": "On the independent OWASP BenchmarkPython suite, 0.4.1 scored +0.21 on the 10 taint categories, with 0 of 16 LDAP and 5 of 51 XPath cases reported. 0.5.1 scores +0.52 (the same per-test table as 0.5.0), but the fixes were chosen from those failures, so it is not a held-out score.",
    "state": [
     "limit",
     "Not held out"

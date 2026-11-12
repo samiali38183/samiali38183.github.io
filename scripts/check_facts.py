@@ -592,7 +592,7 @@ def main() -> int:
             results.append((r.get("conclusion") == ("failure" if red else "success"), f"CI run {repo}/{rid}: conclusion={r.get('conclusion')}{' (expected red)' if red else ''}"))
         return report()
 
-    # sinkline (the clone must be at the v0.5.0 tag or main at that commit)
+    # sinkline (the clone must be at the v0.5.1 tag or main at that commit)
     s = clones / "sinkline"
     py = pybin(venvs, "sinkline", "python")
     sco = run([py, "bench/score.py"], s)
@@ -670,12 +670,12 @@ def main() -> int:
                     "bench/external/README.md pins BenchmarkPython f1291485 and 1,230 cases"))
     expect("BenchmarkPython pin (short) on the page", "f129148", page)
     expect("sinkline home reading", "+0.21 to +0.52", "index.html")
-    expect("sinkline release v0.5.0 commit", run(["git", "rev-list", "-n1", "v0.5.0"], s).strip()[:7], page)
+    expect("sinkline release v0.5.1 commit", run(["git", "rev-list", "-n1", "v0.5.1"], s).strip()[:7], page)
 
     # sinkline Sanitizer switch: stored data against the committed captures (the CLI re-run is capture_sinkline_bench.py --check)
     bench = json.loads((SITE / "assets" / "data" / "bench-sinkline.json").read_text(encoding="utf-8"))
     pv = bench["provenance"]
-    results.append((pv["version"] == "0.5.0" and run([pybin(venvs, "sinkline", "sinkline"), "--version"], s).strip() == "sinkline 0.5.0",
+    results.append((pv["version"] == "0.5.1" and run([pybin(venvs, "sinkline", "sinkline"), "--version"], s).strip() == "sinkline 0.5.1",
                     f"sanitizer-switch captures are from sinkline {pv['version']}; installed CLI matches"))
     expect("sanitizer-switch caption version and commit", f"{pv['version']} {pv['commit']}", page, f"sinkline {pv['version']}, tag v{pv['version']}, commit {pv['commit']}")
     nodes = run(["node", str(SITE / "scripts" / "test_bench_sinkline.mjs")], SITE).strip()
