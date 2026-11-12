@@ -44,15 +44,20 @@ def main() -> int:
     import kev_prioritize as kp  # noqa: E402
     import analyze_snapshot as an  # noqa: E402
 
-    tag_commit = git(repo, "rev-list", "-n1", "v0.2.0")
-    assert git(repo, "rev-parse", "HEAD") == tag_commit, "clone is not at tag v0.2.0"
-    assert kp.__version__ == "0.2.0"
+    tag_commit = git(repo, "rev-list", "-n1", "v0.3.0")
+    assert git(repo, "rev-parse", "HEAD") == tag_commit, "clone is not at tag v0.3.0"
+    assert kp.__version__ == "0.3.0"
     assert kp.DEFAULT_WEIGHTS == {"kev": 0.40, "acr": 0.25, "epss": 0.20, "cvss": 0.20}
 
     csv_path, kev_path = repo / "data/sample_findings.csv", repo / "data/sample_kev.json"
     kev = kp.load_kev(str(kev_path))
     base = kp.load_findings(str(csv_path))  # CSV order
     assert len(base) == 20
+    # The tool's sort is a total order (score, KEV, EPSS, CVSS, ACR, days open, CVE, asset, group, vendor, exposure).
+    # The bench carries the first seven keys and the asset; that is the whole order only if (CVE, asset) is unique,
+    # the strings are ASCII (Python compares code points, JavaScript UTF-16 units) and every row has CVSS.
+    assert len({(f.cve, f.asset) for f in base}) == 20 and all(f.cve.isascii() and f.asset.isascii() for f in base)
+    assert all(f.cvss is not None for f in base) and all(f.cve == f.cve.strip().upper() for f in base)
     # the printed CLI output for the default weights
     cli = subprocess.run([sys.executable, str(repo / "kev_prioritize.py"), str(csv_path), "--kev", str(kev_path), "--top", "20"],
                          capture_output=True, text=True, check=True, cwd=repo).stdout.splitlines()
@@ -60,11 +65,10 @@ def main() -> int:
 
     def ranked(w: tuple) -> list[tuple[int, float]]:
         fs = copy.deepcopy(base)
-        for i, f in enumerate(fs):
-            f.asset = f.asset + "\x00%d" % i  # carry the CSV index through the sort
+        index = {id(f): i for i, f in enumerate(fs)}  # carry the CSV index through the tool's own sort
         weights = dict(zip(("kev", "acr", "epss", "cvss"), w))
         out = kp.score_all(fs, kev, weights)
-        return [(int(f.asset.split("\x00")[1]), f.risk_score) for f in out]
+        return [(index[id(f)], f.risk_score) for f in out]
 
     cases = []
     for key, _label, w in PRESETS:
@@ -99,7 +103,7 @@ def main() -> int:
     assert sum(r[6] for r in findings) == 12
     by = {c["g"]: sum(findings[i][6] for i in c["o"][:TOP]) for c in cases[:4]}
     meta = {
-        "tool": "kev-risk-prioritization", "version": kp.__version__, "tag": "v0.2.0", "commit": tag_commit[:7],
+        "tool": "kev-risk-prioritization", "version": kp.__version__, "tag": "v0.3.0", "commit": tag_commit[:7],
         "python": sys.version.split()[0], "date": "2026-11-11",
         "command": "python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json",
         "parity_cases": len(cases), "random_cases": N_RANDOM, "kev_in_top": by,
@@ -133,7 +137,7 @@ def main() -> int:
                  "epss_date": snap_meta["epss"]["score_date"][:10], "epss_model": snap_meta["epss"]["model_version"],
                  "epss_total": snap_meta["epss"]["rows_total"], "rows": snap_meta["subset"]["rows"],
                  "kev_rows": len(kev_e), "non_kev_rows": len(non_e), "non_kev_population": snap_meta["subset"]["non_kev_population"],
-                 "source": "data/snapshot/epss_subset.csv and SNAPSHOT.json at tag v0.2.0, commit " + tag_commit[:7]},
+                 "source": "data/snapshot/epss_subset.csv and SNAPSHOT.json at tag v0.3.0, commit " + tag_commit[:7]},
         "auc": round(an.auc(kev_e, non_e), 4), "auc_lo": round(lo, 4), "auc_hi": round(hi, 4),
         "median": {"kev": round(an.quantile(kev_e, .5), 3), "non_kev": round(an.quantile(non_e, .5), 3)},
         "thresholds": ths, "x": xs, "kev": ccdf(kev_e), "non_kev": ccdf(non_e),

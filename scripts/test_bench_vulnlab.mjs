@@ -31,7 +31,7 @@ const ok = (label, cond) => eq(label, !!cond, true);
 
 // ---- 1. consistency of the stored data
 const pv = data.provenance;
-eq('tool and tag', `${pv.tool} ${pv.tag} ${pv.commit}`, 'vulnlab v0.1.0 1fceaa8');
+eq('tool and tag', `${pv.tool} ${pv.tag} ${pv.commit}`, 'vulnlab v0.1.1 dd2665d');
 eq('commit_full starts with commit', pv.commit_full.startsWith(pv.commit), true);
 eq('three labs', data.labs.length, 3);
 let labTests = 0;
@@ -72,7 +72,7 @@ for (const lab of data.labs) {
 }
 eq('lab tests add up with the safety tests to the total', labTests + pv.totals.safety_tests, pv.totals.passed);
 eq('lab tests', labTests, pv.totals.lab_tests);
-eq('43 passed', pv.totals.passed, 43);
+eq('137 passed', pv.totals.passed, 137);
 eq('lab 03 correlation: 5 or more in 1m by session', JSON.stringify(data.labs[2].detection.correlation), JSON.stringify({ type: 'value_count', group_by: 'session', timespan: '1m', gte: 5, field: 'object_id' }));
 eq('lab 01 and 02 have no correlation', data.labs[0].detection.correlation === null && data.labs[1].detection.correlation === null, true);
 eq('sinkline summary: findings per version', data.labs.map((l) => l.versions.map((v) => v.sinkline.findings.length).join('/')).join(' '), '1/1 1/1 0/0');

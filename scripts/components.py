@@ -17,6 +17,7 @@ esc = html.escape
 # pend = pending (dotted outline), fp = reported where nothing was expected (half filled).
 STATES = ("hit", "miss", "neg", "pend", "fp")
 Runs = list[tuple[str, int]]
+LONG_STRIP = 40  # strips with more ticks than this are drawn as a multi-row ruler (class "long")
 
 
 def expand(runs: Runs) -> list[str]:
@@ -59,7 +60,9 @@ def strip(runs: Runs, label: str, unit: str, phr: dict[str, str], mini: bool = F
         major = (not mini) and (not scaled) and i % 10 == 0
         extra = ' class="m" data-n="%d"' % i if major else ""
         ticks.append('<i data-s="%s"%s></i>' % (s, extra))
-    return f'<div class="strip" role="img" aria-label="{esc(aria, quote=True)}">{"".join(ticks)}</div>'
+    # Up to LONG_STRIP ticks always stay on one ruler row (ticks shrink to fit); longer rulers wrap onto more rows by design.
+    cls = "strip long" if len(states) > LONG_STRIP else "strip"
+    return f'<div class="{cls}" role="img" aria-label="{esc(aria, quote=True)}">{"".join(ticks)}</div>'
 
 
 def strip_rows(sset: dict, mini: bool = False, vt: str | None = None, show_val: bool = True) -> str:
@@ -109,13 +112,13 @@ def stamp(kind: str, text: str) -> str:
     return f'<span class="{cls}">{esc(text)}</span>'
 
 
-def chip(run_id: str, runs: dict) -> str:
+def chip(run_id: str, runs: dict, label: str | None = None) -> str:
     r = runs[run_id]
     state = {"success": "pass", "failure": "fail"}.get(r["conclusion"], "pend")
     word = {"success": "passed", "failure": "failed"}.get(r["conclusion"], r["conclusion"] or "pending")
     href = f'https://github.com/samiali38183/{r["repo"]}/actions/runs/{run_id}'
     return (f'<a class="chip" data-s="{state}" href="{href}"><span class="st" aria-hidden="true"></span>'
-            f'<span>run {run_id}</span> <span class="d">{word} {r["date"]}</span></a>')
+            f'<span>{esc(label or "run")} {run_id}</span> <span class="d">{word} {r["date"]}</span></a>')
 
 
 # ---------------------------------------------------------------------------------------------

@@ -17,12 +17,12 @@
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta property="og:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="About | Sami Ali">
 <meta name="twitter:description" content="Student at George Mason University focused on detection engineering, application security and vulnerability management, and on checking that security tooling does what it says.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
@@ -56,7 +56,7 @@
 <section class="section" aria-labelledby="rules">
 <h2 id="rules">How I check my work</h2>
 <ol class="rules">
-<li><h3>Run the stock thing first</h3><p>Before writing a replacement, run what already exists on recorded data. The stock SigmaHQ setuid rule matched 0 of 36 events. <a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a></p></li>
+<li><h3>Run the stock thing first</h3><p>Before writing a replacement, run what already exists on recorded data. The stock SigmaHQ setuid rule flagged 0 of the 2 attack events among 36 recorded events. That run is red on purpose: the stock rule missed the attack, which is the finding. <a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a> The latest passing run on main replays the same recording with the replacement rule. <a class="chip" data-s="pass" href="https://github.com/samiali38183/tripline/actions/runs/43100952362"><span class="st" aria-hidden="true"></span><span>run 43100952362</span> <span class="d">passed 2026-11-11</span></a></p></li>
 <li><h3>Test the tests</h3><p>Coverage says a line ran, not that a test would notice it breaking. Six deliberate defects survived kevgate's 227 tests until each got a test of its own. <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808156"><span class="st" aria-hidden="true"></span><span>run 42960808156</span> <span class="d">passed 2026-11-11</span></a></p></li>
 <li><h3>Compare against the original</h3><p>fuzzdiff runs the C parser and the Rust port on the same bytes; five seeded bugs were caught, and a 500,000-input control stayed clean. <a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43035685955"><span class="st" aria-hidden="true"></span><span>run 43035685955</span> <span class="d">passed 2026-11-11</span></a></p></li>
 <li><h3>State the limits where the number is</h3><p>sinkline's page leads with its score on an independent benchmark, and says next to the number that the fixes were chosen from the earlier failures and that Bandit still leads over all 14 categories. <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43033758810"><span class="st" aria-hidden="true"></span><span>run 43033758810</span> <span class="d">passed 2026-11-11</span></a></p></li>

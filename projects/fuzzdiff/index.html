@@ -17,12 +17,12 @@
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta property="og:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="fuzzdiff: picohttpparser ported to safe Rust | Sami Ali">
 <meta name="twitter:description" content="fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="A reading of 0 over 36 and two ruler strips: all 36 ticks outline or hatched as found, 2 filled as left.">
+<meta name="twitter:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-fuzzdiff.css">
@@ -53,14 +53,11 @@
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/fuzzdiff">Repository</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0">Release v0.2.0</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/tree/main/docs">Docs</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">httparse comparison</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 </header>
-<section class="record-head" aria-label="Verification record">
+<section class="glance" aria-label="At a glance">
 <dl>
-<div><dt>Instrument</dt><dd>fuzzdiff v0.2.0 (tag, commit 6ec1e6e, released 2026-11-11)</dd></div>
-<div><dt>Reference standard</dt><dd>the C original, picohttpparser commit dd573d8, run on the same bytes; httparse 1.10.1 as a second parser for the head-parsing comparison</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-11, Windows, rustc 1.99.1; Miri, sanitizers and libFuzzer runs in CI on Linux</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
-<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ cargo test"><code>cargo test --all
-cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --nocapture</code></pre></dd></div>
+<div><dt>Checked against</dt><dd>The C original and httparse, same bytes</dd></div>
+<div><dt>Found, then left</dt><dd><span class="gl">As found</span> 2 of 5 seeded bugs not noticed by the 0.1.0 tests; harness accepted any folded-header error as expected (PR #2)<br><span class="gl">As left</span> 5 of 5 detected; 0 differences from C in 2,000,000 inputs; 609,278 disagree with httparse, all in documented classes</dd></div>
+<div><dt>Limits</dt><dd>Smoke fuzzing (120 s per leg); Miri on the pure-Rust crate only; no vulnerability found <a href="#limits">Full limits</a></dd></div>
 </dl>
 </section>
 <section class="reading-band" aria-label="The reading">
@@ -74,6 +71,16 @@ cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>detected</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>not detected by the 0.1.0 tests</li></ul>
 <div class="strips vt" style="--vt:strip-fuzzdiff"><div class="srow"><span class="label" aria-hidden="true">As found (0.1.0)</span><div class="strip" role="img" aria-label="As found (0.1.0), 5 seeded bugs: 3 detected, 2 not detected by the 0.1.0 tests"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> of 5 detected; <b>2</b> survived the 0.1.0 tests</p></div><div class="srow"><span class="label" aria-hidden="true">As left (0.2.0)</span><div class="strip" role="img" aria-label="As left (0.2.0), 5 seeded bugs: 5 detected"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>5</b> of 5 detected; 4 by the generator, 1 only by a targeted case</p></div></div>
 </section>
+<details class="fold fold-rec"><summary>Verification record: instrument, reference standard, date and how to reproduce (self-issued, not accredited)</summary><section class="record-head" aria-label="Verification record">
+<dl>
+<div><dt>Instrument</dt><dd>fuzzdiff v0.2.0 (tag, commit 6ec1e6e, released 2026-11-11)</dd></div>
+<div><dt>Reference standard</dt><dd>the C original, picohttpparser commit dd573d8, run on the same bytes; httparse 1.10.1 as a second parser for the head-parsing comparison</dd></div>
+<div><dt>Measured on</dt><dd>2026-11-11, Windows, rustc 1.99.1; Miri, sanitizers and libFuzzer runs in CI on Linux</dd></div>
+<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ cargo test"><code>cargo test --all
+cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --nocapture</code></pre></dd></div>
+</dl>
+</section></details>
 <section class="bench" data-bench="fuzzdiff" aria-label="Recorded readings">
 <figure class="plate">
 <span class="plate-label">Plate 1</span>
@@ -109,7 +116,7 @@ cargo test --release -p fuzzdiff-harness --features mutants --test mutants -- --
 <h3>Tests and seeded bugs, re-run locally</h3>
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>detected</li><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>not detected by the 0.1.0 tests</li></ul>
 <div class="strips"><div class="srow"><span class="label" aria-hidden="true">As found (0.1.0)</span><div class="strip" role="img" aria-label="As found (0.1.0), 5 seeded bugs: 3 detected, 2 not detected by the 0.1.0 tests"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> of 5 detected; <b>2</b> survived the 0.1.0 tests</p></div><div class="srow"><span class="label" aria-hidden="true">As left (0.2.0)</span><div class="strip" role="img" aria-label="As left (0.2.0), 5 seeded bugs: 5 detected"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>5</b> of 5 detected; 4 by the generator, 1 only by a targeted case</p></div></div>
-<pre data-copy data-label="$ cargo test --all; cargo test ... mutants; cargo llvm-cov"><code>$ cargo test --all
+<details class="fold fold-tbl"><summary>Output, 26 lines: $ cargo test --all; cargo test ... mutants; cargo llvm-cov</summary><pre data-copy data-label="$ cargo test --all; cargo test ... mutants; cargo llvm-cov"><code>$ cargo test --all
 ...tests\random_smoke.rs     test result: ok.  1 passed
 ...tests\vectors.rs          test result: ok. 10 passed
 ...harness unit test         test result: ok.  1 passed
@@ -134,11 +141,11 @@ $ cargo llvm-cov --workspace --summary-only      # src/ files only
 chunked.rs   145 lines   2 missed
 error.rs      22 lines   0 missed
 message.rs   322 lines  20 missed
-mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code></pre>
+mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code></pre></details>
 <p class="trim">Trimmed: per-test lines and timing removed, the failing-input lines the mutant test also prints are omitted, and the coverage files are summarized by line counts (the percentage is computed from the four rows and equals the CI coverage job). Timings vary from run to run; the counts do not.</p>
 <h3>Three-way comparison with httparse</h3>
 <div class="prose"><p>httparse 1.10.1 (pinned exactly) is the HTTP/1.x parser hyper builds on. It was added as a third parser so that &ldquo;matches the C original&rdquo; can be compared with &ldquo;matches a production Rust parser&rdquo;. The result is a map of leniency choices, not a list of bugs: each class is pinned by a test, and a new class fails CI. Numbers are from <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">docs/DIFFERENTIAL_HTTPARSE.md</a>; the table is copied from its generated block.</p></div>
-<p class="prose">Sweep of 2,000,000 deterministic inputs (999,999 request, 500,001 response, 500,000 header block; half from the corpus, half from the well-formed generators, two thirds then mutated). All three parsers did the same thing on 1,390,722 (69.54%) and disagreed on <b>609,278</b>. picohttpparser and fuzzdiff differed on <b>0</b>; disagreements that no documented class explains: <b>0</b>; 36,905 are only httparse rejecting an invalid prefix earlier than the other two. The share is large because the mutator produces folds, doubled spaces and version digits constantly, not because the parsers disagree on typical traffic.</p><div class="scroll wide"><table class="tbl bt fz-sweep"><caption>Disagreements by attributed feature, as in docs/DIFFERENTIAL_HTTPARSE.md. Patterns are picohttpparser, fuzzdiff, httparse: C complete, P partial, R reject, ! all complete but fields differ</caption><thead><tr><th scope="col">Feature</th><th scope="col" class="num">Inputs attributed</th><th scope="col" class="num">Alone</th><th scope="col">Patterns (count)</th></tr></thead><tbody><tr><th scope="row"><code>obs-fold</code></th><td class="num" data-label="Inputs attributed">258,293</td><td class="num" data-label="Alone">116,039</td><td data-label="Patterns (count)">CCR 233016, PPR 25277</td></tr><tr><th scope="row"><code>multi-space-start-line</code></th><td class="num" data-label="Inputs attributed">104,350</td><td class="num" data-label="Alone">24,524</td><td data-label="Patterns (count)">CCC! 10136, CCR 85708, PPR 8477, RRC 29</td></tr><tr><th scope="row"><code>version-digits</code></th><td class="num" data-label="Inputs attributed">404,441</td><td class="num" data-label="Alone">219,612</td><td data-label="Patterns (count)">CCR 338185, PPR 66256</td></tr><tr><th scope="row"><code>high-byte-start-line</code></th><td class="num" data-label="Inputs attributed">16,527</td><td class="num" data-label="Alone">11,475</td><td data-label="Patterns (count)">CCC! 3406, CCR 10572, PPR 2431, RRC 118</td></tr><tr><th scope="row"><code>bare-lf</code></th><td class="num" data-label="Inputs attributed">213</td><td class="num" data-label="Alone">213</td><td data-label="Patterns (count)">PPR 213</td></tr><tr><th scope="row"><code>bare-cr</code></th><td class="num" data-label="Inputs attributed">442</td><td class="num" data-label="Alone">434</td><td data-label="Patterns (count)">PPR 358, RRP 84</td></tr><tr><th scope="row"><code>leading-empty-lines</code></th><td class="num" data-label="Inputs attributed">1,492</td><td class="num" data-label="Alone">1,467</td><td data-label="Patterns (count)">RRC 123, RRP 1369</td></tr><tr><th scope="row"><code>header-line-without-colon</code></th><td class="num" data-label="Inputs attributed">1</td><td class="num" data-label="Alone">1</td><td data-label="Patterns (count)">RRP 1</td></tr><tr><th scope="row"><code>status-code-range</code></th><td class="num" data-label="Inputs attributed">6,495</td><td class="num" data-label="Alone">6,353</td><td data-label="Patterns (count)">RRC 6065, RRP 430</td></tr></tbody></table></div>
+<p class="prose">Sweep of 2,000,000 deterministic inputs (999,999 request, 500,001 response, 500,000 header block; half from the corpus, half from the well-formed generators, two thirds then mutated). All three parsers did the same thing on 1,390,722 (69.54%) and disagreed on <b>609,278</b>. picohttpparser and fuzzdiff differed on <b>0</b>; disagreements that no documented class explains: <b>0</b>; 36,905 are only httparse rejecting an invalid prefix earlier than the other two. The share is large because the mutator produces folds, doubled spaces and version digits constantly, not because the parsers disagree on typical traffic.</p><details class="fold fold-tbl"><summary>Table, 9 rows: Disagreements by attributed feature, as in docs/DIFFERENTIAL_HTTPARSE.md. Patterns are picohttpparser, fuzzdiff, httparse: C complete, P partial, R reject, ! all complete but fields differ</summary><div class="scroll wide"><table class="tbl bt fz-sweep"><caption>Disagreements by attributed feature, as in docs/DIFFERENTIAL_HTTPARSE.md. Patterns are picohttpparser, fuzzdiff, httparse: C complete, P partial, R reject, ! all complete but fields differ</caption><thead><tr><th scope="col">Feature</th><th scope="col" class="num">Inputs attributed</th><th scope="col" class="num">Alone</th><th scope="col">Patterns (count)</th></tr></thead><tbody><tr><th scope="row"><code>obs-fold</code></th><td class="num" data-label="Inputs attributed">258,293</td><td class="num" data-label="Alone">116,039</td><td data-label="Patterns (count)">CCR 233016, PPR 25277</td></tr><tr><th scope="row"><code>multi-space-start-line</code></th><td class="num" data-label="Inputs attributed">104,350</td><td class="num" data-label="Alone">24,524</td><td data-label="Patterns (count)">CCC! 10136, CCR 85708, PPR 8477, RRC 29</td></tr><tr><th scope="row"><code>version-digits</code></th><td class="num" data-label="Inputs attributed">404,441</td><td class="num" data-label="Alone">219,612</td><td data-label="Patterns (count)">CCR 338185, PPR 66256</td></tr><tr><th scope="row"><code>high-byte-start-line</code></th><td class="num" data-label="Inputs attributed">16,527</td><td class="num" data-label="Alone">11,475</td><td data-label="Patterns (count)">CCC! 3406, CCR 10572, PPR 2431, RRC 118</td></tr><tr><th scope="row"><code>bare-lf</code></th><td class="num" data-label="Inputs attributed">213</td><td class="num" data-label="Alone">213</td><td data-label="Patterns (count)">PPR 213</td></tr><tr><th scope="row"><code>bare-cr</code></th><td class="num" data-label="Inputs attributed">442</td><td class="num" data-label="Alone">434</td><td data-label="Patterns (count)">PPR 358, RRP 84</td></tr><tr><th scope="row"><code>leading-empty-lines</code></th><td class="num" data-label="Inputs attributed">1,492</td><td class="num" data-label="Alone">1,467</td><td data-label="Patterns (count)">RRC 123, RRP 1369</td></tr><tr><th scope="row"><code>header-line-without-colon</code></th><td class="num" data-label="Inputs attributed">1</td><td class="num" data-label="Alone">1</td><td data-label="Patterns (count)">RRP 1</td></tr><tr><th scope="row"><code>status-code-range</code></th><td class="num" data-label="Inputs attributed">6,495</td><td class="num" data-label="Alone">6,353</td><td data-label="Patterns (count)">RRC 6065, RRP 430</td></tr></tbody></table></div></details>
 <div class="prose">
 <p>In words, as the repository states them:</p>
 <ul>
@@ -162,7 +169,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <tr><th scope="row"><code>c_only-sse42</code></th><td data-label="What it runs">the same with <code>-msse4.2</code></td><td class="num" data-label="Executions">5,856,004</td><td data-label="Result">no crash, no sanitizer report</td></tr>
 </tbody>
 </table></div>
-<div class="scroll wide"><table class="tbl">
+<details class="fold fold-tbl"><summary>Table, 8 rows: Results</summary><div class="scroll wide"><table class="tbl">
 <caption>Results</caption>
 <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
@@ -175,10 +182,11 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <tr><th scope="row">Speed, chunked decoding</th><td data-label="Value">level (0.99x and 1.01x)</td><td data-label="Source"><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/BENCHMARKS.md">docs/BENCHMARKS.md</a></td></tr>
 <tr><th scope="row">Bugs found in the C original</th><td data-label="Value">none</td><td data-label="Source"><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/FINDINGS.md">docs/FINDINGS.md</a></td></tr>
 </tbody>
-</table></div>
+</table></div></details>
 </section>
-<section class="section" id="method" aria-labelledby="method-h">
-<h2 id="method-h"><span class="label sec-label">Method</span>How it works</h2>
+<section class="section fold-sec" id="method" aria-labelledby="method-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Method</span><h2 id="method-h">How it works</h2><span class="fold-hint">design, implementation points and diagram</span></summary>
+<div class="fold-body">
 <h3>The problem</h3>
 <div class="prose">
 <p>Network parsers written in C keep having the same bugs: reads past the end of a buffer, length arithmetic that wraps, off-by-ones, half-initialized output. Rewriting one in a memory-safe language is a fair answer only if the rewrite behaves like the original.</p>
@@ -200,6 +208,8 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <h4>Exact-size copies so the sanitizer can see over-reads</h4>
 <p>A C over-read that lands inside a larger allocation goes unnoticed. The C shim (<code>c/shim.c</code>) copies each input into a heap block of exactly <code>len</code> bytes (<code>dup_exact</code>), so one byte past the end is outside the allocation and AddressSanitizer reports it. The shim also returns offsets instead of pointers so the harness can compare results by value.</p>
 </div>
+</div>
+</details>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
@@ -215,8 +225,8 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <li><strong>Blind generator.</strong> The 27.6 million-input seeded generator run in the README has no coverage feedback and is a stand-in for fuzzing, not a replacement.</li>
 </ul>
 </section>
-<section class="section" id="trace" aria-labelledby="trace-h">
-<h2 id="trace-h"><span class="label sec-label">Traceability</span>Where each number comes from</h2>
+<section class="section fold-sec" id="trace" aria-labelledby="trace-h">
+<details class="fold fold-main"><summary><span class="label sec-label">Traceability</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">8 links</span></summary>
 <p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
 <dl class="trace"><div><dt>Tests, sanitizers, Miri, coverage (ci on main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037960324"><span class="st" aria-hidden="true"></span><span>run 43037960324</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Fuzz run with the counts below (pull request 3)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43035685955"><span class="st" aria-hidden="true"></span><span>run 43035685955</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Last fuzz run of pull request 3</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037421227"><span class="st" aria-hidden="true"></span><span>run 43037421227</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0">v0.2.0</a></dd></div><div><dt>Harness fix</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/pull/2">pull request #2</a></dd></div><div><dt>Three-way comparison</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">docs/DIFFERENTIAL_HTTPARSE.md</a></dd></div><div><dt>Deviations</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DEVIATIONS.md">docs/DEVIATIONS.md</a></dd></div><div><dt>Findings</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/FINDINGS.md">docs/FINDINGS.md</a></dd></div></dl>
 <h3>CI evidence</h3>
@@ -230,8 +240,9 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 </tbody>
 </table></div>
 <p class="small muted prose">The fuzz workflow runs on pull requests, weekly and on request, not on every push to <code>main</code>, so the newest fuzz run is the one for the pull request that became 0.2.0. Bench data and the program that produced it: <code>assets/data/fuzzdiff-bench.json</code>, <code>scripts/capture_fuzzdiff_bench.py</code>, <code>scripts/test_bench_fuzzdiff.mjs</code>.</p>
+</details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/vulnlab/"><span class="label">Previous sheet, 5 of 7</span><span class="n">vulnlab</span></a><a class="next" href="/projects/kev-risk-prioritization/"><span class="label">Next sheet, 7 of 7</span><span class="n">kev-risk-prioritization</span></a></nav>
+<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/kevgate-admit/"><span class="label">Previous sheet, 5 of 7</span><span class="n">kevgate-admit</span></a><a class="next" href="/projects/kev-risk-prioritization/"><span class="label">Next sheet, 7 of 7</span><span class="n">kev-risk-prioritization</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">

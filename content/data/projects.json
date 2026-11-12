@@ -2,9 +2,9 @@
  "order": [
   "tripline",
   "sinkline",
+  "vulnlab",
   "kevgate",
   "kevgate-admit",
-  "vulnlab",
   "fuzzdiff",
   "kev-risk-prioritization"
  ],
@@ -17,7 +17,7 @@
    "sheet": 1,
    "kind": "Detection engineering",
    "title": "tripline: a CI gate for detection rules | Sami Ali",
-   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule matched 0 of 36 events; a replacement matches 2.",
+   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule flagged 0 of the 2 attack events among 36 recorded events; a replacement flags both.",
    "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 13 passing, 1 pending (Windows); 98% weighted coverage, 52% on unmodified SigmaHQ rules alone; 212 tests.",
    "labels": {
     "found": "As found",
@@ -39,14 +39,18 @@
    },
    "reading": {
     "num": "0",
-    "den": "/36",
-    "unit": "events matched by the stock rule",
-    "caption": "The stock SigmaHQ Setuid and Setgid rule matched 0 of 36 events in telemetry recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner. The replacement rule matches 2.",
+    "den": "/2",
+    "unit": "attack events flagged by the stock rule",
+    "caption": "Among 36 events recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner, 2 are the attack itself (the two chmod executions). SigmaHQ's stock Setuid and Setgid rule flagged 0 of those 2; the replacement rule flags both. The other 34 events are not attack events.",
     "stamp": [
      "fail",
      "As found: fail"
     ],
-    "run": "41838714456"
+    "run": "41838714456",
+    "run_label": "recording run",
+    "run_ok": "43100952362",
+    "run_ok_label": "main CI run",
+    "run_note": "The recording run's gate failed because the stock rule missed the attack: that failure is the finding. The second run is the latest passing CI run on main, which replays the committed recording with the replacement rule."
    },
    "strip_sets": {
     "main": {
@@ -82,7 +86,7 @@
          4
         ]
        ],
-       "val": "<b>0</b> matched of 36 events"
+       "val": "<b>0</b> of 2 attack events flagged, among 36 recorded events"
       },
       {
        "label": "As left",
@@ -108,7 +112,7 @@
          4
         ]
        ],
-       "val": "<b>2</b> matched of 36 events"
+       "val": "<b>2</b> of 2 attack events flagged, among 36 recorded events"
       }
      ]
     },
@@ -373,11 +377,11 @@
     }
    },
    "home": {
-    "against": "SigmaHQ stock rule, 36 recorded events",
-    "reading": "0 to 2 of 36",
-    "run": "41838714456",
-    "found": "0 of 36 events matched by the stock rule",
-    "left": "Replacement rule: 2 of 36. Gate: 13 of 14 scenarios, 98% weighted, 52% on unmodified SigmaHQ rules alone",
+    "against": "SigmaHQ stock rule; 2 attack events among 36 recorded events",
+    "reading": "0 to 2 of 2 attack events",
+    "run": "43100952362",
+    "found": "Stock rule flagged 0 of the 2 attack events (36 events recorded)",
+    "left": "Replacement rule flags 2 of 2. Gate: 13 of 14 scenarios, 98% weighted, 52% on unmodified SigmaHQ rules alone",
     "tolerance": "One recording per scenario; 675-event benign corpus, Linux only; 1 Windows scenario pending"
    },
    "links": [
@@ -471,7 +475,8 @@
      "CHANGELOG.md"
     ]
    ],
-   "commit": "a0d6622"
+   "commit": "a0d6622",
+   "tier": "featured"
   },
   "sinkline": {
    "slug": "sinkline",
@@ -803,14 +808,15 @@
      "tests/test_action.py"
     ]
    ],
-   "commit": "9c58efd"
+   "commit": "9c58efd",
+   "tier": "featured"
   },
   "kevgate": {
    "slug": "kevgate",
    "content": "kevgate.html",
    "name": "kevgate",
    "version": "v0.1.1",
-   "sheet": 3,
+   "sheet": 4,
    "kind": "Vulnerability management and DevSecOps",
    "title": "kevgate: KEV-ranked vulnerability intake | Sami Ali",
    "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.",
@@ -956,14 +962,15 @@
      "assets/data/kevgate-bench.json"
     ]
    ],
-   "commit": "973c8c1"
+   "commit": "973c8c1",
+   "tier": "featured"
   },
   "kevgate-admit": {
    "slug": "kevgate-admit",
    "content": "kevgate-admit.html",
    "name": "kevgate-admit",
    "version": "v0.1.0",
-   "sheet": 4,
+   "sheet": 5,
    "kind": "Kubernetes security, Go",
    "title": "kevgate-admit: Kubernetes admission webhook | Sami Ali",
    "desc": "kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. Strict image-reference parsing, optional signed evidence, a signed published image, 93 tests and 95% coverage.",
@@ -1108,7 +1115,8 @@
     ]
    ],
    "commit": "161169a",
-   "bench": "kevgate-admit"
+   "bench": "kevgate-admit",
+   "tier": "also"
   },
   "fuzzdiff": {
    "slug": "fuzzdiff",
@@ -1260,28 +1268,29 @@
      "docs/FINDINGS.md"
     ]
    ],
-   "commit": "6ec1e6e"
+   "commit": "6ec1e6e",
+   "tier": "also"
   },
   "kev-risk-prioritization": {
    "slug": "kev-risk-prioritization",
    "content": "kev-risk.html",
    "name": "kev-risk-prioritization",
-   "version": "v0.2.0",
+   "version": "v0.3.0",
    "sheet": 7,
    "kind": "Vulnerability management",
    "title": "kev-risk-prioritization | Sami Ali",
-   "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
-   "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. 27 tests.",
+   "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. v0.3.0 refuses lists that mix rows with and without CVSS and sorts in a total order. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
+   "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. Mixed CVSS lists are refused unless --allow-mixed. 63 tests.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
    "found_title": "The first version claimed more than it showed",
-   "left_title": "A pinned real snapshot, and what it does and does not show",
+   "left_title": "Defects from a review fixed in 0.3.0, and a pinned real snapshot with its limits",
    "record": {
-    "instrument": "kev-risk-prioritization v0.2.0, commit d85495f",
+    "instrument": "kev-risk-prioritization v0.3.0, commit 3859ff6",
     "reference": "a CVSS-only sort of 20 synthetic findings, and a pinned real snapshot: CISA KEV 2026.11.10 and FIRST EPSS scored 2026-11-11",
-    "measured": "2026-11-11, fresh clone of tag v0.2.0, 27 tests pass",
+    "measured": "2026-11-11, fresh clone of tag v0.3.0, 63 tests pass",
     "reproduce": [
      "python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json"
     ],
@@ -1296,7 +1305,7 @@
      "limit",
      "Synthetic data"
     ],
-    "run": "43040235145"
+    "run": "43134445948"
    },
    "strip_sets": {
     "main": {
@@ -1390,9 +1399,9 @@
    "home": {
     "against": "CVSS-only sort of 20 synthetic findings; pinned real KEV and EPSS snapshot",
     "reading": "12 vs 9 KEV in the top 12 (synthetic demo)",
-    "run": "43040235145",
+    "run": "43134445948",
     "found": "Earlier text called it KEV-first in the spirit of BOD 26-04 and showed measurements on invented values",
-    "left": "Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515",
+    "left": "Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515. v0.3.0: mixed CVSS lists refused, total sort order, 63 tests",
     "tolerance": "Weights not validated; EPSS and KEV are related signals; synthetic assets"
    },
    "links": [
@@ -1401,8 +1410,8 @@
      "https://github.com/samiali38183/kev-risk-prioritization"
     ],
     [
-     "Release v0.2.0",
-     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0"
+     "Release v0.3.0",
+     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.3.0"
     ],
     [
      "Methodology",
@@ -1414,20 +1423,26 @@
     ],
     [
      "CI run (main)",
-     "https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43040235145"
+     "https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43134445948"
     ]
    ],
    "trace": [
     [
      "CI run on main",
      "run",
-     "43040235145"
+     "43134445948"
     ],
     [
      "Release",
      "link",
-     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.2.0",
-     "v0.2.0"
+     "https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.3.0",
+     "v0.3.0"
+    ],
+    [
+     "Changelog 0.3.0",
+     "link",
+     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md",
+     "CHANGELOG.md"
     ],
     [
      "Real-data analysis",
@@ -1460,36 +1475,37 @@
      "scripts/test_bench_kev.mjs"
     ]
    ],
-   "commit": "d85495f",
-   "bench": "kev-risk"
+   "commit": "3859ff6",
+   "bench": "kev-risk",
+   "tier": "also"
   },
   "vulnlab": {
    "slug": "vulnlab",
    "content": "vulnlab.html",
    "name": "vulnlab",
-   "version": "v0.1.0",
-   "sheet": 5,
+   "version": "v0.1.1",
+   "sheet": 3,
    "kind": "Web security training lab, Python",
    "title": "vulnlab: localhost-only web vulnerability lab | Sami Ali",
-   "desc": "vulnlab v0.1.0 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 43 tests, loopback only.",
+   "desc": "vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.",
    "fact": "A localhost-only lab of three small vulnerable Flask services: SSRF through a redirect, SQL injection in ORDER BY and IDOR. Each has a fix checked by the tests that show the impact, a sinkline record and a Sigma rule. 3 of 3 fixes verified; sinkline reports two of the three bugs and both fixes of those two. Training lab, loopback only, no CVEs.",
    "labels": {
     "found": "As found",
     "left": "As left"
    },
    "found_title": "Three vulnerable services, one missing check each",
-   "left_title": "Three fixes, checked by the tests that showed the impact",
+   "left_title": "Three fixes, checked by the tests that showed the impact, and four defects of the first release fixed",
    "record": {
-    "instrument": "vulnlab v0.1.0, tag commit 1fceaa8 (released 2026-11-11)",
+    "instrument": "vulnlab v0.1.1, tag commit dd2665d (released 2026-11-11)",
     "reference": "each lab's fixed service and its tests: the same checks that show the impact on the vulnerable service must fail against the fix; sinkline 0.5.0 and a Sigma rule per lab are the other two checks",
-    "measured": "2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.0; CI (Linux) run 43087241629",
+    "measured": "2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.1; CI (Linux) run 43134837698",
     "reproduce": [
      "pip install -r requirements.lock",
      "pytest -q",
      "python tools/sinkline_check.py",
      "sigma check labs/*/detection/*.yml"
     ],
-    "reproduce_label": "$ vulnlab, from a clone at v0.1.0"
+    "reproduce_label": "$ vulnlab, from a clone at v0.1.1"
    },
    "reading": {
     "num": "3",
@@ -1500,7 +1516,7 @@
      "pass",
      "As left: 3 of 3 fixes verified"
     ],
-    "run": "43087241629"
+    "run": "43134837698"
    },
    "strip_sets": {
     "main": {
@@ -1577,9 +1593,9 @@
    "home": {
     "against": "Each lab's fixed service and its tests; sinkline 0.5.0; Sigma rules replayed on recorded logs",
     "reading": "3 of 3 fixes verified; sinkline 2 of 3 detected (2 false positives on fixes)",
-    "run": "43087241629",
+    "run": "43134837698",
     "found": "3 vulnerable services (SSRF, SQL injection, IDOR) show impact in their tests",
-    "left": "3 fixes block it; 43 tests pass; loopback only",
+    "left": "3 fixes block it; 137 tests pass; loopback only",
     "tolerance": "Training lab; bugs simpler than real ones; no CVEs; detection fires on attempts, not impact"
    },
    "links": [
@@ -1588,16 +1604,16 @@
      "https://github.com/samiali38183/vulnlab"
     ],
     [
-     "Release v0.1.0",
-     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0"
+     "Release v0.1.1",
+     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.1"
     ],
     [
      "Method",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/METHOD.md"
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/docs/METHOD.md"
     ],
     [
      "Safety scope",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/docs/SAFETY.md"
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/docs/SAFETY.md"
     ],
     [
      "CI runs",
@@ -1606,50 +1622,56 @@
    ],
    "trace": [
     [
-     "CI on main, tag commit (ci, v0.1.0)",
+     "CI on main, tag commit (ci, v0.1.1)",
      "run",
-     "43087241629"
+     "43134837698"
     ],
     [
      "Release",
      "link",
-     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.0",
-     "v0.1.0"
+     "https://github.com/samiali38183/vulnlab/releases/tag/v0.1.1",
+     "v0.1.1"
+    ],
+    [
+     "Changelog 0.1.1",
+     "link",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/CHANGELOG.md",
+     "CHANGELOG.md"
     ],
     [
      "Lab 01 write-up",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/01-ssrf-redirect/README.md",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/labs/01-ssrf-redirect/README.md",
      "labs/01-ssrf-redirect/README.md"
     ],
     [
      "Lab 02 write-up",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/02-sqli-order-by/README.md",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/labs/02-sqli-order-by/README.md",
      "labs/02-sqli-order-by/README.md"
     ],
     [
      "Lab 03 write-up",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/labs/03-idor-bola/README.md",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/labs/03-idor-bola/README.md",
      "labs/03-idor-bola/README.md"
     ],
     [
      "Harness and replay code",
      "link",
-     "https://github.com/samiali38183/vulnlab/tree/v0.1.0/vulnlab_common",
+     "https://github.com/samiali38183/vulnlab/tree/v0.1.1/vulnlab_common",
      "vulnlab_common/"
     ],
     [
      "Safety tests",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/tests/test_safety.py",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/tests/test_safety.py",
      "tests/test_safety.py"
     ],
     [
      "sinkline capture and check",
      "link",
-     "https://github.com/samiali38183/vulnlab/blob/v0.1.0/tools/sinkline_check.py",
+     "https://github.com/samiali38183/vulnlab/blob/v0.1.1/tools/sinkline_check.py",
      "tools/sinkline_check.py"
     ],
     [
@@ -1665,14 +1687,15 @@
      "scripts/test_bench_vulnlab.mjs"
     ]
    ],
-   "commit": "1fceaa8",
-   "bench": "vulnlab"
+   "commit": "dd2665d",
+   "bench": "vulnlab",
+   "tier": "featured"
   }
  },
  "failed_first": [
   {
    "project": "tripline",
-   "text": "The stock SigmaHQ Setuid and Setgid rule matched 0 of 36 recorded events. A replacement rule matches the 2 chmod executions.",
+   "text": "The stock SigmaHQ Setuid and Setgid rule flagged 0 of the 2 attack events (the two chmod executions) among 36 recorded events. A replacement rule flags both.",
    "state": [
     "pass",
     "Fixed"
@@ -1810,7 +1833,20 @@
    "anchor": "limits",
    "src": [
     "README, labs and results",
-    "https://github.com/samiali38183/vulnlab/blob/v0.1.0/README.md"
+    "https://github.com/samiali38183/vulnlab/blob/v0.1.1/README.md"
+   ]
+  },
+  {
+   "project": "vulnlab",
+   "text": "A review of 0.1.0 found that the fixed SSRF service answered 500 to malformed URLs, that both IDOR variants issued a login token for an unknown user with a null password, and that no test failed if the fixed SSRF service's address check was removed. All three are fixed in 0.1.1 and each has a test.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-left",
+   "src": [
+    "CHANGELOG 0.1.1",
+    "https://github.com/samiali38183/vulnlab/blob/v0.1.1/CHANGELOG.md"
    ]
   },
   {
@@ -1849,6 +1885,19 @@
    "anchor": "as-found",
    "src": [
     "CHANGELOG 0.2.0, Corrections",
+    "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md"
+   ]
+  },
+  {
+   "project": "kev-risk-prioritization",
+   "text": "In 0.2.0 a finding without CVSS was scored on a different scale from one with it (the same KEV finding scored 73.5 without CVSS and 59.5 with CVSS 0.0), so a mixed list was ranked with incomparable scores. 0.3.0 refuses such a list unless --allow-mixed, which scores every row without CVSS.",
+   "state": [
+    "pass",
+    "Fixed"
+   ],
+   "anchor": "as-left",
+   "src": [
+    "CHANGELOG 0.3.0",
     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md"
    ]
   }

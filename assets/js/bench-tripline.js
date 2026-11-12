@@ -143,9 +143,9 @@ async function init() {
       t.addEventListener('click', () => pick(i));
       strip.append(t);
     });
-    const n = ev.filter((e) => e[key]).length;
+    const n = ev.filter((e, i) => e[key] && d.expected.includes(i)).length;
     return { strip, row: h('div', { class: 'srow' }, h('span', { class: 'label', text: a }), strip,
-      h('p', { class: 'val' }, h('b', { text: String(n) }), document.createTextNode(' of ' + ev.length + ' flagged by the ' + b))) };
+      h('p', { class: 'val' }, h('b', { text: String(n) }), document.createTextNode(' of ' + d.expected.length + ' attack events flagged by the ' + b + ', among ' + ev.length + ' recorded events'))) };
   });
   function pick(i, scroll) {
     sel.value = i;

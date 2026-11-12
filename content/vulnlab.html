@@ -21,7 +21,7 @@ A localhost-only training lab: three small Flask services, each with one textboo
     ...
 upstream = requests.get(url, timeout=3)</code></pre></td><td>The direct request to the internal address got 403. The request through the allowed host's redirect got 200, and the preview contained the internal service's marker; the internal service logged one request it should never have received.</td></tr>
 <tr class="row-fail"><th scope="row">02 SQL injection in ORDER BY<br>CWE-89</th><td>A product list binds the search text as a query parameter, so the query looks safe, but the sort column is pasted into the SQL string.</td><td>Placeholders cannot stand in for identifiers, so the placeholder protects one position and the f-string opens another.<pre tabindex="0" data-label="02 vulnerable/app.py, line 16"><code>query = f"... ORDER BY {sort} {direction}"</code></pre></td><td>Ordinary sort values behaved. A sort value that depends on a second table changed the order of the rows that came back: data from a table the endpoint never returns decided what it returned. The test stops there and does not recover the marker.</td></tr>
-<tr class="row-fail"><th scope="row">03 IDOR (broken object-level authorization)<br>CWE-639</th><td>An invoice API checks that the caller is logged in on the read-by-id route but not that the invoice is theirs. The list and update routes do check.<sup class="nref" aria-hidden="true"></sup></td><td>Each route re-implements the rule by hand and one forgot.<pre tabindex="0" data-label="03 vulnerable/app.py, lines 34 and 38"><code>if current_user() is None:
+<tr class="row-fail"><th scope="row">03 IDOR (broken object-level authorization)<br>CWE-639</th><td>An invoice API checks that the caller is logged in on the read-by-id route but not that the invoice is theirs. The list and update routes do check.<sup class="nref" aria-hidden="true"></sup></td><td>Each route re-implements the rule by hand and one forgot.<pre tabindex="0" data-label="03 vulnerable/app.py, lines 37 and 41"><code>if current_user() is None:
     ...
 return jsonify(invoices[object_id])</code></pre></td><td>A logged-in user's own list contained only their invoices. Asking for another user's invoice returned 200 with that user's memo, and all eight ids answered 200. On the same record the update route already answered 404, so the inconsistency is part of the evidence.</td></tr>
 </tbody>
@@ -30,17 +30,37 @@ return jsonify(invoices[object_id])</code></pre></td><td>A logged-in user's own 
 
 <!--@as-left-->
 <div class="prose">
-<p>Each fix is small and each lab's tests show it from two sides: the impact check that passed on the vulnerable service fails on the fix, and a second test shows the fixed service still does its job, so a fix that breaks the feature is not accepted. The three labs' own tests (17) and the tests of the loopback guard and the harness (26) all pass: 43 in all.</p>
+<p>Each fix is small and each lab's tests show it from two sides: the impact check that passed on the vulnerable service fails on the fix, and a second test shows the fixed service still does its job, so a fix that breaks the feature is not accepted. The three labs' own tests (72) and the tests of the loopback guard, the harness, the replay code, the captured output and the Sigma rules (65) all pass: 137 in all.</p>
 </div>
 <div class="scroll wide"><table class="tbl">
 <caption>The three fixes, the tests that check them and what changed</caption>
 <thead><tr><th scope="col">Lab</th><th scope="col">The fix</th><th scope="col">Impact check on the fix</th><th scope="col">Feature check on the fix</th></tr></thead>
 <tbody>
-<tr><th scope="row">01 SSRF through a redirect</th><td>The client no longer follows redirects. The app follows them itself, at most three hops, and checks every hop's host and its resolved address, then connects to that checked address. Only <code>http</code> is accepted.</td><td>Both the direct and the redirected request got 403, the marker was absent and the internal service was never contacted.</td><td>A page on the partner site, directly and through an allowed redirect, still previews.</td></tr>
+<tr><th scope="row">01 SSRF through a redirect</th><td>The client no longer follows redirects. The app follows them itself, at most three hops, and checks every hop's host and its resolved address, then connects to that checked address. Only <code>http</code> is accepted, and a malformed URL gets a 400.</td><td>Both the direct and the redirected request got 403, the marker was absent and the internal service was never contacted.</td><td>A page on the partner site, directly and through an allowed redirect, still previews.</td></tr>
 <tr><th scope="row">02 SQL injection in ORDER BY</th><td>The sort value is looked up in a dictionary of the three columns the application owns; the text interpolated into the SQL is the dictionary's value, never the caller's. Anything else is a 400.</td><td>Three different non-column sort values each got 400 and nothing from the second table appeared.</td><td>Sorting by each allowed column in both directions and filtering by search text still work.</td></tr>
-<tr><th scope="row">03 IDOR</th><td>One helper decides whether an invoice is the caller's, and every by-id route goes through it. A record that is not yours answers 404, the same answer as "does not exist", so responses do not confirm which ids are in use.</td><td>Every record the user did not own answered 404 on read and on update, and the other user's memo never appeared.</td><td>An owner can still read and update their own invoices and list them; requests without a login get 401.</td></tr>
+<tr><th scope="row">03 IDOR</th><td>One helper decides whether an invoice is the caller's, and every by-id route goes through it. A record that is not yours answers 404, the same answer as "does not exist", so responses do not confirm which ids are in use. Authentication is checked before the lookup, so a caller with no token gets the same 401 for an existing and a missing id.</td><td>Every record the user did not own answered 404 on read and on update, and the other user's memo never appeared.</td><td>An owner can still read and update their own invoices and list them; requests without a login get 401.</td></tr>
 </tbody>
 </table></div>
+<h3>Defects of the first release, found in a review and fixed in 0.1.1</h3>
+<div class="prose">
+<p>The first release passed its own tests and still had four defects that the tests did not catch. The labs' own tests now cover each one; the fixes change the services' behavior on bad input and add no attack content.</p>
+</div>
+<details class="fold fold-tbl"><summary>Table, 4 rows: what the review of v0.1.0 found, what v0.1.1 does instead, and the test</summary>
+<div class="scroll wide"><table class="tbl">
+<caption>What the review of v0.1.0 found, what v0.1.1 does instead, and the test</caption>
+<thead><tr><th scope="col">Where</th><th scope="col">As found (v0.1.0)</th><th scope="col">As left (v0.1.1)</th><th scope="col">Test</th></tr></thead>
+<tbody>
+<tr class="row-fail"><th scope="row">Lab 03, both variants: login</th><td>A login with a missing or <code>null</code> password for an unknown user was issued a token (a missing value was compared with a missing value), and a malformed login body caused an unhandled error.</td><td>Unknown users with a missing or null password and malformed bodies get 401.</td><td>14 cases in each variant</td></tr>
+<tr class="row-fail"><th scope="row">Lab 03, fixed: order of checks</th><td>The object lookup ran before authentication, so a caller with no token could tell which ids exist.</td><td>Authentication comes first: the same 401 for an existing and a missing id.</td><td>One case in each variant</td></tr>
+<tr class="row-fail"><th scope="row">Lab 01, fixed: malformed URLs</th><td>Invalid or zero ports, an unterminated IPv6 literal, a missing host, credentials in the URL, a non-http scheme and an over-long URL gave an unhandled 500 or a 403.</td><td>A clean 400 for each; a well-formed URL for an unapproved host is still a 403.</td><td>18 URL cases, 2 redirect-target cases and 1 for the 403</td></tr>
+<tr class="row-fail"><th scope="row">Lab 01 tests: address check</th><td>Removing the check of the resolved address left every test green.</td><td>A test fails if the address check is removed.</td><td>1 case</td></tr>
+</tbody>
+</table></div>
+</details>
+<div class="prose">
+<p>The same review found that the replay code counted a missing field as a distinct value (now a unit-tested case), that <code>tools/sinkline_check.py</code> could run a different sinkline from the one the repository pins (it now runs the active interpreter's sinkline and exits 2 on a version mismatch), and that the README said 43 tests pass when the run reported more. The recorded sinkline output of lab 01 changed line numbers because the fixed service grew; its findings did not change.</p>
+</div>
+<details class="fold"><summary>The other checks, side by side: sinkline and the Sigma rules (table, strips and notes)</summary>
 <h3>The other checks, side by side</h3>
 <div class="prose">
 <p>The tests are the reference. The other two checks are scored against what each lab is known to contain, and they agree with it less.</p>
@@ -60,6 +80,7 @@ return jsonify(invoices[object_id])</code></pre></td><td>A logged-in user's own 
 <p>The write-ups say why. sinkline reports a tainted value reaching a dangerous call; it does not recognize a custom allow-list or address check as a sanitizer, and treats a dictionary lookup against constant column names as a pass-through, so it cannot tell the fixes from the bugs in labs 01 and 02. On lab 01 it also does not say that the bug is the redirect: "tainted URL reaches <code>requests.get</code>" would be just as true of an app with no allow-list at all. Lab 03 has no tainted value reaching a sink: the id is used only as a dictionary key, and whether the caller may see the record is a rule of the application that a source-to-sink analyzer has no model of. Finding that class takes authorization tests, a policy layer that fails closed, or review against an access matrix.</p>
 <p>The lab was not changed to hide any of this.</p>
 </div>
+</details>
 
 <!--@method-->
 <h3>Shape of a lab</h3>
@@ -80,7 +101,7 @@ return jsonify(invoices[object_id])</code></pre></td><td>A logged-in user's own 
 <p>The harness appends one JSON object per request to a log file: timestamp, client address, method, path, raw query string, status, a short hash of the Authorization header as <code>session</code> and the route's <code>object_id</code>. Field names follow W3C-style web-server logs, so the rules read like web-server rules. Single-event rules are compiled by <a href="/projects/tripline/">tripline</a>'s engine (pySigma parses, tripline walks the condition tree), with its logsource router bypassed because that router knows only Windows, Linux auditd and CloudTrail. Lab 03's rule is a correlation (an event count of distinct <code>object_id</code> values per session within a minute) that tripline does not implement, so the lab's own windowing code in <code>vulnlab_common/replay.py</code> evaluates it.</p>
 </div>
 <h3>One real run</h3>
-<div class="prose"><p>Run on 2026-11-11 from a fresh clone at tag v0.1.0 (Windows 11, Python 3.12.2) as <code>bash tools/demo.sh</code>, which runs lab 01 end to end. Trimmed: the pytest header and timings are removed, and the two sinkline reports are on Plate 1.</p></div>
+<div class="prose"><p>Run on 2026-11-11 from a fresh clone at tag v0.1.1 (Windows 11, Python 3.12.2) as <code>bash tools/demo.sh</code>, which runs lab 01 end to end. Trimmed: the pytest header and timings are removed, and the two sinkline reports are on Plate 1.</p></div>
 <pre data-copy data-label="$ bash tools/demo.sh (lab 01, trimmed)"><code>=== 1. vulnerable service: the preview endpoint returns the internal service's canary via an allowed redirect ===
 labs/01-ssrf-redirect/test_lab.py::test_vulnerable_service_returns_internal_marker_via_allowed_redirect PASSED
 === 2. what sinkline reports on the vulnerable version ===
@@ -88,8 +109,9 @@ labs/01-ssrf-redirect/test_lab.py::test_vulnerable_service_returns_internal_mark
 === 3. fixed service: the same request is refused and the internal service is never contacted ===
 labs/01-ssrf-redirect/test_lab.py::test_fixed_service_does_not_return_internal_marker PASSED
 labs/01-ssrf-redirect/test_lab.py::test_fixed_service_still_previews_pages_and_follows_allowed_redirects PASSED
+... 21 more cases, all PASSED (not shown: malformed URLs and redirect targets, one 403 case)
 === 4. what sinkline reports on the fixed version (a documented false positive) ===
-[HIGH] SL-SSRF-001 ... CWE-918  app.py:42:24   (full output on Plate 1)
+[HIGH] SL-SSRF-001 ... CWE-918  app.py:62:24   (full output on Plate 1)
 === 5. replay the Sigma rule over the recorded logs ===
 sample_attack.ndjson: 2 events, 1 alert(s)
   ALERT 'URL preview request names an internal or metadata address': 2 matching event(s)
@@ -112,4 +134,4 @@ sample_benign.ndjson: 2 events, 0 alert(s)</code></pre>
 </ul>
 
 <!--@trace-->
-<p class="prose muted">The sinkline text files recorded in the repository (<code>labs/*/sinkline/*.txt</code>) show the path glyphs as garbled characters, a character-encoding slip when they were written on Windows. The capture script for this page undoes the slip, checks that the text then equals a fresh run of sinkline 0.5.0, and shows the glyphs the tool prints. Findings, lines and exit status are identical.</p>
+<p class="prose muted">The sinkline text files recorded in the repository (<code>labs/*/sinkline/*.txt</code>) showed the path glyphs as garbled characters in v0.1.0, a character-encoding slip when they were written on Windows; v0.1.1 stores them as UTF-8 and a test guards that. The capture script for this page checks that the recorded text equals a fresh run of sinkline 0.5.0 and shows the glyphs the tool prints.</p>

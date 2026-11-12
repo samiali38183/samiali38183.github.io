@@ -272,12 +272,12 @@ def admit_checks(clones: Path, env_go: str) -> None:
                 top.add((e["Package"], e["Test"]))
     expect("kevgate-admit top-level tests", str(len(top)), page, f"{len(top)} top-level")
     expect("kevgate-admit all tests", str(len(allt)), page, f"{len(allt)} with subtests")
-    expect("kevgate-admit tests in the projects ledger", str(len(top)), "projects/index.html", f"{len(top)} tests")
+    expect("kevgate-admit tests in the summary box", str(len(top)), page, f"{len(top)} tests, ")
     run([env_go, "test", "./...", "-coverprofile=c.out", "-count=1"], ka)
     cov = run([env_go, "tool", "cover", "-func=c.out"], ka).strip().splitlines()[-1]
     m = re.search(r"([\d.]+)%", cov)
     expect("kevgate-admit coverage", m.group(1) + "%", page)
-    expect("kevgate-admit coverage in the projects ledger", m.group(1) + "%", "projects/index.html")
+    expect("kevgate-admit coverage in the summary box", m.group(1) + "%", page, f"{len(top)} tests, {m.group(1)}% coverage")
     vec = json.loads((ka / "internal" / "risk" / "testdata" / "parity_vectors.json").read_text(encoding="utf-8"))
     expect("kevgate-admit parity vectors", str(len(vec)), page, f"{len(vec)} generated vectors")
     try:
@@ -303,7 +303,7 @@ def admit_checks(clones: Path, env_go: str) -> None:
 
 
 def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
-    """vulnlab v0.1.0 sheet: release, tag commit, test count, sinkline results, CI run, demo lines, bug lines, Lab explorer data."""
+    """vulnlab v0.1.1 sheet: release, tag commit, test count, sinkline results, CI run, demo lines, bug lines, Lab explorer data."""
     page = "projects/vulnlab/index.html"
     vl = clones / "vulnlab"
     venvs = {k: str(Path(v).resolve()) for k, v in venvs.items()}  # the commands below run in other directories
@@ -319,10 +319,10 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
     results.append((head == tagsha, f"vulnlab clone HEAD {head[:7]} is the {tag} commit {tagsha[:7]}"))
     expect("vulnlab tag commit", tagsha[:7], page)
 
-    # tests: 43 collected, 43 passed
+    # tests: all collected tests pass
     n = collected(py, vl)
     expect("vulnlab collected tests", str(n), page, f"{n} in all")
-    expect("vulnlab tests on the projects page", str(n), "projects/index.html", f"{n} tests")
+    expect("vulnlab tests in the summary box", str(n), page, f"{n} tests pass")
     pt = subprocess.run([py, "-m", "pytest", "-q", "-p", "no:cacheprovider"], cwd=vl, capture_output=True, text=True, env=env).stdout
     m = re.search(r"(\d+) passed", pt)
     results.append((bool(m) and int(m.group(1)) == n and "failed" not in pt, f"vulnlab pytest -q: {pt.strip().splitlines()[-1] if pt.strip() else 'no output'}"))
@@ -350,14 +350,14 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
     html = (SITE / page).read_text(encoding="utf-8")
     shown = re.search(r'data-label="\$ bash tools/demo.sh[^"]*"><code>(.*?)</code>', html, re.S).group(1)
     import html as _h
-    lines = [l for l in _h.unescape(shown).splitlines() if "(full output on Plate 1)" not in l]
+    lines = [l for l in _h.unescape(shown).splitlines() if "(full output on Plate 1)" not in l and "(not shown:" not in l]
     missing = [l for l in lines if l.strip() not in demo]
     results.append((not missing and len(lines) > 8, f"vulnlab demo transcript: {len(lines)} lines, {len(missing)} not found in a real run of tools/demo.sh {missing[:2]}"))
 
     # the vulnerable lines the page quotes, at the lines it names
     for lab, num, text in [("01-ssrf-redirect", 23, "upstream = requests.get(url, timeout=3)"), ("01-ssrf-redirect", 20, "if not host_allowed(url):"),
-                           ("02-sqli-order-by", 16, "ORDER BY {sort} {direction}"), ("03-idor-bola", 34, "if current_user() is None:"),
-                           ("03-idor-bola", 38, "return jsonify(invoices[object_id])")]:
+                           ("02-sqli-order-by", 16, "ORDER BY {sort} {direction}"), ("03-idor-bola", 37, "if current_user() is None:"),
+                           ("03-idor-bola", 41, "return jsonify(invoices[object_id])")]:
         src = (vl / "labs" / lab / "vulnerable" / "app.py").read_text(encoding="utf-8").splitlines()[num - 1]
         results.append((text in src, f"vulnlab {lab} vulnerable/app.py line {num} contains {text!r}"))
         expect(f"vulnlab page quotes {lab} line {num}", text, page)
@@ -537,25 +537,36 @@ def main() -> int:
         cov = run([pybin(venvs, "tripline", "python"), "-m", "pytest", "-q", "-p", "no:cacheprovider", "--cov=tripline", "--cov-branch"], t)
         mcov = re.search(r"^TOTAL\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)%", cov, re.M)
         results.append((bool(mcov) and mcov.group(1) == "91", f"tripline coverage (line+branch) {mcov.group(1) + '%' if mcov else 'not measured'}, page says 91%"))
-        expect("tripline 0 of 36 on home", "0 of 36", "index.html")
         expect("tripline tests on resume page", str(n), "resume/index.html", f"{n} tests")
         code = (
             "from pathlib import Path\n"
             "from tripline.engine.rules import load_rules, evaluate\n"
             "from tripline.replay import load_fixture_events\n"
             "from tripline.scenarios import load_scenarios\n"
+            "from tripline.logsource import normalize\n"
             "root=Path('.')\n"
             "sc={s.id:s for s in load_scenarios(root/'scenarios')}['t1548-001-setuid-setgid']\n"
             "ev=load_fixture_events(sc,root)\n"
             "rs={r.id:r for r in load_rules(root/'rules'/'sigma').rules}\n"
             "for rid in ('c21c4eaa-ba2e-419a-92b2-8371703cbe21','7f3c2b1a-6d4e-4a9b-9c8d-1e2f3a4b5c6d'):\n"
             "    res=[evaluate(rs[rid],e) for e in ev]\n"
-            "    print(sum(x is not None for x in res), sum(x is True for x in res))\n"
+            "    ne=[normalize(e) for e in ev]\n"
+            "    ok=[(x is not None) for x in res]\n"
+            "    atk=[x for x,n,k in zip(res,ne,ok) if k and n['Image'].endswith('/chmod')]\n"
+            "    wrap=sum(1 for n,k in zip(ne,ok) if k and not n['Image'].endswith('/chmod') and 'chmod' in n['CommandLine'])\n"
+            "    print(sum(x is not None for x in res), sum(x is True for x in res), len(atk), sum(x is True for x in atk), wrap)\n"
         )
         o = run([pybin(venvs, "tripline", "python"), "-c", code], t).split()
-        if len(o) == 4:
-            expect("tripline stock rule hits", f"{o[1]} of {o[0]}", "projects/tripline/index.html")
-            expect("tripline replacement rule hits", f"{o[3]} of {o[2]}", "projects/tripline/index.html")
+        if len(o) == 10:
+            # per rule: applicable events, flagged events, attack events (chmod executions), flagged attack events, wrapper events
+            (tot, s_all, n_atk, s_atk, n_wrap), (tot2, r_all, n_atk2, r_atk, n_wrap2) = list(map(int, o[:5])), list(map(int, o[5:]))
+            results.append((tot == tot2 == 36 and n_atk == n_atk2 == 2 and n_wrap == n_wrap2 == 4 and (s_atk, r_atk) == (0, 2) and (s_all, r_all) == (0, 2),
+                            f"F-001 counts from the fixture: {tot} events, {n_atk} attack events, {n_wrap} wrapper lines; stock flagged {s_atk}, replacement flagged {r_atk}"))
+            expect("tripline stock rule on the attack events", f"{s_atk} of the {n_atk} attack events", "projects/tripline/index.html")
+            expect("tripline replacement rule on the attack events", f"{r_atk} of {n_atk}", "projects/tripline/index.html")
+            expect("tripline hero reading on the home page", f"flagged {s_atk} of those {n_atk}", "index.html")
+            expect("tripline resume text", f"flagged {s_atk} of the {n_atk} attack events among {tot} recorded events", "resume/index.html")
+            expect("tripline about text", f"flagged {s_atk} of the {n_atk} attack events among {tot} recorded events", "about/index.html")
         else:
             results.append((False, f"tripline F-001 derivation failed: {o}"))
         # tripline Rule bench: data file against the clone's rule YAML and the page text
