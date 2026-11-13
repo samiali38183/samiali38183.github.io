@@ -2,7 +2,7 @@
 // it does not run any parser. To check the data against fresh parser runs use
 // `python scripts/capture_fuzzdiff_bench.py --check`.
 //
-//   node scripts/test_bench_fuzzdiff.mjs [path/to/data.json]     (the optional path is for the mutation check in docs/QC.md)
+//   node scripts/test_bench_fuzzdiff.mjs [path/to/data.json]     (the optional path lets you point the test at a modified data file)
 //
 // 1. The data is internally consistent: byte counts match the escaped bytes, every harness classification agrees with the
 //    two results it classifies (Equal means identical, BothReject means both errors, RustStricter(D1) needs a fold and
