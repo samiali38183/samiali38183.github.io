@@ -116,7 +116,7 @@ Only: strip entrance (CSS, scroll-driven, optional), one cross-document view tra
 
 Print forces the light tokens, hides navigation, benches and buttons, and prints URLs after external links. `forced-colors` keeps strip shapes with `CanvasText` borders and a 2 px outline on missed ticks.
 
-## Budgets (measured, see QC.md section 8)
+## Budgets (measured)
 
 CSS 26.6 KB raw / 6.9 KB gzip; global JS 1.9 KB raw / 0.8 KB gzip; fonts 81 KB (serif 51, mono 15 + 16); first load per page (HTML, CSS, JS, three fonts, gzip, no screenshots) 90 to 98 KB; no third-party requests.
 
