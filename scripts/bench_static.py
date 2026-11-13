@@ -198,11 +198,11 @@ def kev_snapshot_plate() -> str:
            "so this is two related signals agreeing, not independent validation of either, and it does not test the risk score. "
            f'Drawn from {_n(m["rows"])} rows of the committed EPSS subset (all {_n(m["kev_rows"])} KEV CVEs plus {_n(m["non_kev_rows"])} seeded non-KEV CVEs); '
            f'KEV catalog {esc(m["kev_catalog"])}, EPSS file {esc(m["epss_date"])}, model {esc(m["epss_model"])}.')
-    return (f'<figure class="plate snap"><span class="plate-label">Plate {{{{n}}}}</span><div class="snapfig">{svg}</div>{table}'
+    return (f'<figure class="plate snap"><span class="plate-label">Figure {{{{n}}}}</span><div class="snapfig">{svg}</div>{table}'
             f'<figcaption>{cap}</figcaption></figure>')
 
 # ---------------------------------------------------------------------------------------------
-# kevgate-admit: Admission desk (no-JS state), evidence lookup path, from assets/data/admission-bench.json.
+# kevgate-admit: Admission demo (no-JS state), evidence lookup path, from assets/data/admission-bench.json.
 # The file is written by scripts/capture_admission_bench.py from a running kevgate-admit; this only formats it.
 # ---------------------------------------------------------------------------------------------
 def _admit() -> dict:
@@ -272,7 +272,7 @@ def admit_static() -> str:
           '<th scope="col">Severity</th><th scope="col" class="num">CVSS</th><th scope="col" class="num">EPSS</th><th scope="col" class="num">Risk</th></tr></thead>'
           f'<tbody>{srows}</tbody></table></div>'
           f'<p class="sw-lead">{esc(s["scored_with"])}. Fixture: <code>{esc(s["fixture"])}</code>, {s["bytes"]} bytes.</p>')
-    lead = ('<p class="sw-lead">Recorded, not live. All responses are listed here; with JavaScript on, a desk shows one at a time. '
+    lead = ('<p class="sw-lead">Recorded, not live. All responses are listed here; with JavaScript on, the demo shows one at a time. '
             f'Risk formula: <code>{esc(pv["formula"])}</code>.</p>')
     return lead + t1 + t2 + t3
 
@@ -284,7 +284,7 @@ def admit_caption() -> str:
         "before any report is looked up.</b> "
         f"Recorded, not live: every result is the raw AdmissionReview response of <code>{esc(pv['tool'])}</code> {esc(pv['tag'])} "
         f"(commit {esc(pv['commit'][:7])}, {esc(pv['go'])}), started with <code>{esc(pv['command'])}</code> and sent one POST per pair, {esc(pv['captured'])}. "
-        "The page evaluates no policy; the desk only chooses which recorded response to show. "
+        "The page evaluates no policy; the demo only chooses which recorded response to show. "
         "Synthetic demo data and test output, not a cluster run. Regenerate with <code>python scripts/capture_admission_bench.py</code>; "
         "<code>node scripts/test_bench_admission.mjs</code> checks that the page shows exactly the stored responses.")
 
@@ -311,7 +311,7 @@ def admit_path() -> str:
         f'<li><span class="ap-n" aria-hidden="true">{chr(65 + i)}</span><b>{esc(t)}</b><span class="ap-d">{esc(desc)}</span>'
         f'<span class="ap-c">{" ".join("<code>" + esc(n) + "</code>" for n in names)}</span></li>'
         for i, (t, desc, names) in enumerate(ADMIT_PATH))
-    return ('<figure class="plate admit-path"><span class="plate-label">Plate {{n}}</span>'
+    return ('<figure class="plate admit-path"><span class="plate-label">Figure {{n}}</span>'
             f'<ol class="ap" aria-label="Evidence lookup path, six steps">{items}</ol>'
             '<figcaption><b>From an image digest to a verdict, in six steps.</b> The names are Go identifiers in kevgate-admit v0.1.0, '
             'each checked against the tagged source by the capture script; the packages are <code>internal/admission</code>, <code>imageref</code>, '

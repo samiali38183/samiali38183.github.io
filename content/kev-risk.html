@@ -30,7 +30,7 @@ A standard-library Python script that ranks scan findings with a simple weighted
 </table></div>
 <div class="prose">
 <p>KEV is also not the first sort key in the directive: a non-KEV CVE that is exposed, automatable and gives total control gets 3 days, while a KEV CVE that is not exposed, not automatable and gives partial control gets 14. The notes in the repository say Table 1 was transcribed by eye from an image and should be checked against the source before reuse.</p>
-<p>The limits that remain in the tool: the weights are a design choice with no outcome data behind them, and EPSS is trained partly on exploitation evidence that overlaps with KEV, so the two signals are not independent. Plate 1 shows the first point directly: move the weights and the order moves. With the defaults the KEV weight equals the EPSS and CVSS weights combined, so all 12 KEV findings land first largely by construction.</p>
+<p>The limits that remain in the tool: the weights are a design choice with no outcome data behind them, and EPSS is trained partly on exploitation evidence that overlaps with KEV, so the two signals are not independent. Figure 1 shows the first point directly: move the weights and the order moves. With the defaults the KEV weight equals the EPSS and CVSS weights combined, so all 12 KEV findings land first largely by construction.</p>
 </div>
 
 <!--@as-left-->
@@ -80,8 +80,8 @@ KEV vs non-KEV population
 
 <!--@method-->
 <div class="prose">
-<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it: <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>. Dividing by the weight total keeps the scale at 0 to 100 for any weights, so ordering does not depend on it. Ties break on KEV, EPSS, CVSS, ACR, days open, then CVE id and asset. If no finding in the list has a CVSS value, that term and its weight are dropped for every row and the rest is renormalized, which is how the real snapshot is scored; a list that mixes the two is refused unless <code>--allow-mixed</code> is given. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison. The <a href="/projects/kevgate/">kevgate</a> sheet documents the same weights.</p>
-<p>Plate 1 re-implements that formula in the browser and checks it against the tool: <code>scripts/gen_bench_kev.py</code> calls the tool's own <code>score_all</code> with custom weights for the four presets and 300 random weight vectors, and <code>scripts/test_bench_kev.mjs</code> requires the same order and the same scores to one decimal. Plate 2 is drawn at build time from the committed subset.</p>
+<p>The script reads a CSV of findings, matches each CVE against a KEV file in the CISA feed format, and scores it: <code>100 * (0.40*kev + 0.25*acr/8 + 0.20*epss + 0.20*cvss/10) / 1.05</code>. Dividing by the weight total keeps the scale at 0 to 100 for any weights, so ordering does not depend on it. Ties break on KEV, EPSS, CVSS, ACR, days open, then CVE id and asset. If no finding in the list has a CVSS value, that term and its weight are dropped for every row and the rest is renormalized, which is how the real snapshot is scored; a list that mixes the two is refused unless <code>--allow-mixed</code> is given. Output is text, CSV or JSON, plus a KEV versus non-KEV comparison. The <a href="/projects/kevgate/">kevgate</a> page documents the same weights.</p>
+<p>Figure 1 re-implements that formula in the browser and checks it against the tool: <code>scripts/gen_bench_kev.py</code> calls the tool's own <code>score_all</code> with custom weights for the four presets and 300 random weight vectors, and <code>scripts/test_bench_kev.mjs</code> requires the same order and the same scores to one decimal. Figure 2 is drawn at build time from the committed subset.</p>
 </div>
 
 <!--@limits-->
