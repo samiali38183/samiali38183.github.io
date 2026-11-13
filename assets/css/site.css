@@ -505,3 +505,14 @@ ol.rules h3{margin:0 0 var(--s-2);font-size:var(--step-1)}
   .plate,.limits,.record-head,tr{break-inside:avoid}
 }
 @media (max-width:39.99rem){.srow,.strips.mini .srow{grid-template-columns:minmax(0,1fr)}.srow>.val{grid-column:1}.tbl .chip{white-space:normal}}
+
+/* recruiter-friendly additions */
+.at-a-glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:var(--s-3) var(--s-4);margin:0 0 var(--s-6);padding:var(--s-4) 0;border-top:1px solid var(--rule,currentColor);border-bottom:1px solid var(--rule,currentColor);max-width:66rem}
+.at-a-glance dt{font:600 var(--step--1)/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);margin-bottom:.25rem}
+.at-a-glance dd{margin:0;font-size:var(--step-0);line-height:1.35}
+.kicker{font:600 var(--step--1)/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);margin:0 0 .4rem}
+.hero-read .tech{margin-top:var(--s-3)}
+.tags{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:.5rem}
+.tags li{border:1px solid var(--ink);padding:.3rem .7rem;font-size:var(--step--1);line-height:1.3}
+.terms{display:grid;gap:var(--s-3);margin-top:var(--s-3)}
+.terms dt{font-weight:600}.terms dd{margin:0}
