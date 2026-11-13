@@ -1,4 +1,4 @@
-"""Static (no-JS) record of the kevgate "Control to evidence matrix", the plate caption and the deployment architecture plate.
+"""Static (no-JS) record of the kevgate "Control to evidence matrix", the figure caption and the deployment architecture figure.
 
 All three are generated from assets/data/kevgate-bench.json, which scripts/capture_kevgate_bench.py writes from kevgate v0.1.1 and
 from real CI runs. This module only formats it. The live bench (assets/js/bench-kevgate.js) shows the same strings one control at a
@@ -226,8 +226,8 @@ def arch() -> str:
         alt_html.append(f"<p><strong>{C.esc(items[0][1])}.</strong> {C.esc(items[0][2])}.</p>"
                         f'<ol class="alt-list" type="A" start="{letter + 1}">{"".join(h for k, h in alt if k == "item")}</ol>')
         letter = nxt
-    label = '<span class="plate-label">Plate {{n}}</span>'
+    label = '<span class="plate-label">Figure {{n}}</span>'
     cap = ("How the chart and the workflows at the tag fit together. Letters A to E follow a request; F to J are the workflows. "
-           "The release workflow's attestations and the kind job's NetworkPolicy and Pod Security checks are among the evidence cited in Plate 1.")
+           "The release workflow's attestations and the kind job's NetworkPolicy and Pod Security checks are among the evidence cited in Figure 1.")
     return (f'<figure class="plate diagram kg-arch">{label}<div class="kg-lanes">{"".join(svgs)}</div><figcaption>{esc(cap)}</figcaption></figure>'
             f'<details class="alt"><summary>Describe this diagram</summary>{"".join(alt_html)}</details>')

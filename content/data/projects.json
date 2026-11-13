@@ -20,8 +20,8 @@
    "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule flagged 0 of the 2 attack events among 36 recorded events; a replacement flags both.",
    "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 13 passing, 1 pending (Windows); 98% weighted coverage, 52% on unmodified SigmaHQ rules alone; 212 tests.",
    "labels": {
-    "found": "As found",
-    "left": "As left"
+    "found": "Before",
+    "left": "After"
    },
    "found_title": "The stock setuid rule matched nothing, and false positives and evasion were not measured",
    "left_title": "A replacement rule matches the two chmod runs, and the gaps are now measured",
@@ -44,7 +44,7 @@
     "caption": "Among 36 events recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner, 2 are the attack itself (the two chmod executions). SigmaHQ's stock Setuid and Setgid rule flagged 0 of those 2; the replacement rule flags both. The other 34 events are not attack events.",
     "stamp": [
      "fail",
-     "As found: fail"
+     "Before: fail"
     ],
     "run": "41838714456",
     "run_label": "recording run",
@@ -63,7 +63,7 @@
      },
      "rows": [
       {
-       "label": "As found",
+       "label": "Before",
        "runs": [
         [
          "neg",
@@ -89,7 +89,7 @@
        "val": "<b>0</b> of 2 attack events flagged, among 36 recorded events"
       },
       {
-       "label": "As left",
+       "label": "After",
        "runs": [
         [
          "neg",
@@ -497,10 +497,10 @@
    "kind": "Application security",
    "title": "sinkline: taint analysis for Python web apps | Sami Ali",
    "desc": "sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.",
-   "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 184 tests; scored on OWASP BenchmarkPython v0.1.",
+   "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 184 tests at v0.5.1 (186 on main); scored on OWASP BenchmarkPython v0.1.",
    "labels": {
-    "found": "As found",
-    "left": "As left"
+    "found": "Before",
+    "left": "After"
    },
    "found_title": "On an independent benchmark 0.4.1 scored +0.21, and Bandit leads over all 14 categories",
    "left_title": "0.5.1 scores +0.52 on the taint categories; the fixes were chosen from the failures",
@@ -539,7 +539,7 @@
      },
      "rows": [
       {
-       "label": "As found",
+       "label": "Before",
        "runs": [
         [
          "hit",
@@ -561,7 +561,7 @@
        "val": "sinkline 0.4.1: TP 99, FN 141, FP 89, TN 348. Score <b>+0.21</b>"
       },
       {
-       "label": "As left",
+       "label": "After",
        "runs": [
         [
          "hit",
@@ -842,8 +842,8 @@
    "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.",
    "fact": "A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests at v0.1.1.",
    "labels": {
-    "found": "As found",
-    "left": "As left"
+    "found": "Before",
+    "left": "After"
    },
    "found_title": "The 0.1.0 tests would not have noticed six defects, and five gaps remained",
    "left_title": "Six mutants killed, five gaps closed, controls cited to tests and CI",
@@ -865,7 +865,7 @@
     "caption": "Six defects had survived the test suite; tests added in 0.1.1 now fail when each one is reintroduced. The suite went from 227 to 277 tests.",
     "stamp": [
      "pass",
-     "As left: pass"
+     "After: pass"
     ],
     "run": "42960808156"
    },
@@ -879,7 +879,7 @@
      },
      "rows": [
       {
-       "label": "As found",
+       "label": "Before",
        "runs": [
         [
          "miss",
@@ -889,7 +889,7 @@
        "val": "<b>6</b> survived 227 tests"
       },
       {
-       "label": "As left",
+       "label": "After",
        "runs": [
         [
          "hit",
@@ -1006,10 +1006,10 @@
    "desc": "kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. Strict image-reference parsing, optional signed evidence, a signed published image, 93 tests and 95% coverage.",
    "fact": "An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. v0.1.0: strict image-reference parsing, signed scan reports, an outage test on kind and a signed image on GHCR; 93 tests, 95% coverage. It does not scan images itself.",
    "labels": {
-    "found": "As found",
-    "left": "As left"
+    "found": "Before",
+    "left": "After"
    },
-   "found_title": "Five weaknesses in the reviewed version",
+   "found_title": "Five weaknesses in the version before the release",
    "left_title": "What v0.1.0 changed, and what it still does not do",
    "record": {
     "instrument": "kevgate-admit v0.1.0, tag commit 161169a (released 2026-11-11)",
@@ -1023,35 +1023,35 @@
    "reading": {
     "num": "5",
     "den": "/5",
-    "unit": "review findings closed",
-    "caption": "A review of the earlier version found five weaknesses: a malformed image reference accepted, an option that could drop a KEV finding, an untested outage, unauthenticated evidence and no published image. v0.1.0 closes all five, each with a test, a CI run or a recorded response. The limits it keeps are listed below.",
+    "unit": "weaknesses closed",
+    "caption": "Going back over the earlier version turned up five weaknesses: a malformed image reference accepted, an option that could drop a KEV finding, an untested outage, unauthenticated evidence and no published image. v0.1.0 closes all five, each with a test, a CI run or a recorded response. The limits it keeps are listed below.",
     "stamp": [
      "pass",
-     "As left: 5 of 5 closed"
+     "After: 5 of 5 closed"
     ],
     "run": "43081479456"
    },
    "strip_sets": {
     "main": {
-     "unit": "review findings",
+     "unit": "weaknesses",
      "total_label": "5 findings",
      "phr": {
       "hit": "closed in v0.1.0",
-      "miss": "open in the reviewed version"
+      "miss": "open before the release"
      },
      "rows": [
       {
-       "label": "As found",
+       "label": "Before",
        "runs": [
         [
          "miss",
          5
         ]
        ],
-       "val": "<b>5</b> open in the reviewed version (commit bfa62fe)"
+       "val": "<b>5</b> open before the release (commit bfa62fe)"
       },
       {
-       "label": "As left",
+       "label": "After",
        "runs": [
         [
          "hit",
@@ -1065,7 +1065,7 @@
    },
    "home": {
     "against": "Python score on 1000 vectors; synthetic and real Trivy reports; kind in CI",
-    "reading": "5 of 5 review findings closed",
+    "reading": "5 of 5 weaknesses closed",
     "run": "43081479456",
     "found": "Accepted org/../evil; ignoreUnfixed could drop a KEV finding; outage untested; unsigned evidence; no image",
     "left": "v0.1.0: 93 tests, 95.0% coverage, signed image",
@@ -1132,13 +1132,13 @@
      "README at v0.1.0"
     ],
     [
-     "Admission desk capture script",
+     "Admission demo capture script",
      "link",
      "https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/capture_admission_bench.py",
      "scripts/capture_admission_bench.py"
     ],
     [
-     "Admission desk parity test",
+     "Admission demo parity test",
      "link",
      "https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_admission.mjs",
      "scripts/test_bench_admission.mjs"
@@ -1151,7 +1151,7 @@
    "plain": {
     "what": "It checks each container image against existing scan reports when a workload is created. Depending on the namespace policy, it denies, warns or allows.",
     "why": "The decision happens where the workload gets created. It does not scan images itself.",
-    "found": "A review of the earlier version found five weaknesses, such as a malformed image name that was accepted. Version 0.1.0 closes all five, each with a test, a CI run or a recorded response."
+    "found": "Going back over the earlier version turned up five weaknesses, such as a malformed image name that was accepted. Version 0.1.0 closes all five, each with a test, a CI run or a recorded response."
    },
    "try": {
     "kind": "Try it",
@@ -1169,8 +1169,8 @@
    "desc": "fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.",
    "fact": "picohttpparser ported from C to safe Rust, checked against the C original and against httparse. 39 tests, 95.53% line coverage, 5 of 5 seeded bugs detected, 0 differences from C in 2,000,000 inputs. Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.",
    "labels": {
-    "found": "As found",
-    "left": "As left"
+    "found": "Before",
+    "left": "After"
    },
    "found_title": "Two seeded bugs no test noticed, and a harness exception that would have hidden one",
    "left_title": "Five seeded bugs detected, and a second parser to compare against",
@@ -1205,7 +1205,7 @@
      },
      "rows": [
       {
-       "label": "As found (0.1.0)",
+       "label": "Before (0.1.0)",
        "runs": [
         [
          "hit",
@@ -1219,7 +1219,7 @@
        "val": "<b>3</b> of 5 detected; <b>2</b> survived the 0.1.0 tests"
       },
       {
-       "label": "As left (0.2.0)",
+       "label": "After (0.2.0)",
        "runs": [
         [
          "hit",
@@ -1332,11 +1332,11 @@
    "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. v0.3.0 refuses lists that mix rows with and without CVSS and sorts in a total order. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
    "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. Mixed CVSS lists are refused unless --allow-mixed. 63 tests.",
    "labels": {
-    "found": "As found",
-    "left": "As left"
+    "found": "Before",
+    "left": "After"
    },
    "found_title": "The first version claimed more than it showed",
-   "left_title": "Defects from a review fixed in 0.3.0, and a pinned real snapshot with its limits",
+   "left_title": "Defects found after 0.2.0, fixed in 0.3.0, and a pinned real snapshot with its limits",
    "record": {
     "instrument": "kev-risk-prioritization v0.3.0, commit 3859ff6",
     "reference": "a CVSS-only sort of 20 synthetic findings, and a pinned real snapshot: CISA KEV 2026.11.10 and FIRST EPSS scored 2026-11-11",
@@ -1550,8 +1550,8 @@
    "desc": "vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.",
    "fact": "A localhost-only lab of three small vulnerable Flask services: SSRF through a redirect, SQL injection in ORDER BY and IDOR. Each has a fix checked by the tests that show the impact, a sinkline record and a Sigma rule. 3 of 3 fixes verified; sinkline reports two of the three bugs and both fixes of those two. Training lab, loopback only, no CVEs.",
    "labels": {
-    "found": "As found",
-    "left": "As left"
+    "found": "Before",
+    "left": "After"
    },
    "found_title": "Three vulnerable services, one missing check each",
    "left_title": "Three fixes, checked by the tests that showed the impact, and four defects of the first release fixed",
@@ -1574,7 +1574,7 @@
     "caption": "Each of the three vulnerable services shows its impact in a test, and the same checks fail against its fixed version. sinkline reports two of the three bugs and also both fixed versions of those two (false positives), and nothing on the IDOR, which is not a taint flow. The detection rules alert on the attempts either way.",
     "stamp": [
      "pass",
-     "As left: 3 of 3 fixes verified"
+     "After: 3 of 3 fixes verified"
     ],
     "run": "43134837698"
    },
@@ -1588,7 +1588,7 @@
      },
      "rows": [
       {
-       "label": "As found",
+       "label": "Before",
        "runs": [
         [
          "miss",
@@ -1598,7 +1598,7 @@
        "val": "<b>3</b> vulnerable services show their impact in a test"
       },
       {
-       "label": "As left",
+       "label": "After",
        "runs": [
         [
          "hit",
@@ -1908,7 +1908,7 @@
   },
   {
    "project": "vulnlab",
-   "text": "A review of 0.1.0 found that the fixed SSRF service answered 500 to malformed URLs, that both IDOR variants issued a login token for an unknown user with a null password, and that no test failed if the fixed SSRF service's address check was removed. All three are fixed in 0.1.1 and each has a test.",
+   "text": "A second pass over 0.1.0 found that the fixed SSRF service answered 500 to malformed URLs, that both IDOR variants issued a login token for an unknown user with a null password, and that no test failed if the fixed SSRF service's address check was removed. All three are fixed in 0.1.1 and each has a test.",
    "state": [
     "pass",
     "Fixed"

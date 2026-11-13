@@ -350,7 +350,7 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
     html = (SITE / page).read_text(encoding="utf-8")
     shown = re.search(r'data-label="\$ bash tools/demo.sh[^"]*"><code>(.*?)</code>', html, re.S).group(1)
     import html as _h
-    lines = [l for l in _h.unescape(shown).splitlines() if "(full output on Plate 1)" not in l and "(not shown:" not in l]
+    lines = [l for l in _h.unescape(shown).splitlines() if "(full output on Figure 1)" not in l and "(not shown:" not in l]
     missing = [l for l in lines if l.strip() not in demo]
     results.append((not missing and len(lines) > 8, f"vulnlab demo transcript: {len(lines)} lines, {len(missing)} not found in a real run of tools/demo.sh {missing[:2]}"))
 
@@ -613,7 +613,7 @@ def main() -> int:
     else:
         results.append((False, "sinkline compare_bandit output not parsed"))
     n = collected(py, s)
-    expect("sinkline tests", str(n), "projects/sinkline/index.html", f"{n} (includes")
+    expect("sinkline tests", str(n), "projects/sinkline/index.html", f"{n} on main")
     rules = run([pybin(venvs, "sinkline", "sinkline"), "rules"], s)
     m = re.search(r"(\d+) rules, (\d+) sink signatures", rules)
     if m:

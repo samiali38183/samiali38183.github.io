@@ -134,7 +134,7 @@ async function init() {
   const sel = h('select', { id: 'bl-ev' });
   ev.forEach((e, i) => sel.append(h('option', { value: i, text: (i + 1) + ': ' + (e.c.length > 54 ? e.c.slice(0, 54) + '…' : e.c) })));
   const detail = h('div', { class: 'bl-ev', 'aria-live': 'polite' });
-  const rows = [['As found', 'stock rule', 's'], ['As left', 'replacement rule', 'r']].map(([a, b, key]) => {
+  const rows = [['Before', 'stock rule', 's'], ['After', 'replacement rule', 'r']].map(([a, b, key]) => {
     const strip = h('div', { class: 'strip', 'aria-hidden': 'true' });
     ev.forEach((e, i) => {
       const exp = d.expected.includes(i), hit = e[key];

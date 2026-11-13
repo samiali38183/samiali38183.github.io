@@ -26,28 +26,28 @@ import pages as P  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "https://samiali38183.github.io"
 OG_IMAGE = BASE + "/assets/og.png"
-OG_ALT = "A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left."
+OG_ALT = "0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after)."
 
 # (url path, nav key, title, description, kind, argument)
 PAGES = [
-    ("/", "home", "Sami Ali | Security tools, checked against what they claim",
-     "Sami Ali, George Mason University class of 2028. Detection, application-security and vulnerability-management tools, each checked against a reference, with the readings and CI runs.",
+    ("/", "home", "Sami Ali | Detection and application security projects",
+     "Sami Ali, George Mason University class of 2028. Detection rules, a code analyzer and vulnerability-ranking tools, each tested against recorded data, a benchmark or the original, with the results and CI runs.",
      "home", None),
     ("/projects/", "projects", "Projects | Sami Ali",
-     "Seven projects, each checked against a reference: tripline, sinkline, kevgate, kevgate-admit, vulnlab, fuzzdiff and kev-risk-prioritization, with readings, limits and CI evidence.",
+     "Seven projects: tripline, sinkline, kevgate, kevgate-admit, vulnlab, fuzzdiff and kev-risk-prioritization. Each page has the results, the limits and links to the CI runs.",
      "projects", None),
 ] + [
     (f"/projects/{slug}/", "projects", None, None, "project", slug)
     for slug in ["tripline", "sinkline", "vulnlab", "kevgate", "kevgate-admit", "fuzzdiff", "kev-risk-prioritization"]
 ] + [
     ("/experience/", "experience", "Experience | Sami Ali",
-     "DHS HS-POWER intern on CBP's Vulnerability Assessment Team, May to August 2026. Education and certifications.",
+     "DHS HS-POWER intern on CBP's Vulnerability Assessment Team, May to August 2026, plus education and certifications.",
      "content", "experience.html"),
     ("/about/", "about", "About | Sami Ali",
-     "Student at George Mason University focused on detection engineering, application security and vulnerability management, and on checking that security tooling does what it says.",
+     "George Mason University student working on detection engineering, application security and vulnerability management, and on checking whether security tools do what they say.",
      "content", "about.html"),
     ("/resume/", "resume", "Resume | Sami Ali",
-     "Download Sami Ali's resume (PDF), Security Engineering and Red Team versions, with the same facts as text.",
+     "Sami Ali's resume as a PDF, in a Security Engineering version and a Red Team version, with the same facts as text.",
      "content", "resume.html"),
 ]
 
@@ -170,7 +170,7 @@ def render(ctx: dict, kind: str, arg: str | None, path: str) -> tuple[str, str, 
     elif kind == "project":
         p = ctx["projects"]["projects"][arg]
         body = P.project_page(ctx, arg)
-        sheetline = (f'<p class="wrap sheetline"><b>Sheet {p["sheet"]} of {len(ctx["projects"]["order"])}</b> &middot; {html.escape(p["name"])}'
+        sheetline = (f'<p class="wrap sheetline"><b>Project {p["sheet"]} of {len(ctx["projects"]["order"])}</b> &middot; {html.escape(p["name"])}'
                      f' &middot; {html.escape(p["version"] if p["version"].startswith("v") else "main")}</p>')
         bn = p.get("bench", arg)
         if (ROOT / "assets/js" / f"bench-{bn}.js").exists():

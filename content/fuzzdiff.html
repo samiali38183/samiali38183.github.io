@@ -16,13 +16,13 @@ picohttpparser, an HTTP/1.x parser written in C, ported to safe Rust and checked
 </div>
 <aside class="note"><strong>Differential testing</strong> runs two implementations on the same input and flags any difference. It needs a rule for which differences are expected, and a second opinion to show what &ldquo;same as the original&rdquo; does and does not mean.</aside>
 <div class="scroll wide"><table class="tbl">
-<caption>Reading ledger, version 0.1.0</caption>
+<caption>Checks on version 0.1.0</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead>
 <tbody>
-<tr class="row-fail"><th scope="row">Harness exception for folded headers (D1)</th><td>Applies only when the input has a line feed followed by a space or tab</td><td>Applied to any ObsFold error in strict mode</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/fuzzdiff/pull/2">pull request #2</a></td></tr>
-<tr class="row-fail"><th scope="row">One-line parser changes (chunk overhead ratio, status-line guard)</th><td>At least one test fails for each</td><td>None of the tests noticed either</td><td>{{stamp:fail:As found: fail}}</td><td><a href="https://github.com/samiali38183/fuzzdiff#demo-the-harness-catching-seeded-bugs">README, seeded bugs</a></td></tr>
-<tr><th scope="row">Second parser to compare against</th><td>One, to show where &ldquo;matches the C original&rdquo; stops meaning &ldquo;matches a production parser&rdquo;</td><td>None</td><td>{{stamp:limit:As found: gap}}</td><td><a href="https://github.com/samiali38183/fuzzdiff/blob/main/CHANGELOG.md">CHANGELOG, 0.2.0</a></td></tr>
-<tr><th scope="row">Fuzzing</th><td>The C SIMD path under the fuzzer</td><td>Two-minute runs on the portable C path only</td><td>{{stamp:limit:As found: gap}}</td><td><a href="https://github.com/samiali38183/fuzzdiff/blob/main/CHANGELOG.md">CHANGELOG, 0.2.0</a></td></tr>
+<tr class="row-fail"><th scope="row">Harness exception for folded headers (D1)</th><td>Applies only when the input has a line feed followed by a space or tab</td><td>Applied to any ObsFold error in strict mode</td><td>{{stamp:fail:Before: fail}}</td><td><a href="https://github.com/samiali38183/fuzzdiff/pull/2">pull request #2</a></td></tr>
+<tr class="row-fail"><th scope="row">One-line parser changes (chunk overhead ratio, status-line guard)</th><td>At least one test fails for each</td><td>None of the tests noticed either</td><td>{{stamp:fail:Before: fail}}</td><td><a href="https://github.com/samiali38183/fuzzdiff#demo-the-harness-catching-seeded-bugs">README, seeded bugs</a></td></tr>
+<tr><th scope="row">Second parser to compare against</th><td>One, to show where &ldquo;matches the C original&rdquo; stops meaning &ldquo;matches a production parser&rdquo;</td><td>None</td><td>{{stamp:limit:Before: gap}}</td><td><a href="https://github.com/samiali38183/fuzzdiff/blob/main/CHANGELOG.md">CHANGELOG, 0.2.0</a></td></tr>
+<tr><th scope="row">Fuzzing</th><td>The C SIMD path under the fuzzer</td><td>Two-minute runs on the portable C path only</td><td>{{stamp:limit:Before: gap}}</td><td><a href="https://github.com/samiali38183/fuzzdiff/blob/main/CHANGELOG.md">CHANGELOG, 0.2.0</a></td></tr>
 </tbody>
 </table></div>
 

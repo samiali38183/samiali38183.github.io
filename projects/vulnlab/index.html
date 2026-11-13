@@ -17,12 +17,12 @@
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
+<meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="vulnlab: localhost-only web vulnerability lab | Sami Ali">
 <meta name="twitter:description" content="vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="A reading of 0 over 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two ruler strips show 36 ticks, 2 hatched as found and filled as left.">
+<meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-vulnlab.css">
@@ -43,7 +43,7 @@
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Sheet 3 of 7</b> &middot; vulnlab &middot; v0.1.1</p>
+<p class="wrap sheetline"><b>Project 3 of 7</b> &middot; vulnlab &middot; v0.1.1</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
@@ -58,21 +58,21 @@
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/vulnlab">Repository</a></li><li><a href="https://github.com/samiali38183/vulnlab/releases/tag/v0.1.1">Release v0.1.1</a></li><li><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.1/docs/METHOD.md">Method</a></li><li><a href="https://github.com/samiali38183/vulnlab/blob/v0.1.1/docs/SAFETY.md">Safety scope</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 </header>
-<section class="reading-band" aria-label="The reading">
+<section class="reading-band" aria-label="The result">
 <div class="hero-read">
-<p class="reading sm k-pass" role="img" aria-label="Reading: 3/3 fixes verified by the lab&#x27;s own tests"><span aria-hidden="true">3</span><span class="den" aria-hidden="true">/3</span></p>
+<p class="reading sm k-pass" role="img" aria-label="Result: 3/3 fixes verified by the lab&#x27;s own tests"><span aria-hidden="true">3</span><span class="den" aria-hidden="true">/3</span></p>
 <div>
 <p class="why">Each of the three vulnerable services shows its impact in a test, and the same checks fail against its fixed version. sinkline reports two of the three bugs and also both fixed versions of those two (false positives), and nothing on the IDOR, which is not a taint flow. The detection rules alert on the attempts either way.</p>
-<p class="chips"><span class="stamp pass">As left: 3 of 3 fixes verified</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/vulnlab/actions/runs/43134837698"><span class="st" aria-hidden="true"></span><span>run 43134837698</span> <span class="d">passed 2026-11-12</span></a></p>
+<p class="chips"><span class="stamp pass">After: 3 of 3 fixes verified</span> <a class="chip" data-s="pass" href="https://github.com/samiali38183/vulnlab/actions/runs/43134837698"><span class="st" aria-hidden="true"></span><span>run 43134837698</span> <span class="d">passed 2026-11-12</span></a></p>
 </div>
 </div>
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable service shows the impact</li><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>fixed service blocks the impact</li></ul>
-<div class="strips vt" style="--vt:strip-vulnlab"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 3 labs: 3 vulnerable service shows the impact"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> vulnerable services show their impact in a test</p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 3 labs: 3 fixed service blocks the impact"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>3</b> fixed services block it, checked by the same tests</p></div></div>
+<div class="strips vt" style="--vt:strip-vulnlab"><div class="srow"><span class="label" aria-hidden="true">Before</span><div class="strip" role="img" aria-label="Before, 3 labs: 3 vulnerable service shows the impact"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> vulnerable services show their impact in a test</p></div><div class="srow"><span class="label" aria-hidden="true">After</span><div class="strip" role="img" aria-label="After, 3 labs: 3 fixed service blocks the impact"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>3</b> fixed services block it, checked by the same tests</p></div></div>
 </section>
 <div class="try-head"><h2>See it</h2><p>Pick a lab and a version, vulnerable or fixed, and read the code, the tests and the scanner output side by side.</p></div>
 <section class="bench" id="try" data-bench="vulnlab" aria-label="Recorded readings">
 <figure class="plate">
-<span class="plate-label">Plate 1</span>
+<span class="plate-label">Figure 1</span>
 <div class="bench-static">
 <p class="sw-lead">Recorded, not live. All six lab and version pairs are listed here; with JavaScript on, a two-part switch shows one at a time.</p>
 <div class="scroll wide"><table class="tbl bt"><caption>Recorded results for each lab and version: its own tests, sinkline, and the detection replay</caption><thead><tr><th scope="col">Lab and version</th><th scope="col">Its tests</th><th scope="col">sinkline</th><th scope="col">Detection replay (same for both versions)</th></tr></thead><tbody><tr><th scope="row"><span class="label">Lab 01</span><br>SSRF through a redirect (CWE-918)<br><b>Vulnerable</b></th><td data-label="Its tests"><span class="stamp fail">Impact demonstrated</span><p>1 of 1 test passed</p></td><td data-label="sinkline"><span class="stamp">Finding</span><p>Correct: the finding is the bug.</p></td><td data-label="Detection replay (same for both versions)"><p>Attack sample: 2 events, 1 alert.</p><p>Benign sample: 2 events, 0 alerts.</p></td></tr><tr><th scope="row"><span class="label">Lab 01</span><br>SSRF through a redirect (CWE-918)<br><b>Fixed</b></th><td data-label="Its tests"><span class="stamp pass">Impact blocked</span><p>24 of 24 tests passed</p></td><td data-label="sinkline"><span class="stamp">Finding</span><p>False positive: this version is fixed.</p></td><td data-label="Detection replay (same for both versions)"><p>Attack sample: 2 events, 1 alert.</p><p>Benign sample: 2 events, 0 alerts.</p></td></tr><tr><th scope="row"><span class="label">Lab 02</span><br>SQL injection in ORDER BY (CWE-89)<br><b>Vulnerable</b></th><td data-label="Its tests"><span class="stamp fail">Impact demonstrated</span><p>1 of 1 test passed</p></td><td data-label="sinkline"><span class="stamp">Finding</span><p>Correct: the finding is the bug.</p></td><td data-label="Detection replay (same for both versions)"><p>Attack sample: 4 events, 1 alert.</p><p>Benign sample: 4 events, 0 alerts.</p></td></tr><tr><th scope="row"><span class="label">Lab 02</span><br>SQL injection in ORDER BY (CWE-89)<br><b>Fixed</b></th><td data-label="Its tests"><span class="stamp pass">Impact blocked</span><p>7 of 7 tests passed</p></td><td data-label="sinkline"><span class="stamp">Finding</span><p>False positive: this version is fixed.</p></td><td data-label="Detection replay (same for both versions)"><p>Attack sample: 4 events, 1 alert.</p><p>Benign sample: 4 events, 0 alerts.</p></td></tr><tr><th scope="row"><span class="label">Lab 03</span><br>IDOR / broken object-level authorization (CWE-639)<br><b>Vulnerable</b></th><td data-label="Its tests"><span class="stamp fail">Impact demonstrated</span><p>18 of 18 tests passed</p></td><td data-label="sinkline"><span class="stamp off">No finding</span><p>Not reported.</p></td><td data-label="Detection replay (same for both versions)"><p>Attack sample: 11 events, 1 alert.</p><p>Benign sample: 4 events, 0 alerts.</p></td></tr><tr><th scope="row"><span class="label">Lab 03</span><br>IDOR / broken object-level authorization (CWE-639)<br><b>Fixed</b></th><td data-label="Its tests"><span class="stamp pass">Impact blocked</span><p>18 of 18 tests passed</p></td><td data-label="sinkline"><span class="stamp off">No finding</span><p>Nothing to report on the fixed version.</p></td><td data-label="Detection replay (same for both versions)"><p>Attack sample: 11 events, 1 alert.</p><p>Benign sample: 4 events, 0 alerts.</p></td></tr></tbody></table></div>
@@ -405,17 +405,17 @@ sample_benign.ndjson: 4 events, 0 alert(s)
 <section class="glance" aria-label="At a glance">
 <dl>
 <div><dt>Checked against</dt><dd>Each lab&#x27;s fixed service and its tests; sinkline 0.5.0; Sigma rules replayed on recorded logs</dd></div>
-<div><dt>Found, then left</dt><dd><span class="gl">As found</span> 3 vulnerable services (SSRF, SQL injection, IDOR) show impact in their tests<br><span class="gl">As left</span> 3 fixes block it; 137 tests pass; loopback only</dd></div>
+<div><dt>Before and after</dt><dd><span class="gl">Before</span> 3 vulnerable services (SSRF, SQL injection, IDOR) show impact in their tests<br><span class="gl">After</span> 3 fixes block it; 137 tests pass; loopback only</dd></div>
 <div><dt>Limits</dt><dd>Training lab; bugs simpler than real ones; no CVEs; detection fires on attempts, not impact <a href="#limits">Full limits</a></dd></div>
 </dl>
 </section>
-<details class="fold fold-rec"><summary>Technical description and verification record: instrument, reference standard, date, how to reproduce (self-issued, not accredited)</summary><p class="dek tech">A localhost-only training lab: three small Flask services, each with one textbook web bug (SSRF through a redirect, SQL injection in ORDER BY, a missing object-level authorization check). Every lab has a fixed version, tests that show the impact on the vulnerable service and then the same checks failing against the fix, a Sigma rule replayed on recorded logs, and a record of what <a href="/projects/sinkline/">sinkline</a> does and does not report. It is a training lab, not vulnerability research.</p>
+<details class="fold fold-rec"><summary>Technical description and how the check was run: version, reference, date, how to reproduce</summary><p class="dek tech">A localhost-only training lab: three small Flask services, each with one textbook web bug (SSRF through a redirect, SQL injection in ORDER BY, a missing object-level authorization check). Every lab has a fixed version, tests that show the impact on the vulnerable service and then the same checks failing against the fix, a Sigma rule replayed on recorded logs, and a record of what <a href="/projects/sinkline/">sinkline</a> does and does not report. It is a training lab, not vulnerability research.</p>
 <section class="record-head" aria-label="Verification record">
 <dl>
-<div><dt>Instrument</dt><dd>vulnlab v0.1.1, tag commit dd2665d (released 2026-11-11)</dd></div>
-<div><dt>Reference standard</dt><dd>each lab&#x27;s fixed service and its tests: the same checks that show the impact on the vulnerable service must fail against the fix; sinkline 0.5.0 and a Sigma rule per lab are the other two checks</dd></div>
-<div><dt>Measured on</dt><dd>2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.1; CI (Linux) run 43134837698</dd></div>
-<div><dt>Issued by</dt><dd>The author. Self-issued verification record, not accredited.</dd></div>
+<div><dt>Version tested</dt><dd>vulnlab v0.1.1, tag commit dd2665d (released 2026-11-11)</dd></div>
+<div><dt>Checked against</dt><dd>each lab&#x27;s fixed service and its tests: the same checks that show the impact on the vulnerable service must fail against the fix; sinkline 0.5.0 and a Sigma rule per lab are the other two checks</dd></div>
+<div><dt>Run on</dt><dd>2026-11-11, Python 3.12.2, Windows 11, fresh clone at tag v0.1.1; CI (Linux) run 43134837698</dd></div>
+<div><dt>Run by</dt><dd>Sami Ali. Not independently audited.</dd></div>
 <div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="$ vulnlab, from a clone at v0.1.1"><code>pip install -r requirements.lock
 pytest -q
 python tools/sinkline_check.py
@@ -424,12 +424,12 @@ sigma check labs/*/detection/*.yml</code></pre></dd></div>
 </section></details>
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
-<h2 id="found-h"><span class="label sec-label">As found</span>Three vulnerable services, one missing check each</h2>
+<h2 id="found-h"><span class="label sec-label">Before</span>Three vulnerable services, one missing check each</h2>
 <div class="prose">
 <p>Each vulnerable service is under 60 lines, has no comment pointing at its bug, and does the intended job. What goes wrong is one missing check, and each test first confirms that the intended protection works for the direct case, then shows the impact. Everything the tests touch is data the test created: a marker string, a temporary SQLite file, seeded records.</p>
 </div>
 <ul class="key" aria-label="How to read the strips"><li><span class="strip" aria-hidden="true"><i data-s="miss"></i></span>vulnerable service shows the impact</li><li><span class="strip" aria-hidden="true"><i data-s="hit"></i></span>fixed service blocks the impact</li></ul>
-<div class="strips"><div class="srow"><span class="label" aria-hidden="true">As found</span><div class="strip" role="img" aria-label="As found, 3 labs: 3 vulnerable service shows the impact"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> vulnerable services show their impact in a test</p></div><div class="srow"><span class="label" aria-hidden="true">As left</span><div class="strip" role="img" aria-label="As left, 3 labs: 3 fixed service blocks the impact"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>3</b> fixed services block it, checked by the same tests</p></div></div>
+<div class="strips"><div class="srow"><span class="label" aria-hidden="true">Before</span><div class="strip" role="img" aria-label="Before, 3 labs: 3 vulnerable service shows the impact"><i data-s="miss"></i><i data-s="miss"></i><i data-s="miss"></i></div><p class="val"><b>3</b> vulnerable services show their impact in a test</p></div><div class="srow"><span class="label" aria-hidden="true">After</span><div class="strip" role="img" aria-label="After, 3 labs: 3 fixed service blocks the impact"><i data-s="hit"></i><i data-s="hit"></i><i data-s="hit"></i></div><p class="val"><b>3</b> fixed services block it, checked by the same tests</p></div></div>
 <div class="scroll wide"><table class="tbl">
 <caption>What each vulnerable service does wrong, the line, and the impact its test observes</caption>
 <thead><tr><th scope="col">Lab</th><th scope="col">What it does wrong</th><th scope="col">Root cause (vulnerable line)</th><th scope="col">What the test observes</th></tr></thead>
@@ -446,7 +446,7 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <div class="note" role="note"><strong>IDOR and BOLA</strong> name the same flaw: the server trusts an object id from the client without checking that the caller may use that object (OWASP API1:2023, CWE-639). Sequential ids make other records easy to find but are not the bug; random ids would only make a missing check harder to exploit.</div>
 </section>
 <section class="section" id="as-left" aria-labelledby="left-h">
-<h2 id="left-h"><span class="label sec-label">As left</span>Three fixes, checked by the tests that showed the impact, and four defects of the first release fixed</h2>
+<h2 id="left-h"><span class="label sec-label">After</span>Three fixes, checked by the tests that showed the impact, and four defects of the first release fixed</h2>
 <div class="prose">
 <p>Each fix is small and each lab's tests show it from two sides: the impact check that passed on the vulnerable service fails on the fix, and a second test shows the fixed service still does its job, so a fix that breaks the feature is not accepted. The three labs' own tests (72) and the tests of the loopback guard, the harness, the replay code, the captured output and the Sigma rules (65) all pass: 137 in all.</p>
 </div>
@@ -459,24 +459,24 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <tr><th scope="row">03 IDOR</th><td data-label="The fix">One helper decides whether an invoice is the caller's, and every by-id route goes through it. A record that is not yours answers 404, the same answer as "does not exist", so responses do not confirm which ids are in use. Authentication is checked before the lookup, so a caller with no token gets the same 401 for an existing and a missing id.</td><td data-label="Impact check on the fix">Every record the user did not own answered 404 on read and on update, and the other user's memo never appeared.</td><td data-label="Feature check on the fix">An owner can still read and update their own invoices and list them; requests without a login get 401.</td></tr>
 </tbody>
 </table></div>
-<h3>Defects of the first release, found in a review and fixed in 0.1.1</h3>
+<h3>Defects in the first release, fixed in 0.1.1</h3>
 <div class="prose">
 <p>The first release passed its own tests and still had four defects that the tests did not catch. The labs' own tests now cover each one; the fixes change the services' behavior on bad input and add no attack content.</p>
 </div>
-<details class="fold fold-tbl"><summary>Table, 4 rows: what the review of v0.1.0 found, what v0.1.1 does instead, and the test</summary>
+<details class="fold fold-tbl"><summary>Table, 4 rows: what the second pass over v0.1.0 found, what v0.1.1 does instead, and the test</summary>
 <div class="scroll wide"><table class="tbl">
-<caption>What the review of v0.1.0 found, what v0.1.1 does instead, and the test</caption>
-<thead><tr><th scope="col">Where</th><th scope="col">As found (v0.1.0)</th><th scope="col">As left (v0.1.1)</th><th scope="col">Test</th></tr></thead>
+<caption>What the second pass over v0.1.0 found, what v0.1.1 does instead, and the test</caption>
+<thead><tr><th scope="col">Where</th><th scope="col">Before (v0.1.0)</th><th scope="col">After (v0.1.1)</th><th scope="col">Test</th></tr></thead>
 <tbody>
-<tr class="row-fail"><th scope="row">Lab 03, both variants: login</th><td data-label="As found (v0.1.0)">A login with a missing or <code>null</code> password for an unknown user was issued a token (a missing value was compared with a missing value), and a malformed login body caused an unhandled error.</td><td data-label="As left (v0.1.1)">Unknown users with a missing or null password and malformed bodies get 401.</td><td data-label="Test">14 cases in each variant</td></tr>
-<tr class="row-fail"><th scope="row">Lab 03, fixed: order of checks</th><td data-label="As found (v0.1.0)">The object lookup ran before authentication, so a caller with no token could tell which ids exist.</td><td data-label="As left (v0.1.1)">Authentication comes first: the same 401 for an existing and a missing id.</td><td data-label="Test">One case in each variant</td></tr>
-<tr class="row-fail"><th scope="row">Lab 01, fixed: malformed URLs</th><td data-label="As found (v0.1.0)">Invalid or zero ports, an unterminated IPv6 literal, a missing host, credentials in the URL, a non-http scheme and an over-long URL gave an unhandled 500 or a 403.</td><td data-label="As left (v0.1.1)">A clean 400 for each; a well-formed URL for an unapproved host is still a 403.</td><td data-label="Test">18 URL cases, 2 redirect-target cases and 1 for the 403</td></tr>
-<tr class="row-fail"><th scope="row">Lab 01 tests: address check</th><td data-label="As found (v0.1.0)">Removing the check of the resolved address left every test green.</td><td data-label="As left (v0.1.1)">A test fails if the address check is removed.</td><td data-label="Test">1 case</td></tr>
+<tr class="row-fail"><th scope="row">Lab 03, both variants: login</th><td data-label="Before (v0.1.0)">A login with a missing or <code>null</code> password for an unknown user was issued a token (a missing value was compared with a missing value), and a malformed login body caused an unhandled error.</td><td data-label="After (v0.1.1)">Unknown users with a missing or null password and malformed bodies get 401.</td><td data-label="Test">14 cases in each variant</td></tr>
+<tr class="row-fail"><th scope="row">Lab 03, fixed: order of checks</th><td data-label="Before (v0.1.0)">The object lookup ran before authentication, so a caller with no token could tell which ids exist.</td><td data-label="After (v0.1.1)">Authentication comes first: the same 401 for an existing and a missing id.</td><td data-label="Test">One case in each variant</td></tr>
+<tr class="row-fail"><th scope="row">Lab 01, fixed: malformed URLs</th><td data-label="Before (v0.1.0)">Invalid or zero ports, an unterminated IPv6 literal, a missing host, credentials in the URL, a non-http scheme and an over-long URL gave an unhandled 500 or a 403.</td><td data-label="After (v0.1.1)">A clean 400 for each; a well-formed URL for an unapproved host is still a 403.</td><td data-label="Test">18 URL cases, 2 redirect-target cases and 1 for the 403</td></tr>
+<tr class="row-fail"><th scope="row">Lab 01 tests: address check</th><td data-label="Before (v0.1.0)">Removing the check of the resolved address left every test green.</td><td data-label="After (v0.1.1)">A test fails if the address check is removed.</td><td data-label="Test">1 case</td></tr>
 </tbody>
 </table></div>
 </details>
 <div class="prose">
-<p>The same review found that the replay code counted a missing field as a distinct value (now a unit-tested case), that <code>tools/sinkline_check.py</code> could run a different sinkline from the one the repository pins (it now runs the active interpreter's sinkline and exits 2 on a version mismatch), and that the README said 43 tests pass when the run reported more. The recorded sinkline output of lab 01 changed line numbers because the fixed service grew; its findings did not change.</p>
+<p>The same pass found that the replay code counted a missing field as a distinct value (now a unit-tested case), that <code>tools/sinkline_check.py</code> could run a different sinkline from the one the repository pins (it now runs the active interpreter's sinkline and exits 2 on a version mismatch), and that the README said 43 tests pass when the run reported more. The recorded sinkline output of lab 01 changed line numbers because the fixed service grew; its findings did not change.</p>
 </div>
 <details class="fold"><summary>The other checks, side by side: sinkline and the Sigma rules (table, strips and notes)</summary>
 <h3>The other checks, side by side</h3>
@@ -487,7 +487,7 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <caption>Recorded results of the three checks on the six services</caption>
 <thead><tr><th scope="col">Check</th><th scope="col">Vulnerable versions</th><th scope="col">Fixed versions</th><th scope="col">Verdict</th></tr></thead>
 <tbody>
-<tr><th scope="row">The lab's own tests</th><td data-label="Vulnerable versions">Impact demonstrated in 3 of 3</td><td data-label="Fixed versions">Impact blocked in 3 of 3, features intact</td><td data-label="Verdict"><span class="stamp pass">As left: 3 of 3 fixes verified</span></td></tr>
+<tr><th scope="row">The lab's own tests</th><td data-label="Vulnerable versions">Impact demonstrated in 3 of 3</td><td data-label="Fixed versions">Impact blocked in 3 of 3, features intact</td><td data-label="Verdict"><span class="stamp pass">After: 3 of 3 fixes verified</span></td></tr>
 <tr class="row-fail"><th scope="row">sinkline 0.5.0</th><td data-label="Vulnerable versions">Reports labs 01 and 02, correctly. Reports nothing on lab 03.</td><td data-label="Fixed versions">Still reports labs 01 and 02, which are false positives. Nothing on lab 03.</td><td data-label="Verdict"><span class="stamp limit">2 of 3 found, 2 false positives</span></td></tr>
 <tr><th scope="row">Sigma rules, replayed on recorded logs</th><td data-label="Vulnerable versions">1 alert on each lab's attack log</td><td data-label="Fixed versions">No alert on each benign log; the attempt against the fixed service still alerts, because the rules see attempts, not outcomes</td><td data-label="Verdict"><span class="stamp limit">Fires on attempts</span></td></tr>
 </tbody>
@@ -521,17 +521,17 @@ return jsonify(invoices[object_id])</code></pre></td><td data-label="What the te
 <p>The harness appends one JSON object per request to a log file: timestamp, client address, method, path, raw query string, status, a short hash of the Authorization header as <code>session</code> and the route's <code>object_id</code>. Field names follow W3C-style web-server logs, so the rules read like web-server rules. Single-event rules are compiled by <a href="/projects/tripline/">tripline</a>'s engine (pySigma parses, tripline walks the condition tree), with its logsource router bypassed because that router knows only Windows, Linux auditd and CloudTrail. Lab 03's rule is a correlation (an event count of distinct <code>object_id</code> values per session within a minute) that tripline does not implement, so the lab's own windowing code in <code>vulnlab_common/replay.py</code> evaluates it.</p>
 </div>
 <h3>One real run</h3>
-<div class="prose"><p>Run on 2026-11-11 from a fresh clone at tag v0.1.1 (Windows 11, Python 3.12.2) as <code>bash tools/demo.sh</code>, which runs lab 01 end to end. Trimmed: the pytest header and timings are removed, and the two sinkline reports are on Plate 1.</p></div>
+<div class="prose"><p>Run on 2026-11-11 from a fresh clone at tag v0.1.1 (Windows 11, Python 3.12.2) as <code>bash tools/demo.sh</code>, which runs lab 01 end to end. Trimmed: the pytest header and timings are removed, and the two sinkline reports are on Figure 1.</p></div>
 <pre data-copy data-label="$ bash tools/demo.sh (lab 01, trimmed)"><code>=== 1. vulnerable service: the preview endpoint returns the internal service's canary via an allowed redirect ===
 labs/01-ssrf-redirect/test_lab.py::test_vulnerable_service_returns_internal_marker_via_allowed_redirect PASSED
 === 2. what sinkline reports on the vulnerable version ===
-[HIGH] SL-SSRF-001 ... CWE-918  app.py:23:24   (full output on Plate 1)
+[HIGH] SL-SSRF-001 ... CWE-918  app.py:23:24   (full output on Figure 1)
 === 3. fixed service: the same request is refused and the internal service is never contacted ===
 labs/01-ssrf-redirect/test_lab.py::test_fixed_service_does_not_return_internal_marker PASSED
 labs/01-ssrf-redirect/test_lab.py::test_fixed_service_still_previews_pages_and_follows_allowed_redirects PASSED
 ... 21 more cases, all PASSED (not shown: malformed URLs and redirect targets, one 403 case)
 === 4. what sinkline reports on the fixed version (a documented false positive) ===
-[HIGH] SL-SSRF-001 ... CWE-918  app.py:62:24   (full output on Plate 1)
+[HIGH] SL-SSRF-001 ... CWE-918  app.py:62:24   (full output on Figure 1)
 === 5. replay the Sigma rule over the recorded logs ===
 sample_attack.ndjson: 2 events, 1 alert(s)
   ALERT 'URL preview request names an internal or metadata address': 2 matching event(s)
@@ -545,7 +545,7 @@ sample_benign.ndjson: 2 events, 0 alert(s)</code></pre>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
-<h2 id="limits-h"><span class="label sec-label">Tolerance and limits</span>What the numbers do not show</h2>
+<h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
 <ul class="prose">
 <li><strong>It is a training lab, and the bugs are simpler than real ones.</strong> Each is a textbook class written small enough to fit on one screen: one file, one bug, in-memory or temporary data, no framework configuration, no concurrency and no real identity provider. Finding such a bug in real code is the hard part, and these labs do not exercise it.</li>
 <li><strong>No CVEs, no disclosures, no findings against real software.</strong> None are claimed, and no real product or vendor is reproduced.</li>
@@ -564,7 +564,7 @@ sample_benign.ndjson: 2 events, 0 alert(s)</code></pre>
 <p class="prose muted">The sinkline text files recorded in the repository (<code>labs/*/sinkline/*.txt</code>) showed the path glyphs as garbled characters in v0.1.0, a character-encoding slip when they were written on Windows; v0.1.1 stores them as UTF-8 and a test guards that. The capture script for this page checks that the recorded text equals a fresh run of sinkline 0.5.0 and shows the glyphs the tool prints.</p>
 </details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/sinkline/"><span class="label">Previous sheet, 2 of 7</span><span class="n">sinkline</span></a><a class="next" href="/projects/kevgate/"><span class="label">Next sheet, 4 of 7</span><span class="n">kevgate</span></a></nav>
+<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/sinkline/"><span class="label">Previous project, 2 of 7</span><span class="n">sinkline</span></a><a class="next" href="/projects/kevgate/"><span class="label">Next project, 4 of 7</span><span class="n">kevgate</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">
