@@ -189,13 +189,23 @@ def home(ctx: dict) -> str:
     return f"""<section class="hero" aria-labelledby="top">
 <h1 id="top">I build security tools, then check them against <span class="hl">something I did not write</span>.</h1>
 <p class="dek">I'm Sami Ali, a student at George Mason University (class of 2028). I write detection rules, code analyzers and vulnerability-ranking tools. Each one is tested against recorded data, an outside benchmark or the original it copies.</p>
-<p class="row cta"><a class="btn" href="#work">See the work</a> <a class="btn alt" href="/resume/">Resume</a></p>
+<p class="row cta"><a class="btn" href="#work">See the work</a> <a class="btn alt" href="/resume/">Resume</a> <a class="btn alt" href="mailto:samiali38183@gmail.com">Email me</a></p>
+<dl class="at-a-glance" aria-label="At a glance">
+<div><dt>Looking for</dt><dd>Summer 2027 security internships</dd></div>
+<div><dt>School</dt><dd>George Mason University, class of 2028</dd></div>
+<div><dt>Experience</dt><dd>DHS (CBP) vulnerability assessment intern, summer 2026</dd></div>
+<div><dt>Certifications</dt><dd>Security+, AWS Cloud Practitioner</dd></div>
+<div><dt>Work authorization</dt><dd>U.S. citizen</dd></div>
+</dl>
 <div class="hero-read">
 <p class="reading k-{rd["stamp"][0]}" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
 <div>
-<p class="say">A public SigmaHQ rule is meant to notice a program being set to run with its owner's privileges. I replayed a real recording of that attack, 36 events with 2 attack steps in it, and the rule caught neither. The rule I wrote catches both.</p>
-<p class="why">{esc(rd["caption"])}</p>
+<p class="kicker">The short version</p>
+<p class="say">Security teams use detection rules like tripwires: when an attack happens, the rule should raise an alert. I replayed a real recording of one attack against a widely used public rule, and it raised no alert for either of the 2 attack steps. The rule I wrote alerts on both.</p>
+<details class="fold tech"><summary>Technical detail</summary>
+<p class="why">A public SigmaHQ rule is meant to notice a program being set to run with its owner's privileges (setuid and setgid, ATT&amp;CK T1548.001). {esc(rd["caption"])}</p>
 {reading_chips(ctx, rd)}
+</details>
 </div>
 </div>
 <div class="hero-strips">
@@ -206,11 +216,18 @@ def home(ctx: dict) -> str:
 </section>
 
 <section class="section" aria-labelledby="work">
-<div class="sec-head"><h2 id="work">The work</h2><p class="sec-aside">In each pair of strips, the top row is before the fix and the bottom row is after.</p></div>
+<div class="sec-head"><h2 id="work">The work</h2><p class="sec-aside">Each project has a one-line summary, a result, and a page with the details. In each pair of strips, the top row is before the fix and the bottom row is after.</p></div>
 {work_list(tier(d, "featured"))}
 <h3 class="also-h" id="also">Smaller projects</h3>
 {work_list(tier(d, "also"), "compact")}
 <p><a class="arrow-link" href="/projects/">All {n} projects</a></p>
+</section>
+
+<section class="section prose" aria-labelledby="skills">
+<h2 id="skills">What I work with</h2>
+<ul class="tags">
+<li>Detection engineering (Sigma, ATT&amp;CK)</li><li>Application security</li><li>Vulnerability management</li><li>Python</li><li>Go</li><li>Rust</li><li>Kubernetes</li><li>CI/CD and GitHub Actions</li><li>Terraform and Helm</li><li>Fuzzing</li><li>Power BI</li>
+</ul>
 </section>
 
 <section class="section prose" aria-labelledby="exp">
@@ -225,6 +242,22 @@ def home(ctx: dict) -> str:
 <li>CompTIA Security+ and AWS Certified Cloud Practitioner</li>
 <li>In progress: OSCP and AWS Certified Security - Specialty</li>
 </ul>
+</section>
+
+<section class="section prose" aria-labelledby="terms">
+<h2 id="terms">Terms used on this site</h2>
+<details class="fold"><summary>Plain definitions, for anyone not working in security</summary>
+<dl class="terms">
+<div><dt>Detection rule</dt><dd>A rule that watches system activity and raises an alert when it matches a known attack pattern.</dd></div>
+<div><dt>Sigma</dt><dd>A shared, open format for writing detection rules so they work across different security tools.</dd></div>
+<div><dt>MITRE ATT&amp;CK</dt><dd>A public catalog of attacker techniques, each with an ID such as T1548.001.</dd></div>
+<div><dt>CI (continuous integration)</dt><dd>Automatic checks that run every time code changes. A failed check blocks the change.</dd></div>
+<div><dt>CISA KEV</dt><dd>The U.S. government's list of vulnerabilities that attackers are known to be exploiting right now.</dd></div>
+<div><dt>CVSS and EPSS</dt><dd>Two scores for vulnerabilities: how severe one is (CVSS) and how likely it is to be exploited (EPSS).</dd></div>
+<div><dt>Fuzzing</dt><dd>Feeding a program large amounts of odd input to see whether it breaks or behaves differently.</dd></div>
+<div><dt>Kubernetes</dt><dd>Software that runs and manages containerized applications across many machines.</dd></div>
+</dl>
+</details>
 </section>
 
 <section class="section" aria-labelledby="ev">
