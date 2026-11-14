@@ -362,12 +362,12 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
         results.append((text in src, f"vulnlab {lab} vulnerable/app.py line {num} contains {text!r}"))
         expect(f"vulnlab page quotes {lab} line {num}", text, page)
 
-    # the latest run on main is the one on the page
-    runs = gh("repos/samiali38183/vulnlab/actions/runs?branch=main&per_page=1")["workflow_runs"]
+    # the page cites the main-branch run on the release's tag commit (later main commits may be docs-only)
+    runs = gh(f"repos/samiali38183/vulnlab/actions/runs?branch=main&head_sha={tagsha}&per_page=1")["workflow_runs"]
     rid = str(runs[0]["id"]) if runs else "?"
-    results.append((bool(runs) and runs[0]["conclusion"] == "success", f"vulnlab latest main run {rid}: {runs[0]['name']!r} {runs[0]['conclusion']} sha {runs[0]['head_sha'][:7]}" if runs else "no runs"))
-    expect("vulnlab latest CI run on the page", rid, page, f"run {rid}")
-    expect("vulnlab latest CI run on home", rid, "index.html", f"run {rid}")
+    results.append((bool(runs) and runs[0]["conclusion"] == "success", f"vulnlab main run on the tag commit {rid}: {runs[0]['name']!r} {runs[0]['conclusion']} sha {runs[0]['head_sha'][:7]}" if runs else "no runs"))
+    expect("vulnlab tag-commit CI run on the page", rid, page, f"run {rid}")
+    expect("vulnlab tag-commit CI run on home", rid, "index.html", f"run {rid}")
 
     # the stored bench data equals a fresh run, and the page equals the stored data
     cap = subprocess.run([sys.executable, str(SITE / "scripts" / "capture_vulnlab_bench.py"), "--check", "--clone", str(vl)] + (["--venv", venvs["vulnlab"]] if "vulnlab" in venvs else []),
@@ -402,12 +402,14 @@ def kevgate_checks(clones: Path, venvs: dict[str, str]) -> None:
     for tool, cmd in (("ruff check", [py, "-m", "ruff", "check", "."]), ("mypy --strict src", [py, "-m", "mypy", "--strict", "src"])):
         p = subprocess.run(cmd, cwd=k, capture_output=True, text=True)
         results.append((p.returncode == 0, f"kevgate {tool} exit {p.returncode}"))
-    # latest push runs on main per workflow: the page links the latest green one
+    # push runs on main per workflow at the release's tag commit (later main commits may be docs-only): the page links those
     for wf in ("ci", "security", "deploy-kind", "terraform"):
-        runs = gh(f"repos/samiali38183/kevgate/actions/workflows/{wf}.yml/runs?branch=main&event=push&per_page=1")["workflow_runs"]
+        runs = gh(f"repos/samiali38183/kevgate/actions/workflows/{wf}.yml/runs?branch=main&event=push&head_sha={tagsha}&per_page=1")["workflow_runs"]
+        if not runs:  # a path-filtered workflow (terraform) does not run on every commit: take its latest run
+            runs = gh(f"repos/samiali38183/kevgate/actions/workflows/{wf}.yml/runs?branch=main&event=push&per_page=1")["workflow_runs"]
         rid = str(runs[0]["id"])
-        results.append((runs[0]["conclusion"] == "success", f"kevgate latest {wf} run on main {rid}: {runs[0]['conclusion']} sha {runs[0]['head_sha'][:7]}"))
-        expect(f"kevgate latest {wf} run on the page", rid, page, f"run {rid}")
+        results.append((runs[0]["conclusion"] == "success", f"kevgate {wf} run on main at the tag commit {rid}: {runs[0]['conclusion']} sha {runs[0]['head_sha'][:7]}"))
+        expect(f"kevgate tag-commit {wf} run on the page", rid, page, f"run {rid}")
     rel = gh("repos/samiali38183/kevgate/actions/runs/42960813836")
     results.append((rel["conclusion"] == "success" and rel["head_branch"] == tag, f"kevgate release run 42960813836: {rel['conclusion']} on {rel['head_branch']}"))
     mut = subprocess.run([sys.executable, str(SITE / "scripts" / "rerun_kevgate_mutants.py"), "--clone", str(k), "--python", py], capture_output=True, text=True)
