@@ -17,7 +17,7 @@
    "sheet": 1,
    "kind": "Detection engineering",
    "title": "tripline: a CI gate for detection rules | Sami Ali",
-   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule flagged 0 of the 2 attack events among 36 recorded events; a replacement flags both.",
+   "desc": "tripline replays ATT&CK telemetry through Sigma rules in CI: 98% weighted coverage, 52% on stock SigmaHQ rules. Stock setuid rule: 0 of 2 attack events caught.",
    "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 13 passing, 1 pending (Windows); 98% weighted coverage, 52% on unmodified SigmaHQ rules alone; 212 tests.",
    "labels": {
     "found": "Before",
@@ -496,7 +496,7 @@
    "sheet": 2,
    "kind": "Application security",
    "title": "sinkline: taint analysis for Python web apps | Sami Ali",
-   "desc": "sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.",
+   "desc": "sinkline follows request data across functions and files. On BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, but trails Bandit over all 14.",
    "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 184 tests at v0.5.1 (186 on main); scored on OWASP BenchmarkPython v0.1.",
    "labels": {
     "found": "Before",
@@ -839,7 +839,7 @@
    "sheet": 4,
    "kind": "Vulnerability management and DevSecOps",
    "title": "kevgate: KEV-ranked vulnerability intake | Sami Ali",
-   "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.",
+   "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, a 16-control matrix mapped to tests.",
    "fact": "A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests at v0.1.1.",
    "labels": {
     "found": "Before",
@@ -1003,7 +1003,7 @@
    "sheet": 5,
    "kind": "Kubernetes security, Go",
    "title": "kevgate-admit: Kubernetes admission webhook | Sami Ali",
-   "desc": "kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. Strict image-reference parsing, optional signed evidence, a signed published image, 93 tests and 95% coverage.",
+   "desc": "kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on images with KEV-listed or over-threshold vulnerabilities. 93 tests, 95% coverage.",
    "fact": "An admission webhook that denies or warns on workloads whose image digests carry KEV-listed or over-threshold vulnerabilities. v0.1.0: strict image-reference parsing, signed scan reports, an outage test on kind and a signed image on GHCR; 93 tests, 95% coverage. It does not scan images itself.",
    "labels": {
     "found": "Before",
@@ -1166,7 +1166,7 @@
    "sheet": 6,
    "kind": "Memory safety and fuzzing, Rust",
    "title": "fuzzdiff: picohttpparser ported to safe Rust | Sami Ali",
-   "desc": "fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.",
+   "desc": "fuzzdiff v0.2.0 ports picohttpparser from C to safe Rust and checks it against the original and httparse with differential tests, Miri and libFuzzer.",
    "fact": "picohttpparser ported from C to safe Rust, checked against the C original and against httparse. 39 tests, 95.53% line coverage, 5 of 5 seeded bugs detected, 0 differences from C in 2,000,000 inputs. Rust is about 1.4x to 1.5x slower on head parsing. No vulnerability found.",
    "labels": {
     "found": "Before",
@@ -1329,7 +1329,7 @@
    "sheet": 7,
    "kind": "Vulnerability management",
    "title": "kev-risk-prioritization | Sami Ali",
-   "desc": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. v0.3.0 refuses lists that mix rows with and without CVSS and sorts in a total order. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.",
+   "desc": "A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.",
    "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. Mixed CVSS lists are refused unless --allow-mixed. 63 tests.",
    "labels": {
     "found": "Before",
@@ -1547,7 +1547,7 @@
    "sheet": 3,
    "kind": "Web security training lab, Python",
    "title": "vulnlab: localhost-only web vulnerability lab | Sami Ali",
-   "desc": "vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.",
+   "desc": "vulnlab v0.1.1 is a localhost-only lab of three vulnerable web services (SSRF, SQL injection in ORDER BY, IDOR), each with a fix and tests. 137 tests.",
    "fact": "A localhost-only lab of three small vulnerable Flask services: SSRF through a redirect, SQL injection in ORDER BY and IDOR. Each has a fix checked by the tests that show the impact, a sinkline record and a Sigma rule. 3 of 3 fixes verified; sinkline reports two of the three bugs and both fixes of those two. Training lab, loopback only, no CVEs.",
    "labels": {
     "found": "Before",

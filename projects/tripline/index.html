@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>tripline: a CI gate for detection rules | Sami Ali</title>
-<meta name="description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule flagged 0 of the 2 attack events among 36 recorded events; a replacement flags both.">
+<meta name="description" content="tripline replays ATT&amp;CK telemetry through Sigma rules in CI: 98% weighted coverage, 52% on stock SigmaHQ rules. Stock setuid rule: 0 of 2 attack events caught.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/tripline/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="tripline: a CI gate for detection rules | Sami Ali">
-<meta property="og:description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule flagged 0 of the 2 attack events among 36 recorded events; a replacement flags both.">
+<meta property="og:description" content="tripline replays ATT&amp;CK telemetry through Sigma rules in CI: 98% weighted coverage, 52% on stock SigmaHQ rules. Stock setuid rule: 0 of 2 attack events caught.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/tripline/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="tripline: a CI gate for detection rules | Sami Ali">
-<meta name="twitter:description" content="tripline replays recorded ATT&amp;CK telemetry through Sigma rules on every pull request. v0.3.0: 98% weighted coverage, 52% on unmodified SigmaHQ rules alone. The stock setuid rule flagged 0 of the 2 attack events among 36 recorded events; a replacement flags both.">
+<meta name="twitter:description" content="tripline replays ATT&amp;CK telemetry through Sigma rules in CI: 98% weighted coverage, 52% on stock SigmaHQ rules. Stock setuid rule: 0 of 2 attack events caught.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
 <meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -132,7 +132,7 @@ Setuid or Setgid Bit Set via Chmod (Any Mode Form)   applicable  36  matched 2</
 <h2 id="left-h"><span class="label sec-label">After</span>A replacement rule matches the two chmod runs, and the gaps are now measured</h2>
 <div class="prose">
 <p>The replacement rule anchors on the <code>chmod</code> binary (and, since the sweep below found the gap, on <code>busybox chmod</code>) and handles symbolic and octal forms. Its two matches on the recorded fixture are the two <code>chmod</code> executions. The upstream rule stays in the rule set, so a future upstream fix is picked up automatically.</p>
-<p><strong>Rules written in this repository carry part of the headline.</strong> Six rules were written for this project (the setuid replacement, three AWS rules and two Windows rules), and five of the 13 passing scenarios depend on them. Coverage is therefore shown as two figures, always together: <strong>98% of weight points have a passing scenario (61 of 62), but only 52% (32 of 62, 8 scenarios) pass on unmodified SigmaHQ rules alone.</strong> tripline computes the split from each expected rule's author field.</p>
+<p>Rules written in this repository carry part of the headline. Six rules were written for this project (the setuid replacement, three AWS rules and two Windows rules), and five of the 13 passing scenarios depend on them. Coverage is therefore shown as two figures, always together: <strong>98% of weight points have a passing scenario (61 of 62), but only 52% (32 of 62, 8 scenarios) pass on unmodified SigmaHQ rules alone.</strong> tripline computes the split from each expected rule's author field.</p>
 </div>
 <details class="fold fold-tbl"><summary>Table, 5 rows: The five passing scenarios that need a rule written in this repository (29 of 62 weight points)</summary><div class="scroll wide"><table class="tbl">
 <caption>The five passing scenarios that need a rule written in this repository (29 of 62 weight points)</caption>
@@ -256,14 +256,14 @@ gate passed</code></pre></details>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
 <h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
 <ul class="prose">
-<li><strong>Three emulation runs linked above show failed.</strong> The Linux run 41838714456 failed because the stock setuid rule missed (the finding itself). The two Windows recording runs failed their last step, which asserts that expected rules fire. In the later one, 43090565998, that step failed four scenarios (T1027, T1053.005, T1059.001, T1059.003) against the scenario definitions of that commit; the scenarios were then changed (two now expect rules written in this repository, one was narrowed) and the committed fixtures pass against the changed definitions. The workflows still upload the recorded telemetry, and I check it by hand before committing it as a fixture. The passing gate is the <code>ci</code> run, which replays the committed fixtures.</li>
-<li><strong>98% is not the whole story.</strong> Only 52% of weight points pass on unmodified SigmaHQ rules alone; the rest depend on rules written in this repository, two of them tuned to the Atomic tests' command shape. The pending scenario counts as zero in both figures.</li>
-<li><strong>A pass is a recall check on one recording.</strong> A scenario passes when each expected rule fires on at least one event. The benign corpus is one 33-second Linux recording, so a Windows or AWS rule that fired on everything would still pass.</li>
-<li><strong>The evasion sweep covers three Linux scenarios.</strong> Its variants are hand-written, evaluated as audit events and never executed, and a catch rate over them does not measure real-world evasion.</li>
-<li><strong>One Windows scenario is still pending.</strong> T1027 has no accepted recording: its expected rule matched 0 of 15 events in the latest recording, and re-labelling it to expect another rule would raise the number without testing an obfuscation rule (<a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-003</a>).</li>
-<li><strong>Small coverage.</strong> 14 techniques out of several hundred. The 98% and the 52% are progress against this repo's own list, not a statement about any organization. 17 of the 62 weight points are hand-assigned, and the ranking behind the other 45 is Red Canary's customer detections, a proxy for prevalence in other environments.</li>
-<li><strong>The cloud plane is replayed, not detonated by this project.</strong> The records are real CloudTrail from public datasets, but the cloud rules written for the project sit beside fixtures from the same datasets, so those passes show the wiring works, not that the rules generalize.</li>
-<li><strong>A different evaluator from production.</strong> There is no parity test against a real SIEM backend, so a pass is necessary, not sufficient.</li>
+<li>Three emulation runs linked above show failed. The Linux run 41838714456 failed because the stock setuid rule missed (the finding itself). The two Windows recording runs failed their last step, which asserts that expected rules fire. In the later one, 43090565998, that step failed four scenarios (T1027, T1053.005, T1059.001, T1059.003) against the scenario definitions of that commit. The scenarios were then changed (two now expect rules written in this repository, one was narrowed) and the committed fixtures pass against the changed definitions. The workflows still upload the recorded telemetry, and I check it by hand before committing it as a fixture. The passing gate is the <code>ci</code> run, which replays the committed fixtures.</li>
+<li>The 98% is not the whole story. Only 52% of weight points pass on unmodified SigmaHQ rules alone, and the rest depend on rules written in this repository, two of them tuned to the Atomic tests' command shape. The pending scenario counts as zero in both figures.</li>
+<li>A pass is a recall check on one recording. A scenario passes when each expected rule fires on at least one event. The benign corpus is one 33-second Linux recording, so a Windows or AWS rule that fired on everything would still pass.</li>
+<li>The evasion sweep covers three Linux scenarios. Its variants are hand-written, evaluated as audit events and never executed, and a catch rate over them does not measure real-world evasion.</li>
+<li>One Windows scenario is still pending. T1027 has no accepted recording: its expected rule matched 0 of 15 events in the latest recording, and re-labelling it to expect another rule would raise the number without testing an obfuscation rule (<a href="https://github.com/samiali38183/tripline/blob/main/docs/findings.md">F-003</a>).</li>
+<li>Coverage is small: 14 techniques out of several hundred. The 98% and the 52% are progress against this repo's own list, not a statement about any organization. 17 of the 62 weight points are hand-assigned, and the ranking behind the other 45 is Red Canary's customer detections, a proxy for prevalence in other environments.</li>
+<li>The cloud plane is replayed, not detonated by this project. The records are real CloudTrail from public datasets, but the cloud rules written for the project sit beside fixtures from the same datasets, so those passes show the wiring works, not that the rules generalize.</li>
+<li>The evaluator is different from production. There is no parity test against a real SIEM backend, so a pass is necessary, not sufficient.</li>
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">

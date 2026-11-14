@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>vulnlab: localhost-only web vulnerability lab | Sami Ali</title>
-<meta name="description" content="vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.">
+<meta name="description" content="vulnlab v0.1.1 is a localhost-only lab of three vulnerable web services (SSRF, SQL injection in ORDER BY, IDOR), each with a fix and tests. 137 tests.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/vulnlab/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="vulnlab: localhost-only web vulnerability lab | Sami Ali">
-<meta property="og:description" content="vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.">
+<meta property="og:description" content="vulnlab v0.1.1 is a localhost-only lab of three vulnerable web services (SSRF, SQL injection in ORDER BY, IDOR), each with a fix and tests. 137 tests.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/vulnlab/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="vulnlab: localhost-only web vulnerability lab | Sami Ali">
-<meta name="twitter:description" content="vulnlab v0.1.1 is a localhost-only training lab of three small vulnerable web services (SSRF through a redirect, SQL injection in ORDER BY, IDOR), each with a fix, tests that show the impact and the fix, captured sinkline results and a Sigma rule replayed on recorded logs. 137 tests, loopback only.">
+<meta name="twitter:description" content="vulnlab v0.1.1 is a localhost-only lab of three vulnerable web services (SSRF, SQL injection in ORDER BY, IDOR), each with a fix and tests. 137 tests.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
 <meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -547,14 +547,14 @@ sample_benign.ndjson: 2 events, 0 alert(s)</code></pre>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
 <h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
 <ul class="prose">
-<li><strong>It is a training lab, and the bugs are simpler than real ones.</strong> Each is a textbook class written small enough to fit on one screen: one file, one bug, in-memory or temporary data, no framework configuration, no concurrency and no real identity provider. Finding such a bug in real code is the hard part, and these labs do not exercise it.</li>
-<li><strong>No CVEs, no disclosures, no findings against real software.</strong> None are claimed, and no real product or vendor is reproduced.</li>
-<li><strong>Scope is loopback only.</strong> The services run on 127.0.0.1 and start on random ports; the repository's own guard refuses anything else. It is not a scanner, an exploitation toolkit or a target for anything else, and the vulnerable apps must not be deployed or exposed on a network.</li>
-<li><strong>sinkline reports both fixed injection-style services,</strong> because it does not recognize a custom allow-list, address check or constant-column lookup as a sanitizer. Those two findings are false positives. It reports <strong>nothing on the missing-authorization lab,</strong> vulnerable or fixed, because that bug is not a taint flow: the blind spot of static taint analysis, not a defect of the scan.</li>
-<li><strong>The detection rules see attempts, not impact.</strong> They fire on the fixed services too. Lab 01's rule matches literal internal and metadata addresses and misses an internal target named by hostname or written in another address form; lab 02's matches anything in the sort value other than letters, digits and underscore, so a client that legitimately sends a multi-column sort would be a false positive.</li>
-<li><strong>The IDOR rule is a correlation with an untuned threshold.</strong> Five or more distinct invoice ids per session in a minute is evaluated by the lab's own windowing code, since tripline has no correlation support. A single targeted read of one other user's invoice produces no alert at all, which is the real gap: this class has no request-level signature.</li>
-<li><strong>The fixes are checked by the tests listed, not proven.</strong> Lab 01's fix accepts only <code>http</code>: pinning an address for <code>https</code> needs a custom adapter that keeps SNI and certificate checks on the original hostname, and that is not done here. Nothing was tested against real traffic.</li>
-<li><strong>The page shows recorded results.</strong> It evaluates nothing, runs no service and sends no request. Request strings and logs are not reproduced here; the observable results are described in prose and the labs' own tests are linked below.</li>
+<li>It is a training lab, and the bugs are simpler than real ones. Each is a textbook class written small enough to fit on one screen: one file, one bug, in-memory or temporary data, no framework configuration, no concurrency and no real identity provider. Finding such a bug in real code is the hard part, and these labs do not exercise it.</li>
+<li>There are no CVEs, no disclosures and no findings against real software. None are claimed, and no real product or vendor is reproduced.</li>
+<li>Scope is loopback only. The services run on 127.0.0.1 and start on random ports, and the repository's own guard refuses anything else. It is not a scanner, an exploitation toolkit or a target for anything else, and the vulnerable apps must not be deployed or exposed on a network.</li>
+<li>sinkline reports both fixed injection-style services, because it does not recognize a custom allow-list, address check or constant-column lookup as a sanitizer. Those two findings are false positives. It reports nothing on the missing-authorization lab, vulnerable or fixed, because that bug is not a taint flow. That is the blind spot of static taint analysis, not a defect of the scan.</li>
+<li>The detection rules see attempts, not impact. They fire on the fixed services too. Lab 01's rule matches literal internal and metadata addresses and misses an internal target named by hostname or written in another address form. Lab 02's matches anything in the sort value other than letters, digits and underscore, so a client that legitimately sends a multi-column sort would be a false positive.</li>
+<li>The IDOR rule is a correlation with an untuned threshold. Five or more distinct invoice ids per session in a minute is evaluated by the lab's own windowing code, since tripline has no correlation support. A single targeted read of one other user's invoice produces no alert at all. That is the real gap: this class has no request-level signature.</li>
+<li>The fixes are checked by the tests listed, not proven. Lab 01's fix accepts only <code>http</code>, because pinning an address for <code>https</code> needs a custom adapter that keeps SNI and certificate checks on the original hostname, and that is not done here. Nothing was tested against real traffic.</li>
+<li>The page shows recorded results. It evaluates nothing, runs no service and sends no request. Request strings and logs are not reproduced here. The observable results are described in prose and the labs' own tests are linked below.</li>
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">

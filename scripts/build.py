@@ -31,10 +31,10 @@ OG_ALT = "0 of 2: the stock rule flagged none of the 2 attack events among 36 re
 # (url path, nav key, title, description, kind, argument)
 PAGES = [
     ("/", "home", "Sami Ali | Detection and application security projects",
-     "Sami Ali, George Mason University class of 2028. Detection rules, a code analyzer and vulnerability-ranking tools, each tested against recorded data, a benchmark or the original, with the results and CI runs.",
+     "Sami Ali, George Mason University class of 2028. Detection rules, a code analyzer and ranking tools, tested on recorded data, a benchmark or the original.",
      "home", None),
     ("/projects/", "projects", "Projects | Sami Ali",
-     "Seven projects: tripline, sinkline, kevgate, kevgate-admit, vulnlab, fuzzdiff and kev-risk-prioritization. Each page has the results, the limits and links to the CI runs.",
+     "Seven projects: tripline, sinkline, kevgate, kevgate-admit, vulnlab, fuzzdiff and kev-risk-prioritization. Each page has results, limits and CI run links.",
      "projects", None),
 ] + [
     (f"/projects/{slug}/", "projects", None, None, "project", slug)
@@ -44,7 +44,7 @@ PAGES = [
      "DHS HS-POWER intern on CBP's Vulnerability Assessment Team, May to August 2026, plus education and certifications.",
      "content", "experience.html"),
     ("/about/", "about", "About | Sami Ali",
-     "George Mason University student working on detection engineering, application security and vulnerability management, and on checking whether security tools do what they say.",
+     "George Mason University student working on detection engineering, application security and vulnerability management, and on whether tools do what they say.",
      "content", "about.html"),
     ("/resume/", "resume", "Resume | Sami Ali",
      "Sami Ali's resume as a PDF, in a Security Engineering version and a Red Team version, with the same facts as text.",

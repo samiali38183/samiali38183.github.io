@@ -8,7 +8,7 @@ A standard-library Python script that ranks scan findings with a simple weighted
 {{bench:kev-risk-cap}}
 
 <!--@as-found-->
-<div class="callout"><p><strong>The synthetic demo proves ordering behavior and nothing else.</strong> The 20 sample findings use real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. No DHS or CBP data is involved.</p></div>
+<div class="callout"><p>The synthetic demo shows ordering behavior and nothing else. The 20 sample findings use real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. No DHS or CBP data is involved.</p></div>
 <div class="prose">
 <p>The first version of this project said its score was "in the spirit of" CISA BOD 26-04 and showed a table of measurements computed on the invented sample values, such as an average EPSS of 0.935 for KEV against 0.029 for the rest. Both overstated the work. Those averages describe invented values, not vulnerabilities, and the score shares one input with the directive, not its method. The repository's changelog records both corrections for 0.2.0.</p>
 <p>The directive sets a remediation deadline per asset from four variables in a decision table, and it applies to federal civilian executive branch agencies.<sup class="nref" aria-hidden="true"></sup> The tool is a weighted sum. Of the four variables it models one:</p>
@@ -42,10 +42,10 @@ A standard-library Python script that ranks scan findings with a simple weighted
 <div class="prose">
 <p>Version 0.3.0 fixes defects found in a review of 0.2.0. Four changes alter behavior:</p>
 <ul>
-<li><strong>Mixed lists are refused.</strong> In 0.2.0 the same KEV finding (ACR 4, EPSS 0.5) scored 73.5 without a CVSS value and 59.5 with CVSS 0.0, so a list mixing both kinds was ranked with scores on different scales. Now such a list is an error (exit code 2) unless <code>--allow-mixed</code> is given; then every row is scored without its CVSS term, a warning is printed and each output row carries a <code>score_basis</code> field. Lists where every row, or no row, has CVSS score as before.</li>
-<li><strong>The sort is a total order:</strong> score, KEV, EPSS, CVSS, ACR and days open (all descending), then CVE id, asset, system group, vendor and exposure, so input order never matters. On the demo this swaps ranks 8 and 9: CVE-2018-13379 on vpn-old-01 (300 days open) now ranks above CVE-2022-22965 on app-srv-07 (75 days), both scoring 93.1. On the 2,000-row real-data list 139 tied rows changed position; the row set and every score are unchanged.</li>
-<li><strong>Input is validated, not clamped.</strong> Out-of-range values that 0.2.0 clamped silently are errors that name the row, and bad input (missing columns, empty files, malformed KEV JSON, missing files and similar) ends in one line on stderr and a non-zero exit code instead of a traceback.</li>
-<li><strong>CI runs ruff and mypy</strong> at pinned versions, and a script regenerates or checks the generated analysis and the golden files.</li>
+<li>Mixed lists are refused. In 0.2.0 the same KEV finding (ACR 4, EPSS 0.5) scored 73.5 without a CVSS value and 59.5 with CVSS 0.0, so a list mixing both kinds was ranked with scores on different scales. Now such a list is an error (exit code 2) unless <code>--allow-mixed</code> is given. Then every row is scored without its CVSS term, a warning is printed and each output row carries a <code>score_basis</code> field. Lists where every row, or no row, has CVSS score as before.</li>
+<li>The sort is a total order: score, KEV, EPSS, CVSS, ACR and days open (all descending), then CVE id, asset, system group, vendor and exposure, so input order never matters. On the demo this swaps ranks 8 and 9: CVE-2018-13379 on vpn-old-01 (300 days open) now ranks above CVE-2022-22965 on app-srv-07 (75 days), both scoring 93.1. On the 2,000-row real-data list 139 tied rows changed position, and the row set and every score are unchanged.</li>
+<li>Input is validated, not clamped. Out-of-range values that 0.2.0 clamped silently are errors that name the row. Bad input (missing columns, empty files, malformed KEV JSON, missing files and similar) ends in one line on stderr and a non-zero exit code instead of a traceback.</li>
+<li>CI runs ruff and mypy at pinned versions, and a script regenerates or checks the generated analysis and the golden files.</li>
 </ul>
 </div>
 <pre data-copy data-label="$ python kev_prioritize.py ... --top 14"><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14

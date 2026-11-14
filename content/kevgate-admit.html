@@ -148,15 +148,15 @@ outage test finished: all checks passed</code></pre>
 
 <!--@limits-->
 <ul class="prose">
-<li><strong>It does not verify image signatures at admission.</strong> The published image is signed, but the webhook checks nothing about the images it admits beyond their reports. Kyverno <code>verifyImages</code> or the Sigstore policy-controller already do that.</li>
-<li><strong>Report signatures authenticate the report store only.</strong> They show that someone holding the key signed the file; they say nothing about whether the scan was right or the image is what it claims.</li>
-<li><strong>It does not scan images.</strong> A digest with no report is "no evidence", handled by <code>requireEvidence</code>.</li>
-<li><strong>Evidence goes stale.</strong> <code>maxEvidenceAge</code> bounds it when the report carries a timestamp: a signed one when the report has <code>CreatedAt</code>, otherwise the unsigned file modification time.</li>
-<li><strong>The cert-manager certificate path is not exercised in CI.</strong> It is only checked by <code>helm template</code> and <code>kubeconform</code>; the end-to-end run uses a certificate generated at install time.</li>
-<li><strong>In <code>tls.mode=helm</code> a <code>helm upgrade</code> may delete the generated Secret.</strong> The README documents this; it was not tested. Use cert-manager or an existing Secret outside demos.</li>
-<li><strong>The outage test is narrow.</strong> It does not cover <code>--fail-mode</code> (the webhook answering but unable to judge), slow responses and timeouts at the API server, node drains with the PodDisruptionBudget, or <code>helm upgrade</code>. The demo runs one replica.</li>
-<li><strong>The policy and the KEV catalog are unsigned ConfigMaps,</strong> and exceptions are policy entries with an expiry, not signed attestations. Whoever can edit them controls enforcement.</li>
-<li><strong>The demo uses synthetic evidence,</strong> and ConfigMap-hosted reports are limited to 1 MiB in total. The Admission demo shows responses from a locally run binary, not from a cluster. The race detector was not run locally (it needs cgo); CI runs it.</li>
+<li>It does not verify image signatures at admission. The published image is signed, but the webhook checks nothing about the images it admits beyond their reports. Kyverno <code>verifyImages</code> or the Sigstore policy-controller already do that.</li>
+<li>Report signatures only authenticate the report store. They show that someone holding the key signed the file. They say nothing about whether the scan was right or the image is what it claims.</li>
+<li>It does not scan images. A digest with no report is "no evidence", handled by <code>requireEvidence</code>.</li>
+<li>Evidence goes stale. <code>maxEvidenceAge</code> bounds it when the report carries a timestamp: a signed one when the report has <code>CreatedAt</code>, otherwise the unsigned file modification time.</li>
+<li>The cert-manager certificate path is not exercised in CI. It is only checked by <code>helm template</code> and <code>kubeconform</code>, and the end-to-end run uses a certificate generated at install time.</li>
+<li>In <code>tls.mode=helm</code> a <code>helm upgrade</code> may delete the generated Secret. The README documents this, but I did not test it. Outside demos, use cert-manager or an existing Secret.</li>
+<li>The outage test is narrow. It does not cover <code>--fail-mode</code> (the webhook answering but unable to judge), slow responses and timeouts at the API server, node drains with the PodDisruptionBudget, or <code>helm upgrade</code>. The demo runs one replica.</li>
+<li>The policy and the KEV catalog are unsigned ConfigMaps, and exceptions are policy entries with an expiry, not signed attestations. Whoever can edit them controls enforcement.</li>
+<li>The demo uses synthetic evidence, and ConfigMap-hosted reports are limited to 1 MiB in total. The Admission demo shows responses from a locally run binary, not from a cluster. The race detector was not run locally (it needs cgo), but CI runs it.</li>
 </ul>
 
 <!--@trace-->
