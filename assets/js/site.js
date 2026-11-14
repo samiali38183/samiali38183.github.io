@@ -33,6 +33,18 @@
   addEventListener('hashchange', openFold);
 
   if (navigator.clipboard) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-copy-email]'), function (b) {
+      b.hidden = false;
+      b.addEventListener('click', function () {
+        navigator.clipboard.writeText(b.dataset.copyEmail).then(function () {
+          b.textContent = 'Copied';
+          setTimeout(function () { b.textContent = 'Copy'; }, 1500);
+        }, function () { b.textContent = 'Press Ctrl+C'; });
+      });
+    });
+  }
+
+  if (navigator.clipboard) {
     Array.prototype.forEach.call(document.querySelectorAll('pre[data-copy]'), function (pre) {
       var b = document.createElement('button');
       b.type = 'button';
