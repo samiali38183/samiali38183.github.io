@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>kevgate: KEV-ranked vulnerability intake | Sami Ali</title>
-<meta name="description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.">
+<meta name="description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, a 16-control matrix mapped to tests.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kevgate/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kevgate: KEV-ranked vulnerability intake | Sami Ali">
-<meta property="og:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.">
+<meta property="og:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, a 16-control matrix mapped to tests.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kevgate/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kevgate: KEV-ranked vulnerability intake | Sami Ali">
-<meta name="twitter:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, and a matrix that maps 16 controls to the code, tests and CI steps that cite them.">
+<meta name="twitter:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, a 16-control matrix mapped to tests.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
 <meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -265,15 +265,15 @@ kevgate_auth_throttled_total 3.0</code></pre></details>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
 <h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
 <ul class="prose">
-<li><strong>Nothing is deployed to a real AWS account.</strong> The Terraform (ECR, reports bucket, KMS key, workload and CI roles) was applied only to LocalStack, which has no ECR in its Community edition, so the ECR repository and the GitHub OIDC role are checked statically and by the <code>terraform test</code>. Nothing uses those resources: the service has no AWS SDK code and releases go to GHCR.</li>
-<li><strong>One replica, SQLite on one volume, <code>Recreate</code> rollouts.</strong> That is a demonstration scope; <a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/DEPLOYMENT.md#what-would-change-for-production">DEPLOYMENT.md</a> lists what production would change (Postgres, replicas, tested backup and restore, key lifecycle). The rate limiter and the failure limiter are per process, per source address, and reset on restart.</li>
-<li><strong><code>/metrics</code> is unauthenticated.</strong> It carries counts, not findings, and is protected only by the NetworkPolicy.</li>
-<li><strong>No branch protection on <code>main</code>.</strong> The OIDC trust policy is pinned to <code>refs/heads/main</code>, so whoever can push to <code>main</code> controls what may assume that role. The role has no consumer today. The GitHub API returned "Branch not protected" for the repository on 2026-11-11.</li>
-<li><strong>The detection rules have not been run against a real SIEM or a live Prometheus.</strong> The Sigma rules convert with <code>sigma</code> and are validated; three of four are checked by a <code>jq</code> translation against a real kind audit log. The alert rules are checked with <code>promtool</code> unit tests only.</li>
-<li><strong>No image signature enforcement.</strong> The release is signed and verified by its own job, but nothing at admission checks the signature, and there is no admission policy engine beyond Pod Security Admission.</li>
-<li><strong>The matrix maps claims to evidence; it does not show sufficiency.</strong> A cited test passing shows that the behavior it asserts held on the tag, not that the control covers the threat. The repository's threat model lists the residual risks, and the matrix quotes them.</li>
-<li><strong>The scoring weights are a design choice,</strong> not evaluated against remediation outcomes. Access control is coarse: three scopes, no per-asset authorization, no key expiry or rotation workflow, and revocation needs a restart.</li>
-<li><strong>Bundled KEV file is a 5-entry sample.</strong> <code>kevgate kev-refresh</code> downloads the real catalog; the demo above used the sample.</li>
+<li>Nothing is deployed to a real AWS account. The Terraform (ECR, reports bucket, KMS key, workload and CI roles) was applied only to LocalStack, which has no ECR in its Community edition, so the ECR repository and the GitHub OIDC role are checked statically and by the <code>terraform test</code>. Nothing uses those resources: the service has no AWS SDK code and releases go to GHCR.</li>
+<li>It runs one replica with SQLite on one volume and <code>Recreate</code> rollouts. That is a demonstration scope, and <a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/DEPLOYMENT.md#what-would-change-for-production">DEPLOYMENT.md</a> lists what production would change (Postgres, replicas, tested backup and restore, key lifecycle). The rate limiter and the failure limiter are per process, per source address, and reset on restart.</li>
+<li>The <code>/metrics</code> endpoint is unauthenticated. It carries counts, not findings, and is protected only by the NetworkPolicy.</li>
+<li>There is no branch protection on <code>main</code>. The OIDC trust policy is pinned to <code>refs/heads/main</code>, so whoever can push to <code>main</code> controls what may assume that role. The role has no consumer today. The GitHub API returned "Branch not protected" for the repository on 2026-11-11.</li>
+<li>The detection rules have not been run against a real SIEM or a live Prometheus. The Sigma rules convert with <code>sigma</code> and are validated, and three of four are checked by a <code>jq</code> translation against a real kind audit log. The alert rules are checked with <code>promtool</code> unit tests only.</li>
+<li>Image signatures are not enforced. The release is signed and verified by its own job, but nothing at admission checks the signature, and there is no admission policy engine beyond Pod Security Admission.</li>
+<li>The matrix maps claims to evidence, and it does not show sufficiency. A cited test passing shows that the behavior it asserts held on the tag, not that the control covers the threat. The repository's threat model lists the residual risks, and the matrix quotes them.</li>
+<li>The scoring weights are a design choice and were not evaluated against remediation outcomes. Access control is coarse: three scopes, no per-asset authorization, no key expiry or rotation workflow, and revocation needs a restart.</li>
+<li>The bundled KEV file is a 5-entry sample. <code>kevgate kev-refresh</code> downloads the real catalog, but the demo above used the sample.</li>
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">

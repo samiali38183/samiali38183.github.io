@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>kev-risk-prioritization | Sami Ali</title>
-<meta name="description" content="A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. v0.3.0 refuses lists that mix rows with and without CVSS and sorts in a total order. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.">
+<meta name="description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kev-risk-prioritization/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kev-risk-prioritization | Sami Ali">
-<meta property="og:description" content="A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. v0.3.0 refuses lists that mix rows with and without CVSS and sorts in a total order. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.">
+<meta property="og:description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kev-risk-prioritization/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kev-risk-prioritization | Sami Ali">
-<meta name="twitter:description" content="A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. Not an implementation of CISA BOD 26-04. v0.3.0 refuses lists that mix rows with and without CVSS and sorts in a total order. Includes a pinned real KEV and EPSS snapshot and an interactive weight bench.">
+<meta name="twitter:description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
 <meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -100,7 +100,7 @@
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
 <h2 id="found-h"><span class="label sec-label">Before</span>The first version claimed more than it showed</h2>
-<div class="callout"><p><strong>The synthetic demo proves ordering behavior and nothing else.</strong> The 20 sample findings use real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. No DHS or CBP data is involved.</p></div>
+<div class="callout"><p>The synthetic demo shows ordering behavior and nothing else. The 20 sample findings use real KEV CVE IDs with invented assets, criticality ratings, EPSS, CVSS and ages. No DHS or CBP data is involved.</p></div>
 <div class="prose">
 <p>The first version of this project said its score was "in the spirit of" CISA BOD 26-04 and showed a table of measurements computed on the invented sample values, such as an average EPSS of 0.935 for KEV against 0.029 for the rest. Both overstated the work. Those averages describe invented values, not vulnerabilities, and the score shares one input with the directive, not its method. The repository's changelog records both corrections for 0.2.0.</p>
 <p>The directive sets a remediation deadline per asset from four variables in a decision table, and it applies to federal civilian executive branch agencies.<sup class="nref" aria-hidden="true"></sup> The tool is a weighted sum. Of the four variables it models one:</p>
@@ -135,10 +135,10 @@
 <div class="prose">
 <p>Version 0.3.0 fixes defects found in a review of 0.2.0. Four changes alter behavior:</p>
 <ul>
-<li><strong>Mixed lists are refused.</strong> In 0.2.0 the same KEV finding (ACR 4, EPSS 0.5) scored 73.5 without a CVSS value and 59.5 with CVSS 0.0, so a list mixing both kinds was ranked with scores on different scales. Now such a list is an error (exit code 2) unless <code>--allow-mixed</code> is given; then every row is scored without its CVSS term, a warning is printed and each output row carries a <code>score_basis</code> field. Lists where every row, or no row, has CVSS score as before.</li>
-<li><strong>The sort is a total order:</strong> score, KEV, EPSS, CVSS, ACR and days open (all descending), then CVE id, asset, system group, vendor and exposure, so input order never matters. On the demo this swaps ranks 8 and 9: CVE-2018-13379 on vpn-old-01 (300 days open) now ranks above CVE-2022-22965 on app-srv-07 (75 days), both scoring 93.1. On the 2,000-row real-data list 139 tied rows changed position; the row set and every score are unchanged.</li>
-<li><strong>Input is validated, not clamped.</strong> Out-of-range values that 0.2.0 clamped silently are errors that name the row, and bad input (missing columns, empty files, malformed KEV JSON, missing files and similar) ends in one line on stderr and a non-zero exit code instead of a traceback.</li>
-<li><strong>CI runs ruff and mypy</strong> at pinned versions, and a script regenerates or checks the generated analysis and the golden files.</li>
+<li>Mixed lists are refused. In 0.2.0 the same KEV finding (ACR 4, EPSS 0.5) scored 73.5 without a CVSS value and 59.5 with CVSS 0.0, so a list mixing both kinds was ranked with scores on different scales. Now such a list is an error (exit code 2) unless <code>--allow-mixed</code> is given. Then every row is scored without its CVSS term, a warning is printed and each output row carries a <code>score_basis</code> field. Lists where every row, or no row, has CVSS score as before.</li>
+<li>The sort is a total order: score, KEV, EPSS, CVSS, ACR and days open (all descending), then CVE id, asset, system group, vendor and exposure, so input order never matters. On the demo this swaps ranks 8 and 9: CVE-2018-13379 on vpn-old-01 (300 days open) now ranks above CVE-2022-22965 on app-srv-07 (75 days), both scoring 93.1. On the 2,000-row real-data list 139 tied rows changed position, and the row set and every score are unchanged.</li>
+<li>Input is validated, not clamped. Out-of-range values that 0.2.0 clamped silently are errors that name the row. Bad input (missing columns, empty files, malformed KEV JSON, missing files and similar) ends in one line on stderr and a non-zero exit code instead of a traceback.</li>
+<li>CI runs ruff and mypy at pinned versions, and a script regenerates or checks the generated analysis and the golden files.</li>
 </ul>
 </div>
 <details class="fold fold-tbl"><summary>Output, 14 lines: $ python kev_prioritize.py ... --top 14</summary><pre data-copy data-label="$ python kev_prioritize.py ... --top 14"><code>$ python kev_prioritize.py data/sample_findings.csv --kev data/sample_kev.json --top 14

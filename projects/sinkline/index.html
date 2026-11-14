@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>sinkline: taint analysis for Python web apps | Sami Ali</title>
-<meta name="description" content="sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.">
+<meta name="description" content="sinkline follows request data across functions and files. On BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, but trails Bandit over all 14.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/sinkline/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="sinkline: taint analysis for Python web apps | Sami Ali">
-<meta property="og:description" content="sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.">
+<meta property="og:description" content="sinkline follows request data across functions and files. On BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, but trails Bandit over all 14.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/sinkline/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="sinkline: taint analysis for Python web apps | Sami Ali">
-<meta name="twitter:description" content="sinkline follows request data across functions and files to sinks. On OWASP BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, and trails Bandit over all 14.">
+<meta name="twitter:description" content="sinkline follows request data across functions and files. On BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, but trails Bandit over all 14.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
 <meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -437,14 +437,14 @@ precision 0.623  recall 0.541  F1 0.579   (lenient: any bandit hit on a VULN lin
 <section class="limits section" id="limits" aria-labelledby="limits-h">
 <h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
 <ul class="prose">
-<li><strong>The 0.5.1 score is not held out.</strong> The fixes (made in 0.5.0, unchanged on this suite in 0.5.1) were chosen by reading the failures of 0.4.1 on the same benchmark. Only the 0.4.1 reading is an independent measurement, and it was +0.21 on the taint categories.</li>
-<li><strong>One synthetic suite.</strong> BenchmarkPython v0.1 is a preliminary release of templated cases (many share one shape), and the SQL, command and XXE categories have only 5 to 13 vulnerable cases. The scorer is the repository's own script, not the official one, so the benchmark's own scorecard may differ.</li>
-<li><strong>High false-positive rate.</strong> FPR is 0.21 on the taint categories. The largest remaining source is position-sensitive lists (a list is tracked as a whole), then deliberately obfuscated safe variants. Taint stored through <code>ConfigParser</code> or a user-defined request wrapper is lost.</li>
-<li><strong>Four categories have no checks:</strong> weak hash, weak PRNG, cookie flags and trust boundary. Over all 14 categories Bandit leads, +0.36 to +0.27.</li>
-<li><strong>The self-labeled corpus is not independent.</strong> 109 lines, labeled alongside the engine, kept as a regression gate. Its F1 of 0.992 is not an accuracy estimate.</li>
-<li><strong>The public-project scans are unlabeled.</strong> Three of the four are deliberately vulnerable training apps. The one microblog finding is parameter injection into a fixed host, which sinkline labels SSRF, not a proven SSRF, and its redirect check is still treated as a guard. Neither the new findings nor the absence of others is a measure of accuracy. No CVEs or real-world vulnerabilities are claimed.</li>
-<li><strong>Figure 1 shows recorded runs of small files, not a benchmark.</strong> One case is worth knowing: <code>return shlex.quote(request.args.get("name", ""))</code>, is not reported in 0.5.1 (the changelog says a returned call result counts as XSS only when it is the tainted string itself, and an unknown call is not guessed at), while the same value assigned to a variable first is. The recorded run is in <code>assets/data/sinkline-bench/html-wrong-direct.txt</code>. Changes made on main after the v0.5.1 tag now report the direct return as XSS (CWE-79), so a newer sinkline would not match that recording.</li>
-<li><strong>Known design limits.</strong> Taint passed between requests through a module global, returned closures, dynamic dispatch, and instance fields tracked per class rather than per object. Python only, summaries context-insensitive, and no coverage for OWASP A04 and A06.</li>
+<li>The 0.5.1 score is not held out. The fixes (made in 0.5.0, unchanged on this suite in 0.5.1) were chosen by reading the failures of 0.4.1 on the same benchmark. Only the 0.4.1 reading is an independent measurement, and it was +0.21 on the taint categories.</li>
+<li>It was tested on one synthetic suite. BenchmarkPython v0.1 is a preliminary release of templated cases (many share one shape), and the SQL, command and XXE categories have only 5 to 13 vulnerable cases. The scorer is the repository's own script, not the official one, so the benchmark's own scorecard may differ.</li>
+<li>The false-positive rate is high. FPR is 0.21 on the taint categories. The largest remaining source is position-sensitive lists (a list is tracked as a whole), then deliberately obfuscated safe variants. Taint stored through <code>ConfigParser</code> or a user-defined request wrapper is lost.</li>
+<li>Four categories have no checks: weak hash, weak PRNG, cookie flags and trust boundary. Over all 14 categories Bandit leads, +0.36 to +0.27.</li>
+<li>The self-labeled corpus is not independent. It is 109 lines, labeled alongside the engine and kept as a regression gate. Its F1 of 0.992 is not an accuracy estimate.</li>
+<li>The public-project scans are unlabeled. Three of the four are deliberately vulnerable training apps. The one microblog finding is parameter injection into a fixed host, which sinkline labels SSRF, not a proven SSRF, and its redirect check is still treated as a guard. Neither the new findings nor the absence of others is a measure of accuracy. No CVEs or real-world vulnerabilities are claimed.</li>
+<li>Figure 1 shows recorded runs of small files, not a benchmark. One case is worth knowing: <code>return shlex.quote(request.args.get("name", ""))</code>, is not reported in 0.5.1 (the changelog says a returned call result counts as XSS only when it is the tainted string itself, and an unknown call is not guessed at), while the same value assigned to a variable first is. The recorded run is in <code>assets/data/sinkline-bench/html-wrong-direct.txt</code>. Changes made on main after the v0.5.1 tag now report the direct return as XSS (CWE-79), so a newer sinkline would not match that recording.</li>
+<li>There are known design limits. Taint passed between requests through a module global, returned closures, dynamic dispatch, and instance fields tracked per class rather than per object. Python only, summaries context-insensitive, and no coverage for OWASP A04 and A06.</li>
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">

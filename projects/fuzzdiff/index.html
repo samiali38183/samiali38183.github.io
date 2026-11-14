@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>fuzzdiff: picohttpparser ported to safe Rust | Sami Ali</title>
-<meta name="description" content="fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.">
+<meta name="description" content="fuzzdiff v0.2.0 ports picohttpparser from C to safe Rust and checks it against the original and httparse with differential tests, Miri and libFuzzer.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/fuzzdiff/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="fuzzdiff: picohttpparser ported to safe Rust | Sami Ali">
-<meta property="og:description" content="fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.">
+<meta property="og:description" content="fuzzdiff v0.2.0 ports picohttpparser from C to safe Rust and checks it against the original and httparse with differential tests, Miri and libFuzzer.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/fuzzdiff/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="fuzzdiff: picohttpparser ported to safe Rust | Sami Ali">
-<meta name="twitter:description" content="fuzzdiff v0.2.0 ports the picohttpparser HTTP parser from C to safe Rust and checks it against the original and against httparse with differential tests, five seeded bugs, Miri and libFuzzer smoke runs.">
+<meta name="twitter:description" content="fuzzdiff v0.2.0 ports picohttpparser from C to safe Rust and checks it against the original and httparse with differential tests, Miri and libFuzzer.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
 <meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -222,14 +222,14 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <section class="limits section" id="limits" aria-labelledby="limits-h">
 <h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
 <ul class="prose">
-<li><strong>The fuzz runs are short.</strong> Two minutes per leg is a smoke run, not assurance, and the libFuzzer targets never reach the overhead guard or the <code>last_len</code> case (D2). No 32-bit or big-endian target has been run.</li>
-<li><strong>No new vulnerability was found.</strong> picohttpparser has no published security advisory, the httparse differences are leniency choices and not defects in the C code, and the advisories in <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/CVE_CLASSES.md">CVE_CLASSES.md</a> are examples of bug classes, mostly from other parsers.</li>
-<li><strong>Miri covers the pure-Rust crate only.</strong> The C code and the FFI harness cannot run under it, so the comparison with C is not covered by Miri. The crate forbids unsafe code, so there is little for it to find.</li>
-<li><strong>The httparse comparison is narrow.</strong> It covers head parsing and the first chunk-size line only (httparse has no chunked decoder), httparse in its default configuration, two parsers on one input and not a proxy and server pair, and 64 header slots on each side.</li>
-<li><strong>Five seeded bugs are a small sample.</strong> Three are caught in under 300 generated inputs, which shows the plumbing works; one is caught only by a hand-built case because the random generator never builds that input.</li>
-<li><strong>The Rust port is slower</strong> on head parsing (about 1.4x to 1.5x), and the cause was not profiled. On Windows the C side ran its portable path, so a Linux build with SIMD may widen the gap; that was not measured.</li>
-<li><strong>Two deliberate deviations.</strong> D1: optional rejection of folded header lines, off by default. D2: <code>last_len</code> larger than the buffer is an error in Rust, while C reads out of bounds. D2 was found by reading the code and has not been reproduced under a sanitizer. Details in <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DEVIATIONS.md">DEVIATIONS.md</a>.</li>
-<li><strong>Blind generator.</strong> The 27.6 million-input seeded generator run in the README has no coverage feedback and is a stand-in for fuzzing, not a replacement.</li>
+<li>The fuzz runs are short. Two minutes per leg is a smoke run, not assurance, and the libFuzzer targets never reach the overhead guard or the <code>last_len</code> case (D2). No 32-bit or big-endian target has been run.</li>
+<li>I did not find a new vulnerability. picohttpparser has no published security advisory, the httparse differences are leniency choices and not defects in the C code, and the advisories in <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/CVE_CLASSES.md">CVE_CLASSES.md</a> are examples of bug classes, mostly from other parsers.</li>
+<li>Miri only covers the pure-Rust crate. The C code and the FFI harness cannot run under it, so the comparison with C is not covered by Miri. The crate forbids unsafe code, so there is little for it to find.</li>
+<li>The httparse comparison is narrow. It covers head parsing and the first chunk-size line only (httparse has no chunked decoder), httparse in its default configuration, two parsers on one input and not a proxy and server pair, and 64 header slots on each side.</li>
+<li>Five seeded bugs are a small sample. Three are caught in under 300 generated inputs, which shows the plumbing works. One is caught only by a hand-built case because the random generator never builds that input.</li>
+<li>The Rust port is slower on head parsing (about 1.4x to 1.5x), and the cause was not profiled. On Windows the C side ran its portable path, so a Linux build with SIMD may widen the gap. That was not measured.</li>
+<li>There are two deliberate deviations. D1 is optional rejection of folded header lines, off by default. D2: <code>last_len</code> larger than the buffer is an error in Rust, while C reads out of bounds. D2 was found by reading the code and has not been reproduced under a sanitizer. Details in <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DEVIATIONS.md">DEVIATIONS.md</a>.</li>
+<li>The generator is blind. The 27.6 million-input seeded generator run in the README has no coverage feedback and is a stand-in for fuzzing, not a replacement.</li>
 </ul>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
