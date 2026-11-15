@@ -35,7 +35,7 @@ PAGES = [
      "Security engineering student at George Mason University (May 2028). Application-security and detection tools with measured results. Seeking a Summer 2027 internship.",
      "home", None),
     ("/projects/", "projects", "Work archive | Sami Ali",
-     "Projects beyond the featured four: kevgate-admit, fuzzdiff, kev-risk-prioritization and call-kettle, each labelled with its data type and limits.",
+     "Projects beyond the featured four: vulnlab, kevgate-admit, fuzzdiff and kev-risk-prioritization, each labelled with its data type and limits.",
      "projects", None),
 ] + [
     (f"/projects/{slug}/", "projects", None, None, "project", slug)

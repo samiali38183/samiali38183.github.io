@@ -166,25 +166,26 @@ EMAIL = "samiali38183@gmail.com"
 LINKEDIN = "https://www.linkedin.com/in/sami-ali-1a4b89345"
 HEADLINE = "Security engineering student building application-security and detection tools, with measured results."
 INTRO = ("I'm a cybersecurity student at George Mason University (B.S. IT, May 2028) who builds application-security and detection tools, "
-         "then measures where they fail. In summer 2026 I worked on the DHS/CBP Vulnerability Assessment Team. "
+         "and tests where they fail. In summer 2026 I worked on the DHS/CBP Vulnerability Assessment Team. "
          "I'm looking for a Summer 2027 security engineering internship.")
 ABOUT = [
-    "I build security tools for finding and stopping application bugs, and I publish the measurements, including where the tools fail. "
-    "tripline replays recorded attack telemetry through detection rules and fails the build when a rule stops catching it. "
-    "sinkline traces user input to dangerous calls in Python web apps. vulnlab exploits, fixes and detects three web bug classes on localhost. "
-    "At DHS/CBP I matched Tenable scan results against CISA's Known Exploited Vulnerabilities catalog and ranked remediation by exploitation risk. "
-    "I hold Security+ and AWS Cloud Practitioner, and I am studying for OSCP. I am looking for a Summer 2027 security engineering internship."]
+    "I build detection and application-security tooling because a rule or a scanner that has never been run against real input only looks like coverage. "
+    "I would rather find the miss myself, write it down and fix it than learn about it during an incident, so each project here carries a record of what it got wrong.",
+    "I earned an A.S. in Information Technology at Northern Virginia Community College in May 2026 and am working toward a B.S. in Information Technology with a cybersecurity minor at George Mason University. "
+    "I hold Security+ and the AWS Cloud Practitioner certification, and I am studying for OSCP and the AWS Certified Security - Specialty."]
 CALL_KETTLE = {
     "name": "call-kettle", "kind": "AI agent security, Python", "url": "/projects/call-kettle/", "repo": GH + "/call-kettle",
     "blurb": "Phone receptionist backend (FastAPI, Twilio, Claude tool use) where the model only proposes actions and server code authorizes each one. "
-             "Includes a 48-case adversarial evaluation using a scripted model, 19 boundary-removal tests, an authorization matrix and documented security invariants.",
+             "A scripted attacker model runs 42 attacks and 6 normal requests against the real gate; all pass.",
     "label": "Scripted model, synthetic data",
+    "hero": {"src": "/assets/img/call-kettle/hero-security-eval.png", "w": 1800, "h": 1120,
+             "alt": "Summary of the evaluation: one case in which the caller says to ignore instructions and cancel another customer's booking, the scripted model asks to cancel it and the server check refuses with policy_disabled. 48 of 48 cases pass."},
 }
 EXPERIENCE = [
-    "Matched Nessus/Tenable scan results against the CISA Known Exploited Vulnerabilities (KEV) catalog to identify high-risk systems and aged findings.",
-    "Designed a risk-based prioritization method weighing KEV status, asset criticality, exposure, EPSS and CVSS, and benchmarked remediation against CISA BOD 26-04 timelines.",
+    "Matched Nessus/Tenable scan results against CISA's Known Exploited Vulnerabilities (KEV) catalog to find high-risk systems and aged findings.",
+    "Designed a risk-based prioritization method weighing KEV status, asset criticality, exposure, EPSS (exploit likelihood) and CVSS (severity); benchmarked remediation against CISA directive BOD 26-04 timelines.",
     "Built a multi-page Power BI dashboard and an executive briefing on actively exploited vulnerabilities for technical and leadership audiences.",
-    "Wrote remediation recommendations aligned with the NIST Cybersecurity Framework.",
+    "Wrote remediation recommendations aligned with NIST CSF.",
 ]
 
 
@@ -196,12 +197,11 @@ def copy_email(cls: str = "") -> str:
 
 
 def figure(p: dict) -> str:
-    """Hero image on a white card, with a one-line label that says what kind of data it is."""
+    """Hero image on a white card. No caption: the blurb already says what kind of data it is."""
     h = p["hero"]
     img = (f'<img src="{h["src"]}" width="{h["w"]}" height="{h["h"]}" alt="{esc(h["alt"], quote=True)}" loading="lazy" decoding="async">')
-    return (f'<figure class="shot"><a class="hero-zoom" href="/projects/{p["slug"]}/" tabindex="-1" aria-hidden="true">'
-            f'<div class="hero-card">{img}</div></a>'
-            f'<figcaption><span class="tag">{esc(p["label"])}</span></figcaption></figure>')
+    return (f'<figure class="shot"><a class="hero-zoom" href="{p["url"]}" tabindex="-1" aria-hidden="true">'
+            f'<div class="hero-card">{img}</div></a></figure>')
 
 
 def proj_links(p: dict) -> str:
@@ -215,14 +215,18 @@ def proj_links(p: dict) -> str:
 def home(ctx: dict) -> str:
     d = ctx["projects"]
     feats = []
-    for i, slug in enumerate(d["home_order"], 1):
-        p = d["projects"][slug]
+    ck = CALL_KETTLE
+    items = [(slug, {**d["projects"][slug], "url": f"/projects/{slug}/"}) for slug in d["home_order"]]
+    items.append(("call-kettle", {**ck, "version": ""}))
+    for i, (slug, p) in enumerate(items, 1):
+        ver = f' <span class="ver">{esc(ver_of(p))}</span>' if p["version"] else ""
+        links = proj_links(p) if slug != "call-kettle" else f'<a href="{ck["url"]}">Write-up</a> <a href="{ck["repo"]}">Source</a>'
         feats.append(
             f'<li class="feat"><div class="feat-text">'
-            f'<p class="meta"><span class="no">{i:02d}</span> {esc(p["kind"])} <span class="ver">{esc(ver_of(p))}</span></p>'
+            f'<p class="meta"><span class="no">{i:02d}</span> {esc(p["kind"])}{ver}</p>'
             f'<h3><a href="/projects/{slug}/">{esc(p["name"])}</a></h3>'
             f'<p class="blurb">{esc(p["blurb"])}</p>'
-            f'<p class="links">{proj_links(p)}</p></div>{figure(p)}</li>')
+            f'<p class="links">{links}</p></div>{figure(p)}</li>')
     research = []
     for slug in ("fuzzdiff", "kev-risk-prioritization"):
         p = d["projects"][slug]
@@ -247,7 +251,7 @@ def home(ctx: dict) -> str:
 <section class="section" aria-labelledby="work">
 <h2 id="work">Selected work</h2>
 <ol class="feats">{"".join(feats)}</ol>
-<p class="more"><a href="/projects/">Work archive</a>: {len(d["order"]) - len(d["home_order"])} more projects and call-kettle.</p>
+<p class="more"><a href="/projects/">Work archive</a>: {len(d["order"]) - len(d["home_order"])} more projects.</p>
 </section>
 
 <section class="section" aria-labelledby="exp">
@@ -296,10 +300,8 @@ def projects_index(ctx: dict) -> str:
         if slug in d["home_order"]:
             continue
         rows.append(archive_row(p["name"], f"/projects/{slug}/", p["kind"], ver_of(p), p["blurb"], p["label"], proj_links(p)))
-    ck = CALL_KETTLE
-    rows.append(archive_row(ck["name"], ck["url"], ck["kind"], "", ck["blurb"], ck["label"],
-                            f'<a href="{ck["url"]}">Write-up</a> <a href="{ck["repo"]}">Source</a>'))
-    feat = ", ".join(f'<a href="/projects/{s}/">{esc(d["projects"][s]["name"])}</a>' for s in d["home_order"])
+    feat = ", ".join([f'<a href="/projects/{s}/">{esc(d["projects"][s]["name"])}</a>' for s in d["home_order"]]
+                     + [f'<a href="{CALL_KETTLE["url"]}">call-kettle</a>'])
     return f"""<h1>Work archive</h1>
 <p class="dek">Projects that are not featured on the <a href="/">home page</a>. Featured: {feat}.</p>
 <ol class="archive">{"".join(rows)}</ol>"""

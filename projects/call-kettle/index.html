@@ -57,7 +57,7 @@
 
 <section class="section" aria-labelledby="flow-h">
 <h2 id="flow-h">One request, two outcomes</h2>
-<figure class="hero-fig"><div class="hero-card"><img src="/assets/img/call-kettle/example-flow.svg" width="1300" height="620" alt="A legitimate booking and a cancel request injected by a caller, each passing from caller speech to the model's proposed tool call, the server authorization layer, the business tools and the audit record; the legitimate one is saved and the adversarial one is refused." loading="lazy" decoding="async"></div><figcaption><span class="tag">Recorded run, scripted model, synthetic data</span></figcaption></figure>
+<figure class="hero-fig"><div class="hero-card"><img src="/assets/img/call-kettle/example-flow.svg" width="1300" height="620" alt="A legitimate booking and a cancel request injected by a caller, each passing from caller speech to the model's proposed tool call, the server authorization layer, the business tools and the audit record; the legitimate one is saved and the adversarial one is refused." loading="lazy" decoding="async"></div></figure>
 <figure class="hero-fig"><div class="hero-card"><img src="/assets/img/call-kettle/example-terminal.png" width="2196" height="1586" alt="Saved terminal output of python -m qa.record_example. A legitimate booking is allowed and one booking is added. An injected cancel is refused by the gate with control policy_disabled. A second injected cancel is allowed by the gate but rejected by the tool's own ownership rule. In both attacks no booking row changes. 3 of 3 recorded cases match; scripted model, synthetic data, no network." loading="lazy" decoding="async"></div><figcaption><span class="tag">Saved terminal output</span></figcaption></figure>
 </section>
 

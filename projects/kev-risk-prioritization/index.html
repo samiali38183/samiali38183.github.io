@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>kev-risk-prioritization | Sami Ali</title>
-<meta name="description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
+<meta name="description" content="A standard-library Python script that ranks scan findings with a hand-weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kev-risk-prioritization/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kev-risk-prioritization | Sami Ali">
-<meta property="og:description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
+<meta property="og:description" content="A standard-library Python script that ranks scan findings with a hand-weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kev-risk-prioritization/">
 <meta property="og:image" content="https://samiali38183.github.io/assets/og/kev-risk-prioritization.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="kev-risk-prioritization: 12 vs 9 KEV findings in the top 12 on 20 synthetic findings: risk score vs CVSS-only sort. Weights not validated.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kev-risk-prioritization | Sami Ali">
-<meta name="twitter:description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
+<meta name="twitter:description" content="A standard-library Python script that ranks scan findings with a hand-weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <meta name="twitter:image" content="https://samiali38183.github.io/assets/og/kev-risk-prioritization.png">
 <meta name="twitter:image:alt" content="kev-risk-prioritization: 12 vs 9 KEV findings in the top 12 on 20 synthetic findings: risk score vs CVSS-only sort. Weights not validated.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -172,7 +172,7 @@ KEV vs non-KEV population
 <section class="limits section" id="limits" aria-labelledby="limits-h">
 <h2 id="limits-h">Limits</h2>
 <ul class="prose">
-<li>Not an implementation of BOD 26-04: it does not model exposure, automatability, technical impact, per-asset deadlines or forensic triage, and it is not a compliance tool.</li>
+<li>It does not model exposure, automatability, technical impact, per-asset deadlines or forensic triage, and it is not a compliance tool.</li>
 <li>The 0.40 / 0.25 / 0.20 / 0.20 weights are a design choice with no outcome data behind them. The bench shows how the order depends on them; it cannot say which weights are right.</li>
 <li>The demo data is synthetic, so 12 of 12 shows how the formula orders findings, not what a real environment looks like.</li>
 <li>EPSS and KEV are related signals, so the AUC of 0.9515 is not independent validation of either, and it says nothing about the risk score.</li>
