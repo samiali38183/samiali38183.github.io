@@ -692,7 +692,7 @@ def main() -> int:
     results.append(("f1291485808b66e20ddb6b01b10dc71b3df8c8ba" in readme and "1,230" in readme,
                     "bench/external/README.md pins BenchmarkPython f1291485 and 1,230 cases"))
     expect("BenchmarkPython pin (short) on the page", "f129148", page)
-    expect("sinkline home blurb", "scores +0.52", "index.html")
+    expect("sinkline home blurb", "found 88", "index.html")
     expect("sinkline release v0.5.1 commit", run(["git", "rev-list", "-n1", "v0.5.1"], s).strip()[:7], page)
 
     # sinkline Sanitizer switch: stored data against the committed captures (the CLI re-run is capture_sinkline_bench.py --check)

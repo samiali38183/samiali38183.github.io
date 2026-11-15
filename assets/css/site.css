@@ -517,9 +517,11 @@ main>.section{padding-top:var(--s-8)}
 .hero-read .why{max-width:34rem;font-size:var(--step--1);color:var(--ink-2);margin:0 0 var(--s-3)}
 .hero-read .why+.chips{align-items:center}
 .fold-tbl{margin:var(--s-4) 0}
-.actions{align-items:stretch}
-.actions .btn{display:flex;align-items:center;height:100%;min-height:2.9rem}
+.actions{align-items:center}
+.actions .btn{display:inline-flex;align-items:center;min-height:3rem;padding-block:0}
 .intro-text{max-width:44rem}
 .overview p:first-child{font-size:var(--step-0);line-height:1.6}
 .overview{margin-bottom:var(--s-5)}
 @media (min-width:70rem){.title.has-hero{grid-template-columns:minmax(0,11fr) minmax(0,12fr)}.title.has-hero .page-hero{position:sticky;top:var(--s-4);align-self:start}.overview p{font-size:1.0625rem}}
+.arow h2{font-size:var(--step-2);margin:0 0 var(--s-1)}
+.arow h2 a{color:var(--ink)}
