@@ -486,6 +486,14 @@
    "try": {
     "kind": "Try it",
     "text": "Pick a command line and see whether the stock rule and the replacement flag it."
+   },
+   "hero": {
+    "src": "/assets/img/hero-tripline.png",
+    "w": 1800,
+    "h": 1100,
+    "alt": "ci](https://github.com/samiali38183/tripline/actions/workflows/ci.yml/badge.svg)](https://github.com/samiali38183/tripline/actions/workflows/ci.yml)\n[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)\n![python](https://img.shields.io/badge/python-3.12-blue)\n[![weighted coverage](docs/coverage.svg)](docs/scorecard.md)\n\n**tripline automatically checks that security detection rules still catch the attacks they are written for, and fails the code review when one stops.**\n\n![Left: a published SigmaHQ rule flagged 0 of 2 recorded setuid attack commands while the replacement rule written in this repo flagged 2 of 2. Right: weighted coverage across 14 ATT&CK scenarios is 52% on unmodified SigmaHQ rules and 98% with the rules written in this repo.",
+    "caption": "A stock SigmaHQ rule flagged 0 of 2 real setuid attacks I recorded on a GitHub runner. The replacement rule written here flags 2 of 2 (finding F-001).",
+    "full": "https://github.com/samiali38183/tripline/blob/main/docs/img/hero.png"
    }
   },
   "sinkline": {
@@ -829,6 +837,14 @@
    "try": {
     "kind": "Try it",
     "text": "Switch one small Flask app between unsafe, right sanitizer and wrong sanitizer, and read the real scanner output."
+   },
+   "hero": {
+    "src": "/assets/img/hero-sinkline.png",
+    "w": 1800,
+    "h": 1100,
+    "alt": "ci](https://github.com/samiali38183/sinkline/actions/workflows/ci.yml/badge.svg)](https://github.com/samiali38183/sinkline/actions/workflows/ci.yml)\n![python](https://img.shields.io/badge/python-3.9%E2%80%933.13-blue)\n![deps](https://img.shields.io/badge/dependencies-0-brightgreen)\n![license](https://img.shields.io/badge/license-MIT-lightgrey)\n\n**sinkline scans Python web apps for security bugs by following user input through the code, and reports it only when it reaches something dangerous without being cleaned first.**\n\n![Bar chart on OWASP BenchmarkPython, 240 vulnerable and 437 safe test cases. Real bugs found: sinkline 0.5.0 175 (73%), sinkline 0.4.1 99 (41%), Bandit 31 (13%), Semgrep 18 (8%). Safe cases wrongly flagged: sinkline 0.5.0 93 (21%), 0.4.1 89 (20%), Bandit 25 (6%), Semgrep 15 (3%).",
+    "caption": "On an independent benchmark, sinkline 0.5.0 found 175 of 240 real bugs against 31 for Bandit and 18 for Semgrep, and it also flagged more safe code (21% of safe cases against 6% and 3%). 0.4.1, before I tuned on the suite's misses, found 99.",
+    "full": "https://github.com/samiali38183/sinkline/blob/main/docs/img/hero.png"
    }
   },
   "kevgate": {
@@ -993,6 +1009,14 @@
    "try": {
     "kind": "See it",
     "text": "Click a control to see the code and the CI checks behind it."
+   },
+   "hero": {
+    "src": "/assets/img/hero-kevgate.png",
+    "w": 1800,
+    "h": 1100,
+    "alt": "ci](https://github.com/samiali38183/kevgate/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/ci.yml)\n[![security](https://github.com/samiali38183/kevgate/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/security.yml)\n[![deploy-kind](https://github.com/samiali38183/kevgate/actions/workflows/deploy-kind.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/deploy-kind.yml)\n[![terraform](https://github.com/samiali38183/kevgate/actions/workflows/terraform.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/terraform.yml)\n\n**kevgate turns a vulnerability scanner export into a fix-first list, putting the flaws attackers are known to exploit at the top, and ships with the security pipeline a production service needs.**\n\n![Two panels. Left: ranking weights read from the code, 0.40 for being in CISA's Known Exploited Vulnerabilities list, 0.25 asset importance, 0.20 exploit likelihood (EPSS), 0.20 severity (CVSS). Right: 12 checks all green on the latest main run, including 277 tests at 99.92% branch coverage, Semgrep, Bandit, gitleaks, pip-audit, checkov, Trivy, a kind cluster deploy with NetworkPolicy and Pod Security checks, and an OWASP ZAP scan.",
+    "caption": "277 tests at 99.92% branch coverage, plus 11 more checks (type checks, scanners, a cluster deploy), all green on main. Weights are my own choice and have not been tested against remediation outcomes.",
+    "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/hero.png"
    }
   },
   "kevgate-admit": {
@@ -1156,6 +1180,14 @@
    "try": {
     "kind": "Try it",
     "text": "Pick an image and a namespace policy and read the response the real webhook returned."
+   },
+   "hero": {
+    "src": "/assets/img/hero-kevgate-admit.png",
+    "w": 1800,
+    "h": 1120,
+    "alt": "ci](https://github.com/samiali38183/kevgate-admit/actions/workflows/ci.yml/badge.svg)](https://github.com/samiali38183/kevgate-admit/actions/workflows/ci.yml)\n[![e2e-kind](https://github.com/samiali38183/kevgate-admit/actions/workflows/e2e-kind.yml/badge.svg)](https://github.com/samiali38183/kevgate-admit/actions/workflows/e2e-kind.yml)\n[![security](https://github.com/samiali38183/kevgate-admit/actions/workflows/security.yml/badge.svg)](https://github.com/samiali38183/kevgate-admit/actions/workflows/security.yml)\n\nkevgate-admit is a Kubernetes validating admission webhook, written in Go. It refuses workloads whose container images carry CISA KEV-listed vulnerabilities or a risk score over a per-namespace limit. It decides from scan reports for the exact image digest, never from tags, and it does not scan images itself.\n\nIn plain terms: before Kubernetes starts a container, this gatekeeper checks whether the image has a vulnerability that attackers are known to be using, and blocks it if so.\n\n![Result of the kind cluster test: five demo workloads applied, three denied, one allowed and one admitted with a warning in audit mode, then the outage test showing that failurePolicy Fail rejects new Pods while the webhook is down and Ignore lets a Pod through that the policy would deny.",
+    "caption": "What the cluster did with five demo workloads and during a webhook outage, from the e2e-kind CI transcript. The scan data is synthetic.",
+    "full": "https://github.com/samiali38183/kevgate-admit/blob/main/docs/img/hero-e2e.png"
    }
   },
   "fuzzdiff": {
@@ -1319,6 +1351,14 @@
    "try": {
     "kind": "See it",
     "text": "Pick an input and compare what the C parser, the Rust port and httparse each return."
+   },
+   "hero": {
+    "src": "/assets/img/hero-fuzzdiff.png",
+    "w": 1800,
+    "h": 1120,
+    "alt": "ci](https://github.com/samiali38183/fuzzdiff/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samiali38183/fuzzdiff/actions/workflows/ci.yml)\n[![fuzz](https://github.com/samiali38183/fuzzdiff/actions/workflows/fuzz.yml/badge.svg)](https://github.com/samiali38183/fuzzdiff/actions/workflows/fuzz.yml)\n\nfuzzdiff is a Rust port of [picohttpparser](https://github.com/h2o/picohttpparser), the C parser for HTTP/1.x requests, responses, headers and chunked bodies. Next to the port is a harness that feeds the same input to the C original and the Rust port and reports any difference. I wanted to know whether a memory-safe rewrite of a parser that reads hostile input behaves like the original, and to check that instead of just claiming it.\n\nIn plain terms: servers use parsers like this one to read requests from strangers, and bugs in such parsers are a classic way in. I rewrote one in a language that prevents that class of bug, then fed both versions tens of millions of random inputs and compared every answer.\n\n![Differential fuzzing result: 0 differences between the C parser and the Rust port in 90-second runs of 27,639,000 and 23,539,000 generated inputs, and 5 of 5 deliberately planted bugs detected by the harness.",
+    "caption": "The C original and the Rust port gave the same answer on every generated input, and the harness caught all 5 bugs I planted to test it (random inputs never found one of them, so a hand-written case caught it). Sampling, not proof.",
+    "full": "https://github.com/samiali38183/fuzzdiff/blob/main/docs/img/hero-differential.png"
    }
   },
   "kev-risk-prioritization": {
@@ -1537,6 +1577,14 @@
    "try": {
     "kind": "Try it",
     "text": "Move the four weights and watch the ranking reorder."
+   },
+   "hero": {
+    "src": "/assets/img/hero-kev-risk-prioritization.png",
+    "w": 1800,
+    "h": 1300,
+    "alt": "ci](https://github.com/samiali38183/kev-risk-prioritization/actions/workflows/ci.yml/badge.svg)](https://github.com/samiali38183/kev-risk-prioritization/actions/workflows/ci.yml)\n![python](https://img.shields.io/badge/python-3.9%2B%20%C2%B7%20stdlib%20only-blue)\n![license](https://img.shields.io/badge/license-MIT-lightgrey)\n\nA small weighted score that ranks vulnerability findings with known-exploited (CISA KEV) CVEs first, then asset criticality, EPSS and CVSS. It is a case study I wrote to think through prioritization, not an implementation of CISA BOD 26-04.\n\nScanners return more findings than a team can patch. Sorting by CVSS puts severity first and ignores whether anyone is exploiting the bug, so this tool puts KEV matches first. The score, its weights and the tests are my own design. [What BOD 26-04 requires, and how this differs](docs/bod-26-04.md) is written up separately.\n\n![Left: EPSS scores of 1,779 known-exploited CVEs against 5,000 others, medians 0.533 and 0.006, AUC 0.9515. Right: this tool puts all 100 KEV findings of a 2,000-row list in its top 100, EPSS alone puts 65 and asset criticality alone puts 10. Bottom: the AUC is partly circular and the weights are unvalidated.",
+    "caption": "On the real KEV catalog and EPSS scores, EPSS separates known-exploited CVEs from the rest with an AUC of 0.9515, but that result is partly circular because EPSS is trained on exploitation data that overlaps with KEV, so it is not validation of either. The tool's 100 of 100 comes mostly from its weights.",
+    "full": "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/img/hero-real-data.png"
    }
   },
   "vulnlab": {
@@ -1759,6 +1807,14 @@
    "try": {
     "kind": "See it",
     "text": "Pick a lab and a version, vulnerable or fixed, and read the code, the tests and the scanner output side by side."
+   },
+   "hero": {
+    "src": "/assets/img/hero-vulnlab.png",
+    "w": 1800,
+    "h": 1100,
+    "alt": "ci](https://github.com/samiali38183/vulnlab/actions/workflows/ci.yml/badge.svg)](https://github.com/samiali38183/vulnlab/actions/workflows/ci.yml)\n![python](https://img.shields.io/badge/python-3.12-blue)\n![license](https://img.shields.io/badge/license-MIT-lightgrey)\n\n**A lab of three small vulnerable web services that run only on localhost. Each bug is exploited, fixed, scanned by a static analyzer and matched by a log detection rule, and the results of all four are recorded.**\n\n![Table for three labs (SSRF via redirect, SQL injection, IDOR). Proof and fix: 26, 9 and 37 lab tests pass. sinkline scan on vulnerable and fixed code: 1 and 1 findings for SSRF and SQL injection (a correct finding, then a false alarm on the fix), 0 and 0 for IDOR because it is not a taint flow. Sigma log rule: 1 alert on the attack log and 0 on the benign log for all three.",
+    "caption": "All 137 tests pass. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where my static analyzer gets it wrong are left in and written up.",
+    "full": "https://github.com/samiali38183/vulnlab/blob/main/docs/img/hero.png"
    }
   }
  },

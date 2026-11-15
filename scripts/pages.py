@@ -132,6 +132,16 @@ def tier(d: dict, name: str) -> list[dict]:
     return [d["projects"][s] for s in d["order"] if d["projects"][s]["tier"] == name]
 
 
+def hero_fig(p: dict, cls: str, eager: bool = False, link: bool = True) -> str:
+    """The project's hero image on a neutral card (the PNGs have a white background). Width and height reserve the space."""
+    h = p["hero"]
+    load = 'fetchpriority="high"' if eager else 'loading="lazy"'
+    img = (f'<img src="{h["src"]}" width="{h["w"]}" height="{h["h"]}" alt="{esc(h["alt"], quote=True)}" {load} decoding="async">')
+    if link:
+        img = f'<a class="hero-zoom" href="{h["src"]}" aria-label="Open the {esc(p["name"], quote=True)} result image at full size">{img}</a>'
+    return f'<figure class="hero-fig {cls}"><div class="hero-card">{img}</div><figcaption>{esc(h["caption"])}</figcaption></figure>'
+
+
 def work_list(plist: list[dict], cls: str = "") -> str:
     """The project list: number, name, one plain sentence, the reading, and the as found / as left strips."""
     items = []
@@ -142,7 +152,8 @@ def work_list(plist: list[dict], cls: str = "") -> str:
             f'<p class="w-kind">{esc(p["kind"])}</p>'
             f'<p class="w-lede">{esc(p["lede"])}</p>'
             f'<p class="w-res"><span class="w-rl">Result</span> {esc(p["home"]["reading"])}</p></div>'
-            f'<div class="w-viz">{C.strip_rows(p["strip_sets"]["main"], mini=True, vt="strip-" + p["slug"])}</div></li>')
+            f'<div class="w-viz">{C.strip_rows(p["strip_sets"]["main"], mini=True, vt="strip-" + p["slug"])}</div>'
+            f'{hero_fig(p, "w-hero")}</li>')
     return f'<ol class="work {cls}">{"".join(items)}</ol>'
 
 
@@ -444,7 +455,7 @@ def project_page(ctx: dict, slug: str) -> str:
         bench = bench.replace('<section class="bench"', f'<section class="bench" id="try"', 1)
         bench = (f'<div class="try-head"><h2>{esc(tr["kind"])}</h2><p>{esc(tr["text"])}</p></div>\n' + bench)
     return f"""<div class="sheet">
-<header class="title">
+<header class="title has-hero">
 <h1>{esc(p["name"])}</h1>
 <dl class="plain">
 <div><dt>What it does</dt><dd>{esc(pl["what"])}</dd></div>
@@ -454,6 +465,7 @@ def project_page(ctx: dict, slug: str) -> str:
 <p class="row cta">{try_btn}<a class="btn alt" href="#limits">Read the limits</a></p>
 <ul class="linkrow">{links}</ul>
 {note}
+{hero_fig(p, "page-hero", eager=True)}
 </header>
 {reading_band(ctx, p)}
 {bench}

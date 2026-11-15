@@ -46,7 +46,7 @@
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
-<header class="title">
+<header class="title has-hero">
 <h1>sinkline</h1>
 <dl class="plain">
 <div><dt>What it does</dt><dd>It follows data from a web request through functions and files. It reports a finding only if the data reaches a dangerous call without the right clean-up for that kind of bug.</dd></div>
@@ -56,6 +56,14 @@
 <p class="row cta"><a class="btn" href="#try">Try it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
 <ul class="linkrow"><li><a href="https://github.com/samiali38183/sinkline">Repository</a></li><li><a href="https://github.com/samiali38183/sinkline/releases/tag/v0.5.1">Release v0.5.1</a></li><li><a href="https://github.com/samiali38183/sinkline/blob/main/bench/external/README.md">External benchmark</a></li><li><a href="https://github.com/samiali38183/sinkline/blob/main/docs/DESIGN.md">Design doc</a></li><li><a href="https://github.com/samiali38183/sinkline/actions/runs/43136290658">CI run (main)</a></li><li><a href="https://samiali38183.github.io/sinkline/">Sample HTML report</a></li></ul>
 
+<figure class="hero-fig page-hero"><div class="hero-card"><a class="hero-zoom" href="/assets/img/hero-sinkline.png" aria-label="Open the sinkline result image at full size"><img src="/assets/img/hero-sinkline.png" width="1800" height="1100" alt="ci](https://github.com/samiali38183/sinkline/actions/workflows/ci.yml/badge.svg)](https://github.com/samiali38183/sinkline/actions/workflows/ci.yml)
+![python](https://img.shields.io/badge/python-3.9%E2%80%933.13-blue)
+![deps](https://img.shields.io/badge/dependencies-0-brightgreen)
+![license](https://img.shields.io/badge/license-MIT-lightgrey)
+
+**sinkline scans Python web apps for security bugs by following user input through the code, and reports it only when it reaches something dangerous without being cleaned first.**
+
+![Bar chart on OWASP BenchmarkPython, 240 vulnerable and 437 safe test cases. Real bugs found: sinkline 0.5.0 175 (73%), sinkline 0.4.1 99 (41%), Bandit 31 (13%), Semgrep 18 (8%). Safe cases wrongly flagged: sinkline 0.5.0 93 (21%), 0.4.1 89 (20%), Bandit 25 (6%), Semgrep 15 (3%)." fetchpriority="high" decoding="async"></a></div><figcaption>On an independent benchmark, sinkline 0.5.0 found 175 of 240 real bugs against 31 for Bandit and 18 for Semgrep, and it also flagged more safe code (21% of safe cases against 6% and 3%). 0.4.1, before I tuned on the suite&#x27;s misses, found 99.</figcaption></figure>
 </header>
 <section class="reading-band" aria-label="The result">
 <div class="hero-read">
