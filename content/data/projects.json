@@ -516,7 +516,7 @@
    "sheet": 2,
    "kind": "Application security",
    "title": "sinkline: taint analysis for Python web apps | Sami Ali",
-   "desc": "sinkline follows request data across functions and files. On BenchmarkPython it scores +0.52 on taint categories vs Bandit +0.07, but trails Bandit over all 14.",
+   "desc": "sinkline follows request data across functions and files. On a frozen held-out set of 219 labeled bugs it found 88, against 34 for Bandit and 53 for Semgrep, and missed 60%.",
    "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 184 tests at v0.5.1 (186 on main); scored on OWASP BenchmarkPython v0.1.",
    "labels": {
     "found": "Before",
@@ -851,25 +851,35 @@
     "text": "Switch one small Flask app between unsafe, right sanitizer and wrong sanitizer, and read the real scanner output."
    },
    "hero": {
+    "src": "/assets/img/hero-sinkline-heldout.png",
+    "w": 1600,
+    "h": 672,
+    "alt": "Recall and precision of sinkline, Bandit and Semgrep on a held-out set of CodeQL's Python test cases. Taint classes, 219 labeled bugs: sinkline recall 0.40, precision 0.77; Bandit 0.16 and 0.77; Semgrep 0.24 and 0.46. Property classes, 127 labeled bugs: sinkline 0.00 recall, Bandit 0.24, Semgrep 0.18.",
+    "caption": "Held-out test: 346 labeled bugs from CodeQL's Python query tests, with labels, scorer and rules frozen before the run and no tuning afterwards. On the 219 bugs in classes sinkline covers it found 88 (40%); Bandit found 34 and Semgrep 53.",
+    "full": "https://github.com/samiali38183/sinkline/blob/main/docs/img/heldout.png",
+    "label": "held-out result"
+   },
+   "blurb": "A static taint analyzer for Python web apps. On a held-out set of 219 labeled bugs from CodeQL's Python tests it found 88, against 34 for Bandit and 53 for Semgrep, and missed 60%. Labels and scorer were frozen before the run.",
+   "label": "Held-out test, frozen before the run",
+   "og": {
+    "big": "88 of 219",
+    "line": "held-out labeled bugs found. Bandit 34, Semgrep 53. It missed 60%, and found none in 127 bugs of classes it does not cover."
+   },
+   "overview": [
+    "sinkline is a static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports a finding only when the input reaches a dangerous call, such as a SQL query or a shell command, without a sanitizer for that bug class. It has 43 rules mapped to OWASP Top 10 and CWE, SARIF output and a GitHub Action, and it has no dependencies.",
+    "Held-out result: 346 labeled bugs from CodeQL's Python query tests, with labels, scorer and rules frozen before anything was run and no tuning afterwards. On the 219 bugs in classes sinkline has rules for, it found 88 (40%), with 77% of its findings real. Bandit found 34 (16%) at 77%, and Semgrep OSS with its registry rules found 53 (24%) at 46%. On the 127 bugs in classes it does not attempt, such as weak crypto and cookie flags, it found none and Bandit found 30.",
+    "Turning the interprocedural analysis off changed nothing on this set, so its snippets do not test it. The earlier figures are not held out: on OWASP BenchmarkPython's ten taint categories 0.4.1 scored +0.21 and 0.5.1 scores +0.52 (Bandit +0.07), but those fixes were chosen from the failures of 0.4.1, and over all 14 categories Bandit leads.",
+    "A separate sample report page shows sinkline's HTML output."
+   ],
+   "hero2": {
     "src": "/assets/img/hero-sinkline.png",
     "w": 1800,
     "h": 1100,
     "alt": "Bar chart on OWASP BenchmarkPython, 240 vulnerable and 437 safe test cases. Real bugs found: sinkline 0.5.0 175 (73%), sinkline 0.4.1 99 (41%), Bandit 31 (13%), Semgrep 18 (8%). Safe cases wrongly flagged: sinkline 0.5.0 93 (21%), 0.4.1 89 (20%), Bandit 25 (6%), Semgrep 15 (3%).",
-    "caption": "On an independent benchmark, sinkline 0.5.0 found 175 of 240 real bugs against 31 for Bandit and 18 for Semgrep, and it also flagged more safe code (21% of safe cases against 6% and 3%). 0.4.1, before I tuned on the suite's misses, found 99.",
-    "full": "https://github.com/samiali38183/sinkline/blob/main/docs/img/hero.png"
-   },
-   "blurb": "A static taint analyzer for Python web apps. On the ten taint categories of OWASP BenchmarkPython it scores +0.52 (true-positive rate minus false-positive rate) against Bandit's +0.07, but the fixes were tuned on earlier failures, and Bandit leads over all 14 categories.",
-   "label": "Public benchmark, scored by the repository's own script",
-   "og": {
-    "big": "+0.52",
-    "line": "on 10 taint categories of OWASP BenchmarkPython, Bandit +0.07. Not held out. Bandit leads over all 14."
-   },
-   "overview": [
-    "sinkline is a static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports a finding only when the input reaches a dangerous call, such as a SQL query or a shell command, without a sanitizer for that bug class. It has 43 rules and 151 sink signatures mapped to OWASP Top 10 and CWE, SARIF output and a GitHub Action, and it has no dependencies.",
-    "It was measured on OWASP BenchmarkPython v0.1, a public suite of 240 vulnerable and 437 safe cases. The score is true-positive rate minus false-positive rate on the ten taint categories. Version 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20) against Bandit's +0.07. Version 0.5.1 scores +0.52 (TPR 0.73, FPR 0.21).",
-    "Those fixes were chosen by reading the failures of 0.4.1 on the same suite, so +0.52 is not a held-out score. Over all 14 categories Bandit leads, +0.36 to +0.27. The false-positive rate stays high, and the scorer is the repository's own script, not the benchmark's official one.",
-    "A separate sample report page shows sinkline's HTML output."
-   ]
+    "caption": "The earlier benchmark: on OWASP BenchmarkPython, sinkline 0.5.0 found 175 of 240 real bugs against 31 for Bandit and 18 for Semgrep, and flagged more safe code. These fixes were chosen from the suite's misses, so it is not a held-out result.",
+    "full": "https://github.com/samiali38183/sinkline/blob/main/docs/img/hero.png",
+    "label": "benchmark chart"
+   }
   },
   "kevgate": {
    "slug": "kevgate",

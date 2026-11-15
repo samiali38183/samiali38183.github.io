@@ -282,7 +282,7 @@ def home(ctx: dict) -> str:
 
 def archive_row(name: str, url: str, kind: str, ver: str, blurb: str, label: str, links: str) -> str:
     ver_html = f' <span class="ver">{esc(ver)}</span>' if ver else ""
-    return (f'<li class="arow"><div class="a-head"><h3><a href="{url}">{esc(name)}</a></h3>'
+    return (f'<li class="arow"><div class="a-head"><h2><a href="{url}">{esc(name)}</a></h2>'
             f'<p class="meta">{esc(kind)}{ver_html}</p></div>'
             f'<div class="a-body"><p class="blurb">{esc(blurb)}</p><p class="meta"><span class="tag">{esc(label)}</span></p>'
             f'<p class="links">{links}</p></div></li>')
