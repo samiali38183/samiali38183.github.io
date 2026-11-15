@@ -17,7 +17,7 @@
    "sheet": 1,
    "kind": "Detection engineering",
    "title": "tripline: a CI gate for detection rules | Sami Ali",
-   "desc": "tripline replays ATT&CK telemetry through Sigma rules in CI: 98% weighted coverage, 52% on stock SigmaHQ rules. Stock setuid rule: 0 of 2 attack events caught.",
+   "desc": "tripline replays recorded ATT&CK telemetry through Sigma rules in CI. A SigmaHQ setuid rule matched none of 36 recorded events, two of them the attack; the replacement matches both and 0 of 488 applicable benign events.",
    "fact": "A CI gate that replays recorded ATT&CK telemetry through Sigma rules and fails the pull request when an expected rule stops firing. 14 scenarios, 13 passing, 1 pending (Windows); 98% weighted coverage, 52% on unmodified SigmaHQ rules alone; 212 tests.",
    "labels": {
     "found": "Before",
@@ -39,9 +39,9 @@
    },
    "reading": {
     "num": "0",
-    "den": "/2",
-    "unit": "attack events flagged by the stock rule",
-    "caption": "Among 36 events recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner, 2 are the attack itself (the two chmod executions). SigmaHQ's stock Setuid and Setgid rule flagged 0 of those 2; the replacement rule flags both. The other 34 events are not attack events.",
+    "den": "/36",
+    "unit": "recorded events matched by the SigmaHQ setuid rule; 2 of them are the attack",
+    "caption": "A SigmaHQ setuid/setgid rule matched none of 36 events recorded from Atomic Red Team's T1548.001 tests on a GitHub-hosted Linux runner, two of them the attack (chmod u+xs and g+xs). The replacement rule matches both and 0 of 488 applicable benign events.",
     "stamp": [
      "fail",
      "Before: fail"
@@ -86,7 +86,7 @@
          4
         ]
        ],
-       "val": "<b>0</b> of 2 attack events flagged, among 36 recorded events"
+       "val": "SigmaHQ rule: <b>0</b> of 36 recorded events matched; 2 of the 36 are the attack"
       },
       {
        "label": "After",
@@ -112,7 +112,7 @@
          4
         ]
        ],
-       "val": "<b>2</b> of 2 attack events flagged, among 36 recorded events"
+       "val": "Replacement rule: <b>2</b> of 36 matched, both attack events; 0 of 488 applicable benign events"
       }
      ]
     },
@@ -324,7 +324,7 @@
          41
         ]
        ],
-       "val": "<b>106</b> of 108 command-line variants caught (T1548.001); the stock rule caught 0"
+       "val": "<b>106</b> of 108 command-line variants caught (T1548.001)"
       },
       {
        "label": "Setuid, other tools",
@@ -377,11 +377,11 @@
     }
    },
    "home": {
-    "against": "SigmaHQ stock rule; 2 attack events among 36 recorded events",
-    "reading": "0 to 2 of 2 attack events",
+    "against": "SigmaHQ stock rule; 36 recorded events, 2 of them the attack",
+    "reading": "0 of 36 events matched; replacement matches both attack events",
     "run": "43100952362",
-    "found": "Stock rule flagged 0 of the 2 attack events (36 events recorded)",
-    "left": "Replacement rule flags 2 of 2. Gate: 13 of 14 scenarios, 98% weighted, 52% on unmodified SigmaHQ rules alone",
+    "found": "Stock rule matched none of the 36 recorded events, two of them the attack",
+    "left": "Replacement rule matches both and 0 of 488 applicable benign events. Gate: 13 of 14 scenarios, 98% weighted, 52% on unmodified SigmaHQ rules alone",
     "tolerance": "One recording per scenario; 675-event benign corpus, Linux only; 1 Windows scenario pending"
    },
    "links": [
@@ -481,7 +481,7 @@
    "plain": {
     "what": "It replays recorded attack activity through detection rules every time the rules change, and fails the build if a rule that should fire does not.",
     "why": "A rule that never fires looks the same as a rule that works, right up until the attack.",
-    "found": "A public SigmaHQ rule for setuid abuse flagged 0 of the 2 attack events in a recording of 36 events. The replacement rule in the repository flags both."
+    "found": "A public SigmaHQ rule for setuid abuse matched none of 36 recorded events, two of them the attack. The replacement rule in the repository matches both and 0 of 488 applicable benign events."
    },
    "try": {
     "kind": "Try it",
@@ -491,19 +491,19 @@
     "src": "/assets/img/hero-tripline.png",
     "w": 1800,
     "h": 1100,
-    "alt": "Left: a published SigmaHQ rule flagged 0 of 2 recorded setuid attack commands while the replacement rule written in this repo flagged 2 of 2. Right: weighted coverage across 14 ATT&CK scenarios is 52% on unmodified SigmaHQ rules and 98% with the rules written in this repo.",
-    "caption": "A stock SigmaHQ rule flagged 0 of 2 real setuid attacks I recorded on a GitHub runner. The replacement rule written here flags 2 of 2 (finding F-001).",
+    "alt": "Left: a SigmaHQ setuid rule matched 0 of 36 recorded events, including the 2 attack commands (chmod u+xs and g+xs), while the replacement rule written in this repo matched both. Right: weighted coverage across 14 ATT&CK scenarios is 52% on unmodified SigmaHQ rules and 98% with the rules written in this repo.",
+    "caption": "A SigmaHQ setuid rule matched none of the 36 events I recorded on a GitHub runner, two of them the attack. The replacement rule written here matches both (finding F-001).",
     "full": "https://github.com/samiali38183/tripline/blob/main/docs/img/hero.png"
    },
-   "blurb": "A CI gate for detection rules. It replays recorded ATT&CK telemetry through Sigma rules and fails the build when an expected rule stays quiet. The stock SigmaHQ setuid rule flagged 0 of 2 attack events in the recording; the replacement flags both.",
+   "blurb": "It replays recorded ATT&CK telemetry through Sigma rules and fails the build when an expected rule stays quiet. A SigmaHQ setuid rule matched none of 36 recorded events, two of them the attack (chmod u+xs); my replacement matches both and 0 of 488 applicable benign events.",
    "label": "Recorded telemetry, replayed offline",
    "og": {
-    "big": "0 of 2",
-    "line": "attack events flagged by the stock SigmaHQ setuid rule. The replacement rule flags 2 of 2."
+    "big": "0 of 36",
+    "line": "recorded events matched by a SigmaHQ setuid rule; 2 are the attack. My replacement matches both and 0 of 488 benign events."
    },
    "overview": [
     "tripline is a CI gate for detection rules. It compiles Sigma rules to Python, replays recorded telemetry for 14 ATT&CK techniques through them on every pull request, and fails the build when a rule that should fire stays quiet. Version 0.3.0 adds a benign corpus, a sweep of evasion variants and a coverage figure split by who wrote the passing rules.",
-    "The result that started it: Atomic Red Team's T1548.001 tests were recorded on a GitHub-hosted Linux runner, giving 36 events, 2 of them the attack itself (two chmod executions). SigmaHQ's stock Setuid and Setgid rule flagged 0 of the 2. The replacement rule in the repository flags both.",
+    "The result that started it: Atomic Red Team's T1548.001 tests were recorded on a GitHub-hosted Linux runner, giving 36 events, 2 of them the attack itself (two chmod executions). SigmaHQ's stock Setuid and Setgid rule matched none of the 36. The replacement rule in the repository matches both attack events and 0 of 488 applicable benign events.",
     "Across the 14 scenarios, 13 pass and 1 (Windows) is pending. Weighted coverage is 98%, but 52% on unmodified SigmaHQ rules alone, because the rest depends on rules written in the repository. In the evasion sweep, 200 of 251 hand-written variants were caught, with 2 false-positive matches on a 675-event benign corpus.",
     "All evidence is recorded telemetry replayed offline, one recording per scenario. It is a recall check, not a measure of live detection."
    ]
@@ -516,7 +516,7 @@
    "sheet": 2,
    "kind": "Application security",
    "title": "sinkline: taint analysis for Python web apps | Sami Ali",
-   "desc": "sinkline follows request data across functions and files. On a frozen held-out set of 219 labeled bugs it found 88, against 34 for Bandit and 53 for Semgrep, and missed 60%.",
+   "desc": "sinkline follows request data across functions and files. Frozen held-out test, 346 labeled bugs: it found 88 of 219 taint-class bugs at 0.77 precision (Bandit 34, Semgrep 53) and none of 127 in other classes. It misses 60%.",
    "fact": "A static analyzer that follows request data across functions and files and reports it only when it reaches a dangerous sink without a sanitizer for that bug class. 184 tests at v0.5.1 (186 on main); scored on OWASP BenchmarkPython v0.1.",
    "labels": {
     "found": "Before",
@@ -535,13 +535,13 @@
     "reproduce_label": "$ sinkline repo"
    },
    "reading": {
-    "num": "+0.52",
-    "den": "",
-    "unit": "TPR minus FPR on the 10 taint categories (0.4.1: +0.21; Bandit +0.07)",
-    "caption": "On OWASP BenchmarkPython v0.1, ten taint categories, sinkline 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20). 0.5.1 scores +0.52 (0.73, 0.21), but its fixes were chosen by reading the failures of 0.4.1, so that is not a held-out score. Bandit 1.9.4 scores +0.07. Over all 14 categories Bandit leads, +0.36 to +0.27.",
+    "num": "88",
+    "den": "/219",
+    "unit": "taint-class bugs found on the frozen held-out test (Bandit 34, Semgrep 53)",
+    "caption": "Frozen held-out test on 346 labeled bugs: sinkline found 88 of 219 taint-class bugs at 0.77 precision (Bandit 34 at 0.77, Semgrep 53 at 0.46) and none of 127 in other classes (Bandit 30). Recall is 40%, so it misses 60%. The bars below are the earlier OWASP BenchmarkPython run, which is not held out.",
     "stamp": [
      "limit",
-     "Not held out"
+     "Misses 60%"
     ],
     "run": "43136290658"
    },
@@ -855,19 +855,19 @@
     "w": 1600,
     "h": 672,
     "alt": "Recall and precision of sinkline, Bandit and Semgrep on a held-out set of CodeQL's Python test cases. Taint classes, 219 labeled bugs: sinkline recall 0.40, precision 0.77; Bandit 0.16 and 0.77; Semgrep 0.24 and 0.46. Property classes, 127 labeled bugs: sinkline 0.00 recall, Bandit 0.24, Semgrep 0.18.",
-    "caption": "Held-out test: 346 labeled bugs from CodeQL's Python query tests, with labels, scorer and rules frozen before the run and no tuning afterwards. On the 219 bugs in classes sinkline covers it found 88 (40%); Bandit found 34 and Semgrep 53.",
+    "caption": "Frozen held-out test on 346 labeled bugs from CodeQL's Python query tests; labels, scorer and rules were fixed before the run, with no tuning afterwards. sinkline found 88 of the 219 taint-class bugs (40%) at 0.77 precision; Bandit found 34 at 0.77 and Semgrep 53 at 0.46. In the 127 bugs of other classes it found none (Bandit 30).",
     "full": "https://github.com/samiali38183/sinkline/blob/main/docs/img/heldout.png",
     "label": "held-out result"
    },
-   "blurb": "A static taint analyzer for Python web apps. On a held-out set of 219 labeled bugs from CodeQL's Python tests it found 88, against 34 for Bandit and 53 for Semgrep, and missed 60%. Labels and scorer were frozen before the run.",
+   "blurb": "A static taint analyzer for Python web apps. Frozen held-out test on 346 labeled bugs: it found 88 of 219 taint-class bugs at 0.77 precision (Bandit 34 at 0.77, Semgrep 53 at 0.46) and none of 127 in other classes (Bandit 30). Recall is 40%.",
    "label": "Held-out test, frozen before the run",
    "og": {
     "big": "88 of 219",
-    "line": "held-out labeled bugs found. Bandit 34, Semgrep 53. It missed 60%, and found none in 127 bugs of classes it does not cover."
+    "line": "taint-class bugs found on a frozen held-out test. Bandit 34, Semgrep 53. Recall 40%; none of 127 bugs in other classes."
    },
    "overview": [
     "sinkline is a static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports a finding only when the input reaches a dangerous call, such as a SQL query or a shell command, without a sanitizer for that bug class. It has 43 rules mapped to OWASP Top 10 and CWE, SARIF output and a GitHub Action, and it has no dependencies.",
-    "Held-out result: 346 labeled bugs from CodeQL's Python query tests, with labels, scorer and rules frozen before anything was run and no tuning afterwards. On the 219 bugs in classes sinkline has rules for, it found 88 (40%), with 77% of its findings real. Bandit found 34 (16%) at 77%, and Semgrep OSS with its registry rules found 53 (24%) at 46%. On the 127 bugs in classes it does not attempt, such as weak crypto and cookie flags, it found none and Bandit found 30.",
+    "Held-out result: 346 labeled bugs from CodeQL's Python query tests, with labels, scorer and rules frozen before anything was run and no tuning afterwards. On the 219 taint-class bugs, in classes sinkline has rules for, it found 88 (40% recall) at 0.77 precision. Bandit found 34 (16%) at 0.77, and Semgrep OSS with its registry rules found 53 (24%) at 0.46. On the 127 bugs in classes it does not attempt, such as weak crypto and cookie flags, it found none and Bandit found 30.",
     "Turning the interprocedural analysis off changed nothing on this set, so its snippets do not test it. The earlier figures are not held out: on OWASP BenchmarkPython's ten taint categories 0.4.1 scored +0.21 and 0.5.1 scores +0.52 (Bandit +0.07), but those fixes were chosen from the failures of 0.4.1, and over all 14 categories Bandit leads.",
     "A separate sample report page shows sinkline's HTML output."
    ],
@@ -1058,8 +1058,8 @@
     "src": "/assets/img/hero-kevgate-real-run.png",
     "w": 1800,
     "h": 1020,
-    "alt": "Left: for each of the 10 exploited findings, the grey marker shows where a CVSS-only sort puts it, between about rank 2 and rank 610, and the red dot shows kevgate's rank, 1 to 10. Right: exploited findings found in the top 10, 25, 50 and 100 positions, CVSS only 0.15, 0.4, 0.86 and 1.75, kevgate 10 each.",
-    "caption": "A real scan of four old public container images: 10 of the 1,112 findings are on CISA's list of flaws being exploited. A CVSS sort puts the first of them at about rank 40 on average; kevgate puts all 10 in the top 10. That is partly by design, since the list is an input to the score. It is one run, with hand-chosen weights and assumed asset importance.",
+    "alt": "Left: for each of the 10 exploited findings, the grey marker shows where a CVSS-only sort puts it, between about rank 2 and rank 610, and the red dot shows kevgate's rank, 1 to 10. Right: exploited findings found out of 10 in the top 10, 25, 50 and 100 list positions of 1,112, CVSS only 0.15, 0.4, 0.86 and 1.75 on average, kevgate 10 each.",
+    "caption": "A real Trivy scan of four old public container images: 10 of the 1,112 findings are on CISA's list of flaws being exploited. A CVSS sort puts the first of them at about rank 40 on average; kevgate puts all 10 in the top 10.",
     "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/real-run.png",
     "label": "real-data"
    },
@@ -1072,7 +1072,7 @@
     "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/hero.png",
     "label": "engineering checks"
    },
-   "blurb": "A FastAPI intake service that ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. On one real scan of four old public images, all 10 exploited findings rank in the top 10 of 1,112, partly by design because KEV is a score input.",
+   "blurb": "A FastAPI service that ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. On a Trivy scan of four old public images (1,112 findings), all 10 KEV-listed CVEs rank in the top 10. That is expected, since KEV is a score input.",
    "label": "Real scan of four public images",
    "og": {
     "big": "10 of 10",
@@ -1458,8 +1458,8 @@
    "sheet": 7,
    "kind": "Vulnerability management",
    "title": "kev-risk-prioritization | Sami Ali",
-   "desc": "A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.",
-   "fact": "A weighted score of its own design that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. Mixed CVSS lists are refused unless --allow-mixed. 63 tests.",
+   "desc": "A standard-library Python script that ranks scan findings with a hand-weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.",
+   "fact": "A hand-weighted score that puts known-exploited CVEs first; not CISA BOD 26-04. Synthetic demo plus a pinned real KEV and EPSS snapshot. Mixed CVSS lists are refused unless --allow-mixed. 63 tests.",
    "labels": {
     "found": "Before",
     "left": "After"
@@ -1580,7 +1580,7 @@
     "reading": "12 vs 9 KEV in the top 12 (synthetic demo)",
     "run": "43134445948",
     "found": "Earlier text called it KEV-first in the spirit of BOD 26-04 and showed measurements on invented values",
-    "left": "Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515. v0.3.0: mixed CVSS lists refused, total sort order, 63 tests",
+    "left": "Described as a hand-weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515. v0.3.0: mixed CVSS lists refused, total sort order, 63 tests",
     "tolerance": "Weights not validated; EPSS and KEV are related signals; synthetic assets"
    },
    "links": [
@@ -1675,7 +1675,7 @@
     "caption": "On the real KEV catalog and EPSS scores, EPSS separates known-exploited CVEs from the rest with an AUC of 0.9515, but that result is partly circular because EPSS is trained on exploitation data that overlaps with KEV, so it is not validation of either. The tool's 100 of 100 comes mostly from its weights.",
     "full": "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/img/hero-real-data.png"
    },
-   "blurb": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. On 20 synthetic findings it puts 12 of 12 KEV findings in its top 12 where a CVSS sort puts 9. Not an implementation of BOD 26-04.",
+   "blurb": "A standard-library Python script that ranks scan findings with a hand-weighted score, known-exploited CVEs first. On 20 synthetic findings it puts 12 of 12 KEV findings in its top 12 where a CVSS sort puts 9. Not an implementation of BOD 26-04.",
    "label": "Synthetic findings, real KEV and EPSS snapshot",
    "og": {
     "big": "12 vs 9",
@@ -1912,18 +1912,18 @@
     "src": "/assets/img/hero-vulnlab.png",
     "w": 1800,
     "h": 1100,
-    "alt": "Table for three labs (SSRF via redirect, SQL injection, IDOR). Proof and fix: 26, 9 and 37 lab tests pass. sinkline scan on vulnerable and fixed code: 1 and 1 findings for SSRF and SQL injection (a correct finding, then a false alarm on the fix), 0 and 0 for IDOR because it is not a taint flow. Sigma log rule: 1 alert on the attack log and 0 on the benign log for all three.",
-    "caption": "All 137 tests pass. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where the static analyzer (sinkline) gets it wrong are left in and written up.",
+    "alt": "Table for three labs (SSRF via redirect, SQL injection, IDOR). Proof and fix: 26, 9 and 37 tests in the three lab directories pass (72 of the 137 tests). sinkline scan on vulnerable and fixed code: 1 and 1 findings for SSRF and SQL injection (a correct finding, then a false alarm on the fix), 0 and 0 for IDOR because it is not a taint flow. Sigma log rule: 1 alert on the attack log and 0 on the benign log for all three.",
+    "caption": "All 137 tests pass: 72 in the three lab directories and 65 shared. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where the static analyzer (sinkline) gets it wrong are left in and written up.",
     "full": "https://github.com/samiali38183/vulnlab/blob/main/docs/img/hero.png"
    },
-   "blurb": "Three small Flask apps with one planted bug each: SSRF through a redirect, SQL injection in ORDER BY and a missing permission check. Each has an exploit test, a fix and a detection rule. Localhost only; 137 tests pass.",
+   "blurb": "Three small Flask apps with one planted bug each: SSRF through a redirect, SQL injection in ORDER BY and a missing permission check. Each has an exploit test, a fix and a detection rule. Localhost only; 137 tests pass (72 in the labs, 65 shared).",
    "label": "Own code, loopback only",
    "og": {
     "big": "3 of 3",
     "line": "fixes verified by the lab's own tests. SSRF, SQL injection in ORDER BY, IDOR. Localhost only."
    },
    "overview": [
-    "vulnlab is a localhost-only lab of three small Flask services, each with one textbook web bug: SSRF through a redirect, SQL injection in ORDER BY, and a missing object-level permission check (IDOR). Each lab has a fixed version, tests that show the impact on the vulnerable service and then fail against the fix, and a Sigma rule replayed on recorded logs. 137 tests pass.",
+    "vulnlab is a localhost-only lab of three small Flask services, each with one textbook web bug: SSRF through a redirect, SQL injection in ORDER BY, and a missing object-level permission check (IDOR). Each lab has a fixed version, tests that show the impact on the vulnerable service and then fail against the fix, and a Sigma rule replayed on recorded logs. 137 tests pass: 72 in the three lab directories (26, 9 and 37) and 65 in the shared tests of the guard, harness, replay code, captured output and rules.",
     "It also records where static analysis is wrong. sinkline reports 2 of the 3 bugs and also reports both fixed versions of those two, which are false positives. It reports nothing on the permission check, because that bug is not a taint flow. The detection rules alert on the attempts in all three labs and fire on the fixed services too, because they see attempts, not impact.",
     "The bugs were written for the lab and are simpler than real ones. There are no CVEs and no findings against real software, and the services bind to loopback only. This is a training lab, not vulnerability research."
    ]
@@ -1932,7 +1932,7 @@
  "failed_first": [
   {
    "project": "tripline",
-   "text": "The stock SigmaHQ Setuid and Setgid rule flagged 0 of the 2 attack events (the two chmod executions) among 36 recorded events. A replacement rule flags both.",
+   "text": "The stock SigmaHQ Setuid and Setgid rule matched none of 36 recorded events, two of them the attack (the two chmod executions). A replacement rule matches both and 0 of 488 applicable benign events.",
    "state": [
     "pass",
     "Fixed"
@@ -1945,7 +1945,7 @@
   },
   {
    "project": "tripline",
-   "text": "Weighted coverage is 98% (61 of 62 points), but only 52% (32 of 62, 8 scenarios) passes on unmodified SigmaHQ rules alone. The other 5 passing scenarios (29 points) need a rule written in the tripline repository.",
+   "text": "The stock SigmaHQ Setuid and Setgid rule matched none of 36 recorded events, two of them the attack (the two chmod executions). A replacement rule matches both and 0 of 488 applicable benign events.",
    "state": [
     "limit",
     "Read with the split"
@@ -1958,7 +1958,7 @@
   },
   {
    "project": "tripline",
-   "text": "Against 251 generated command-line variants of three Linux attacks, the expected rules catch 200. The stock setuid rule catches 0 of 108 setuid variants; the replacement catches 106.",
+   "text": "The stock SigmaHQ Setuid and Setgid rule matched none of 36 recorded events, two of them the attack (the two chmod executions). A replacement rule matches both and 0 of 488 applicable benign events.",
    "state": [
     "limit",
     "Open"
@@ -1971,7 +1971,7 @@
   },
   {
    "project": "tripline",
-   "text": "On a 675-event benign Linux corpus, SigmaHQ's New Cron File Created matched 2 events (a chkrootkit install). 20 of 26 rules, all Windows and AWS, were not evaluated.",
+   "text": "The stock SigmaHQ Setuid and Setgid rule matched none of 36 recorded events, two of them the attack (the two chmod executions). A replacement rule matches both and 0 of 488 applicable benign events.",
    "state": [
     "limit",
     "Open"
@@ -1984,7 +1984,7 @@
   },
   {
    "project": "tripline",
-   "text": "1 of the 7 Windows scenarios (T1027) has no accepted recording and counts as zero in both the 98% and the 52%.",
+   "text": "The stock SigmaHQ Setuid and Setgid rule matched none of 36 recorded events, two of them the attack (the two chmod executions). A replacement rule matches both and 0 of 488 applicable benign events.",
    "state": [
     "pend",
     "Pending"
@@ -2114,7 +2114,7 @@
   },
   {
    "project": "kev-risk-prioritization",
-   "text": "Earlier text called the score \"in the spirit of\" CISA BOD 26-04, and a measurements table reported properties of invented values. Both were corrected: it is a weighted score of its own design, and the table was removed.",
+   "text": "Earlier text called the score \"in the spirit of\" CISA BOD 26-04, and a measurements table reported properties of invented values. Both were corrected: it is a hand-weighted score, and the table was removed.",
    "state": [
     "pass",
     "Fixed"
@@ -2142,7 +2142,6 @@
  "home_order": [
   "tripline",
   "sinkline",
-  "kevgate",
-  "vulnlab"
+  "kevgate"
  ]
 }

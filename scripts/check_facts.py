@@ -313,7 +313,6 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
         env["PATH"] = str(Path(py).parent) + os.pathsep + env.get("PATH", "")
     tag = gh("repos/samiali38183/vulnlab/releases/latest")["tag_name"]
     expect("vulnlab latest release", tag, page)
-    expect("vulnlab latest release on home", tag, "index.html")
     tagsha = run(["git", "rev-list", "-n1", tag], vl).strip()
     head = run(["git", "rev-parse", "HEAD"], vl).strip()
     results.append((head == tagsha, f"vulnlab clone HEAD {head[:7]} is the {tag} commit {tagsha[:7]}"))
@@ -450,7 +449,8 @@ def kevgate_main_checks(clones: Path, py: str, page: str) -> None:
         results.append((want in text, f"kevgate real-run {label}: {want!r} on the page"))
     ranks = r["equal_acr"]["kev_ranks"]
     results.append((max(ranks) == 10 and r["equal_acr"]["kev_in_top"]["10"] == r["kev_findings"] == 10, "kevgate real-run: all 10 KEV findings rank 1 to 10 in results.json"))
-    expect("kevgate real-run home line", f"all {r['kev_findings']} exploited findings rank in the top 10 of {r['findings_total']:,}", "index.html")
+    expect("kevgate real-run home line", f"all {r['kev_findings']} KEV-listed CVEs rank in the top 10", "index.html")
+    expect("kevgate real-run home findings", f"{r['findings_total']:,} findings", "index.html")
 
 
 def main() -> int:
@@ -587,9 +587,24 @@ def main() -> int:
             (tot, s_all, n_atk, s_atk, n_wrap), (tot2, r_all, n_atk2, r_atk, n_wrap2) = list(map(int, o[:5])), list(map(int, o[5:]))
             results.append((tot == tot2 == 36 and n_atk == n_atk2 == 2 and n_wrap == n_wrap2 == 4 and (s_atk, r_atk) == (0, 2) and (s_all, r_all) == (0, 2),
                             f"F-001 counts from the fixture: {tot} events, {n_atk} attack events, {n_wrap} wrapper lines; stock flagged {s_atk}, replacement flagged {r_atk}"))
-            expect("tripline stock rule on the attack events", f"{s_atk} of the {n_atk} attack events", "projects/tripline/index.html")
-            expect("tripline replacement rule on the attack events", f"{r_atk} of {n_atk}", "projects/tripline/index.html")
-            expect("tripline home blurb", f"flagged {s_atk} of {n_atk} attack events", "index.html")
+            expect("tripline stock rule on the recorded events", f"The stock rule matched none of the {tot}", "projects/tripline/index.html")
+            expect("tripline replacement rule on the recorded events", f"Replacement rule: {r_all} of {tot} matched", "projects/tripline/index.html")
+            expect("tripline home blurb", f"matched none of {tot} recorded events, two of them the attack", "index.html")
+            bcode = (
+                "from pathlib import Path\n"
+                "from tripline.benign import load_corpus, replay_benign\n"
+                "from tripline.engine.rules import load_rules\n"
+                "rep = replay_benign(load_rules(Path('rules/sigma')), load_corpus(Path('fixtures/benign')))\n"
+                "by = {r.rule_id: r for r in rep.rules}\n"
+                "print(*[x for rid in ('c21c4eaa-ba2e-419a-92b2-8371703cbe21','7f3c2b1a-6d4e-4a9b-9c8d-1e2f3a4b5c6d') for x in (by[rid].applicable, by[rid].matched)])\n"
+            )
+            ob = run([pybin(venvs, "tripline", "python"), "-c", bcode], t).split()
+            if len(ob) == 4:
+                sa, sm, ra, rm = map(int, ob)
+                results.append((sm == rm == 0 and sa == ra and sa > 0, f"setuid rules on the benign corpus: stock {sm} of {sa}, replacement {rm} of {ra}"))
+                expect("tripline replacement on benign events", f"{rm} of {ra} applicable benign events", "index.html", f"{rm} of {ra} applicable benign events")
+            else:
+                results.append((False, f"tripline benign derivation failed: {ob}"))
         else:
             results.append((False, f"tripline F-001 derivation failed: {o}"))
         # tripline Rule bench: data file against the clone's rule YAML and the page text
@@ -692,7 +707,7 @@ def main() -> int:
     results.append(("f1291485808b66e20ddb6b01b10dc71b3df8c8ba" in readme and "1,230" in readme,
                     "bench/external/README.md pins BenchmarkPython f1291485 and 1,230 cases"))
     expect("BenchmarkPython pin (short) on the page", "f129148", page)
-    expect("sinkline home blurb", "found 88", "index.html")
+    expect("sinkline home blurb", "found 88 of 219 taint-class bugs", "index.html")
     expect("sinkline release v0.5.1 commit", run(["git", "rev-list", "-n1", "v0.5.1"], s).strip()[:7], page)
 
     # sinkline Sanitizer switch: stored data against the committed captures (the CLI re-run is capture_sinkline_bench.py --check)

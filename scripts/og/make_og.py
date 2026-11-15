@@ -69,7 +69,7 @@ def main() -> None:
     body = ('<div class="name" style="max-width:1000px">Security engineering student</div>'
             '<div class="line" style="margin-top:28px;font-size:40px">Building application-security and detection tools, with measured results.</div>'
             '<div class="kind" style="margin-top:24px">George Mason University, expected May 2028</div>'
-            '<div class="foot">tripline &middot; sinkline &middot; kevgate &middot; vulnlab</div>')
+            '<div class="foot">tripline &middot; sinkline &middot; kevgate &middot; call-kettle</div>')
     render(chrome, CARD.format(fonts=fonts, name_size=96, name_top=72, big_size=10, big_top=0, body=body), out_dir / "home.png")
     print("wrote home")
 
