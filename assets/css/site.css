@@ -519,3 +519,25 @@ ol.rules h3{margin:0 0 var(--s-2);font-size:var(--step-1)}
 .email-line{margin:calc(-1*var(--s-4)) 0 var(--s-5);font-size:var(--step--1);color:var(--ink-2)}
 .copy-email{font:600 var(--step--1)/1 var(--mono);margin-left:.5rem;padding:.3rem .6rem;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
 .copy-email:hover{background:var(--ink);color:var(--paper)}
+
+/* hero result images: PNGs have a white background, so they sit on a white card in both themes */
+.hero-fig{margin:0 0 var(--s-6)}
+.hero-card{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:clamp(.5rem,1.5vw,1rem);line-height:0}
+.hero-card img{display:block;width:100%;height:auto;max-width:100%}
+.hero-zoom{display:block;cursor:zoom-in}
+.hero-fig figcaption{margin:var(--s-2) 0 0;font-size:var(--step--1);line-height:1.5;color:var(--ink-2);max-width:48rem}
+.title.has-hero{display:grid;grid-template-columns:minmax(0,1fr);column-gap:var(--s-7)}
+.title.has-hero>*{grid-column:1;min-width:0}
+.title.has-hero>:not(h1):not(.page-hero){order:2}
+.title.has-hero .page-hero{order:1;margin:0 0 var(--s-5);max-width:62rem}
+@media (min-width:70rem){
+  .title.has-hero{grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start}
+  .title.has-hero>h1{grid-column:1/-1}
+  .title.has-hero .page-hero{grid-column:2;grid-row:2/span 5;margin:0}
+  .title.has-hero .plain>div{grid-template-columns:minmax(0,1fr)}
+  .title.has-hero .plain dd{font-size:var(--step-0)}
+}
+.work>li>.w-hero{grid-column:2/-1;margin:var(--s-4) 0 0;max-width:46rem}
+.work.compact>li>.w-hero{max-width:40rem}
+@media (max-width:63.99rem){.work>li>.w-hero{grid-column:2}}
+@media (max-width:39.99rem){.work>li>.w-hero{grid-column:1}.hero-card{padding:.375rem}}
