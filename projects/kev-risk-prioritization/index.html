@@ -7,26 +7,25 @@
 <meta name="description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kev-risk-prioritization/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kev-risk-prioritization | Sami Ali">
 <meta property="og:description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kev-risk-prioritization/">
-<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og/kev-risk-prioritization.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta property="og:image:alt" content="kev-risk-prioritization: 12 vs 9 KEV findings in the top 12 on 20 synthetic findings: risk score vs CVSS-only sort. Weights not validated.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kev-risk-prioritization | Sami Ali">
 <meta name="twitter:description" content="A standard-library Python script that ranks scan findings with its own weighted score, known-exploited CVEs first. Not an implementation of CISA BOD 26-04.">
-<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og/kev-risk-prioritization.png">
+<meta name="twitter:image:alt" content="kev-risk-prioritization: 12 vs 9 KEV findings in the top 12 on 20 synthetic findings: risk score vs CVSS-only sort. Weights not validated.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-kev-risk.css">
-<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -39,23 +38,17 @@
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Project 7 of 7</b> &middot; kev-risk-prioritization &middot; v0.3.0</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
 <header class="title has-hero">
+<p class="crumb"><a href="/projects/">Work</a> <span aria-hidden="true">/</span> Vulnerability management <span class="ver">v0.3.0</span></p>
 <h1>kev-risk-prioritization</h1>
-<dl class="plain">
-<div><dt>What it does</dt><dd>It scores each finding from KEV listing, asset criticality, EPSS and CVSS, using weights chosen by hand, and sorts by that score. It is not an implementation of CISA BOD 26-04.</dd></div>
-<div><dt>Why it matters</dt><dd>Sorting by severity alone can bury the vulnerabilities attackers are already using.</dd></div>
-<div class="pf"><dt>What was found</dt><dd>On 20 synthetic findings, a CVSS-only sort puts 9 of the 12 known-exploited ones in its top 12, and the risk score puts all 12 there. That shows how the formula orders findings, not that it speeds up fixing. The weights are not validated.</dd></div>
-</dl>
-<p class="row cta"><a class="btn" href="#try">Try it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
-<ul class="linkrow"><li><a href="https://github.com/samiali38183/kev-risk-prioritization">Repository</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.3.0">Release v0.3.0</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">Methodology</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/bod-26-04.md">BOD 26-04 notes</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43134445948">CI run (main)</a></li></ul>
+<div class="overview prose"><p>kev-risk-prioritization is a standard-library Python script that scores each finding from CISA KEV listing, asset criticality, EPSS and CVSS, using weights chosen by hand (0.40, 0.25, 0.20, 0.20), and sorts by that score. It is not an implementation of CISA BOD 26-04. Sorting by severity alone can bury the vulnerabilities attackers are already using; this orders them first.</p><p>On 20 synthetic findings, a CVSS-only sort puts 9 of the 12 known-exploited ones in its top 12 and the risk score puts all 12 there. That shows how the formula orders findings, not that it speeds up fixing.</p><p>On a real KEV and EPSS snapshot, EPSS separates known-exploited CVEs from the rest with an AUC of 0.9515. That result is partly circular, because EPSS is trained on exploitation data that overlaps with KEV, so it validates neither signal. The weights are unvalidated. kevgate supersedes this tool for the real-data case. The script uses only the CVSS and EPSS values supplied to it.</p></div>
+<ul class="linkrow"><li><a href="#try">Try it</a></li><li><a href="#limits">Limits</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization">Repository</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.3.0">Release v0.3.0</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/methodology.md">Methodology</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/bod-26-04.md">BOD 26-04 notes</a></li><li><a href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43134445948">CI run (main)</a></li></ul>
 
 <figure class="hero-fig page-hero"><div class="hero-card"><a class="hero-zoom" href="/assets/img/hero-kev-risk-prioritization.png" aria-label="Open the kev-risk-prioritization result image at full size"><img src="/assets/img/hero-kev-risk-prioritization.png" width="1800" height="1300" alt="Left: EPSS scores of 1,779 known-exploited CVEs against 5,000 others, medians 0.533 and 0.006, AUC 0.9515. Right: this tool puts all 100 KEV findings of a 2,000-row list in its top 100, EPSS alone puts 65 and asset criticality alone puts 10. Bottom: the AUC is partly circular and the weights are unvalidated." fetchpriority="high" decoding="async"></a></div><figcaption>On the real KEV catalog and EPSS scores, EPSS separates known-exploited CVEs from the rest with an AUC of 0.9515, but that result is partly circular because EPSS is trained on exploitation data that overlaps with KEV, so it is not validation of either. The tool&#x27;s 100 of 100 comes mostly from its weights.</figcaption></figure>
 </header>
@@ -82,15 +75,7 @@
 <figcaption><b>With the default weights all 12 KEV findings are in the top 12; a CVSS-only sort puts 9 there.</b> The 20 findings are the tool's synthetic demo: real KEV CVE IDs with invented assets, ACR, EPSS, CVSS and ages. It shows how the formula orders findings under different weights. It does not show that any weighting improves remediation, and the default result is largely by construction, since the KEV weight (0.40) equals the EPSS and CVSS weights combined. Scores come from kev-risk-prioritization v0.3.0 (commit 3859ff6); the page re-implements the formula and <code>scripts/test_bench_kev.mjs</code> checks it against the tool on 304 weight vectors.</figcaption>
 </figure>
 </section>
-<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>CVSS-only sort of 20 synthetic findings; pinned real KEV and EPSS snapshot</dd></div>
-<div><dt>Before and after</dt><dd><span class="gl">Before</span> Earlier text called it KEV-first in the spirit of BOD 26-04 and showed measurements on invented values<br><span class="gl">After</span> Described as its own weighted score, not BOD 26-04; real snapshot: EPSS vs KEV AUC 0.9515. v0.3.0: mixed CVSS lists refused, total sort order, 63 tests</dd></div>
-<div><dt>Limits</dt><dd>Weights not validated; EPSS and KEV are related signals; synthetic assets <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>
-<details class="fold fold-rec"><summary>Technical description and how the check was run: version, reference, date, how to reproduce</summary><p class="dek tech">A standard-library Python script that ranks scan findings with a simple weighted score of its own design: known-exploited (CISA KEV) CVEs first, then asset criticality, EPSS and CVSS. It is not an implementation of CISA BOD 26-04.</p>
-<section class="record-head" aria-label="Verification record">
+<details class="fold fold-rec"><summary>How the check was run: version, reference, date, how to reproduce</summary><section class="record-head" aria-label="Verification record">
 <dl>
 <div><dt>Version tested</dt><dd>kev-risk-prioritization v0.3.0, commit 3859ff6</dd></div>
 <div><dt>Checked against</dt><dd>a CVSS-only sort of 20 synthetic findings, and a pinned real snapshot: CISA KEV 2026.11.10 and FIRST EPSS scored 2026-11-11</dd></div>
@@ -185,7 +170,7 @@ KEV vs non-KEV population
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
-<h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
+<h2 id="limits-h">Limits</h2>
 <ul class="prose">
 <li>Not an implementation of BOD 26-04: it does not model exposure, automatability, technical impact, per-asset deadlines or forensic triage, and it is not a compliance tool.</li>
 <li>The 0.40 / 0.25 / 0.20 / 0.20 weights are a design choice with no outcome data behind them. The bench shows how the order depends on them; it cannot say which weights are right.</li>
@@ -199,12 +184,12 @@ KEV vs non-KEV population
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
 <details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">8 links</span></summary>
-<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<p class="prose muted">Run states were captured when the site was built.</p>
 <dl class="trace"><div><dt>CI run on main</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kev-risk-prioritization/actions/runs/43134445948"><span class="st" aria-hidden="true"></span><span>run 43134445948</span> <span class="d">passed 2026-11-12</span></a></dd></div><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/releases/tag/v0.3.0">v0.3.0</a></dd></div><div><dt>Changelog 0.3.0</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md">CHANGELOG.md</a></dd></div><div><dt>Real-data analysis</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/real_data_analysis.md">docs/real_data_analysis.md</a></dd></div><div><dt>BOD 26-04 notes</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/bod-26-04.md">docs/bod-26-04.md</a></dd></div><div><dt>Snapshot</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/tree/main/data/snapshot">data/snapshot/</a></dd></div><div><dt>Sample data</dt><dd><a href="https://github.com/samiali38183/kev-risk-prioritization/tree/main/data">data/</a></dd></div><div><dt>Bench parity test</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_kev.mjs">scripts/test_bench_kev.mjs</a></dd></div></dl>
 
 </details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/fuzzdiff/"><span class="label">Previous project, 6 of 7</span><span class="n">fuzzdiff</span></a></nav>
+<nav class="sheets" aria-label="Other projects"><a class="prev" href="/projects/fuzzdiff/"><span class="label">Previous</span><span class="n">fuzzdiff</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">
@@ -213,9 +198,9 @@ KEV vs non-KEV population
 <li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
 <li><a href="https://github.com/samiali38183">GitHub</a></li>
 <li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
-<li><a href="/resume.pdf">Resume (PDF)</a></li>
+<li><a href="/resume/">Resume</a></li>
 </ul>
-<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+<p>Static site, no tracking or cookies. <a href="https://github.com/samiali38183/samiali38183.github.io">Source</a></p>
 </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>

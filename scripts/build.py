@@ -25,31 +25,37 @@ import pages as P  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "https://samiali38183.github.io"
-OG_IMAGE = BASE + "/assets/og.png"
-OG_ALT = "0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after)."
+LASTMOD = "2026-11-14"
+GITHUB = "https://github.com/samiali38183"
+SITE_OG_ALT = "Sami Ali. " + P.HEADLINE
 
 # (url path, nav key, title, description, kind, argument)
 PAGES = [
-    ("/", "home", "Sami Ali | Detection and application security projects",
-     "Sami Ali, George Mason University class of 2028. Detection rules, a code analyzer and ranking tools, tested on recorded data, a benchmark or the original.",
+    ("/", "home", "Sami Ali | Security engineering student",
+     "Security engineering student at George Mason University (May 2028). Application-security and detection tools with measured results. Seeking a Summer 2027 internship.",
      "home", None),
-    ("/projects/", "projects", "Projects | Sami Ali",
-     "Seven projects: tripline, sinkline, kevgate, kevgate-admit, vulnlab, fuzzdiff and kev-risk-prioritization. Each page has results, limits and CI run links.",
+    ("/projects/", "projects", "Work archive | Sami Ali",
+     "Projects beyond the featured four: kevgate-admit, fuzzdiff, kev-risk-prioritization and call-kettle, each labelled with its data type and limits.",
      "projects", None),
 ] + [
     (f"/projects/{slug}/", "projects", None, None, "project", slug)
     for slug in ["tripline", "sinkline", "vulnlab", "kevgate", "kevgate-admit", "fuzzdiff", "kev-risk-prioritization"]
 ] + [
-    ("/experience/", "experience", "Experience | Sami Ali",
-     "DHS HS-POWER intern on CBP's Vulnerability Assessment Team, May to August 2026, plus education and certifications.",
+    ("/projects/call-kettle/", "projects", "call-kettle: tool-call authorization for a phone agent | Sami Ali",
+     "call-kettle is a phone receptionist backend where the model only proposes actions and server code authorizes each one, with a 48-case offline adversarial evaluation.",
+     "content", "call-kettle.html"),
+    ("/experience/", "experience", "Experience and education | Sami Ali",
+     "DHS/CBP Vulnerability Assessment Team intern (summer 2026), George Mason University B.S. IT (May 2028), Security+ and AWS Cloud Practitioner.",
      "content", "experience.html"),
     ("/about/", "about", "About | Sami Ali",
-     "George Mason University student working on detection engineering, application security and vulnerability management, and on whether tools do what they say.",
+     "Sami Ali builds application-security and detection tools and publishes the measurements, including where the tools fail.",
      "content", "about.html"),
     ("/resume/", "resume", "Resume | Sami Ali",
-     "Sami Ali's resume as a PDF, in a Security Engineering version and a Red Team version, with the same facts as text.",
+     "Sami Ali's one-page resume as a PDF, in Security Engineering and Red Team versions.",
      "content", "resume.html"),
 ]
+# Pages served from the tripline and sinkline repositories on the same host. Listed in the sitemap only.
+EXTERNAL_PAGES = ["/tripline/", "/sinkline/"]
 
 NAV = [("projects", "/projects/", "Work"), ("experience", "/experience/", "Experience"),
        ("about", "/about/", "About"), ("resume", "/resume/", "Resume")]
@@ -63,7 +69,7 @@ LAYOUT = """<!DOCTYPE html>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{canon}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
@@ -81,8 +87,7 @@ LAYOUT = """<!DOCTYPE html>
 <meta name="twitter:image:alt" content="{ogalt}">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
-{headextra}<script>try{{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
-</head>
+{headextra}</head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
@@ -91,11 +96,9 @@ LAYOUT = """<!DOCTYPE html>
 <nav class="site-nav" aria-label="Primary">
 <ul>
 {nav}
-<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
-{sheetline}
 </header>
 <main id="main" class="wrap">
 {body}
@@ -106,9 +109,9 @@ LAYOUT = """<!DOCTYPE html>
 <li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
 <li><a href="https://github.com/samiali38183">GitHub</a></li>
 <li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
-<li><a href="/resume.pdf">Resume (PDF)</a></li>
+<li><a href="/resume/">Resume</a></li>
 </ul>
-<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+<p>Static site, no tracking or cookies. <a href="https://github.com/samiali38183/samiali38183.github.io">Source</a></p>
 </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>
@@ -159,35 +162,56 @@ def number_plates(body: str) -> str:
     return re.sub(r"\{\{n\}\}", lambda _m: str(next(count)), body)
 
 
+def check_copy(ctx: dict) -> None:
+    """Length rules for the public copy: intro 30-60 words, About 100-150, blurbs 25-50, project overviews 150-300."""
+    def n(s: str) -> int:
+        return len(s.split())
+    assert 30 <= n(P.INTRO) <= 60, n(P.INTRO)
+    assert 100 <= n(" ".join(P.ABOUT)) <= 150, n(" ".join(P.ABOUT))
+    assert 25 <= n(P.CALL_KETTLE["blurb"]) <= 50
+    for slug, p in ctx["projects"]["projects"].items():
+        assert 25 <= n(p["blurb"]) <= 50, (slug, n(p["blurb"]))
+        assert 150 <= sum(n(x) for x in p["overview"]) <= 300, (slug, sum(n(x) for x in p["overview"]))
+
+
+def og_for(ctx: dict, kind: str, arg: str | None) -> tuple[str, str]:
+    """(image URL, alt text) for a page: a typographic card per project, one general card for the rest."""
+    if kind == "project":
+        p = ctx["projects"]["projects"][arg]
+        return f"{BASE}/assets/og/{arg}.png", f'{p["name"]}: {p["og"]["big"]} {p["og"]["line"]}'
+    if kind == "content" and arg == "call-kettle.html":
+        return f"{BASE}/assets/og/call-kettle.png", "call-kettle: 48 of 48 evaluation cases pass. Scripted model, synthetic data."
+    return f"{BASE}/assets/og/home.png", SITE_OG_ALT
+
+
 def render(ctx: dict, kind: str, arg: str | None, path: str) -> tuple[str, str, str, str, str]:
     """Return (title, description, body, sheetline, extra scripts) for one page."""
     extra = ""
-    sheetline = ""
     if kind == "home":
         body = P.home(ctx)
     elif kind == "projects":
         body = P.projects_index(ctx)
     elif kind == "project":
-        p = ctx["projects"]["projects"][arg]
         body = P.project_page(ctx, arg)
-        sheetline = (f'<p class="wrap sheetline"><b>Project {p["sheet"]} of {len(ctx["projects"]["order"])}</b> &middot; {html.escape(p["name"])}'
-                     f' &middot; {html.escape(p["version"] if p["version"].startswith("v") else "main")}</p>')
-        bn = p.get("bench", arg)
+        bn = ctx["projects"]["projects"][arg].get("bench", arg)
         if (ROOT / "assets/js" / f"bench-{bn}.js").exists():
             extra = f'<script type="module" src="/assets/js/bench-{bn}.js"></script>\n'
     else:
         body = P.expand(ctx, (ROOT / "content" / arg).read_text(encoding="utf-8").strip())
     body = body.replace('<aside class="note">', '<div class="note" role="note">').replace('</aside>', '</div>')
     body = C.label_tables(number_plates(body))
-    title = desc = ""
-    return title, desc, body, sheetline, extra
+    return "", "", body, "", extra
+
+
+PERSON = {"@context": "https://schema.org", "@type": "Person", "name": "Sami Ali", "url": BASE + "/",
+          "description": P.HEADLINE, "sameAs": [GITHUB, P.LINKEDIN]}
 
 
 def build() -> None:
     ctx = load_ctx()
-    nav_cache = {}
+    check_copy(ctx)
     for path, key, title, desc, kind, arg in PAGES:
-        _, _, body, sheetline, extra = render(ctx, kind, arg, path)
+        _, _, body, _, extra = render(ctx, kind, arg, path)
         if kind == "project":
             p = ctx["projects"]["projects"][arg]
             title, desc = p["title"], p["desc"]
@@ -199,25 +223,27 @@ def build() -> None:
         bn = ctx["projects"]["projects"][arg].get("bench", arg) if kind == "project" else arg
         if kind == "project" and (ROOT / "assets/css" / f"bench-{bn}.css").exists():
             headextra = f'<link rel="stylesheet" href="/assets/css/bench-{bn}.css">\n'
+        if kind == "home":
+            headextra += '<script type="application/ld+json">' + json.dumps(PERSON, separators=(",", ":")) + "</script>\n"
+        og, ogalt = og_for(ctx, kind, arg)
         out = LAYOUT.format(
-            headextra=headextra, title=html.escape(title), desc=html.escape(desc, quote=True), canon=BASE + path, og=OG_IMAGE,
-            ogalt=html.escape(OG_ALT, quote=True), nav=nav, body=body, sheetline=sheetline, extra=extra)
+            headextra=headextra, title=html.escape(title), desc=html.escape(desc, quote=True), canon=BASE + path, og=og,
+            ogalt=html.escape(ogalt, quote=True), nav=nav, body=body, extra=extra)
         target = ROOT / path.strip("/") / "index.html" if path != "/" else ROOT / "index.html"
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(out, encoding="utf-8", newline="\n")
-        nav_cache[path] = nav
 
     nav404 = "\n".join('<li><a href="{}">{}</a></li>'.format(h, lab) for _, h, lab in NAV)
     body404 = P.expand(ctx, (ROOT / "content" / "404.html").read_text(encoding="utf-8").strip())
-    nf = LAYOUT.format(headextra="", title="Page not found | Sami Ali", desc="Page not found.", canon=BASE + "/404.html", og=OG_IMAGE,
-                       ogalt=html.escape(OG_ALT, quote=True), nav=nav404, body=body404, sheetline="", extra="")
+    nf = LAYOUT.format(headextra="", title="Page not found | Sami Ali", desc="Page not found.", canon=BASE + "/404.html",
+                       og=f"{BASE}/assets/og/home.png", ogalt=html.escape(SITE_OG_ALT, quote=True), nav=nav404, body=body404, extra="")
     nf = nf.replace('<meta name="description"', '<meta name="robots" content="noindex">\n<meta name="description"')
     (ROOT / "404.html").write_text(nf, encoding="utf-8", newline="\n")
 
     for old, new in REDIRECTS.items():
         (ROOT / old).write_text(REDIRECT.format(path=new, url=BASE + new), encoding="utf-8", newline="\n")
 
-    urls = "".join(f"<url><loc>{BASE}{p}</loc></url>\n" for p, *_ in PAGES)
+    urls = "".join(f"<url><loc>{BASE}{p}</loc><lastmod>{LASTMOD}</lastmod></url>\n" for p in [x[0] for x in PAGES] + EXTERNAL_PAGES)
     (ROOT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n",

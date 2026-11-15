@@ -4,28 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About | Sami Ali</title>
-<meta name="description" content="George Mason University student working on detection engineering, application security and vulnerability management, and on whether tools do what they say.">
+<meta name="description" content="Sami Ali builds application-security and detection tools and publishes the measurements, including where the tools fail.">
 <link rel="canonical" href="https://samiali38183.github.io/about/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="About | Sami Ali">
-<meta property="og:description" content="George Mason University student working on detection engineering, application security and vulnerability management, and on whether tools do what they say.">
+<meta property="og:description" content="Sami Ali builds application-security and detection tools and publishes the measurements, including where the tools fail.">
 <meta property="og:url" content="https://samiali38183.github.io/about/">
-<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og/home.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta property="og:image:alt" content="Sami Ali. Security engineering student building application-security and detection tools, with measured results.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="About | Sami Ali">
-<meta name="twitter:description" content="George Mason University student working on detection engineering, application security and vulnerability management, and on whether tools do what they say.">
-<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta name="twitter:description" content="Sami Ali builds application-security and detection tools and publishes the measurements, including where the tools fail.">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og/home.png">
+<meta name="twitter:image:alt" content="Sami Ali. Security engineering student building application-security and detection tools, with measured results.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
-<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -38,41 +37,19 @@
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/" aria-current="page">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
-
 </header>
 <main id="main" class="wrap">
 <h1>About</h1>
-<div class="prose">
-<p>I'm a junior at George Mason University studying Information Technology with a cybersecurity minor, after an A.S. at Northern Virginia Community College. In summer 2026 I worked on CBP's Vulnerability Assessment Team through the DHS HS-POWER program, where the question that kept coming up was which findings to fix first.</p>
-<p>I'm focused on detection engineering, application security and vulnerability management, and on measuring whether security tools do what they say. The projects here come from that: a gate that tests detection rules against recorded attack telemetry, a taint analyzer that reports how it scores against a pattern linter, and an intake service that ranks findings by known exploitation.</p>
-<p>I'm studying for the OSCP and the AWS Security Specialty so I understand how the attacks I defend against actually run.</p>
-<p>I'm looking for internships in security engineering, application security, detection engineering, vulnerability research, cloud security and offensive security. I'm a U.S. citizen. Email is the quickest way to reach me: <a href="mailto:samiali38183@gmail.com">email</a>. I'm also on <a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a> and <a href="https://github.com/samiali38183">GitHub</a>.</p>
+<div class="prose about">
+<p>I build security tools for finding and stopping application bugs, and I publish the measurements, including where the tools fail. tripline replays recorded attack telemetry through detection rules and fails the build when a rule stops catching it. sinkline traces user input to dangerous calls in Python web apps. vulnlab exploits, fixes and detects three web bug classes on localhost. At DHS/CBP I matched Tenable scan results against CISA&#x27;s Known Exploited Vulnerabilities catalog and ranked remediation by exploitation risk. I hold Security+ and AWS Cloud Practitioner, and I am studying for OSCP. I am looking for a Summer 2027 security engineering internship.</p>
 </div>
-
-<section class="section" aria-labelledby="rules">
-<h2 id="rules">How I check my work</h2>
-<ol class="rules">
-<li><h3>Run the stock thing first</h3><p>Before writing a replacement, run the existing rule on recorded data. The stock SigmaHQ setuid rule flagged 0 of the 2 attack events among 36 recorded events. That run is red on purpose: the stock rule missed the attack, and that is the finding. <a class="chip" data-s="fail" href="https://github.com/samiali38183/tripline/actions/runs/41838714456"><span class="st" aria-hidden="true"></span><span>run 41838714456</span> <span class="d">failed 2026-11-04</span></a> The latest passing run on main replays the same recording with the replacement rule. <a class="chip" data-s="pass" href="https://github.com/samiali38183/tripline/actions/runs/43100952362"><span class="st" aria-hidden="true"></span><span>run 43100952362</span> <span class="d">passed 2026-11-11</span></a></p></li>
-<li><h3>Test the tests</h3><p>Coverage says a line ran, not that a test would notice it breaking. I added six deliberate defects to kevgate, and all six passed its 227 tests until each got a test of its own. <a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808156"><span class="st" aria-hidden="true"></span><span>run 42960808156</span> <span class="d">passed 2026-11-11</span></a></p></li>
-<li><h3>Compare against the original</h3><p>fuzzdiff runs the C parser and the Rust port on the same bytes; five seeded bugs were caught, and a 500,000-input control stayed clean. <a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43035685955"><span class="st" aria-hidden="true"></span><span>run 43035685955</span> <span class="d">passed 2026-11-11</span></a></p></li>
-<li><h3>State the limits where the number is</h3><p>sinkline's page leads with its score on an outside benchmark. Right next to the number it says the fixes were picked from the earlier failures and that Bandit still leads over all 14 categories. <a class="chip" data-s="pass" href="https://github.com/samiali38183/sinkline/actions/runs/43136290658"><span class="st" aria-hidden="true"></span><span>run 43136290658</span> <span class="d">passed 2026-11-12</span></a></p></li>
-</ol>
-</section>
-
-<section class="section" aria-labelledby="issued">
-<h2 id="issued">Contact</h2>
-<div class="record-head">
-<dl>
-<div><dt>Name</dt><dd>Sami Ali</dd></div>
-<div><dt>Contact</dt><dd><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></dd></div>
-<div><dt>GitHub</dt><dd><a href="https://github.com/samiali38183">github.com/samiali38183</a></dd></div>
-<div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">linkedin.com/in/sami-ali-1a4b89345</a></dd></div>
-</dl>
-</div>
+<section class="section" aria-labelledby="contact">
+<h2 id="contact">Contact</h2>
+<p class="contact-line"><span class="email-copy "><a class="email" href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a> <button type="button" class="copy-email" data-copy-email="samiali38183@gmail.com" hidden>Copy</button><span class="copy-status" role="status" aria-live="polite"></span></span></p>
+<p><a href="https://github.com/samiali38183">github.com/samiali38183</a> &middot; <a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a> &middot; <a href="/resume/">Resume</a></p>
 </section>
 </main>
 <footer class="site-footer">
@@ -81,9 +58,9 @@
 <li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
 <li><a href="https://github.com/samiali38183">GitHub</a></li>
 <li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
-<li><a href="/resume.pdf">Resume (PDF)</a></li>
+<li><a href="/resume/">Resume</a></li>
 </ul>
-<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+<p>Static site, no tracking or cookies. <a href="https://github.com/samiali38183/samiali38183.github.io">Source</a></p>
 </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>

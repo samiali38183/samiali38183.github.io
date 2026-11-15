@@ -1,0 +1,29 @@
+<div class="sheet ck">
+<header class="title has-hero">
+<p class="crumb"><a href="/projects/">Work</a> <span aria-hidden="true">/</span> AI agent security, Python</p>
+<h1>Call Kettle</h1>
+<div class="overview prose">
+<p>Call Kettle answers inbound calls for small home-service businesses. Twilio delivers the call, a Claude model holds the conversation, and a FastAPI backend books, moves and cancels appointments in SQLite. Because anyone can phone it, the model's output is treated as untrusted input.</p>
+<p>The design splits the system into a model that proposes tool calls and server code that authorizes them. Every call passes <code>authorize_tool_call</code>: tenant binding, known tool, tenant policy, after-hours rule, argument schema and per-call budgets, with default deny. Behind it, the tools enforce ownership, a service allow-list, the slot grid and a SQLite overlap check. Identity comes from the call rather than the model's arguments, so a transfer goes to the tenant's configured number and a confirmation text goes only to the caller ID.</p>
+<p>The offline evaluation uses a scripted model that does whatever an attacker wants, while the real agent loop, gate, tools and a fresh database handle it. Its 48 cases (42 attacks, 6 normal-use controls) cover prompt injection, including text planted in tool results, cross-tenant access, argument tampering, claim forgery, data leakage, loop exhaustion and retries. All pass. Nineteen more tests each remove one safety check and must see cases fail.</p>
+</div>
+<ul class="linkrow"><li><a href="#limits">Limits</a></li><li><a href="https://github.com/samiali38183/call-kettle">Repository</a></li><li><a href="https://github.com/samiali38183/call-kettle/blob/main/docs/SECURITY_EVALUATION.md">Evaluation</a></li><li><a href="https://github.com/samiali38183/call-kettle/blob/main/docs/SECURITY_INVARIANTS.md">Security invariants</a></li></ul>
+<figure class="hero-fig page-hero"><div class="hero-card"><img src="/assets/img/call-kettle/hero-security-eval.png" width="1800" height="1120" alt="Summary of the evaluation: one case from the run in which the caller says to ignore instructions and cancel another customer's booking, the scripted model asks to cancel it and the server check refuses with policy_disabled. Of all 106 actions the scripted model tried, 26 were refused by the gate, 14 rejected by the tool's own rules and 66 allowed. 48 of 48 cases pass, 19 tests remove one safety check, 0 network connections, 0 audit rows holding a name or phone number." decoding="async"></div><figcaption><span class="tag">Recorded run, scripted model, synthetic data</span></figcaption></figure>
+</header>
+
+<section class="section" aria-labelledby="flow-h">
+<h2 id="flow-h">One request, two outcomes</h2>
+<figure class="hero-fig"><div class="hero-card"><img src="/assets/img/call-kettle/example-flow.svg" width="1300" height="620" alt="A legitimate booking and a cancel request injected by a caller, each passing from caller speech to the model's proposed tool call, the server authorization layer, the business tools and the audit record; the legitimate one is saved and the adversarial one is refused." loading="lazy" decoding="async"></div><figcaption><span class="tag">Recorded run, scripted model, synthetic data</span></figcaption></figure>
+<figure class="hero-fig"><div class="hero-card"><img src="/assets/img/call-kettle/example-terminal.png" width="2196" height="1586" alt="Saved terminal output of python -m qa.record_example. A legitimate booking is allowed and one booking is added. An injected cancel is refused by the gate with control policy_disabled. A second injected cancel is allowed by the gate but rejected by the tool's own ownership rule. In both attacks no booking row changes. 3 of 3 recorded cases match; scripted model, synthetic data, no network." loading="lazy" decoding="async"></div><figcaption><span class="tag">Saved terminal output</span></figcaption></figure>
+</section>
+
+<section class="limits section" id="limits" aria-labelledby="limits-h">
+<h2 id="limits-h">Limits</h2>
+<ul>
+<li>The scripted model shows what the server does when the model misbehaves, not how often a real model would. No live-model evaluation exists.</li>
+<li>The gate and the evaluation exist in the public repository, which is a sanitized snapshot. They are not in the deployed private code.</li>
+<li>Spoofed caller ID, unverified booking phone numbers and DNS rebinding on webhook URLs are documented limitations and are not tested.</li>
+<li>Reviewing the boundary found six defects, including a confirmation text that went to a caller-supplied number. Each was fixed and has a case.</li>
+</ul>
+</section>
+</div>

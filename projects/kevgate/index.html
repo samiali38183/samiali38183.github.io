@@ -7,26 +7,25 @@
 <meta name="description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. On a real scan, all 10 exploited findings land in the top 10. v0.1.1: 277 tests; main: 298.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kevgate/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kevgate: KEV-ranked vulnerability intake | Sami Ali">
 <meta property="og:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. On a real scan, all 10 exploited findings land in the top 10. v0.1.1: 277 tests; main: 298.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kevgate/">
-<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og/kevgate.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta property="og:image:alt" content="kevgate: 10 of 10 exploited findings in the top 10 of 1,112. A CVSS sort puts the first at about rank 40. One run; KEV is a score input.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kevgate: KEV-ranked vulnerability intake | Sami Ali">
 <meta name="twitter:description" content="kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. On a real scan, all 10 exploited findings land in the top 10. v0.1.1: 277 tests; main: 298.">
-<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og/kevgate.png">
+<meta name="twitter:image:alt" content="kevgate: 10 of 10 exploited findings in the top 10 of 1,112. A CVSS sort puts the first at about rank 40. One run; KEV is a score input.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-kevgate.css">
-<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -39,23 +38,17 @@
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Project 4 of 7</b> &middot; kevgate &middot; v0.1.1</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
 <header class="title has-hero">
+<p class="crumb"><a href="/projects/">Work</a> <span aria-hidden="true">/</span> Vulnerability management and DevSecOps <span class="ver">v0.1.1</span></p>
 <h1>kevgate</h1>
-<dl class="plain">
-<div><dt>What it does</dt><dd>A small service that ranks scanner findings by CISA KEV listing, EPSS, CVSS and how critical the asset is. It ships with a container, a Helm chart, Terraform and a CI pipeline.</dd></div>
-<div><dt>Why it matters</dt><dd>The point is to show what shipping a small service carefully looks like: authentication, rate limits, hardened containers, and CI that tests those controls.</dd></div>
-<div class="pf"><dt>What was found</dt><dd>On a real scan of four old public container images, 10 of the 1,112 findings are on CISA&#x27;s list of flaws attackers are exploiting. Sorted by severity score alone, the first of them lands at about rank 40 on average and the 10 average rank 246; kevgate puts all 10 in the top 10. That is partly by design, since the exploited list is one of its inputs. It is one run, with hand-chosen weights and assumed asset importance.</dd></div>
-</dl>
-<p class="row cta"><a class="btn" href="#try">See it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
-<ul class="linkrow"><li><a href="https://github.com/samiali38183/kevgate">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">Release v0.1.1</a></li><li><a href="https://github.com/samiali38183/kevgate/tree/main/docs/real-run">Real-data run</a></li><li><a href="https://github.com/samiali38183/kevgate/pull/2">Hardening PR #2</a></li><li><a href="https://github.com/samiali38183/kevgate/tree/v0.1.1/docs">Docs</a></li><li><a href="#trace">CI runs</a></li></ul>
+<div class="overview prose"><p>kevgate is a small FastAPI service that takes vulnerability scanner findings and returns a remediation queue ranked by CISA KEV listing, EPSS, CVSS and asset criticality. The repository also shows what shipping a small service carefully looks like: hashed, scoped API keys, rate limits, a hardened container, a Helm chart, Terraform and a GitHub Actions security pipeline that tests those controls.</p><p>Real-data run: a scan of four old public container images produced 1,112 findings, 10 of them on CISA&#x27;s list of flaws being exploited. A CVSS-only sort puts the first of those at about rank 40 on average, and the 10 average rank 246. kevgate puts all 10 in the top 10. That is partly by design, since KEV listing is an input to the score, and it is one run.</p><p>Engineering check: six defects survived the test suite under mutation testing. Tests added in v0.1.1 kill all six, and the suite grew from 227 to 277 tests (298 on main).</p><p>Scope: one replica, SQLite, and Terraform applied only to LocalStack. Nothing is deployed to a real AWS account.</p></div>
+<ul class="linkrow"><li><a href="#try">See it</a></li><li><a href="#limits">Limits</a></li><li><a href="https://github.com/samiali38183/kevgate">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">Release v0.1.1</a></li><li><a href="https://github.com/samiali38183/kevgate/tree/main/docs/real-run">Real-data run</a></li><li><a href="https://github.com/samiali38183/kevgate/pull/2">Hardening PR #2</a></li><li><a href="https://github.com/samiali38183/kevgate/tree/v0.1.1/docs">Docs</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 <figure class="hero-fig page-hero"><div class="hero-card"><a class="hero-zoom" href="/assets/img/hero-kevgate-real-run.png" aria-label="Open the kevgate real-data image at full size"><img src="/assets/img/hero-kevgate-real-run.png" width="1800" height="1020" alt="Left: for each of the 10 exploited findings, the grey marker shows where a CVSS-only sort puts it, between about rank 2 and rank 610, and the red dot shows kevgate&#x27;s rank, 1 to 10. Right: exploited findings found in the top 10, 25, 50 and 100 positions, CVSS only 0.15, 0.4, 0.86 and 1.75, kevgate 10 each." fetchpriority="high" decoding="async"></a></div><figcaption>A real scan of four old public container images: 10 of the 1,112 findings are on CISA&#x27;s list of flaws being exploited. A CVSS sort puts the first of them at about rank 40 on average; kevgate puts all 10 in the top 10. That is partly by design, since the list is an input to the score. It is one run, with hand-chosen weights and assumed asset importance.</figcaption></figure>
 </header>
@@ -83,15 +76,7 @@
 <figcaption><b>Every one of 16 controls cites at least one test or CI step; none of the cited tests or steps is evidence that the control is sufficient.</b> Recorded, not live: every line number, test name, CI job and step comes from <code>kevgate</code> v0.1.1 (commit 973c8c1) and from real GitHub Actions runs, captured on 2026-11-11 with Python 3.12.2 and pytest 9.2.0: 34 cited tests (84 cases, all passed on a rerun) of 277 collected, and 24 CI step citations. The page evaluates nothing. Regenerate with <code>python scripts/capture_kevgate_bench.py</code>; <code>python scripts/capture_kevgate_bench.py --check</code> compares the stored data with a fresh capture and <code>node scripts/test_bench_kevgate.mjs</code> checks that the page shows exactly the stored data.</figcaption>
 </figure>
 </section>
-<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>Its own six surviving mutants and 16 controls; kind cluster in CI</dd></div>
-<div><dt>Before and after</dt><dd><span class="gl">Before</span> Six mutants survived 227 tests<br><span class="gl">After</span> Six killed; v0.1.1: 277 tests; main: 298</dd></div>
-<div><dt>Limits</dt><dd>Demonstration scope: one replica, SQLite, LocalStack only <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>
-<details class="fold fold-rec"><summary>Technical description and how the check was run: version, reference, date, how to reproduce</summary><p class="dek tech">A small vulnerability intake service. Scanner findings go in; a remediation queue comes out, ranked by CISA KEV membership, EPSS, CVSS and asset criticality. The repository also shows what shipping it carefully looks like: authentication, rate limits, container hardening, Kubernetes and Terraform, and a CI pipeline that tests the controls. This page covers v0.1.1, with a matrix that maps each control to the code and the checks that cite it.</p>
-<section class="record-head" aria-label="Verification record">
+<details class="fold fold-rec"><summary>How the check was run: version, reference, date, how to reproduce</summary><section class="record-head" aria-label="Verification record">
 <dl>
 <div><dt>Version tested</dt><dd>kevgate v0.1.1, commit 973c8c1 (annotated tag)</dd></div>
 <div><dt>Checked against</dt><dd>its own six surviving mutants and sixteen security controls, each cited to a test or a CI step (a kind cluster in CI for the cluster controls)</dd></div>
@@ -265,7 +250,7 @@ kevgate_auth_throttled_total 3.0</code></pre></details>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
-<h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
+<h2 id="limits-h">Limits</h2>
 <ul class="prose">
 <li>Nothing is deployed to a real AWS account. The Terraform (ECR, reports bucket, KMS key, workload and CI roles) was applied only to LocalStack, which has no ECR in its Community edition, so the ECR repository and the GitHub OIDC role are checked statically and by the <code>terraform test</code>. Nothing uses those resources: the service has no AWS SDK code and releases go to GHCR.</li>
 <li>It runs one replica with SQLite on one volume and <code>Recreate</code> rollouts. That is a demonstration scope, and <a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/docs/DEPLOYMENT.md#what-would-change-for-production">DEPLOYMENT.md</a> lists what production would change (Postgres, replicas, tested backup and restore, key lifecycle). The rate limiter and the failure limiter are per process, per source address, and reset on restart.</li>
@@ -281,7 +266,7 @@ kevgate_auth_throttled_total 3.0</code></pre></details>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
 <details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">10 links</span></summary>
-<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<p class="prose muted">Run states were captured when the site was built.</p>
 <dl class="trace"><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/kevgate/releases/tag/v0.1.1">v0.1.1 (973c8c1)</a></dd></div><div><dt>Tests run (ci)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808156"><span class="st" aria-hidden="true"></span><span>run 42960808156</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Security scans (security)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960808037"><span class="st" aria-hidden="true"></span><span>run 42960808037</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Kind cluster controls (deploy-kind)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960807983"><span class="st" aria-hidden="true"></span><span>run 42960807983</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Terraform (terraform, last run on main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42956666367"><span class="st" aria-hidden="true"></span><span>run 42956666367</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release run, v0.1.1</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate/actions/runs/42960813836"><span class="st" aria-hidden="true"></span><span>run 42960813836</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Mutation tests</dt><dd><a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/tests/test_mutation_kills.py">tests/test_mutation_kills.py</a></dd></div><div><dt>Changelog</dt><dd><a href="https://github.com/samiali38183/kevgate/blob/v0.1.1/CHANGELOG.md">CHANGELOG 0.1.1</a></dd></div><div><dt>Matrix data</dt><dd><a href="/assets/data/kevgate-bench.json">assets/data/kevgate-bench.json</a></dd></div><div><dt>Real-data run, sources and limits</dt><dd><a href="https://github.com/samiali38183/kevgate/blob/main/docs/real-run/README.md">docs/real-run/README.md</a></dd></div></dl>
 <h3>CI evidence</h3>
 <div class="prose"><p>The latest runs on <code>main</code> are the evidence for the controls and the matrix. Three workflows ran green on the tag commit (<code>973c8c1</code>); <code>terraform</code> has a path filter and last ran on the commit before it (<code>b08a920</code>), which has the same <code>infra/</code> and workflow files. The release workflow ran on the tag. The results column is from the repository's own docs, which summarize those runs, and from the run logs.</p></div>
@@ -298,7 +283,7 @@ kevgate_auth_throttled_total 3.0</code></pre></details>
 </table></div>
 </details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/vulnlab/"><span class="label">Previous project, 3 of 7</span><span class="n">vulnlab</span></a><a class="next" href="/projects/kevgate-admit/"><span class="label">Next project, 5 of 7</span><span class="n">kevgate-admit</span></a></nav>
+<nav class="sheets" aria-label="Other projects"><a class="prev" href="/projects/vulnlab/"><span class="label">Previous</span><span class="n">vulnlab</span></a><a class="next" href="/projects/kevgate-admit/"><span class="label">Next</span><span class="n">kevgate-admit</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">
@@ -307,9 +292,9 @@ kevgate_auth_throttled_total 3.0</code></pre></details>
 <li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
 <li><a href="https://github.com/samiali38183">GitHub</a></li>
 <li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
-<li><a href="/resume.pdf">Resume (PDF)</a></li>
+<li><a href="/resume/">Resume</a></li>
 </ul>
-<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+<p>Static site, no tracking or cookies. <a href="https://github.com/samiali38183/samiali38183.github.io">Source</a></p>
 </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>

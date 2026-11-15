@@ -7,26 +7,25 @@
 <meta name="description" content="kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on images with KEV-listed or over-threshold vulnerabilities. 93 tests, 95% coverage.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/kevgate-admit/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="kevgate-admit: Kubernetes admission webhook | Sami Ali">
 <meta property="og:description" content="kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on images with KEV-listed or over-threshold vulnerabilities. 93 tests, 95% coverage.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/kevgate-admit/">
-<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og/kevgate-admit.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta property="og:image:alt" content="kevgate-admit: 5 of 5 weaknesses closed in v0.1.0, each with a test, a CI run or a recorded response.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="kevgate-admit: Kubernetes admission webhook | Sami Ali">
 <meta name="twitter:description" content="kevgate-admit v0.1.0 is a Go admission webhook that denies or warns on images with KEV-listed or over-threshold vulnerabilities. 93 tests, 95% coverage.">
-<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og/kevgate-admit.png">
+<meta name="twitter:image:alt" content="kevgate-admit: 5 of 5 weaknesses closed in v0.1.0, each with a test, a CI run or a recorded response.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-kevgate-admit.css">
-<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -39,23 +38,17 @@
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Project 5 of 7</b> &middot; kevgate-admit &middot; v0.1.0</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
 <header class="title has-hero">
+<p class="crumb"><a href="/projects/">Work</a> <span aria-hidden="true">/</span> Kubernetes security, Go <span class="ver">v0.1.0</span></p>
 <h1>kevgate-admit</h1>
-<dl class="plain">
-<div><dt>What it does</dt><dd>It checks each container image against existing scan reports when a workload is created. Depending on the namespace policy, it denies, warns or allows.</dd></div>
-<div><dt>Why it matters</dt><dd>The decision happens where the workload gets created. It does not scan images itself.</dd></div>
-<div class="pf"><dt>What was found</dt><dd>Going back over the earlier version turned up five weaknesses, such as a malformed image name that was accepted. Version 0.1.0 closes all five, each with a test, a CI run or a recorded response.</dd></div>
-</dl>
-<p class="row cta"><a class="btn" href="#try">Try it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
-<ul class="linkrow"><li><a href="https://github.com/samiali38183/kevgate-admit">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/releases/tag/v0.1.0">Release v0.1.0</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/DESIGN.md">Design notes</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/THREAT_MODEL.md">Threat model</a></li><li><a href="#trace">CI runs</a></li></ul>
+<div class="overview prose"><p>kevgate-admit is a Kubernetes validating admission webhook written in Go. When a workload is created it checks each container image against existing scan reports, using the same risk model as kevgate, and denies, warns or allows according to the namespace policy. It does not scan images itself.</p><p>Going back over the first version turned up five weaknesses: a malformed image reference was accepted, an option could drop a KEV finding, an outage was untested, scan evidence was unauthenticated and there was no published image. v0.1.0 closes all five, each with a test, a CI run or a recorded response. It adds strict image-reference parsing, optional signed scan reports and a signed image on GHCR. 93 tests, 95% coverage.</p><p>In the kind cluster test, five demo workloads gave three denials, one allowed workload and one admitted with a warning in audit mode. The outage test shows that failurePolicy Fail rejects new Pods while the webhook is down and Ignore lets through a Pod the policy would deny. The scan data is synthetic.</p><p>It does not verify image signatures at admission.</p></div>
+<ul class="linkrow"><li><a href="#try">Try it</a></li><li><a href="#limits">Limits</a></li><li><a href="https://github.com/samiali38183/kevgate-admit">Repository</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/releases/tag/v0.1.0">Release v0.1.0</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/DESIGN.md">Design notes</a></li><li><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/docs/THREAT_MODEL.md">Threat model</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 <figure class="hero-fig page-hero"><div class="hero-card"><a class="hero-zoom" href="/assets/img/hero-kevgate-admit.png" aria-label="Open the kevgate-admit result image at full size"><img src="/assets/img/hero-kevgate-admit.png" width="1800" height="1120" alt="Result of the kind cluster test: five demo workloads applied, three denied, one allowed and one admitted with a warning in audit mode, then the outage test showing that failurePolicy Fail rejects new Pods while the webhook is down and Ignore lets a Pod through that the policy would deny." fetchpriority="high" decoding="async"></a></div><figcaption>What the cluster did with five demo workloads and during a webhook outage, from the e2e-kind CI transcript. The scan data is synthetic.</figcaption></figure>
 </header>
@@ -107,15 +100,7 @@ kevgate-admit audit: would deny [maxRisk] registry.example.com/demo/kev-vulnerab
 <figcaption><b>The same image is denied where the namespace enforces, only warned about where it audits, and a malformed reference is rejected before any report is looked up.</b> Recorded, not live: every result is the raw AdmissionReview response of <code>kevgate-admit</code> v0.1.0 (commit 161169a, go version go1.27.4 windows/amd64), started with <code>kevgate-admit serve --self-signed --policy-file deploy/demo/policy.yaml --kev-file deploy/demo/kev-demo.json --evidence-dir deploy/demo/reports</code> and sent one POST per pair, 2026-11-11. The page evaluates no policy; the demo only chooses which recorded response to show. Synthetic demo data and test output, not a cluster run. Regenerate with <code>python scripts/capture_admission_bench.py</code>; <code>node scripts/test_bench_admission.mjs</code> checks that the page shows exactly the stored responses.</figcaption>
 </figure>
 </section>
-<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>Python score on 1000 vectors; synthetic and real Trivy reports; kind in CI</dd></div>
-<div><dt>Before and after</dt><dd><span class="gl">Before</span> Accepted org/../evil; ignoreUnfixed could drop a KEV finding; outage untested; unsigned evidence; no image<br><span class="gl">After</span> v0.1.0: 93 tests, 95.0% coverage, signed image</dd></div>
-<div><dt>Limits</dt><dd>Does not scan images or verify image signatures; synthetic evidence in the demo <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>
-<details class="fold fold-rec"><summary>Technical description and how the check was run: version, reference, date, how to reproduce</summary><p class="dek tech">A Kubernetes validating admission webhook, written in Go. It denies or warns on workloads whose container images carry KEV-listed or over-threshold vulnerabilities, using the same risk model as <a href="/projects/kevgate/">kevgate</a>. Release v0.1.0 adds strict image-reference parsing, optional signed scan reports and a signed image on GHCR.</p>
-<section class="record-head" aria-label="Verification record">
+<details class="fold fold-rec"><summary>How the check was run: version, reference, date, how to reproduce</summary><section class="record-head" aria-label="Verification record">
 <dl>
 <div><dt>Version tested</dt><dd>kevgate-admit v0.1.0, tag commit 161169a (released 2026-11-11)</dd></div>
 <div><dt>Checked against</dt><dd>kevgate&#x27;s Python risk score on 1000 generated vectors; synthetic and one real Trivy report; a kind cluster in CI; distribution/reference for the image-reference grammar</dd></div>
@@ -272,7 +257,7 @@ outage test finished: all checks passed</code></pre></details>
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
-<h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
+<h2 id="limits-h">Limits</h2>
 <ul class="prose">
 <li>It does not verify image signatures at admission. The published image is signed, but the webhook checks nothing about the images it admits beyond their reports. Kyverno <code>verifyImages</code> or the Sigstore policy-controller already do that.</li>
 <li>Report signatures only authenticate the report store. They show that someone holding the key signed the file. They say nothing about whether the scan was right or the image is what it claims.</li>
@@ -287,7 +272,7 @@ outage test finished: all checks passed</code></pre></details>
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
 <details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">9 links</span></summary>
-<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<p class="prose muted">Run states were captured when the site was built.</p>
 <dl class="trace"><div><dt>Release, image build, scan and signature (release, v0.1.0)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43080641309"><span class="st" aria-hidden="true"></span><span>run 43080641309</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Unit tests and lint (ci, main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43081479537"><span class="st" aria-hidden="true"></span><span>run 43081479537</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Kind end to end (e2e-kind, main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43081479456"><span class="st" aria-hidden="true"></span><span>run 43081479456</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Scans (security, main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43081479552"><span class="st" aria-hidden="true"></span><span>run 43081479552</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Outage test, first passing run (e2e-kind, pull request)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/kevgate-admit/actions/runs/43042286763"><span class="st" aria-hidden="true"></span><span>run 43042286763</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Score parity script</dt><dd><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/scripts/gen_parity.py">scripts/gen_parity.py</a></dd></div><div><dt>End-to-end transcript</dt><dd><a href="https://github.com/samiali38183/kevgate-admit/blob/v0.1.0/README.md#end-to-end-transcript">README at v0.1.0</a></dd></div><div><dt>Admission demo capture script</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/capture_admission_bench.py">scripts/capture_admission_bench.py</a></dd></div><div><dt>Admission demo parity test</dt><dd><a href="https://github.com/samiali38183/samiali38183.github.io/blob/main/scripts/test_bench_admission.mjs">scripts/test_bench_admission.mjs</a></dd></div></dl>
 <h3>CI evidence</h3>
 <div class="scroll wide"><table class="tbl">
@@ -306,7 +291,7 @@ outage test finished: all checks passed</code></pre></details>
 </div>
 </details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/kevgate/"><span class="label">Previous project, 4 of 7</span><span class="n">kevgate</span></a><a class="next" href="/projects/fuzzdiff/"><span class="label">Next project, 6 of 7</span><span class="n">fuzzdiff</span></a></nav>
+<nav class="sheets" aria-label="Other projects"><a class="prev" href="/projects/kevgate/"><span class="label">Previous</span><span class="n">kevgate</span></a><a class="next" href="/projects/fuzzdiff/"><span class="label">Next</span><span class="n">fuzzdiff</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">
@@ -315,9 +300,9 @@ outage test finished: all checks passed</code></pre></details>
 <li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
 <li><a href="https://github.com/samiali38183">GitHub</a></li>
 <li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
-<li><a href="/resume.pdf">Resume (PDF)</a></li>
+<li><a href="/resume/">Resume</a></li>
 </ul>
-<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+<p>Static site, no tracking or cookies. <a href="https://github.com/samiali38183/samiali38183.github.io">Source</a></p>
 </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>

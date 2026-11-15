@@ -58,6 +58,9 @@ def expand(ctx: dict, text: str, p: dict | None = None) -> str:
             return B.admit_path()
         if kind == "snapshot":
             return {"figure": B.kev_snapshot_plate}[arg]()
+        if kind == "copy":
+            return {"about": lambda: "".join(f"<p>{esc(x)}</p>" for x in ABOUT), "email": copy_email,
+                    "experience": lambda: "".join(f"<li>{esc(b)}</li>" for b in EXPERIENCE)}[arg]()
         if kind == "kb":
             return f"{round((ROOT / arg).stat().st_size / 1000)} KB"
         if kind == "benchtable":
@@ -147,21 +150,6 @@ def second_hero(p: dict) -> str:
     return hero_fig(p, "hero-second", key="hero2") if "hero2" in p else ""
 
 
-def work_list(plist: list[dict], cls: str = "") -> str:
-    """The project list: number, name, one plain sentence, the reading, and the as found / as left strips."""
-    items = []
-    for p in plist:
-        items.append(
-            f'<li><span class="no" aria-hidden="true">{p["sheet"]:02d}</span>'
-            f'<div class="w-main"><h3><a href="/projects/{p["slug"]}/">{esc(p["name"])}</a> <span class="ver">{esc(ver_of(p))}</span></h3>'
-            f'<p class="w-kind">{esc(p["kind"])}</p>'
-            f'<p class="w-lede">{esc(p["lede"])}</p>'
-            f'<p class="w-res"><span class="w-rl">Result</span> {esc(p["home"]["reading"])}</p></div>'
-            f'<div class="w-viz">{C.strip_rows(p["strip_sets"]["main"], mini=True, vt="strip-" + p["slug"])}</div>'
-            f'{hero_fig(p, "w-hero")}</li>')
-    return f'<ol class="work {cls}">{"".join(items)}</ol>'
-
-
 def reading_chips(ctx: dict, rd: dict) -> str:
     """Verdict stamp and run chips. A recording run that is red by design gets its reason in plain words and a green main-branch run beside it."""
     chips = [C.chip(rd["run"], ctx["runs"], rd.get("run_label"))]
@@ -171,144 +159,150 @@ def reading_chips(ctx: dict, rd: dict) -> str:
     return f'<p class="chips">{C.stamp(*rd["stamp"])} {" ".join(chips)}</p>{note}'
 
 
+# ---------------------------------------------------------------------------------------------
+# Home, work archive and shared copy
+# ---------------------------------------------------------------------------------------------
+EMAIL = "samiali38183@gmail.com"
+LINKEDIN = "https://www.linkedin.com/in/sami-ali-1a4b89345"
+HEADLINE = "Security engineering student building application-security and detection tools, with measured results."
+INTRO = ("I'm a cybersecurity student at George Mason University (B.S. IT, May 2028) who builds application-security and detection tools, "
+         "then measures where they fail. In summer 2026 I worked on the DHS/CBP Vulnerability Assessment Team. "
+         "I'm looking for a Summer 2027 security engineering internship.")
+ABOUT = [
+    "I build security tools for finding and stopping application bugs, and I publish the measurements, including where the tools fail. "
+    "tripline replays recorded attack telemetry through detection rules and fails the build when a rule stops catching it. "
+    "sinkline traces user input to dangerous calls in Python web apps. vulnlab exploits, fixes and detects three web bug classes on localhost. "
+    "At DHS/CBP I matched Tenable scan results against CISA's Known Exploited Vulnerabilities catalog and ranked remediation by exploitation risk. "
+    "I hold Security+ and AWS Cloud Practitioner, and I am studying for OSCP. I am looking for a Summer 2027 security engineering internship."]
+CALL_KETTLE = {
+    "name": "call-kettle", "kind": "AI agent security, Python", "url": "/projects/call-kettle/", "repo": GH + "/call-kettle",
+    "blurb": "Phone receptionist backend (FastAPI, Twilio, Claude tool use) where the model only proposes actions and server code authorizes each one. "
+             "Includes a 48-case adversarial evaluation using a scripted model, 19 boundary-removal tests, an authorization matrix and documented security invariants.",
+    "label": "Scripted model, synthetic data",
+}
+EXPERIENCE = [
+    "Matched Nessus/Tenable scan results against the CISA Known Exploited Vulnerabilities (KEV) catalog to identify high-risk systems and aged findings.",
+    "Designed a risk-based prioritization method weighing KEV status, asset criticality, exposure, EPSS and CVSS, and benchmarked remediation against CISA BOD 26-04 timelines.",
+    "Built a multi-page Power BI dashboard and an executive briefing on actively exploited vulnerabilities for technical and leadership audiences.",
+    "Wrote remediation recommendations aligned with the NIST Cybersecurity Framework.",
+]
+
+
+def copy_email(cls: str = "") -> str:
+    """The visible address plus a Copy button. The button is hidden until site.js runs, so without JavaScript only the text and the mailto link remain."""
+    return (f'<span class="email-copy {cls}"><a class="email" href="mailto:{EMAIL}">{EMAIL}</a> '
+            f'<button type="button" class="copy-email" data-copy-email="{EMAIL}" hidden>Copy</button>'
+            '<span class="copy-status" role="status" aria-live="polite"></span></span>')
+
+
+def figure(p: dict) -> str:
+    """Hero image on a white card, with a one-line label that says what kind of data it is."""
+    h = p["hero"]
+    img = (f'<img src="{h["src"]}" width="{h["w"]}" height="{h["h"]}" alt="{esc(h["alt"], quote=True)}" loading="lazy" decoding="async">')
+    return (f'<figure class="shot"><a class="hero-zoom" href="/projects/{p["slug"]}/" tabindex="-1" aria-hidden="true">'
+            f'<div class="hero-card">{img}</div></a>'
+            f'<figcaption><span class="tag">{esc(p["label"])}</span></figcaption></figure>')
+
+
+def proj_links(p: dict) -> str:
+    links = [("Write-up", f'/projects/{p["slug"]}/'), ("Source", GH + "/" + p["slug"])]
+    for t, u in p["links"]:
+        if t.startswith(("Live coverage report", "Sample HTML report")):
+            links.append(("Live report" if t.startswith("Live") else "Sample report", u))
+    return " ".join(f'<a href="{u}">{t}</a>' for t, u in links)
+
+
 def home(ctx: dict) -> str:
     d = ctx["projects"]
-    t = d["projects"]["tripline"]
-    main = t["strip_sets"]["main"]
-    n = len(d["order"])
-    rows = []
-    for slug in d["order"]:
+    feats = []
+    for i, slug in enumerate(d["home_order"], 1):
         p = d["projects"][slug]
-        sset = p["strip_sets"]["main"]
-        minis = C.strip_rows(sset, mini=True)
-        rows.append(
-            f'<tr><th scope="row" class="name"><a href="/projects/{slug}/">{esc(p["name"])}</a><span class="ver">{esc(p["version"])}</span></th>'
-            f'<td>{esc(p["home"]["against"])}</td><td>{minis}</td>'
-            f'<td class="rd"><b>{esc(p["home"]["reading"])}</b></td><td>{run_chip(ctx, p["home"]["run"])}</td></tr>')
-    ledger = (
-        f'<table class="tbl wt ledger"><caption class="vh">All checks: {n} projects, what each was checked against and the result</caption>'
-        '<thead><tr><th scope="col">Project</th><th scope="col">Checked against</th><th scope="col">Before, then after</th>'
-        '<th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>")
-    ff = []
-    for item in d["failed_first"]:
-        p = d["projects"][item["project"]]
-        ff.append(
-            f'<tr><th scope="row" class="name"><a href="/projects/{item["project"]}/#{item["anchor"]}">{esc(p["name"])}</a></th>'
-            f'<td>{esc(item["text"])}</td><td>{C.stamp(*item["state"])}</td>'
-            f'<td><a href="{item["src"][1]}">{esc(item["src"][0])}</a></td></tr>')
-    head = ('<thead><tr><th scope="col">Project</th><th scope="col">What the check found</th><th scope="col">State</th><th scope="col">Source</th></tr></thead>')
-    failed = ('<table class="tbl wt"><caption class="vh">Problems found, with the source of each item</caption>' + head +
-              "<tbody>" + "".join(ff) + "</tbody></table>")
-    rd = t["reading"]
-    den = f'<span class="den" aria-hidden="true">{esc(rd["den"])}</span>'
-    aria = f'Result: {rd["num"]}{rd["den"]} {rd["unit"]}'
-    return f"""<section class="hero" aria-labelledby="top">
-<h1 id="top">I build security tools, then check them against <span class="hl">something I did not write</span>.</h1>
-<p class="dek">I'm Sami Ali, a student at George Mason University (class of 2028). I write detection rules, code analyzers and vulnerability-ranking tools. Each one is tested against recorded data, an outside benchmark or the original it copies.</p>
-<p class="row cta"><a class="btn" href="#work">See the work</a> <a class="btn alt" href="/resume/">Resume</a> <a class="btn alt" href="mailto:samiali38183@gmail.com">Email me</a></p>
-<p class="email-line">If the button does nothing on your device, my address is <strong>samiali38183@gmail.com</strong> <button type="button" class="copy-email" data-copy-email="samiali38183@gmail.com" hidden>Copy</button></p>
-<dl class="at-a-glance" aria-label="At a glance">
-<div><dt>Looking for</dt><dd>Summer 2027 security internships</dd></div>
-<div><dt>School</dt><dd>George Mason University, class of 2028</dd></div>
-<div><dt>Experience</dt><dd>DHS (CBP) vulnerability assessment intern, summer 2026</dd></div>
-<div><dt>Certifications</dt><dd>Security+, AWS Cloud Practitioner</dd></div>
-<div><dt>Work authorization</dt><dd>U.S. citizen</dd></div>
-</dl>
-<div class="hero-read">
-<p class="reading k-{rd["stamp"][0]}" role="img" aria-label="{esc(aria, quote=True)}"><span aria-hidden="true">{esc(rd["num"])}</span>{den}</p>
-<div>
-<p class="kicker">The short version</p>
-<p class="say">Security teams use detection rules like tripwires: when an attack happens, the rule should raise an alert. I replayed a real recording of one attack against a widely used public rule, and it raised no alert for either of the 2 attack steps. The rule I wrote alerts on both.</p>
-<details class="fold tech"><summary>Technical detail</summary>
-<p class="why">A public SigmaHQ rule is meant to notice a program being set to run with its owner's privileges (setuid and setgid, ATT&amp;CK T1548.001). {esc(rd["caption"])}</p>
-{reading_chips(ctx, rd)}
-</details>
-</div>
-</div>
-<div class="hero-strips">
-{C.key(main)}
-{C.strip_rows(main)}
-</div>
-<p><a class="arrow-link" href="/projects/tripline/#as-found">Read the full results</a></p>
+        feats.append(
+            f'<li class="feat"><div class="feat-text">'
+            f'<p class="meta"><span class="no">{i:02d}</span> {esc(p["kind"])} <span class="ver">{esc(ver_of(p))}</span></p>'
+            f'<h3><a href="/projects/{slug}/">{esc(p["name"])}</a></h3>'
+            f'<p class="blurb">{esc(p["blurb"])}</p>'
+            f'<p class="links">{proj_links(p)}</p></div>{figure(p)}</li>')
+    research = []
+    for slug in ("fuzzdiff", "kev-risk-prioritization"):
+        p = d["projects"][slug]
+        research.append(f'<li><a href="/projects/{slug}/">{esc(p["name"])}</a> <span class="ver">{esc(ver_of(p))}</span><br>{esc(p["lede"])}</li>')
+    bullets = "".join(f"<li>{esc(b)}</li>" for b in EXPERIENCE)
+    return f"""<section class="intro" aria-labelledby="top">
+<h1 id="top">Sami Ali</h1>
+<p class="headline">{esc(HEADLINE)}</p>
+<ul class="facts-strip">
+<li>George Mason University, B.S. Information Technology, expected May 2028</li>
+<li>DHS/CBP Vulnerability Assessment Team intern, summer 2026</li>
+</ul>
+<ul class="actions" aria-label="Resume and links">
+<li><a class="btn" href="/resume.pdf">Resume (PDF)</a></li>
+<li><a class="btn alt" href="https://github.com/samiali38183">GitHub</a></li>
+<li><a class="btn alt" href="{LINKEDIN}">LinkedIn</a></li>
+</ul>
+<p class="email-line">{copy_email()}</p>
+<p class="intro-text">{esc(INTRO)}</p>
 </section>
 
 <section class="section" aria-labelledby="work">
-<div class="sec-head"><h2 id="work">The work</h2><p class="sec-aside">Each project has a one-line summary, a result, and a page with the details. In each pair of strips, the top row is before the fix and the bottom row is after.</p></div>
-{work_list(tier(d, "featured"))}
-<h3 class="also-h" id="also">Smaller projects</h3>
-{work_list(tier(d, "also"), "compact")}
-<p><a class="arrow-link" href="/projects/">All {n} projects</a></p>
+<h2 id="work">Selected work</h2>
+<ol class="feats">{"".join(feats)}</ol>
+<p class="more"><a href="/projects/">Work archive</a>: {len(d["order"]) - len(d["home_order"])} more projects and call-kettle.</p>
 </section>
 
-<section class="section prose" aria-labelledby="skills">
-<h2 id="skills">What I work with</h2>
-<ul class="tags">
-<li>Detection engineering (Sigma, ATT&amp;CK)</li><li>Application security</li><li>Vulnerability management</li><li>Python</li><li>Go</li><li>Rust</li><li>Kubernetes</li><li>CI/CD and GitHub Actions</li><li>Terraform and Helm</li><li>Fuzzing</li><li>Power BI</li>
-</ul>
-</section>
-
-<section class="section prose" aria-labelledby="exp">
+<section class="section" aria-labelledby="exp">
 <h2 id="exp">Experience</h2>
-<p><strong>U.S. Department of Homeland Security (CBP), HS-POWER Program</strong>, Vulnerability Assessment Team analyst intern, May to August 2026. Matched Nessus/Tenable scan results against the CISA KEV catalog, designed a risk-based prioritization method, and built a Power BI dashboard and executive briefing. <a href="/experience/">Details</a></p>
+<div class="entry">
+<p class="entry-h"><strong>Vulnerability Assessment Team analyst intern</strong>, U.S. Department of Homeland Security (CBP), HS-POWER program. Ashburn, VA. Summer 2026.</p>
+<ul>{bullets}</ul>
+<p class="note-line">Work product is not published; the public projects use synthetic or open data. <a href="/experience/">Education and details</a></p>
+</div>
 </section>
 
-<section class="section prose" aria-labelledby="certs">
-<h2 id="certs">Education and certifications</h2>
-<ul>
-<li>B.S. Information Technology, Cybersecurity Minor, George Mason University, expected May 2028</li>
-<li>CompTIA Security+ and AWS Certified Cloud Practitioner</li>
-<li>In progress: OSCP and AWS Certified Security - Specialty</li>
-</ul>
+<section class="section" aria-labelledby="research">
+<h2 id="research">Additional research</h2>
+<ul class="plain-list">{"".join(research)}</ul>
 </section>
 
-<section class="section prose" aria-labelledby="terms">
-<h2 id="terms">Terms used on this site</h2>
-<details class="fold"><summary>Plain definitions, for anyone not working in security</summary>
-<dl class="terms">
-<div><dt>Detection rule</dt><dd>A rule that watches system activity and raises an alert when it matches a known attack pattern.</dd></div>
-<div><dt>Sigma</dt><dd>A shared, open format for writing detection rules so they work across different security tools.</dd></div>
-<div><dt>MITRE ATT&amp;CK</dt><dd>A public catalog of attacker techniques, each with an ID such as T1548.001.</dd></div>
-<div><dt>CI (continuous integration)</dt><dd>Automatic checks that run every time code changes. A failed check blocks the change.</dd></div>
-<div><dt>CISA KEV</dt><dd>The U.S. government's list of vulnerabilities that attackers are known to be exploiting right now.</dd></div>
-<div><dt>CVSS and EPSS</dt><dd>Two scores for vulnerabilities: how severe one is (CVSS) and how likely it is to be exploited (EPSS).</dd></div>
-<div><dt>Fuzzing</dt><dd>Feeding a program large amounts of odd input to see whether it breaks or behaves differently.</dd></div>
-<div><dt>Kubernetes</dt><dd>Software that runs and manages containerized applications across many machines.</dd></div>
+<section class="section" aria-labelledby="edu">
+<h2 id="edu">Education and certifications</h2>
+<dl class="facts">
+<dt>George Mason University</dt><dd>B.S. Information Technology, Cybersecurity Minor. Expected May 2028.</dd>
+<dt>Northern Virginia Community College</dt><dd>A.S. Information Technology, May 2026.</dd>
+<dt>Certifications</dt><dd>CompTIA Security+ (SY0-701), AWS Certified Cloud Practitioner. Studying for OSCP.</dd>
 </dl>
-</details>
 </section>
 
-<section class="section" aria-labelledby="ev">
-<div class="sec-head"><h2 id="ev">The evidence</h2></div>
-<p class="ledger-note">Every number above comes from these two tables and the CI runs they link to. Both tables are complete. They start closed to keep the page short.</p>
-<details class="fold fold-main fold-ev"><summary><span class="label sec-label">All checks</span><span class="fold-t" id="rec">What each of the {n} projects was checked against</span><span class="fold-hint">The strips use the same units as each project page, cut down to at most 24 ticks. Top row is before, bottom row is after.</span></summary>
-{ledger}
-</details>
-<details class="fold fold-main fold-ev"><summary><span class="label sec-label">Problems found</span><span class="fold-t" id="ff">{len(ff)} problems, each copied from the repository text it links to</span><span class="fold-hint">What was broken or missing before the fix.</span></summary>
-{failed}
-</details>
+<section class="section" aria-labelledby="contact">
+<h2 id="contact">Contact</h2>
+<p class="contact-line">{copy_email("big")}</p>
+<p><a href="https://github.com/samiali38183">github.com/samiali38183</a> &middot; <a href="{LINKEDIN}">LinkedIn</a> &middot; <a href="/resume.pdf">Resume (PDF)</a></p>
 </section>"""
+
+
+def archive_row(name: str, url: str, kind: str, ver: str, blurb: str, label: str, links: str) -> str:
+    ver_html = f' <span class="ver">{esc(ver)}</span>' if ver else ""
+    return (f'<li class="arow"><div class="a-head"><h3><a href="{url}">{esc(name)}</a></h3>'
+            f'<p class="meta">{esc(kind)}{ver_html}</p></div>'
+            f'<div class="a-body"><p class="blurb">{esc(blurb)}</p><p class="meta"><span class="tag">{esc(label)}</span></p>'
+            f'<p class="links">{links}</p></div></li>')
 
 
 def projects_index(ctx: dict) -> str:
     d = ctx["projects"]
-    return f"""<h1>Projects</h1>
-<p class="dek">Seven projects. Each was checked against something other than my own opinion, and the result is on its row. The table with every reference and CI run is on the <a href="/#rec">home page</a>.</p>
-<section aria-labelledby="featured">
-<h2 id="featured">Featured</h2>
-{work_list(tier(d, "featured"))}
-</section>
-<section class="section" aria-labelledby="also">
-<h2 id="also">Also</h2>
-{work_list(tier(d, "also"), "compact")}
-</section>
-<section class="section prose" aria-labelledby="other">
-<h2 id="other">Other repositories</h2>
-<p class="muted">Also public.</p>
-<ul>
-<li><a href="https://github.com/samiali38183/call-kettle">call-kettle</a>: phone receptionist backend with booking rules enforced in code and per-tenant limits. A sanitized snapshot; no customers.</li>
-<li><a href="https://github.com/samiali38183/focuslog">focuslog</a>: a single-file Pomodoro timer and session log.</li>
-</ul>
-</section>"""
+    rows = []
+    for slug in d["order"]:
+        p = d["projects"][slug]
+        if slug in d["home_order"]:
+            continue
+        rows.append(archive_row(p["name"], f"/projects/{slug}/", p["kind"], ver_of(p), p["blurb"], p["label"], proj_links(p)))
+    ck = CALL_KETTLE
+    rows.append(archive_row(ck["name"], ck["url"], ck["kind"], "", ck["blurb"], ck["label"],
+                            f'<a href="{ck["url"]}">Write-up</a> <a href="{ck["repo"]}">Source</a>'))
+    feat = ", ".join(f'<a href="/projects/{s}/">{esc(d["projects"][s]["name"])}</a>' for s in d["home_order"])
+    return f"""<h1>Work archive</h1>
+<p class="dek">Projects that are not featured on the <a href="/">home page</a>. Featured: {feat}.</p>
+<ol class="archive">{"".join(rows)}</ol>"""
 
 
 # ---------------------------------------------------------------------------------------------
@@ -355,22 +349,10 @@ def fold_long(html: str) -> str:
     return "".join(out)
 
 
-def glance(p: dict) -> str:
-    h = p["home"]
-    return f"""<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>{esc(h["against"])}</dd></div>
-<div><dt>Before and after</dt><dd><span class="gl">Before</span> {esc(h["found"])}<br><span class="gl">After</span> {esc(h["left"])}</dd></div>
-<div><dt>Limits</dt><dd>{esc(h["tolerance"])} <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>"""
-
-
 def record_head(p: dict, dek: str) -> str:
     r = p["record"]
     repro = "\n".join(r["reproduce"])
-    inner = f"""<p class="dek tech">{dek}</p>
-<section class="record-head" aria-label="Verification record">
+    inner = f"""<section class="record-head" aria-label="Verification record">
 <dl>
 <div><dt>Version tested</dt><dd>{esc(r["instrument"])}</dd></div>
 <div><dt>Checked against</dt><dd>{esc(r["reference"])}</dd></div>
@@ -379,7 +361,7 @@ def record_head(p: dict, dek: str) -> str:
 <div class="full"><dt>Reproduce</dt><dd><pre data-copy data-label="{esc(r["reproduce_label"])}"><code>{esc(repro)}</code></pre></dd></div>
 </dl>
 </section>"""
-    return fold("Technical description and how the check was run: version, reference, date, how to reproduce", inner, "fold-rec")
+    return fold("How the check was run: version, reference, date, how to reproduce", inner, "fold-rec")
 
 
 def reading_band(ctx: dict, p: dict) -> str:
@@ -408,7 +390,7 @@ def trace(ctx: dict, p: dict, extra: str) -> str:
         else:
             val = f'<a href="{t[2]}">{esc(t[3])}</a>'
         items.append(f'<div><dt>{esc(t[0])}</dt><dd>{val}</dd></div>')
-    body = f"""<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+    body = f"""<p class="prose muted">Run states were captured when the site was built.</p>
 <dl class="trace">{"".join(items)}</dl>
 {extra}"""
     return f"""<section class="section fold-sec" id="trace" aria-labelledby="trace-h">
@@ -425,11 +407,11 @@ def sheets(ctx: dict, p: dict) -> str:
     prev = nxt = ""
     if i > 0:
         q = d["projects"][order[i - 1]]
-        prev = f'<a class="prev" href="/projects/{q["slug"]}/"><span class="label">Previous project, {q["sheet"]} of {len(order)}</span><span class="n">{esc(q["name"])}</span></a>'
+        prev = f'<a class="prev" href="/projects/{q["slug"]}/"><span class="label">Previous</span><span class="n">{esc(q["name"])}</span></a>'
     if i < len(order) - 1:
         q = d["projects"][order[i + 1]]
-        nxt = f'<a class="next" href="/projects/{q["slug"]}/"><span class="label">Next project, {q["sheet"]} of {len(order)}</span><span class="n">{esc(q["name"])}</span></a>'
-    return f'<nav class="sheets" aria-label="Sheets">{prev}{nxt}</nav>'
+        nxt = f'<a class="next" href="/projects/{q["slug"]}/"><span class="label">Next</span><span class="n">{esc(q["name"])}</span></a>'
+    return f'<nav class="sheets" aria-label="Other projects">{prev}{nxt}</nav>'
 
 
 def project_page(ctx: dict, slug: str) -> str:
@@ -452,30 +434,28 @@ def project_page(ctx: dict, slug: str) -> str:
 {after}<figcaption>{ex(f["bench-cap"])}</figcaption>
 </figure>
 </section>"""
-    pl = p["plain"]
     tr = p["try"]
     has_bench = "bench" in f
-    try_btn = f'<a class="btn" href="#try">{esc(tr["kind"])}</a> ' if has_bench else ""
     if has_bench:
         bench = bench.replace('<section class="bench"', f'<section class="bench" id="try"', 1)
         bench = (f'<div class="try-head"><h2>{esc(tr["kind"])}</h2><p>{esc(tr["text"])}</p></div>\n' + bench)
+    overview = "".join(f"<p>{esc(x)}</p>" for x in p["overview"])
+    jump = []
+    if has_bench:
+        jump.append(f'<li><a href="#try">{esc(tr["kind"])}</a></li>')
+    jump.append('<li><a href="#limits">Limits</a></li>')
     return f"""<div class="sheet">
 <header class="title has-hero">
+<p class="crumb"><a href="/projects/">Work</a> <span aria-hidden="true">/</span> {esc(p["kind"])} <span class="ver">{esc(ver_of(p))}</span></p>
 <h1>{esc(p["name"])}</h1>
-<dl class="plain">
-<div><dt>What it does</dt><dd>{esc(pl["what"])}</dd></div>
-<div><dt>Why it matters</dt><dd>{esc(pl["why"])}</dd></div>
-<div class="pf"><dt>What was found</dt><dd>{esc(pl["found"])}</dd></div>
-</dl>
-<p class="row cta">{try_btn}<a class="btn alt" href="#limits">Read the limits</a></p>
-<ul class="linkrow">{links}</ul>
+<div class="overview prose">{overview}</div>
+<ul class="linkrow">{"".join(jump)}{links}</ul>
 {note}
 {hero_fig(p, "page-hero", eager=True)}
 </header>
 {reading_band(ctx, p)}
 {second_hero(p)}
 {bench}
-{glance(p)}
 {record_head(p, ex(f["dek"]))}
 <article class="record">
 <section class="section" id="as-found" aria-labelledby="found-h">
@@ -495,7 +475,7 @@ def project_page(ctx: dict, slug: str) -> str:
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
-<h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
+<h2 id="limits-h">Limits</h2>
 {ex(f["limits"])}
 </section>
 {trace(ctx, p, ex(f.get("trace", "")))}
