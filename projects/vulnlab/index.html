@@ -63,7 +63,7 @@
 
 **A lab of three small vulnerable web services that run only on localhost. Each bug is exploited, fixed, scanned by a static analyzer and matched by a log detection rule, and the results of all four are recorded.**
 
-![Table for three labs (SSRF via redirect, SQL injection, IDOR). Proof and fix: 26, 9 and 37 lab tests pass. sinkline scan on vulnerable and fixed code: 1 and 1 findings for SSRF and SQL injection (a correct finding, then a false alarm on the fix), 0 and 0 for IDOR because it is not a taint flow. Sigma log rule: 1 alert on the attack log and 0 on the benign log for all three." fetchpriority="high" decoding="async"></a></div><figcaption>All 137 tests pass. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where my static analyzer gets it wrong are left in and written up.</figcaption></figure>
+![Table for three labs (SSRF via redirect, SQL injection, IDOR). Proof and fix: 26, 9 and 37 lab tests pass. sinkline scan on vulnerable and fixed code: 1 and 1 findings for SSRF and SQL injection (a correct finding, then a false alarm on the fix), 0 and 0 for IDOR because it is not a taint flow. Sigma log rule: 1 alert on the attack log and 0 on the benign log for all three." fetchpriority="high" decoding="async"></a></div><figcaption>All 137 tests pass. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where the static analyzer (sinkline) gets it wrong are left in and written up.</figcaption></figure>
 </header>
 <section class="reading-band" aria-label="The result">
 <div class="hero-read">
