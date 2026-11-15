@@ -1015,7 +1015,7 @@
     "w": 1800,
     "h": 1100,
     "alt": "ci](https://github.com/samiali38183/kevgate/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/ci.yml)\n[![security](https://github.com/samiali38183/kevgate/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/security.yml)\n[![deploy-kind](https://github.com/samiali38183/kevgate/actions/workflows/deploy-kind.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/deploy-kind.yml)\n[![terraform](https://github.com/samiali38183/kevgate/actions/workflows/terraform.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/terraform.yml)\n\n**kevgate turns a vulnerability scanner export into a fix-first list, putting the flaws attackers are known to exploit at the top, and ships with the security pipeline a production service needs.**\n\n![Two panels. Left: ranking weights read from the code, 0.40 for being in CISA's Known Exploited Vulnerabilities list, 0.25 asset importance, 0.20 exploit likelihood (EPSS), 0.20 severity (CVSS). Right: 12 checks all green on the latest main run, including 277 tests at 99.92% branch coverage, Semgrep, Bandit, gitleaks, pip-audit, checkov, Trivy, a kind cluster deploy with NetworkPolicy and Pod Security checks, and an OWASP ZAP scan.",
-    "caption": "277 tests at 99.92% branch coverage, plus 11 more checks (type checks, scanners, a cluster deploy), all green on main. Weights are my own choice and have not been tested against remediation outcomes.",
+    "caption": "277 tests at 99.92% branch coverage, plus 11 more checks (type checks, scanners, a cluster deploy), all green on main. The weights are hand-picked and have not been tested against remediation outcomes.",
     "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/hero.png"
    }
   },
@@ -1813,7 +1813,7 @@
     "w": 1800,
     "h": 1100,
     "alt": "ci](https://github.com/samiali38183/vulnlab/actions/workflows/ci.yml/badge.svg)](https://github.com/samiali38183/vulnlab/actions/workflows/ci.yml)\n![python](https://img.shields.io/badge/python-3.12-blue)\n![license](https://img.shields.io/badge/license-MIT-lightgrey)\n\n**A lab of three small vulnerable web services that run only on localhost. Each bug is exploited, fixed, scanned by a static analyzer and matched by a log detection rule, and the results of all four are recorded.**\n\n![Table for three labs (SSRF via redirect, SQL injection, IDOR). Proof and fix: 26, 9 and 37 lab tests pass. sinkline scan on vulnerable and fixed code: 1 and 1 findings for SSRF and SQL injection (a correct finding, then a false alarm on the fix), 0 and 0 for IDOR because it is not a taint flow. Sigma log rule: 1 alert on the attack log and 0 on the benign log for all three.",
-    "caption": "All 137 tests pass. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where my static analyzer gets it wrong are left in and written up.",
+    "caption": "All 137 tests pass. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where the static analyzer (sinkline) gets it wrong are left in and written up.",
     "full": "https://github.com/samiali38183/vulnlab/blob/main/docs/img/hero.png"
    }
   }
