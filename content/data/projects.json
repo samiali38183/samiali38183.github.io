@@ -855,8 +855,8 @@
    "sheet": 4,
    "kind": "Vulnerability management and DevSecOps",
    "title": "kevgate: KEV-ranked vulnerability intake | Sami Ali",
-   "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. Six surviving mutants killed, 277 tests, a 16-control matrix mapped to tests.",
-   "fact": "A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. 277 tests at v0.1.1.",
+   "desc": "kevgate ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. On a real scan, all 10 exploited findings land in the top 10. v0.1.1: 277 tests; main: 298.",
+   "fact": "A small API that turns scanner findings into a remediation queue ranked by CISA KEV, EPSS, CVSS and asset criticality, shipped with a container, Helm chart, Terraform and a CI security pipeline. v0.1.1: 277 tests; main: 298.",
    "labels": {
     "found": "Before",
     "left": "After"
@@ -919,10 +919,10 @@
    },
    "home": {
     "against": "Its own six surviving mutants and 16 controls; kind cluster in CI",
-    "reading": "6 of 6 mutants killed",
+    "reading": "All 10 exploited flaws in the top 10 of 1,112 findings; a CVSS sort puts the first at about rank 40",
     "run": "42960808156",
     "found": "Six mutants survived 227 tests",
-    "left": "Six killed; 277 tests",
+    "left": "Six killed; v0.1.1: 277 tests; main: 298",
     "tolerance": "Demonstration scope: one replica, SQLite, LocalStack only"
    },
    "links": [
@@ -933,6 +933,10 @@
     [
      "Release v0.1.1",
      "https://github.com/samiali38183/kevgate/releases/tag/v0.1.1"
+    ],
+    [
+     "Real-data run",
+     "https://github.com/samiali38183/kevgate/tree/main/docs/real-run"
     ],
     [
      "Hardening PR #2",
@@ -996,6 +1000,12 @@
      "link",
      "/assets/data/kevgate-bench.json",
      "assets/data/kevgate-bench.json"
+    ],
+    [
+     "Real-data run, sources and limits",
+     "link",
+     "https://github.com/samiali38183/kevgate/blob/main/docs/real-run/README.md",
+     "docs/real-run/README.md"
     ]
    ],
    "commit": "973c8c1",
@@ -1004,19 +1014,29 @@
    "plain": {
     "what": "A small service that ranks scanner findings by CISA KEV listing, EPSS, CVSS and how critical the asset is. It ships with a container, a Helm chart, Terraform and a CI pipeline.",
     "why": "The point is to show what shipping a small service carefully looks like: authentication, rate limits, hardened containers, and CI that tests those controls.",
-    "found": "Six defects had survived the 227 tests. Tests were added until each one fails when the defect is put back. The suite is now 277 tests."
+    "found": "On a real scan of four old public container images, 10 of the 1,112 findings are on CISA's list of flaws attackers are exploiting. Sorted by severity score alone, the first of them lands at about rank 40 on average and the 10 average rank 246; kevgate puts all 10 in the top 10. That is partly by design, since the exploited list is one of its inputs. It is one run, with hand-chosen weights and assumed asset importance."
    },
    "try": {
     "kind": "See it",
     "text": "Click a control to see the code and the CI checks behind it."
    },
    "hero": {
+    "src": "/assets/img/hero-kevgate-real-run.png",
+    "w": 1800,
+    "h": 1020,
+    "alt": "Left: for each of the 10 exploited findings, the grey marker shows where a CVSS-only sort puts it, between about rank 2 and rank 610, and the red dot shows kevgate's rank, 1 to 10. Right: exploited findings found in the top 10, 25, 50 and 100 positions, CVSS only 0.15, 0.4, 0.86 and 1.75, kevgate 10 each.",
+    "caption": "A real scan of four old public container images: 10 of the 1,112 findings are on CISA's list of flaws being exploited. A CVSS sort puts the first of them at about rank 40 on average; kevgate puts all 10 in the top 10. That is partly by design, since the list is an input to the score. It is one run, with hand-chosen weights and assumed asset importance.",
+    "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/real-run.png",
+    "label": "real-data"
+   },
+   "hero2": {
     "src": "/assets/img/hero-kevgate.png",
     "w": 1800,
     "h": 1100,
-    "alt": "ci](https://github.com/samiali38183/kevgate/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/ci.yml)\n[![security](https://github.com/samiali38183/kevgate/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/security.yml)\n[![deploy-kind](https://github.com/samiali38183/kevgate/actions/workflows/deploy-kind.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/deploy-kind.yml)\n[![terraform](https://github.com/samiali38183/kevgate/actions/workflows/terraform.yml/badge.svg?branch=main)](https://github.com/samiali38183/kevgate/actions/workflows/terraform.yml)\n\n**kevgate turns a vulnerability scanner export into a fix-first list, putting the flaws attackers are known to exploit at the top, and ships with the security pipeline a production service needs.**\n\n![Two panels. Left: ranking weights read from the code, 0.40 for being in CISA's Known Exploited Vulnerabilities list, 0.25 asset importance, 0.20 exploit likelihood (EPSS), 0.20 severity (CVSS). Right: 12 checks all green on the latest main run, including 277 tests at 99.92% branch coverage, Semgrep, Bandit, gitleaks, pip-audit, checkov, Trivy, a kind cluster deploy with NetworkPolicy and Pod Security checks, and an OWASP ZAP scan.",
-    "caption": "277 tests at 99.92% branch coverage, plus 11 more checks (type checks, scanners, a cluster deploy), all green on main. The weights are hand-picked and have not been tested against remediation outcomes.",
-    "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/hero.png"
+    "alt": "Two panels. Left: ranking weights read from the code, 0.40 for being in CISA's Known Exploited Vulnerabilities list, 0.25 asset importance, 0.20 exploit likelihood (EPSS), 0.20 severity (CVSS). Right: 12 checks all green on the latest main run at v0.1.1, including 277 tests at 99.92% branch coverage, Semgrep, Bandit, gitleaks, pip-audit, checkov, Trivy, a kind cluster deploy with NetworkPolicy and Pod Security checks, and an OWASP ZAP scan.",
+    "caption": "The engineering checks at v0.1.1: 277 tests at 99.92% branch coverage, plus 11 more checks (type checks, scanners, a cluster deploy), all green. v0.1.1: 277 tests; main: 298.",
+    "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/hero.png",
+    "label": "engineering checks"
    }
   },
   "kevgate-admit": {

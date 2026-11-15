@@ -4,7 +4,7 @@
 Usage:
   python scripts/check_facts.py --clones DIR [--venv tripline=PATH ...] [--go GOBIN]
 
-DIR holds fresh clones named tripline, sinkline, kevgate, kevgate-admit, vulnlab and kev-risk-prioritization.
+DIR holds fresh clones named tripline, sinkline, kevgate (at the latest release tag), kevgate-main (at main), kevgate-admit, vulnlab and kev-risk-prioritization.
 --venv gives the virtualenv directory (with the project installed with its dev extras) for a Python
 project; without it the current interpreter is used. Needs git, the gh CLI (authenticated) and Go.
 Exit code 1 if any check fails.
@@ -423,10 +423,36 @@ def kevgate_checks(clones: Path, venvs: dict[str, str]) -> None:
     expect("kevgate matrix control count", str(len(data["controls"])), page, f"Every one of {len(data['controls'])} controls")
     expect("kevgate matrix cited tests", str(data["meta"]["tests_cited"]), page, f"{data['meta']['tests_cited']} cited tests")
     expect("kevgate matrix collected tests", str(data["meta"]["tests_total"]), page, f"of {data['meta']['tests_total']} collected")
+    kevgate_main_checks(clones, py, page)
     all_html = "".join(x.read_text(encoding="utf-8") for x in SITE.rglob("*.html") if "content" not in x.parts)
     for rid in sorted(set(re.findall(r"github\.com/samiali38183/kevgate/actions/runs/(\d+)", all_html))):
         r = gh(f"repos/samiali38183/kevgate/actions/runs/{rid}")
         results.append((r.get("conclusion") == "success", f"CI run kevgate/{rid}: workflow {r.get('name')!r} conclusion={r.get('conclusion')} sha={r.get('head_sha', '')[:7]}"))
+
+
+def kevgate_main_checks(clones: Path, py: str, page: str) -> None:
+    """The v0.1.1 sheet also cites kevgate main: its test count and the real-data run (docs/real-run/results.json).
+    Needs a second clone named kevgate-main at main; the tag clone cannot answer these. Fails, and says so, if it is absent."""
+    km = clones / "kevgate-main"
+    if not km.exists():
+        results.append((False, "kevgate-main clone (main) is missing: cannot verify 'main: N tests' or the real-data run numbers"))
+        return
+    env = {**os.environ, "PYTHONPATH": str(km / "src")}
+    out = subprocess.run([py, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"], cwd=km, capture_output=True, text=True, env=env).stdout
+    m = re.search(r"(\d+) tests? collected", out)
+    nm = int(m.group(1)) if m else sum(int(x) for x in re.findall(r": (\d+)$", out, re.M))
+    expect("kevgate tests on main", f"main: {nm}", page)
+    expect("kevgate tests on main, resume page", f"main: {nm}", "resume/index.html")
+    r = json.loads((km / "docs/real-run/results.json").read_text(encoding="utf-8"))
+    c = r["cvss_only"]
+    text = text_of(page)
+    for label, want in [("findings", f"{r['findings_total']:,}"), ("exploited findings", f"{r['kev_findings']} of the {r['findings_total']:,}"),
+                        ("first at rank", f"about rank {round(c['mean_first_kev_rank'])}"), ("mean rank", f"rank {round(c['mean_rank_of_kev'])}"),
+                        ("kevgate in top 10", f"all {r['equal_acr']['kev_in_top']['10']} in the top 10")]:
+        results.append((want in text, f"kevgate real-run {label}: {want!r} on the page"))
+    ranks = r["equal_acr"]["kev_ranks"]
+    results.append((max(ranks) == 10 and r["equal_acr"]["kev_in_top"]["10"] == r["kev_findings"] == 10, "kevgate real-run: all 10 KEV findings rank 1 to 10 in results.json"))
+    expect("kevgate real-run home line", f"All {r['kev_findings']} exploited flaws in the top 10 of {r['findings_total']:,} findings; a CVSS sort puts the first at about rank {round(c['mean_first_kev_rank'])}", "index.html")
 
 
 def main() -> int:
