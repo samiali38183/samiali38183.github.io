@@ -132,14 +132,19 @@ def tier(d: dict, name: str) -> list[dict]:
     return [d["projects"][s] for s in d["order"] if d["projects"][s]["tier"] == name]
 
 
-def hero_fig(p: dict, cls: str, eager: bool = False, link: bool = True) -> str:
+def hero_fig(p: dict, cls: str, eager: bool = False, link: bool = True, key: str = "hero") -> str:
     """The project's hero image on a neutral card (the PNGs have a white background). Width and height reserve the space."""
-    h = p["hero"]
+    h = p[key]
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
     img = (f'<img src="{h["src"]}" width="{h["w"]}" height="{h["h"]}" alt="{esc(h["alt"], quote=True)}" {load} decoding="async">')
     if link:
-        img = f'<a class="hero-zoom" href="{h["src"]}" aria-label="Open the {esc(p["name"], quote=True)} result image at full size">{img}</a>'
+        img = f'<a class="hero-zoom" href="{h["src"]}" aria-label="Open the {esc(p["name"], quote=True)} {esc(h.get("label", "result"), quote=True)} image at full size">{img}</a>'
     return f'<figure class="hero-fig {cls}"><div class="hero-card">{img}</div><figcaption>{esc(h["caption"])}</figcaption></figure>'
+
+
+def second_hero(p: dict) -> str:
+    """An optional second image below the reading band, for pages whose lead image is not the engineering evidence."""
+    return hero_fig(p, "hero-second", key="hero2") if "hero2" in p else ""
 
 
 def work_list(plist: list[dict], cls: str = "") -> str:
@@ -468,6 +473,7 @@ def project_page(ctx: dict, slug: str) -> str:
 {hero_fig(p, "page-hero", eager=True)}
 </header>
 {reading_band(ctx, p)}
+{second_hero(p)}
 {bench}
 {glance(p)}
 {record_head(p, ex(f["dek"]))}
