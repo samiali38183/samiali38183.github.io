@@ -1,41 +1,10 @@
 <div class="resume-sheet">
 <h1>Resume</h1>
-<p class="dek">Two one-page versions, both text-searchable PDFs.</p>
+<p class="dek">Two one-page PDFs with the same experience and education.</p>
 <div class="dl-row">
-<a class="btn" href="/resume.pdf">Security Engineering resume (PDF, {{kb:resume.pdf}})</a>
-<a class="btn alt" href="/resume-red-team.pdf">Red Team version (PDF, {{kb:resume-red-team.pdf}})</a>
+<a class="btn" href="/resume.pdf">Security Engineering (PDF, {{kb:resume.pdf}})</a>
+<a class="btn alt" href="/resume-red-team.pdf">Red Team (PDF, {{kb:resume-red-team.pdf}})</a>
 </div>
-<p class="small muted prose">The Red Team version has the same experience and education. It leads with vulnlab, then tripline's evasion measurements and sinkline's benchmark, and leaves out the kevgate pipeline. The text below has the same facts as the PDFs.</p>
-
-<section class="section" aria-labelledby="edu">
-<h2 id="edu">Education</h2>
-<ul class="prose">
-<li>George Mason University, B.S. Information Technology, Cybersecurity Minor. Expected May 2028.</li>
-<li>Northern Virginia Community College, A.S. Information Technology, May 2026. GPA 3.7.</li>
-</ul>
-</section>
-<section class="section" aria-labelledby="exp">
-<h2 id="exp">Experience</h2>
-<p class="prose"><strong>U.S. Department of Homeland Security (CBP), HS-POWER Program</strong>, Vulnerability Assessment Team analyst intern, Ashburn, VA, May 2026 to August 2026. <a href="/experience/">Bullets on the experience page.</a></p>
-</section>
-<section class="section" aria-labelledby="proj">
-<h2 id="proj">Projects</h2>
-<ul class="prose">
-<li><a href="/projects/tripline/">tripline</a> (v0.3.0): detection-as-code quality gate in Python. Compiles Sigma rules to Python predicates, replays recorded telemetry for 14 ATT&amp;CK techniques, fails pull requests when an expected rule stops firing. 212 tests; 13 scenarios passing, 1 pending; 98% prevalence-weighted coverage, 52% on unmodified SigmaHQ rules alone; 200 of 251 evasion variants caught, 2 false-positive matches on 675 benign events. Reading: the stock SigmaHQ setuid rule flagged 0 of the 2 attack events among 36 recorded events; the replacement flags both. Recording run, red because the stock rule missed the attack: {{run:41838714456}}; latest passing run on main: {{run:43100952362}}</li>
-<li><a href="/projects/sinkline/">sinkline</a> (v0.5.1): static analyzer for Python web apps. Interprocedural taint analysis, 43 rules and 151 sink signatures mapped to OWASP Top 10 and CWE, SARIF output, GitHub Action, no dependencies, 184 tests. On OWASP BenchmarkPython v0.1 (10 taint categories) it scores +0.52 TPR minus FPR (0.4.1: +0.21; Bandit +0.07), but the fixes were chosen from the 0.4.1 failures, and over all 14 categories Bandit leads, +0.36 to +0.27. {{run:43136290658}}</li>
-<li><a href="/projects/kevgate/">kevgate</a> (v0.1.1): FastAPI vulnerability-intake service ranking findings by CISA KEV, EPSS, CVSS and asset criticality. Hashed scoped API keys, rate limiting, JSON logs, Prometheus metrics, container, Helm chart, Terraform validated against LocalStack, and a GitHub Actions security pipeline. v0.1.1: 277 tests; main: 298. {{run:42960808156}}</li>
-</ul>
-</section>
-<section class="section" aria-labelledby="skills">
-<h2 id="skills">Skills</h2>
-<p class="prose">Python. Sigma, MITRE ATT&amp;CK, Atomic Red Team, taint analysis and SAST, OWASP Top 10, Nessus/Tenable, CISA KEV, EPSS and CVSS, NIST CSF. AWS fundamentals, Docker, Kubernetes and Helm (kind in CI), Terraform, GitHub Actions, Prometheus. Git, pytest, Power BI, Wireshark, Linux.</p>
-</section>
-<section class="section" aria-labelledby="cert">
-<h2 id="cert">Certifications</h2>
-<p class="prose">CompTIA Security+, AWS Certified Cloud Practitioner. In progress: AWS Certified Security - Specialty, OSCP.</p>
-</section>
-<section class="section" aria-labelledby="contact">
-<h2 id="contact">Contact</h2>
-<p class="prose"><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a>, <a href="https://www.linkedin.com/in/sami-ali-1a4b89345">linkedin.com/in/sami-ali-1a4b89345</a>, <a href="https://github.com/samiali38183">github.com/samiali38183</a>. U.S. citizen.</p>
-</section>
+<p class="prose">The Red Team version leads with vulnlab, then tripline's evasion measurements and sinkline's benchmark, and leaves out kevgate.</p>
+<p class="prose">Contact: {{copy:email}}</p>
 </div>

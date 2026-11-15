@@ -80,7 +80,7 @@ def fuzzdiff_checks(clones: Path) -> None:
     page = "projects/fuzzdiff/index.html"
     tag = gh("repos/samiali38183/fuzzdiff/releases/latest")["tag_name"]
     expect("fuzzdiff latest release", tag, page)
-    expect("fuzzdiff latest release on home", tag, "index.html")
+    expect("fuzzdiff latest release on the archive page", tag, "projects/index.html")
     sha = run(["git", "rev-list", "-n1", "v0.2.0"], fz).strip()
     expect("fuzzdiff v0.2.0 tag commit", sha[:7], page)
 
@@ -164,7 +164,7 @@ def kev_risk_checks(clones: Path, venvs: dict[str, str]) -> None:
     py = pybin(venvs, "kev", "python")
     tag = gh("repos/samiali38183/kev-risk-prioritization/releases/latest")["tag_name"]
     expect("kev-risk latest release", tag, page)
-    expect("kev-risk latest release on home", tag, "index.html")
+    expect("kev-risk latest release on the archive page", tag, "projects/index.html")
     head = run(["git", "rev-parse", "HEAD"], kr).strip()
     tagsha = run(["git", "rev-list", "-n1", tag], kr).strip()
     results.append((head == tagsha, f"kev-risk clone HEAD {head[:7]} is the {tag} commit {tagsha[:7]}"))
@@ -254,7 +254,7 @@ def admit_checks(clones: Path, env_go: str) -> None:
     ka = clones / "kevgate-admit"
     tag = gh("repos/samiali38183/kevgate-admit/releases/latest")["tag_name"]
     expect("kevgate-admit latest release", tag, page)
-    expect("kevgate-admit latest release on home", tag, "index.html")
+    expect("kevgate-admit latest release on the archive page", tag, "projects/index.html")
     tagsha = run(["git", "rev-list", "-n1", tag], ka).strip()
     head = run(["git", "rev-parse", "HEAD"], ka).strip()
     results.append((head == tagsha, f"kevgate-admit clone HEAD {head[:7]} is the {tag} commit {tagsha[:7]}"))
@@ -277,7 +277,7 @@ def admit_checks(clones: Path, env_go: str) -> None:
     cov = run([env_go, "tool", "cover", "-func=c.out"], ka).strip().splitlines()[-1]
     m = re.search(r"([\d.]+)%", cov)
     expect("kevgate-admit coverage", m.group(1) + "%", page)
-    expect("kevgate-admit coverage in the summary box", m.group(1) + "%", page, f"{len(top)} tests, {m.group(1)}% coverage")
+    expect("kevgate-admit coverage in the summary box", m.group(1) + "%", page, f"{len(top)} tests, {round(float(m.group(1)))}% coverage")
     vec = json.loads((ka / "internal" / "risk" / "testdata" / "parity_vectors.json").read_text(encoding="utf-8"))
     expect("kevgate-admit parity vectors", str(len(vec)), page, f"{len(vec)} generated vectors")
     try:
@@ -338,8 +338,7 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
             else:
                 fixed_found += found > 0
     reading = f"sinkline {vuln_found} of 3 detected ({fixed_found} false positives on fixes)"
-    expect("vulnlab sinkline result", reading, "index.html")
-    expect("vulnlab sinkline result on the projects page", reading, "projects/index.html")
+    expect("vulnlab sinkline result", f"sinkline reports {vuln_found} of the 3 bugs", "projects/vulnlab/index.html")
     ck = subprocess.run([py, "tools/sinkline_check.py"], cwd=vl, capture_output=True, text=True, env=env)
     results.append((ck.returncode == 0, f"vulnlab tools/sinkline_check.py exit {ck.returncode}"))
     sg = subprocess.run([pybin(venvs, "vulnlab", "sigma"), "check", *sorted(str(x.relative_to(vl)) for x in vl.glob("labs/*/detection/*.yml"))], cwd=vl, capture_output=True, text=True, env=env).stdout
@@ -367,7 +366,6 @@ def vulnlab_checks(clones: Path, venvs: dict[str, str]) -> None:
     rid = str(runs[0]["id"]) if runs else "?"
     results.append((bool(runs) and runs[0]["conclusion"] == "success", f"vulnlab main run on the tag commit {rid}: {runs[0]['name']!r} {runs[0]['conclusion']} sha {runs[0]['head_sha'][:7]}" if runs else "no runs"))
     expect("vulnlab tag-commit CI run on the page", rid, page, f"run {rid}")
-    expect("vulnlab tag-commit CI run on home", rid, "index.html", f"run {rid}")
 
     # the stored bench data equals a fresh run, and the page equals the stored data
     cap = subprocess.run([sys.executable, str(SITE / "scripts" / "capture_vulnlab_bench.py"), "--check", "--clone", str(vl)] + (["--venv", venvs["vulnlab"]] if "vulnlab" in venvs else []),
@@ -393,7 +391,7 @@ def kevgate_checks(clones: Path, venvs: dict[str, str]) -> None:
     expect("kevgate tag commit", tagsha[:7], page)
     n = collected(py, k)
     expect("kevgate tests", str(n), page, f"{n} collected")
-    expect("kevgate tests on resume page", str(n), "resume/index.html", f"{n} tests")
+    expect("kevgate tests in the overview", str(n), "projects/kevgate/index.html", f"{n} tests")
     cov = run([py, "-m", "pytest", "--cov", "-p", "no:cacheprovider"], k)
     m = re.search(r"Total coverage: ([\d.]+)%", cov)
     results.append((bool(m) and f"{n} passed" in cov, f"kevgate pytest --cov: {n} passed, coverage {m.group(1) if m else '?'}%"))
@@ -442,7 +440,7 @@ def kevgate_main_checks(clones: Path, py: str, page: str) -> None:
     m = re.search(r"(\d+) tests? collected", out)
     nm = int(m.group(1)) if m else sum(int(x) for x in re.findall(r": (\d+)$", out, re.M))
     expect("kevgate tests on main", f"main: {nm}", page)
-    expect("kevgate tests on main, resume page", f"main: {nm}", "resume/index.html")
+    expect("kevgate tests on main, overview", f"{nm} on main", "projects/kevgate/index.html")
     r = json.loads((km / "docs/real-run/results.json").read_text(encoding="utf-8"))
     c = r["cvss_only"]
     text = text_of(page)
@@ -452,7 +450,7 @@ def kevgate_main_checks(clones: Path, py: str, page: str) -> None:
         results.append((want in text, f"kevgate real-run {label}: {want!r} on the page"))
     ranks = r["equal_acr"]["kev_ranks"]
     results.append((max(ranks) == 10 and r["equal_acr"]["kev_in_top"]["10"] == r["kev_findings"] == 10, "kevgate real-run: all 10 KEV findings rank 1 to 10 in results.json"))
-    expect("kevgate real-run home line", f"All {r['kev_findings']} exploited flaws in the top 10 of {r['findings_total']:,} findings; a CVSS sort puts the first at about rank {round(c['mean_first_kev_rank'])}", "index.html")
+    expect("kevgate real-run home line", f"all {r['kev_findings']} exploited findings rank in the top 10 of {r['findings_total']:,}", "index.html")
 
 
 def main() -> int:
@@ -565,7 +563,6 @@ def main() -> int:
         cov = run([pybin(venvs, "tripline", "python"), "-m", "pytest", "-q", "-p", "no:cacheprovider", "--cov=tripline", "--cov-branch"], t)
         mcov = re.search(r"^TOTAL\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)%", cov, re.M)
         results.append((bool(mcov) and mcov.group(1) == "91", f"tripline coverage (line+branch) {mcov.group(1) + '%' if mcov else 'not measured'}, page says 91%"))
-        expect("tripline tests on resume page", str(n), "resume/index.html", f"{n} tests")
         code = (
             "from pathlib import Path\n"
             "from tripline.engine.rules import load_rules, evaluate\n"
@@ -592,9 +589,7 @@ def main() -> int:
                             f"F-001 counts from the fixture: {tot} events, {n_atk} attack events, {n_wrap} wrapper lines; stock flagged {s_atk}, replacement flagged {r_atk}"))
             expect("tripline stock rule on the attack events", f"{s_atk} of the {n_atk} attack events", "projects/tripline/index.html")
             expect("tripline replacement rule on the attack events", f"{r_atk} of {n_atk}", "projects/tripline/index.html")
-            expect("tripline hero reading on the home page", f"flagged {s_atk} of those {n_atk}", "index.html")
-            expect("tripline resume text", f"flagged {s_atk} of the {n_atk} attack events among {tot} recorded events", "resume/index.html")
-            expect("tripline about text", f"flagged {s_atk} of the {n_atk} attack events among {tot} recorded events", "about/index.html")
+            expect("tripline home blurb", f"flagged {s_atk} of {n_atk} attack events", "index.html")
         else:
             results.append((False, f"tripline F-001 derivation failed: {o}"))
         # tripline Rule bench: data file against the clone's rule YAML and the page text
@@ -697,7 +692,7 @@ def main() -> int:
     results.append(("f1291485808b66e20ddb6b01b10dc71b3df8c8ba" in readme and "1,230" in readme,
                     "bench/external/README.md pins BenchmarkPython f1291485 and 1,230 cases"))
     expect("BenchmarkPython pin (short) on the page", "f129148", page)
-    expect("sinkline home reading", "+0.21 to +0.52", "index.html")
+    expect("sinkline home blurb", "scores +0.52", "index.html")
     expect("sinkline release v0.5.1 commit", run(["git", "rev-list", "-n1", "v0.5.1"], s).strip()[:7], page)
 
     # sinkline Sanitizer switch: stored data against the committed captures (the CLI re-run is capture_sinkline_bench.py --check)
@@ -720,7 +715,7 @@ def main() -> int:
     k = clones / "kevgate"
     n = collected(pybin(venvs, "kevgate", "python"), k)
     expect("kevgate tests (main)", str(n), "projects/kevgate/index.html", f"{n} collected")
-    expect("kevgate tests on resume page", str(n), "resume/index.html", f"{n} tests")
+    expect("kevgate tests in the overview (main)", str(n), "projects/kevgate/index.html", f"{n} on main")
     tagsha = run(["git", "rev-list", "-n1", "v0.1.1"], k).strip()[:7]
     expect("kevgate v0.1.1 tag commit", tagsha, "projects/kevgate/index.html")
     for wf in ("ci", "security", "deploy-kind", "terraform", "release"):

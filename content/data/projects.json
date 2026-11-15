@@ -494,7 +494,19 @@
     "alt": "Left: a published SigmaHQ rule flagged 0 of 2 recorded setuid attack commands while the replacement rule written in this repo flagged 2 of 2. Right: weighted coverage across 14 ATT&CK scenarios is 52% on unmodified SigmaHQ rules and 98% with the rules written in this repo.",
     "caption": "A stock SigmaHQ rule flagged 0 of 2 real setuid attacks I recorded on a GitHub runner. The replacement rule written here flags 2 of 2 (finding F-001).",
     "full": "https://github.com/samiali38183/tripline/blob/main/docs/img/hero.png"
-   }
+   },
+   "blurb": "A CI gate for detection rules. It replays recorded ATT&CK telemetry through Sigma rules and fails the build when an expected rule stays quiet. The stock SigmaHQ setuid rule flagged 0 of 2 attack events in the recording; the replacement flags both.",
+   "label": "Recorded telemetry, replayed offline",
+   "og": {
+    "big": "0 of 2",
+    "line": "attack events flagged by the stock SigmaHQ setuid rule. The replacement rule flags 2 of 2."
+   },
+   "overview": [
+    "tripline is a CI gate for detection rules. It compiles Sigma rules to Python, replays recorded telemetry for 14 ATT&CK techniques through them on every pull request, and fails the build when a rule that should fire stays quiet. Version 0.3.0 adds a benign corpus, a sweep of evasion variants and a coverage figure split by who wrote the passing rules.",
+    "The result that started it: Atomic Red Team's T1548.001 tests were recorded on a GitHub-hosted Linux runner, giving 36 events, 2 of them the attack itself (two chmod executions). SigmaHQ's stock Setuid and Setgid rule flagged 0 of the 2. The replacement rule in the repository flags both.",
+    "Across the 14 scenarios, 13 pass and 1 (Windows) is pending. Weighted coverage is 98%, but 52% on unmodified SigmaHQ rules alone, because the rest depends on rules written in the repository. In the evasion sweep, 200 of 251 hand-written variants were caught, with 2 false-positive matches on a 675-event benign corpus.",
+    "All evidence is recorded telemetry replayed offline, one recording per scenario. It is a recall check, not a measure of live detection."
+   ]
   },
   "sinkline": {
    "slug": "sinkline",
@@ -845,7 +857,19 @@
     "alt": "Bar chart on OWASP BenchmarkPython, 240 vulnerable and 437 safe test cases. Real bugs found: sinkline 0.5.0 175 (73%), sinkline 0.4.1 99 (41%), Bandit 31 (13%), Semgrep 18 (8%). Safe cases wrongly flagged: sinkline 0.5.0 93 (21%), 0.4.1 89 (20%), Bandit 25 (6%), Semgrep 15 (3%).",
     "caption": "On an independent benchmark, sinkline 0.5.0 found 175 of 240 real bugs against 31 for Bandit and 18 for Semgrep, and it also flagged more safe code (21% of safe cases against 6% and 3%). 0.4.1, before I tuned on the suite's misses, found 99.",
     "full": "https://github.com/samiali38183/sinkline/blob/main/docs/img/hero.png"
-   }
+   },
+   "blurb": "A static taint analyzer for Python web apps. On the ten taint categories of OWASP BenchmarkPython it scores +0.52 (true-positive rate minus false-positive rate) against Bandit's +0.07, but the fixes were tuned on earlier failures, and Bandit leads over all 14 categories.",
+   "label": "Public benchmark, scored by the repository's own script",
+   "og": {
+    "big": "+0.52",
+    "line": "on 10 taint categories of OWASP BenchmarkPython, Bandit +0.07. Not held out. Bandit leads over all 14."
+   },
+   "overview": [
+    "sinkline is a static analyzer for Python web apps. It follows attacker-controlled input across functions and files and reports a finding only when the input reaches a dangerous call, such as a SQL query or a shell command, without a sanitizer for that bug class. It has 43 rules and 151 sink signatures mapped to OWASP Top 10 and CWE, SARIF output and a GitHub Action, and it has no dependencies.",
+    "It was measured on OWASP BenchmarkPython v0.1, a public suite of 240 vulnerable and 437 safe cases. The score is true-positive rate minus false-positive rate on the ten taint categories. Version 0.4.1 scored +0.21 (TPR 0.41, FPR 0.20) against Bandit's +0.07. Version 0.5.1 scores +0.52 (TPR 0.73, FPR 0.21).",
+    "Those fixes were chosen by reading the failures of 0.4.1 on the same suite, so +0.52 is not a held-out score. Over all 14 categories Bandit leads, +0.36 to +0.27. The false-positive rate stays high, and the scorer is the repository's own script, not the benchmark's official one.",
+    "A separate sample report page shows sinkline's HTML output."
+   ]
   },
   "kevgate": {
    "slug": "kevgate",
@@ -1037,7 +1061,19 @@
     "caption": "The engineering checks at v0.1.1: 277 tests at 99.92% branch coverage, plus 11 more checks (type checks, scanners, a cluster deploy), all green. v0.1.1: 277 tests; main: 298.",
     "full": "https://github.com/samiali38183/kevgate/blob/main/docs/img/hero.png",
     "label": "engineering checks"
-   }
+   },
+   "blurb": "A FastAPI intake service that ranks scanner findings by CISA KEV, EPSS, CVSS and asset criticality. On one real scan of four old public images, all 10 exploited findings rank in the top 10 of 1,112, partly by design because KEV is a score input.",
+   "label": "Real scan of four public images",
+   "og": {
+    "big": "10 of 10",
+    "line": "exploited findings in the top 10 of 1,112. A CVSS sort puts the first at about rank 40. One run; KEV is a score input."
+   },
+   "overview": [
+    "kevgate is a small FastAPI service that takes vulnerability scanner findings and returns a remediation queue ranked by CISA KEV listing, EPSS, CVSS and asset criticality. The repository also shows what shipping a small service carefully looks like: hashed, scoped API keys, rate limits, a hardened container, a Helm chart, Terraform and a GitHub Actions security pipeline that tests those controls.",
+    "Real-data run: a scan of four old public container images produced 1,112 findings, 10 of them on CISA's list of flaws being exploited. A CVSS-only sort puts the first of those at about rank 40 on average, and the 10 average rank 246. kevgate puts all 10 in the top 10. That is partly by design, since KEV listing is an input to the score, and it is one run.",
+    "Engineering check: six defects survived the test suite under mutation testing. Tests added in v0.1.1 kill all six, and the suite grew from 227 to 277 tests (298 on main).",
+    "Scope: one replica, SQLite, and Terraform applied only to LocalStack. Nothing is deployed to a real AWS account."
+   ]
   },
   "kevgate-admit": {
    "slug": "kevgate-admit",
@@ -1208,7 +1244,19 @@
     "alt": "Result of the kind cluster test: five demo workloads applied, three denied, one allowed and one admitted with a warning in audit mode, then the outage test showing that failurePolicy Fail rejects new Pods while the webhook is down and Ignore lets a Pod through that the policy would deny.",
     "caption": "What the cluster did with five demo workloads and during a webhook outage, from the e2e-kind CI transcript. The scan data is synthetic.",
     "full": "https://github.com/samiali38183/kevgate-admit/blob/main/docs/img/hero-e2e.png"
-   }
+   },
+   "blurb": "A Go admission webhook for Kubernetes. It denies or warns on workloads whose container images carry KEV-listed or over-threshold vulnerabilities, using kevgate's risk model. v0.1.0: 93 tests, 95% coverage, tested in a kind cluster with synthetic scan data.",
+   "label": "Synthetic scan data, kind cluster in CI",
+   "og": {
+    "big": "5 of 5",
+    "line": "weaknesses closed in v0.1.0, each with a test, a CI run or a recorded response."
+   },
+   "overview": [
+    "kevgate-admit is a Kubernetes validating admission webhook written in Go. When a workload is created it checks each container image against existing scan reports, using the same risk model as kevgate, and denies, warns or allows according to the namespace policy. It does not scan images itself.",
+    "Going back over the first version turned up five weaknesses: a malformed image reference was accepted, an option could drop a KEV finding, an outage was untested, scan evidence was unauthenticated and there was no published image. v0.1.0 closes all five, each with a test, a CI run or a recorded response. It adds strict image-reference parsing, optional signed scan reports and a signed image on GHCR. 93 tests, 95% coverage.",
+    "In the kind cluster test, five demo workloads gave three denials, one allowed workload and one admitted with a warning in audit mode. The outage test shows that failurePolicy Fail rejects new Pods while the webhook is down and Ignore lets through a Pod the policy would deny. The scan data is synthetic.",
+    "It does not verify image signatures at admission."
+   ]
   },
   "fuzzdiff": {
    "slug": "fuzzdiff",
@@ -1379,7 +1427,18 @@
     "alt": "Differential fuzzing result: 0 differences between the C parser and the Rust port in 90-second runs of 27,639,000 and 23,539,000 generated inputs, and 5 of 5 deliberately planted bugs detected by the harness.",
     "caption": "The C original and the Rust port gave the same answer on every generated input, and the harness caught all 5 bugs I planted to test it (random inputs never found one of them, so a hand-written case caught it). Sampling, not proof.",
     "full": "https://github.com/samiali38183/fuzzdiff/blob/main/docs/img/hero-differential.png"
-   }
+   },
+   "blurb": "picohttpparser ported from C to safe Rust and compared with the original and with httparse on the same input. No differences from C in 2,000,000 inputs, and 5 of 5 seeded bugs detected. No vulnerability found.",
+   "label": "Differential fuzzing, sampled",
+   "og": {
+    "big": "5 of 5",
+    "line": "seeded bugs detected. 0 differences from the C original in 2,000,000 inputs. No vulnerability found."
+   },
+   "overview": [
+    "fuzzdiff ports picohttpparser, an HTTP/1.x parser written in C, to safe Rust. The C original, the Rust port and a second parser (httparse) are then run on the same input, and every difference is reported. A rewrite can change behavior without anyone noticing; running the original next to the copy shows where.",
+    "To test the harness, 5 bugs were planted. The 0.1.0 tests missed 2 of them; v0.2.0 detects all 5, although one is caught only by a hand-built case because the random generator never builds that input. Against the C original there were 0 differences in 2,000,000 inputs. Against httparse, 609,278 inputs disagree, all in documented classes of leniency.",
+    "The fuzz runs are short smoke runs of two minutes per leg, and Miri covers the pure-Rust crate only. The Rust port is about 1.4x to 1.5x slower on head parsing, and the cause was not profiled. No vulnerability was found. This is sampling, not proof."
+   ]
   },
   "kev-risk-prioritization": {
    "slug": "kev-risk-prioritization",
@@ -1605,7 +1664,18 @@
     "alt": "Left: EPSS scores of 1,779 known-exploited CVEs against 5,000 others, medians 0.533 and 0.006, AUC 0.9515. Right: this tool puts all 100 KEV findings of a 2,000-row list in its top 100, EPSS alone puts 65 and asset criticality alone puts 10. Bottom: the AUC is partly circular and the weights are unvalidated.",
     "caption": "On the real KEV catalog and EPSS scores, EPSS separates known-exploited CVEs from the rest with an AUC of 0.9515, but that result is partly circular because EPSS is trained on exploitation data that overlaps with KEV, so it is not validation of either. The tool's 100 of 100 comes mostly from its weights.",
     "full": "https://github.com/samiali38183/kev-risk-prioritization/blob/main/docs/img/hero-real-data.png"
-   }
+   },
+   "blurb": "A standard-library Python script that ranks scan findings with a weighted score of its own design, known-exploited CVEs first. On 20 synthetic findings it puts 12 of 12 KEV findings in its top 12 where a CVSS sort puts 9. Not an implementation of BOD 26-04.",
+   "label": "Synthetic findings, real KEV and EPSS snapshot",
+   "og": {
+    "big": "12 vs 9",
+    "line": "KEV findings in the top 12 on 20 synthetic findings: risk score vs CVSS-only sort. Weights not validated."
+   },
+   "overview": [
+    "kev-risk-prioritization is a standard-library Python script that scores each finding from CISA KEV listing, asset criticality, EPSS and CVSS, using weights chosen by hand (0.40, 0.25, 0.20, 0.20), and sorts by that score. It is not an implementation of CISA BOD 26-04. Sorting by severity alone can bury the vulnerabilities attackers are already using; this orders them first.",
+    "On 20 synthetic findings, a CVSS-only sort puts 9 of the 12 known-exploited ones in its top 12 and the risk score puts all 12 there. That shows how the formula orders findings, not that it speeds up fixing.",
+    "On a real KEV and EPSS snapshot, EPSS separates known-exploited CVEs from the rest with an AUC of 0.9515. That result is partly circular, because EPSS is trained on exploitation data that overlaps with KEV, so it validates neither signal. The weights are unvalidated. kevgate supersedes this tool for the real-data case. The script uses only the CVSS and EPSS values supplied to it."
+   ]
   },
   "vulnlab": {
    "slug": "vulnlab",
@@ -1835,7 +1905,18 @@
     "alt": "Table for three labs (SSRF via redirect, SQL injection, IDOR). Proof and fix: 26, 9 and 37 lab tests pass. sinkline scan on vulnerable and fixed code: 1 and 1 findings for SSRF and SQL injection (a correct finding, then a false alarm on the fix), 0 and 0 for IDOR because it is not a taint flow. Sigma log rule: 1 alert on the attack log and 0 on the benign log for all three.",
     "caption": "All 137 tests pass. Each bug is proven on the vulnerable service and blocked on the fixed one, and the places where the static analyzer (sinkline) gets it wrong are left in and written up.",
     "full": "https://github.com/samiali38183/vulnlab/blob/main/docs/img/hero.png"
-   }
+   },
+   "blurb": "Three small Flask apps with one planted bug each: SSRF through a redirect, SQL injection in ORDER BY and a missing permission check. Each has an exploit test, a fix and a detection rule. Localhost only; 137 tests pass.",
+   "label": "Own code, loopback only",
+   "og": {
+    "big": "3 of 3",
+    "line": "fixes verified by the lab's own tests. SSRF, SQL injection in ORDER BY, IDOR. Localhost only."
+   },
+   "overview": [
+    "vulnlab is a localhost-only lab of three small Flask services, each with one textbook web bug: SSRF through a redirect, SQL injection in ORDER BY, and a missing object-level permission check (IDOR). Each lab has a fixed version, tests that show the impact on the vulnerable service and then fail against the fix, and a Sigma rule replayed on recorded logs. 137 tests pass.",
+    "It also records where static analysis is wrong. sinkline reports 2 of the 3 bugs and also reports both fixed versions of those two, which are false positives. It reports nothing on the permission check, because that bug is not a taint flow. The detection rules alert on the attempts in all three labs and fire on the fixed services too, because they see attempts, not impact.",
+    "The bugs were written for the lab and are simpler than real ones. There are no CVEs and no findings against real software, and the services bind to loopback only. This is a training lab, not vulnerability research."
+   ]
   }
  },
  "failed_first": [
@@ -2047,5 +2128,11 @@
     "https://github.com/samiali38183/kev-risk-prioritization/blob/main/CHANGELOG.md"
    ]
   }
+ ],
+ "home_order": [
+  "tripline",
+  "sinkline",
+  "kevgate",
+  "vulnlab"
  ]
 }

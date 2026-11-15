@@ -7,26 +7,25 @@
 <meta name="description" content="fuzzdiff v0.2.0 ports picohttpparser from C to safe Rust and checks it against the original and httparse with differential tests, Miri and libFuzzer.">
 <link rel="canonical" href="https://samiali38183.github.io/projects/fuzzdiff/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#F3EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sami Ali">
 <meta property="og:title" content="fuzzdiff: picohttpparser ported to safe Rust | Sami Ali">
 <meta property="og:description" content="fuzzdiff v0.2.0 ports picohttpparser from C to safe Rust and checks it against the original and httparse with differential tests, Miri and libFuzzer.">
 <meta property="og:url" content="https://samiali38183.github.io/projects/fuzzdiff/">
-<meta property="og:image" content="https://samiali38183.github.io/assets/og.png">
+<meta property="og:image" content="https://samiali38183.github.io/assets/og/fuzzdiff.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta property="og:image:alt" content="fuzzdiff: 5 of 5 seeded bugs detected. 0 differences from the C original in 2,000,000 inputs. No vulnerability found.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="fuzzdiff: picohttpparser ported to safe Rust | Sami Ali">
 <meta name="twitter:description" content="fuzzdiff v0.2.0 ports picohttpparser from C to safe Rust and checks it against the original and httparse with differential tests, Miri and libFuzzer.">
-<meta name="twitter:image" content="https://samiali38183.github.io/assets/og.png">
-<meta name="twitter:image:alt" content="0 of 2: the stock rule flagged none of the 2 attack events among 36 recorded events. Two strips of 36 ticks show the 2 attack events hatched in the top row (before) and filled in the bottom row (after).">
+<meta name="twitter:image" content="https://samiali38183.github.io/assets/og/fuzzdiff.png">
+<meta name="twitter:image:alt" content="fuzzdiff: 5 of 5 seeded bugs detected. 0 differences from the C original in 2,000,000 inputs. No vulnerability found.">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/bench-fuzzdiff.css">
-<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -39,23 +38,17 @@
 <li><a href="/experience/">Experience</a></li>
 <li><a href="/about/">About</a></li>
 <li><a href="/resume/">Resume</a></li>
-<li><button type="button" id="theme" aria-pressed="false" hidden>Dark mode</button></li>
 </ul>
 </nav>
 </div>
-<p class="wrap sheetline"><b>Project 6 of 7</b> &middot; fuzzdiff &middot; v0.2.0</p>
 </header>
 <main id="main" class="wrap">
 <div class="sheet">
 <header class="title has-hero">
+<p class="crumb"><a href="/projects/">Work</a> <span aria-hidden="true">/</span> Memory safety and fuzzing, Rust <span class="ver">v0.2.0</span></p>
 <h1>fuzzdiff</h1>
-<dl class="plain">
-<div><dt>What it does</dt><dd>picohttpparser is an HTTP parser written in C. It was ported to safe Rust, then the C original, the port and a third parser (httparse) were run on the same input.</dd></div>
-<div><dt>Why it matters</dt><dd>A rewrite can change behavior without anyone noticing. Running the original next to the copy shows where.</dd></div>
-<div class="pf"><dt>What was found</dt><dd>5 bugs were planted to see whether the checks would notice. The 0.1.0 tests missed 2; 0.2.0 catches all 5. Against the C original there were 0 differences in 2,000,000 inputs. No vulnerability was found.</dd></div>
-</dl>
-<p class="row cta"><a class="btn" href="#try">See it</a> <a class="btn alt" href="#limits">Read the limits</a></p>
-<ul class="linkrow"><li><a href="https://github.com/samiali38183/fuzzdiff">Repository</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0">Release v0.2.0</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/tree/main/docs">Docs</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">httparse comparison</a></li><li><a href="#trace">CI runs</a></li></ul>
+<div class="overview prose"><p>fuzzdiff ports picohttpparser, an HTTP/1.x parser written in C, to safe Rust. The C original, the Rust port and a second parser (httparse) are then run on the same input, and every difference is reported. A rewrite can change behavior without anyone noticing; running the original next to the copy shows where.</p><p>To test the harness, 5 bugs were planted. The 0.1.0 tests missed 2 of them; v0.2.0 detects all 5, although one is caught only by a hand-built case because the random generator never builds that input. Against the C original there were 0 differences in 2,000,000 inputs. Against httparse, 609,278 inputs disagree, all in documented classes of leniency.</p><p>The fuzz runs are short smoke runs of two minutes per leg, and Miri covers the pure-Rust crate only. The Rust port is about 1.4x to 1.5x slower on head parsing, and the cause was not profiled. No vulnerability was found. This is sampling, not proof.</p></div>
+<ul class="linkrow"><li><a href="#try">See it</a></li><li><a href="#limits">Limits</a></li><li><a href="https://github.com/samiali38183/fuzzdiff">Repository</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0">Release v0.2.0</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/tree/main/docs">Docs</a></li><li><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">httparse comparison</a></li><li><a href="#trace">CI runs</a></li></ul>
 
 <figure class="hero-fig page-hero"><div class="hero-card"><a class="hero-zoom" href="/assets/img/hero-fuzzdiff.png" aria-label="Open the fuzzdiff result image at full size"><img src="/assets/img/hero-fuzzdiff.png" width="1800" height="1120" alt="Differential fuzzing result: 0 differences between the C parser and the Rust port in 90-second runs of 27,639,000 and 23,539,000 generated inputs, and 5 of 5 deliberately planted bugs detected by the harness." fetchpriority="high" decoding="async"></a></div><figcaption>The C original and the Rust port gave the same answer on every generated input, and the harness caught all 5 bugs I planted to test it (random inputs never found one of them, so a hand-written case caught it). Sampling, not proof.</figcaption></figure>
 </header>
@@ -83,15 +76,7 @@
 <figcaption><b>With default settings picohttpparser and fuzzdiff return the same result on every input here, except the two seeded-bug rows and the strict-mode row (documented deviation D1); httparse, a different parser, differs from both in a fixed set of documented classes.</b> Recorded, not live: every result was returned by the parser named, on the bytes shown (fuzzdiff 0.2.0, tag v0.2.0, commit 6ec1e6e; picohttpparser dd573d8; httparse 1.10.1 (default configuration); 64 header slots for all three; Windows, release build, MSVC build of the C code), run 2026-11-11 with <code>scripts/capture_fuzzdiff_bench.py</code>. The page runs no parser. The httparse column covers head parsing and, for chunked bodies, only the first chunk-size line. The two seeded-bug rows run the Rust parser with a test-only bug switched on; the shipped parser has none.</figcaption>
 </figure>
 </section>
-<section class="glance" aria-label="At a glance">
-<dl>
-<div><dt>Checked against</dt><dd>The C original and httparse, same bytes</dd></div>
-<div><dt>Before and after</dt><dd><span class="gl">Before</span> 2 of 5 seeded bugs not noticed by the 0.1.0 tests; harness accepted any folded-header error as expected (PR #2)<br><span class="gl">After</span> 5 of 5 detected; 0 differences from C in 2,000,000 inputs; 609,278 disagree with httparse, all in documented classes</dd></div>
-<div><dt>Limits</dt><dd>Smoke fuzzing (120 s per leg); Miri on the pure-Rust crate only; no vulnerability found <a href="#limits">Full limits</a></dd></div>
-</dl>
-</section>
-<details class="fold fold-rec"><summary>Technical description and how the check was run: version, reference, date, how to reproduce</summary><p class="dek tech">picohttpparser, an HTTP/1.x parser written in C, ported to safe Rust and checked by running the C original, the Rust port and a second parser (httparse) on the same input and reporting every difference.</p>
-<section class="record-head" aria-label="Verification record">
+<details class="fold fold-rec"><summary>How the check was run: version, reference, date, how to reproduce</summary><section class="record-head" aria-label="Verification record">
 <dl>
 <div><dt>Version tested</dt><dd>fuzzdiff v0.2.0 (tag, commit 6ec1e6e, released 2026-11-11)</dd></div>
 <div><dt>Checked against</dt><dd>the C original, picohttpparser commit dd573d8, run on the same bytes; httparse 1.10.1 as a second parser for the head-parsing comparison</dd></div>
@@ -222,7 +207,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 </section>
 </article>
 <section class="limits section" id="limits" aria-labelledby="limits-h">
-<h2 id="limits-h"><span class="label sec-label">Limits</span>What these numbers do not show</h2>
+<h2 id="limits-h">Limits</h2>
 <ul class="prose">
 <li>The fuzz runs are short. Two minutes per leg is a smoke run, not assurance, and the libFuzzer targets never reach the overhead guard or the <code>last_len</code> case (D2). No 32-bit or big-endian target has been run.</li>
 <li>I did not find a new vulnerability. picohttpparser has no published security advisory, the httparse differences are leniency choices and not defects in the C code, and the advisories in <a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/CVE_CLASSES.md">CVE_CLASSES.md</a> are examples of bug classes, mostly from other parsers.</li>
@@ -236,7 +221,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 </section>
 <section class="section fold-sec" id="trace" aria-labelledby="trace-h">
 <details class="fold fold-main"><summary><span class="label sec-label">Evidence</span><h2 id="trace-h">Where each number comes from</h2><span class="fold-hint">8 links</span></summary>
-<p class="prose muted">Chips show the state of each GitHub Actions run as captured when this page was built. The page does not call GitHub at runtime.</p>
+<p class="prose muted">Run states were captured when the site was built.</p>
 <dl class="trace"><div><dt>Tests, sanitizers, Miri, coverage (ci on main)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037960324"><span class="st" aria-hidden="true"></span><span>run 43037960324</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Fuzz run with the counts below (pull request 3)</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43035685955"><span class="st" aria-hidden="true"></span><span>run 43035685955</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Last fuzz run of pull request 3</dt><dd><a class="chip" data-s="pass" href="https://github.com/samiali38183/fuzzdiff/actions/runs/43037421227"><span class="st" aria-hidden="true"></span><span>run 43037421227</span> <span class="d">passed 2026-11-11</span></a></dd></div><div><dt>Release</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/releases/tag/v0.2.0">v0.2.0</a></dd></div><div><dt>Harness fix</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/pull/2">pull request #2</a></dd></div><div><dt>Three-way comparison</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DIFFERENTIAL_HTTPARSE.md">docs/DIFFERENTIAL_HTTPARSE.md</a></dd></div><div><dt>Deviations</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/DEVIATIONS.md">docs/DEVIATIONS.md</a></dd></div><div><dt>Findings</dt><dd><a href="https://github.com/samiali38183/fuzzdiff/blob/main/docs/FINDINGS.md">docs/FINDINGS.md</a></dd></div></dl>
 <h3>CI evidence</h3>
 <div class="scroll wide"><table class="tbl">
@@ -251,7 +236,7 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <p class="small muted prose">The fuzz workflow runs on pull requests, weekly and on request, not on every push to <code>main</code>, so the newest fuzz run is the one for the pull request that became 0.2.0. Bench data and the program that produced it: <code>assets/data/fuzzdiff-bench.json</code>, <code>scripts/capture_fuzzdiff_bench.py</code>, <code>scripts/test_bench_fuzzdiff.mjs</code>.</p>
 </details>
 </section>
-<nav class="sheets" aria-label="Sheets"><a class="prev" href="/projects/kevgate-admit/"><span class="label">Previous project, 5 of 7</span><span class="n">kevgate-admit</span></a><a class="next" href="/projects/kev-risk-prioritization/"><span class="label">Next project, 7 of 7</span><span class="n">kev-risk-prioritization</span></a></nav>
+<nav class="sheets" aria-label="Other projects"><a class="prev" href="/projects/kevgate-admit/"><span class="label">Previous</span><span class="n">kevgate-admit</span></a><a class="next" href="/projects/kev-risk-prioritization/"><span class="label">Next</span><span class="n">kev-risk-prioritization</span></a></nav>
 </div>
 </main>
 <footer class="site-footer">
@@ -260,9 +245,9 @@ mutants.rs     3 lines   0 missed           # 492 lines, 22 missed: 95.53%</code
 <li><a href="mailto:samiali38183@gmail.com">samiali38183@gmail.com</a></li>
 <li><a href="https://github.com/samiali38183">GitHub</a></li>
 <li><a href="https://www.linkedin.com/in/sami-ali-1a4b89345">LinkedIn</a></li>
-<li><a href="/resume.pdf">Resume (PDF)</a></li>
+<li><a href="/resume/">Resume</a></li>
 </ul>
-<p>Static site, no tracking, no cookies. Source: <a href="https://github.com/samiali38183/samiali38183.github.io">samiali38183.github.io</a>.</p>
+<p>Static site, no tracking or cookies. <a href="https://github.com/samiali38183/samiali38183.github.io">Source</a></p>
 </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>
