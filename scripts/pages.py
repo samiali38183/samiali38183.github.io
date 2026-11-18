@@ -183,7 +183,7 @@ CALL_KETTLE = {
 }
 EXPERIENCE = [
     "Matched Nessus/Tenable scan results against CISA's Known Exploited Vulnerabilities (KEV) catalog to find high-risk systems and aged findings.",
-    "Designed a risk-based prioritization method weighing KEV status, asset criticality, exposure, EPSS (exploit likelihood) and CVSS (severity); benchmarked remediation against CISA directive BOD 26-04 timelines.",
+    "Designed a risk-based prioritization method weighing KEV status, asset criticality, exposure, EPSS (exploit likelihood) and CVSS (severity), because severity alone does not show which flaws attackers are exploiting; benchmarked remediation against CISA directive BOD 26-04 timelines.",
     "Built a multi-page Power BI dashboard and an executive briefing on actively exploited vulnerabilities for technical and leadership audiences.",
     "Wrote remediation recommendations aligned with NIST CSF.",
 ]
