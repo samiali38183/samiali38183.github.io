@@ -172,7 +172,8 @@ ABOUT = [
     "I build detection and application-security tooling because a rule or a scanner that has never been run against real input only looks like coverage. "
     "I would rather find the miss myself, write it down and fix it than learn about it during an incident, so each project here carries a record of what it got wrong.",
     "I'm working toward a B.S. in Information Technology with a cybersecurity minor at George Mason University, expected May 2028. "
-    "I hold Security+ and the AWS Cloud Practitioner certification, and I am studying for OSCP and the AWS Certified Security - Specialty."]
+    "I hold Security+ and the AWS Cloud Practitioner certification, and I am studying for OSCP and the AWS Certified Security - Specialty. "
+    "Outside of coursework I spend most of my time reading other people's exploits and detection rules, then rebuilding the idea myself to see where it actually breaks."]
 CALL_KETTLE = {
     "name": "call-kettle", "kind": "AI agent security, Python", "url": "/projects/call-kettle/", "repo": GH + "/call-kettle",
     "blurb": "Phone receptionist backend (FastAPI, Twilio, Claude tool use) where the model only proposes actions and server code authorizes each one. "
